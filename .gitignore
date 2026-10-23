@@ -1,0 +1,19 @@
+# 各リポジトリの作業コピー。独立した git リポジトリなので、
+# ここで `git add` すると gitlink（submodule もどき）として登録されてしまう。それを防ぐ。
+# 秘匿が目的ではない。clone しても中身は入らない。
+/mcp/
+/lib/
+/skill/
+/app/
+
+# S1000D の仕様書・スキーマ・公式サンプル（利用条件により再配布不可。D-03・D-06）
+/specs/
+*.zip
+
+# stack.json 生成やサイトのビルドで出るもの
+node_modules/
+site/dist/
+site/.astro/
+
+# macOS
+.DS_Store
