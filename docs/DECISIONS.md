@@ -52,7 +52,7 @@ GitHub はすべて Private で作成済みです。
 | 種類 | 段階 | GitHub | npm | ローカル |
 |---|---|---|---|---|
 | hub | 1 | `shuji-bonji/s1000d-stack` | — | `/Users/bonji/workspace/shuji-bonji/s1000d-stack` |
-| ライブラリ（未作成） | 1 | `shuji-bonji/s1000d-core` | `@shuji-bonji/s1000d-core` | `s1000d-stack/lib/s1000d-core` |
+| ライブラリ | 1 | `shuji-bonji/s1000d-core`（GitHub 未作成。ローカルは 2026-10-23 に作成、未コミット） | `@shuji-bonji/s1000d-core`（未公開） | `s1000d-stack/lib/s1000d-core` |
 | MCP | 1 | `shuji-bonji/s1000d-brex-mcp` | `@shuji-bonji/s1000d-brex-mcp` | `s1000d-stack/mcp/s1000d-brex-mcp` |
 | MCP | 2 | `shuji-bonji/s1000d-reader-mcp` | `@shuji-bonji/s1000d-reader-mcp` | `s1000d-stack/mcp/s1000d-reader-mcp` |
 | MCP | 2 | `shuji-bonji/s1000d-verify-mcp` | `@shuji-bonji/s1000d-verify-mcp` | `s1000d-stack/mcp/s1000d-verify-mcp` |
@@ -124,6 +124,13 @@ flowchart LR
 
 計画を立てたチャットで検討した案をそのまま記録しています。異論があれば変更します。
 
+### D-12 XML は @xmldom/xmldom、XPath は fontoxpath で評価する（2026-10-23）
+
+- s1000d-core の XML 層は `@xmldom/xmldom`（DOM）＋ `fontoxpath`（XPath 3.1）で実装します。両方を `XmlEngine` インターフェースの後ろに置き、差し替えられる形にします。
+- 理由: 2026-10-23 の実測で、Issue 7 の既定 BREX の `objectPath` 274 件のうち 1 件が XPath 2.0 の構文（`for … return some … satisfies`）で書かれており、XPath 1.0 だけの `xpath` パッケージでは評価できませんでした（もう 1 件は `not (` の空白を受け付けない `xpath` 側の不具合）。`fontoxpath` は 274 件すべてを構文解析・評価でき、`@xmldom/xmldom` の Document をそのまま文脈に取れます（slimdom は不要）。Bike Samples 106 件 × 該当ルールの評価 25,758 回は約 8 秒で、`xpath` と同じ結果でした。
+- 実装上の注意: `fontoxpath` の `ANY_TYPE` は結果が節点 1 つのとき配列ではなく節点そのものを返す。`@xmldom/xmldom` 0.9 は致命的な構文エラーを `onError` に渡さず `ParseError` を投げる。どちらも `XmlEngine` の実装で正規化済み。
+- XSD 検証の方式は決めていません（U-08 に残す）。
+
 ## 未決事項
 
 | ID | 内容 | 判断の材料 |
@@ -135,7 +142,7 @@ flowchart LR
 | U-05 | 作成ツール・閲覧ソフトの製品名 | 一般の利用者向けの名前にする |
 | U-06 | Starlight の日本語検索の精度 | Pagefind で日本語ページを検索して確認する |
 | U-07 | Issue 4.2 に対応する時期 | 段階 2 で reader を作るときに判断する。Issue 4.2 以降の ICN メタデータファイル（IMF）を reader の対象に含めるかも一緒に判断する |
-| U-08 | XML の読み取りと XSD 検証の方式 | 下記「U-08 の判断材料」 |
+| U-08 | XSD 検証の方式（段階 2）。XML の読み取りと XPath は D-12 で決定済み | 下記「U-08 の判断材料」。候補は `xmllint-wasm` と `libxml2-wasm` |
 | U-09 | Skill のリポジトリ名の規則 | houki-hub に倣うなら `s1000d-<名前>-skill`（例: `s1000d-review-skill`）。段階 3 で Skill を作るときに決める |
 
 ### U-08 の判断材料
@@ -155,10 +162,9 @@ BREX のルールは `objectPath` に XPath で対象を書くため、XML を D
 
 libxml2 本体は、長年の保守担当者が退いて「公式に保守されていない」状態と報じられています。wasm 版もネイティブ版も libxml2 を包んでいるため、この懸念は共通です。
 
-案（まだ決定ではありません）:
+経過:
 
-1. 段階 1 の BREX 照合は XPath 1.0 で足りるので、純粋な JS（`@xmldom/xmldom` ＋ `xpath`）で始める。ネイティブも wasm も要らず、XPath 1.0 は仕様が固定なので保守の心配が小さい。
-2. s1000d-core の中で「XML を読んで XPath を評価する」部分を 1 つのインターフェースの後ろに置き、後で差し替えられるようにする。
-3. XSD 検証（段階 2）の方式は、そのときに `xmllint-wasm` と `libxml2-wasm` を比べて決める。純粋な JS で S1000D 規模の XSD 1.0 を検証できる実績のあるライブラリは見当たらない。
+1. 当初は「XPath 1.0 で足りる」と見て `xpath` パッケージを候補にしたが、既定 BREX に XPath 2.0 の式が含まれることが実測で分かり、`fontoxpath` に決めた（D-12）。
+2. 残るのは XSD 検証（段階 2）の方式。純粋な JS で S1000D 規模の XSD 1.0 を検証できる実績のあるライブラリは見当たらないため、`xmllint-wasm` と `libxml2-wasm` を段階 2 で比べる。libxml2 本体の保守状況の懸念は両者に共通する。
 
 出典: [libxml2-wasm（GitHub）](https://github.com/jameslan/libxml2-wasm)、[xmllint-wasm（GitHub）](https://github.com/notengrafik/xmllint-wasm)、[libxmljs2 の README](https://cdn.jsdelivr.net/npm/libxmljs2@0.37.0/README.md)、[libxml2 が保守されなくなったという報道](https://www.linux.org/threads/linuxiac-libxml2-becomes-officially-unmaintained-after-maintainer-steps-down.59832/latest)
