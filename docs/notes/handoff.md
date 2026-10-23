@@ -47,7 +47,7 @@ cd site && npm run build && npm run preview
 
 ## 次にやること（候補の順）
 
-1. **利用者側**: サイト 9 ページの通読（`cd site && npm run build && npm run preview`）。段階 1 の最後の完了条件。
+1. **利用者側**: サイト 9 ページの通読（`cd site && npm run build && npm run preview`）。段階 1 の最後の完了条件。ページごとの根拠と確認方法、機械的確認の結果は [notes/site-review.md](./site-review.md)（2026-10-24）にある。
 2. **U-01（公開の時期）** を決める。hub を Public にするなら `deploy.yml` の push トリガーを戻し、GitHub Pages（Source: GitHub Actions）を有効にする。brex-mcp を npm に出すなら、初回は手動 publish、以後は Trusted Publisher（D-14）。
 3. **段階 2 の入口**: U-08（XSD 検証の方式。候補 `xmllint-wasm` と `libxml2-wasm`。判断材料は DECISIONS.md）を比較して決める → s1000d-reader-mcp / s1000d-verify-mcp / manual-model の設計。
 4. **調査の宿題**: Bike Samples 105 件に既定 BREX への違反 55 件が出る原因（既定 BREX の厳しさか、サンプルの不備か）。学習サイトの題材になる。
@@ -58,6 +58,7 @@ cd site && npm run build && npm run preview
 2. DECISIONS.md（D-01〜D-14 と未決 U-01〜U-09）
 3. notes/background.md（仕様書の読解結果、配布物のファイル構成、設計のヒント）
 4. このメモ
+5. notes/site-review.md（サイト通読用の照合シート。通読が済んだら不要）
 
 > [!NOTE]
 > 文章は GitHub のアラート記法（`> [!NOTE]` など）を使い、日付は JST で書きます。既定 BREX の DMC は `S1000D-Y-04-10-0301-00A-022A-D` で、システム差異コード（Y）が配布物のファイル名・仕様書本文・データ辞書で食い違うため、コードでは決め打ちしていません。

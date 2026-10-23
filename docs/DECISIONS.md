@@ -84,7 +84,7 @@ MCP の 4 つのリポジトリは作成済みですが、中身はまだ空で�
 - 他のリポジトリと同じ Node と TypeScript の環境で動き、全文検索（Pagefind）や目次などドキュメントサイトに必要な機能が揃っているためです。
 - MkDocs（Material for MkDocs）は 2026-11-05 に保守終了予定のため採用しません。
 - VitePress は使いません。
-- **見た目は Starlight の既定のまま使います（2026-10-24 追記）。** コミュニティのテーマ（`starlight-theme-rapide` など、いずれも Starlight 0.42 対応）と、スターターテンプレートの Varsha（ランディングページ＋ Starlight 0.42.5 ＋ブログ。MIT だが「Built with varsha」の表記を残す条件付き、Star 2）を検討しましたが、サイト全体のバランスを崩さないため当面は導入しません。調整は `site/src/styles/custom.css` だけで行います。テーマは `astro.config.mjs` の `plugins` に 1 行足せば後から入れられます。
+- **テーマは `starlight-theme-rapide` を使います（2026-10-24 追記、同日改定）。** 当初は Starlight の既定の見た目のままとしていましたが、同日に `site/astro.config.mjs` の `plugins` に `starlightThemeRapide()` を追加して採用しました（`site/package.json` の依存は `starlight-theme-rapide` ^0.6.0、Starlight 0.42 対応）。スターターテンプレートの Varsha（ランディングページ＋ Starlight 0.42.5 ＋ブログ。MIT だが「Built with varsha」の表記を残す条件付き、Star 2）は採用しません。細かな調整は `site/src/styles/custom.css` で行います。
 
 ### D-08 最初の成果物は BREX MCP（2026-10-22）
 
@@ -121,15 +121,15 @@ flowchart LR
 |---|---|
 | コード（s1000d-core、各 MCP、app、scripts） | MIT |
 | 学習サイトの文章（`site/`） | CC BY 4.0 |
-| 自作のサンプルデータ（券売機の例など） | MIT または CC0 |
+| 自作のサンプルデータ（券売機の例など） | MIT（2026-10-24 に確定。当初は MIT または CC0） |
 
-計画を立てたチャットで検討した案をそのまま記録しています。異論があれば変更します。
+計画を立てたチャットで検討した案を記録し、2026-10-24 にサンプルデータのライセンスを MIT に確定しました。
 
 ### D-12 XML は @xmldom/xmldom、XPath は fontoxpath で評価する（2026-10-23）
 
 - s1000d-core の XML 層は `@xmldom/xmldom`（DOM）＋ `fontoxpath`（XPath 3.1）で実装します。両方を `XmlEngine` インターフェースの後ろに置き、差し替えられる形にします。
 - 理由: 2026-10-23 の実測で、Issue 7 の既定 BREX の `objectPath` 274 件のうち 1 件が XPath 2.0 の構文（`for … return some … satisfies`）で書かれており、XPath 1.0 だけの `xpath` パッケージでは評価できませんでした（もう 1 件は `not (` の空白を受け付けない `xpath` 側の不具合）。`fontoxpath` は 274 件すべてを構文解析・評価でき、`@xmldom/xmldom` の Document をそのまま文脈に取れます（slimdom は不要）。Bike Samples 106 件 × 該当ルールの評価 25,758 回は約 8 秒で、`xpath` と同じ結果でした。
-- 実装上の注意: `fontoxpath` の `ANY_TYPE` は結果が節点 1 つのとき配列ではなく節点そのものを返す。`@xmldom/xmldom` 0.9 は致命的な構文エラーを `onError` に渡さず `ParseError` を投げる。どちらも `XmlEngine` の実装で正規化済み。
+- 実装上の注意: `fontoxpath` の `ANY_TYPE` は結果が節点 1 つのとき配列ではなく節点そのものを返す。また `ANY_TYPE` で属性を選ぶと節点ではなく文字列に原子化して返すため、違反箇所の行番号を保つには先に節点集合として評価する（`xml/xmldom-fontoxpath.ts`）。`@xmldom/xmldom` 0.9 は致命的な構文エラーを `onError` に渡さず `ParseError` を投げる。どちらも `XmlEngine` の実装で正規化済み。
 - XSD 検証の方式は決めていません（U-08 に残す）。
 
 ### D-13 MCP サーバーは MCP SDK v2 で書く（2026-10-23）
@@ -148,7 +148,7 @@ flowchart LR
 
 | ID | 内容 | 判断の材料 |
 |---|---|---|
-| U-01 | 最初の公開の時期 | 「すべて揃った時点」と「段階 1 の 3 つが揃った時点」のどちらにするか。BREX を扱う MCP は他に無いこと、Zenn Book「IETM入門」を公開済みであることは早い公開の理由になる。「揃った」の条件には、サイトの BREX・データモジュールの説明を仕様書と照合済みであることを含める。**2026-10-24 時点**: s1000d-core は公開済み。hub は Private のため GitHub Pages を有効にできず（Free プラン）、`deploy.yml` は `workflow_dispatch` だけにしてある。hub を Public にするときに push トリガーを戻す |
+| U-01 | 最初の公開の時期 | 「すべて揃った時点」と「段階 1 の 3 つが揃った時点」のどちらにするか。BREX を扱う MCP は他に無いこと、Zenn Book「IETM入門」を公開済みであることは早い公開の理由になる。「揃った」の条件には、サイトの BREX・データモジュールの説明を仕様書と照合済みであることを含める。**2026-10-24 時点**: s1000d-core は公開済み。hub は Private のため GitHub Pages を有効にできず（Free プラン）、`deploy.yml` は `workflow_dispatch` だけにしてある。hub を Public にするときに push トリガーを戻す。brex-mcp を npm に公開したら、サイトの `guide/getting-started.md` と `mcp/brex-mcp.md` にある「npm 未公開（開発中）」の note を 2 つとも消す |
 | ~~U-02~~ | Issue 7 の利用条件の全文に、再配布や組み込みについての特別な許可があるか | **解決（2026-10-23）**: 無い。「Special usage rights」の対象は 8 区分の団体・企業・機関に限られる。D-03 に反映済み |
 | U-03 | 自作サンプルデータを共有パッケージに切り出す時期 | 2 つ目の MCP がテストで使い始めた時点を目安にする |
 | U-04 | 共通データモデルのパッケージ名 | `manual-model` は仮称 |

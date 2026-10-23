@@ -180,7 +180,7 @@ flowchart TB
 - Mermaid は `astro-mermaid`（クライアント側で描画、テーマ追従）。Starlight より前に integrations に置く必要がある。
 - Pagefind の日本語検索は、単語単位では期待どおり。複合語はそのままだと同じつながりのページしか返らない（U-06 の注記）。
 - GitHub Pages は、Free プランの Private リポジトリでは有効にできない（`actions/configure-pages` が `Get Pages site failed … Not Found` で止まる）。hub が Private の間は `deploy.yml` を `workflow_dispatch` だけにし、`cd site && npm run build && npm run preview` で確認する。
-- テーマは入れない（D-07 追記）。候補と比較結果は D-07 を参照。
+- テーマは `starlight-theme-rapide`（D-07 追記）。検討した候補は D-07 を参照。
 
 ## 利用条件（Issue 7）の確認結果
 
