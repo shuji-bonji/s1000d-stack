@@ -1,7 +1,8 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import mermaid from 'astro-mermaid';
+import { defineConfig } from 'astro/config';
+import starlightThemeRapide from 'starlight-theme-rapide';
 
 // GitHub Pages（https://shuji-bonji.github.io/s1000d-stack/）で公開する前提の設定。
 // ローカルで `npm run dev` するときも同じ base で動く。
@@ -20,7 +21,11 @@ export default defineConfig({
         root: { label: '日本語', lang: 'ja' },
       },
       social: [
-        { icon: 'github', label: 'GitHub', href: 'https://github.com/shuji-bonji/s1000d-core' },
+        {
+          icon: 'github',
+          label: 'GitHub',
+          href: 'https://github.com/shuji-bonji/s1000d-core',
+        },
       ],
       editLink: {
         baseUrl: 'https://github.com/shuji-bonji/s1000d-stack/edit/main/site/',
@@ -31,7 +36,10 @@ export default defineConfig({
           label: 'S1000D を知る',
           items: [
             { label: 'IETM と S1000D', slug: 'guide/ietm-and-s1000d' },
-            { label: 'データモジュールと DMC', slug: 'guide/data-module-and-dmc' },
+            {
+              label: 'データモジュールと DMC',
+              slug: 'guide/data-module-and-dmc',
+            },
             { label: 'BREX（ビジネスルール交換）', slug: 'guide/brex' },
           ],
         },
@@ -53,6 +61,7 @@ export default defineConfig({
       customCss: ['./src/styles/custom.css'],
       lastUpdated: true,
       pagination: true,
+      plugins: [starlightThemeRapide()],
     }),
   ],
 });
