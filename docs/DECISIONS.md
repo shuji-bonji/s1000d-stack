@@ -51,7 +51,7 @@ GitHub は s1000d-core を除き Private です（s1000d-core は 2026-10-24 に
 
 | 種類 | 段階 | GitHub | npm | ローカル |
 |---|---|---|---|---|
-| hub | 1 | `shuji-bonji/s1000d-stack` | — | `/Users/bonji/workspace/shuji-bonji/s1000d-stack` |
+| hub | 1 | `shuji-bonji/s1000d-stack`（Private。サイトは GitHub Pages `https://shuji-bonji.github.io/s1000d-stack/` で公開予定） | — | `/Users/bonji/workspace/shuji-bonji/s1000d-stack` |
 | ライブラリ | 1 | `shuji-bonji/s1000d-core`（**Public**、2026-10-24） | `@shuji-bonji/s1000d-core` **0.1.0 公開済み**（2026-10-24） | `s1000d-stack/lib/s1000d-core` |
 | MCP | 1 | `shuji-bonji/s1000d-brex-mcp`（ローカルは 2026-10-23 に作成、未コミット） | `@shuji-bonji/s1000d-brex-mcp`（未公開） | `s1000d-stack/mcp/s1000d-brex-mcp` |
 | MCP | 2 | `shuji-bonji/s1000d-reader-mcp` | `@shuji-bonji/s1000d-reader-mcp` | `s1000d-stack/mcp/s1000d-reader-mcp` |
@@ -137,6 +137,12 @@ flowchart LR
 - `initialize` の `instructions` に「しないこと」（XSD 検証をしない、準拠を判定しない、重大度を解釈しない、仕様書を同梱しない）を先に書きます（shuji-mcp-patterns §G）。
 - Node は 22 以上（SDK v2 の要件）。
 
+### D-14 npm への公開は Trusted Publisher で行う（2026-10-24）
+
+- 各パッケージの公開は、`v*` の tag を push したときに GitHub Actions が OIDC で `npm publish --provenance --access public` を実行する方式にします（houki-abbreviations の `publish.yml` と同じ）。`NPM_TOKEN` は Secrets に置きません。
+- Trusted Publisher は既存パッケージにしか設定できないため、各パッケージの **初回だけは手動で** `npm publish --access public` を行い、その後に npm 側で Trusted Publisher（Repository と `publish.yml`）を登録します。s1000d-core は 2026-10-24 に 0.1.0 を手動公開済みで、npm 側の登録は作業中。
+- 手順は各リポジトリの `docs/RELEASE.md` に書きます。
+
 ## 未決事項
 
 | ID | 内容 | 判断の材料 |
@@ -146,7 +152,7 @@ flowchart LR
 | U-03 | 自作サンプルデータを共有パッケージに切り出す時期 | 2 つ目の MCP がテストで使い始めた時点を目安にする |
 | U-04 | 共通データモデルのパッケージ名 | `manual-model` は仮称 |
 | U-05 | 作成ツール・閲覧ソフトの製品名 | 一般の利用者向けの名前にする |
-| U-06 | Starlight の日本語検索の精度 | Pagefind で日本語ページを検索して確認する |
+| ~~U-06~~ | Starlight の日本語検索の精度 | **解決（2026-10-24）**: 生成された Pagefind の索引を Node から検索して確認。単語（照合・券売機・適用性・識別・商標）は期待どおり。Pagefind は日本語を単語に分けて索引するため、「データモジュール」のような複合語をそのまま入れると同じつながりで現れたページ（1 件）だけが返り、「データ モジュール」と空けると 9 件になる。サイトの見出しに主要な複合語をそのまま書くことで補う |
 | U-07 | Issue 4.2 に対応する時期 | 段階 2 で reader を作るときに判断する。Issue 4.2 以降の ICN メタデータファイル（IMF）を reader の対象に含めるかも一緒に判断する |
 | U-08 | XSD 検証の方式（段階 2）。XML の読み取りと XPath は D-12 で決定済み | 下記「U-08 の判断材料」。候補は `xmllint-wasm` と `libxml2-wasm` |
 | ~~U-10~~ | s1000d-core の npm 公開の時期 | **解決（2026-10-24）**: brex-mcp の CI が `file:` 依存を解決できず落ちたため、core を先に `0.1.0` として npm に公開し、GitHub も Public にした。brex-mcp の依存は `^0.1.0`。hub と brex-mcp の公開（U-01）は従来どおり段階 1 が揃った時点で判断する |

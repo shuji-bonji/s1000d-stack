@@ -1,0 +1,28 @@
+name: Stack version check
+
+# stack.json の published が npm の公開版とずれていないかを照合する。
+# ずれていれば失敗する。直すのは手元で: node scripts/generate-stack.mjs --readme → commit → push
+
+on:
+  schedule:
+    - cron: '23 22 * * *' # 毎日 07:23 JST
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'stack.json'
+      - 'scripts/generate-stack.mjs'
+      - '.github/workflows/stack-check.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/generate-stack.mjs --check

@@ -1,0 +1,36 @@
+---
+title: s1000d-stack
+description: LLM が S1000D® の技術文書を読み、BREX（ビジネスルール）に沿って検査・作成するための MCP サーバー・ライブラリ・Skill と、体験型マニュアルの作成ツール・閲覧ソフト
+template: splash
+hero:
+  tagline: S1000D® の技術文書を、LLM がプロジェクトの決まり（BREX）に沿って読み、検査し、作れるようにする道具の束ねです。
+  actions:
+    - text: はじめに
+      link: /s1000d-stack/guide/getting-started/
+      icon: right-arrow
+    - text: GitHub（s1000d-core）
+      link: https://github.com/shuji-bonji/s1000d-core
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid stagger>
+  <Card title="BREX を読む" icon="open-book">
+    顧客やプロジェクトから渡された BREX（Business Rules Exchange）データモジュールを、「どの要素に何を求めているか」が分かる文章にして一覧にします。SNS（システム番号）や属性値の意味も引けます。
+  </Card>
+  <Card title="データモジュールを照合する" icon="approve-check">
+    データモジュールを、参照している BREX の連鎖（プロジェクト → 組織 → S1000D 既定 BREX）に各層ごとに照合し、違反を箇所（XPath と行番号）・値・ルール ID・重大度付きで返します。
+  </Card>
+  <Card title="仕様書は同梱しません" icon="warning">
+    S1000D の仕様書・XML スキーマ・既定 BREX・公式サンプルは、利用条件により再配布できません。利用者ご自身で s1000d.org から入手し、置き場所を環境変数で指定します。
+  </Card>
+  <Card title="この先" icon="rocket">
+    データモジュールの本文を読む reader、XSD と BREX で検証する verify、共通データモデルから S1000D を生成する writer、そして体験型マニュアルの作成ツールと閲覧ソフトへ広げます。
+  </Card>
+</CardGrid>
+
+:::note[商標について]
+このプロジェクトは ASD（Aerospace, Security and Defence Industries Association of Europe）とは無関係の個人プロジェクトです。S1000D® は ASD の登録商標です。
+:::

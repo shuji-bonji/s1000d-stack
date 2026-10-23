@@ -1,0 +1,9 @@
+/* 日本語の本文を読みやすくする最小限の調整 */
+:root {
+  --sl-font: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic UI', system-ui, sans-serif;
+  --sl-line-height: 1.85;
+}
+.sl-markdown-content table {
+  display: block;
+  overflow-x: auto;
+}

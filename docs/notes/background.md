@@ -174,6 +174,12 @@ flowchart TB
 | Bike Samples 105 件を「自転車 BREX → 既定 BREX」の 2 層に照合すると、既定 BREX への違反が合計 55 件出る | 公式サンプルでも既定 BREX をすべて満たしてはいない。既定 BREX 側の厳しさ（例: `issueType` と `reasonForUpdate` の整合）かサンプル側の不備かは未調査。学習サイトで「既定 BREX は公式サンプルにも違反を出す」と書く材料になる |
 | 既定 BREX の `objectValue` には説明文（本文）が空のものがある（`securityClassification` の値など） | `lookup_value` の `meaning` が空配列になることがある。値の意味は仕様書の Chap 3.9.6.1 を参照させる |
 
+### サイトの生成と検索（2026-10-24）
+
+- Astro 7.4 ＋ Starlight 0.42。Astro 7 は Node 22.23.4 以上を要求する（22.22 では起動しない）。GitHub Pages の deploy は Node 24 で動かす。
+- Mermaid は `astro-mermaid`（クライアント側で描画、テーマ追従）。Starlight より前に integrations に置く必要がある。
+- Pagefind の日本語検索は、単語単位では期待どおり。複合語はそのままだと同じつながりのページしか返らない（U-06 の注記）。
+
 ## 利用条件（Issue 7）の確認結果
 
 2026-10-23 に、Issue 7 の PDF 冒頭の `S1000D-A-00-00-0000-00A-021A-D`（2025-07-28 付）を全文読みました。D-03 の判断は変わりません。要点は次のとおりです（私的な要約であり、法的な判断ではありません）。
