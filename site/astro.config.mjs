@@ -12,7 +12,7 @@ export default defineConfig({
     // astro-mermaid は starlight より前に置く（README の指示）
     mermaid({ theme: 'neutral', autoTheme: true }),
     starlight({
-      title: 's1000d-stack',
+      title: 'S1000D Stack',
       description:
         'LLM が S1000D® の技術文書を読み、BREX（ビジネスルール）に沿って検査・作成するための MCP サーバー・ライブラリ・Skill と、体験型マニュアルの作成ツール・閲覧ソフトの学習サイト',
       defaultLocale: 'root',
