@@ -47,13 +47,13 @@ S1000D は ASD の商標で、EU では登録商標です。次の 3 点を守�
 
 ### D-05 リポジトリと配置（2026-10-23）
 
-GitHub はすべて Private で作成済みです。
+GitHub は s1000d-core を除き Private です（s1000d-core は 2026-10-24 に npm 公開と同時に Public にしました）。
 
 | 種類 | 段階 | GitHub | npm | ローカル |
 |---|---|---|---|---|
 | hub | 1 | `shuji-bonji/s1000d-stack` | — | `/Users/bonji/workspace/shuji-bonji/s1000d-stack` |
-| ライブラリ | 1 | `shuji-bonji/s1000d-core`（GitHub 未作成。ローカルは 2026-10-23 に作成、未コミット） | `@shuji-bonji/s1000d-core`（未公開） | `s1000d-stack/lib/s1000d-core` |
-| MCP | 1 | `shuji-bonji/s1000d-brex-mcp` | `@shuji-bonji/s1000d-brex-mcp` | `s1000d-stack/mcp/s1000d-brex-mcp` |
+| ライブラリ | 1 | `shuji-bonji/s1000d-core`（**Public**、2026-10-24） | `@shuji-bonji/s1000d-core` **0.1.0 公開済み**（2026-10-24） | `s1000d-stack/lib/s1000d-core` |
+| MCP | 1 | `shuji-bonji/s1000d-brex-mcp`（ローカルは 2026-10-23 に作成、未コミット） | `@shuji-bonji/s1000d-brex-mcp`（未公開） | `s1000d-stack/mcp/s1000d-brex-mcp` |
 | MCP | 2 | `shuji-bonji/s1000d-reader-mcp` | `@shuji-bonji/s1000d-reader-mcp` | `s1000d-stack/mcp/s1000d-reader-mcp` |
 | MCP | 2 | `shuji-bonji/s1000d-verify-mcp` | `@shuji-bonji/s1000d-verify-mcp` | `s1000d-stack/mcp/s1000d-verify-mcp` |
 | ライブラリ（未作成） | 2 | 未定 | `@shuji-bonji/manual-model`（仮） | `s1000d-stack/lib/` |
@@ -131,6 +131,12 @@ flowchart LR
 - 実装上の注意: `fontoxpath` の `ANY_TYPE` は結果が節点 1 つのとき配列ではなく節点そのものを返す。`@xmldom/xmldom` 0.9 は致命的な構文エラーを `onError` に渡さず `ParseError` を投げる。どちらも `XmlEngine` の実装で正規化済み。
 - XSD 検証の方式は決めていません（U-08 に残す）。
 
+### D-13 MCP サーバーは MCP SDK v2 で書く（2026-10-23）
+
+- `@modelcontextprotocol/server` 2.x（`serveStdio` ＋ `buildServer()`、`fromJsonSchema` で JSON Schema をそのまま使う）を使います。rfcxml-mcp など既存の MCP が v2 に移行済みで、同じ型にするためです。
+- `initialize` の `instructions` に「しないこと」（XSD 検証をしない、準拠を判定しない、重大度を解釈しない、仕様書を同梱しない）を先に書きます（shuji-mcp-patterns §G）。
+- Node は 22 以上（SDK v2 の要件）。
+
 ## 未決事項
 
 | ID | 内容 | 判断の材料 |
@@ -143,6 +149,7 @@ flowchart LR
 | U-06 | Starlight の日本語検索の精度 | Pagefind で日本語ページを検索して確認する |
 | U-07 | Issue 4.2 に対応する時期 | 段階 2 で reader を作るときに判断する。Issue 4.2 以降の ICN メタデータファイル（IMF）を reader の対象に含めるかも一緒に判断する |
 | U-08 | XSD 検証の方式（段階 2）。XML の読み取りと XPath は D-12 で決定済み | 下記「U-08 の判断材料」。候補は `xmllint-wasm` と `libxml2-wasm` |
+| ~~U-10~~ | s1000d-core の npm 公開の時期 | **解決（2026-10-24）**: brex-mcp の CI が `file:` 依存を解決できず落ちたため、core を先に `0.1.0` として npm に公開し、GitHub も Public にした。brex-mcp の依存は `^0.1.0`。hub と brex-mcp の公開（U-01）は従来どおり段階 1 が揃った時点で判断する |
 | U-09 | Skill のリポジトリ名の規則 | houki-hub に倣うなら `s1000d-<名前>-skill`（例: `s1000d-review-skill`）。段階 3 で Skill を作るときに決める |
 
 ### U-08 の判断材料
