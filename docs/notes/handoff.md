@@ -24,9 +24,9 @@ flowchart LR
 
 | リポジトリ | 公開 | npm | 状態 |
 |---|---|---|---|
-| [shuji-bonji/s1000d-core](https://github.com/shuji-bonji/s1000d-core) | Public | `@shuji-bonji/s1000d-core` 0.1.0（2026-10-24、手動公開） | CI 通過。`publish.yml`（Trusted Publisher、タグ `v*` で起動）と `docs/RELEASE.md` を追加済み。**npm 側の Trusted Publisher 登録（Repository `shuji-bonji/s1000d-core`、Workflow `publish.yml`）はまだ** |
+| [shuji-bonji/s1000d-core](https://github.com/shuji-bonji/s1000d-core) | Public | `@shuji-bonji/s1000d-core` 0.1.0（2026-10-24、手動公開） | CI 通過。`publish.yml`（Trusted Publisher、タグ `v*` で起動）と `docs/RELEASE.md` をコミット済み。npm 側の Trusted Publisher 登録も済み（2026-10-24）。次の版からは `docs/RELEASE.md` の手順（version を上げてタグ `vX.Y.Z` を push）だけで公開される |
 | [shuji-bonji/s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | Private | 未公開 | CI 通過。core は npm の `^0.1.0` を参照 |
-| [shuji-bonji/s1000d-stack](https://github.com/shuji-bonji/s1000d-stack)（hub） | Private | — | README・`stack.json`・`scripts/generate-stack.mjs`・`site/`・`.github/workflows/`（`deploy.yml` は手動実行のみ、`stack-check.yml` は毎日）・`docs/` を作成済み。**コミットと push は利用者側で行う**（開発機の接続フォルダーからは git のロックファイルが消せないため） |
+| [shuji-bonji/s1000d-stack](https://github.com/shuji-bonji/s1000d-stack)（hub） | Private | — | README・`stack.json`・`scripts/generate-stack.mjs`・`site/`・`.github/workflows/`（`deploy.yml` は手動実行のみ、`stack-check.yml` は毎日）・`docs/` を作成し、コミット・push 済み（2026-10-24）。今後も git のコミット・push は利用者側で行う（開発機の接続フォルダーからは git のロックファイルが消せないため） |
 
 ローカルの配置は `/Users/bonji/workspace/shuji-bonji/s1000d-stack/` の下に `lib/s1000d-core`、`mcp/s1000d-brex-mcp`、`specs/s1000d/`（いずれも hub の `.gitignore` で除外）です。
 
@@ -47,7 +47,7 @@ cd site && npm run build && npm run preview
 
 ## 次にやること（候補の順）
 
-1. **利用者側**: hub のコミット・push、core の `publish.yml` と `docs/RELEASE.md` のコミット、npm での Trusted Publisher 登録。サイト 9 ページの通読。
+1. **利用者側**: サイト 9 ページの通読（`cd site && npm run build && npm run preview`）。段階 1 の最後の完了条件。
 2. **U-01（公開の時期）** を決める。hub を Public にするなら `deploy.yml` の push トリガーを戻し、GitHub Pages（Source: GitHub Actions）を有効にする。brex-mcp を npm に出すなら、初回は手動 publish、以後は Trusted Publisher（D-14）。
 3. **段階 2 の入口**: U-08（XSD 検証の方式。候補 `xmllint-wasm` と `libxml2-wasm`。判断材料は DECISIONS.md）を比較して決める → s1000d-reader-mcp / s1000d-verify-mcp / manual-model の設計。
 4. **調査の宿題**: Bike Samples 105 件に既定 BREX への違反 55 件が出る原因（既定 BREX の厳しさか、サンプルの不備か）。学習サイトの題材になる。
