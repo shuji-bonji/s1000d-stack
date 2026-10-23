@@ -100,6 +100,59 @@ MCP が探すべきもの:
 - 使える NOTATION の一覧: `notations/notations.xml`
 - 要素の定義（`explain_brex` で要素の説明を補うときの候補）: `data_dictionary_7/Files/`
 
+## BREX の章（Issue 7 Chap 4.10.2〜4.10.3）の読解結果
+
+2026-10-23 に PDF の p.2110〜2143（Chap 4.10.2 BREX data module、4.10.2.1 SNS rules、4.10.2.2 Context related rules、4.10.2.3 Context independent rules、4.10.2.4 Coding BREX data modules、4.10.3 Default BREX data module）を読みました。関連する Chap 4.10.1（ビジネスルール文書）の `brSeverityLevel` の定義も確認しました。以下は照合処理の実装に必要な点の要約で、仕様書の記述そのものではありません。
+
+### 構造と意味
+
+| 要素・属性 | 仕様書の定め | 照合処理での扱い |
+|---|---|---|
+| `<brex>` | `<commonInfo>`、`<snsRules>`、`<contextRules>`（繰り返し可）、`<nonContextRules>` を持つ。属性 `defaultBrSeverityLevel` | 4 つのブロックに分けて読む |
+| `<contextRules rulesContext="…">` | `rulesContext` は対象スキーマの URL（例: `http://www.s1000d.org/S1000D_7/xml_schema_flat/comment.xsd`）。省略時はすべてのスキーマに共通。スキーマ固有のルールは共通ルールを上書きし、かつ共通ルールの真の制限でなければならない | 対象データモジュールの `xsi:noNamespaceSchemaLocation` と `rulesContext` を突き合わせ、共通ブロック ＋ 該当スキーマのブロックを適用する。既定 BREX では共通 1 ＋ スキーマ別 6（comment / ddn / dml / icnmetadata / pm / update） |
+| `<structureObjectRule>` | `<brDecisionRef>`、`<objectPath>`、`<objectUse>`、`<objectValue>`（繰り返し可）。属性 `brSeverityLevel` | 1 件 = 1 ルール |
+| `<objectPath allowedObjectFlag="…">` | XPath でルールの対象を指す。`0` = 使ってはならない、`1` = 必ず含める、`2` = 任意（使うなら仕様とスキーマどおりに）。XPath の版は BRDP-S1-00576 でプロジェクトが決める | `0`: XPath の結果が空でなければ違反。`1`: 結果が空なら違反。`2`: 結果があれば `objectValue` と照合。XPath は `not(…)` のような真偽値を返す式も書かれる（仕様書の例）ので、結果が節点集合か真偽値かを両方扱う |
+| `<objectValue valueForm="…" valueAllowed="…" valueTailoring="…">` | `valueForm`: `single` / `range` / `pattern`。`valueAllowed`: 値、範囲（書式は Chap 3.9.5.3 の適用性の範囲表記。例 `000~022`）、またはパターン（XML Schema Part 2 の正規表現）。`valueTailoring`: `restrictable` / `lexical` / `closed`（既定）で下位 BREX による調整の可否 | 対象の値が、並んだ `objectValue` のどれか 1 つに合えば適合。`pattern` は XSD 正規表現なので JavaScript の正規表現へ変換が要る（全体一致、`\i` `\c` などの文字クラス）。既定 BREX では single 1,340・range 81・pattern 24 |
+| `<objectUse>` | 人が読む説明。`<refs>` を含められる | `explain_brex` と違反報告の本文に使う |
+| `<brDecisionRef brDecisionIdentNumber="…">` | ビジネスルール決定への参照。既定 BREX では `BREX-S1-NNNNN`（S1000D が付番、版が変わっても番号は変わらない）。プロジェクトの番号体系は BRDP-S1-00566 で決める | ルール ID として報告に載せる |
+| `brSeverityLevel` | `brsl01`〜`brsl99`。意味はプロジェクトが Chap 3.9.6.1 の設定可能値として決める | 報告にそのまま載せる。意味の解釈はしない |
+| `<notationRuleList>` › `<notationRule>` › `<notationName allowedNotationFlag="…">` | **`<contextRules>` の子**（`<structureObjectRuleGroup>` の兄弟）。`rulesContext` 無しの `<contextRules>` 内に置けば基本セット、スキーマ指定の `<contextRules>` 内なら そのスキーマでの再定義または除外。`1` = 許可、`0` = その文脈では禁止 | `list_notations` は「基本セット」と「スキーマ別の差分」を分けて返す |
+| `<snsRules>` › `<snsDescr>` › `<snsSystem>` / `<snsSubSystem>` / `<snsSubSubSystem>` / `<snsAssy>` | `<snsCode>` と `<snsTitle>` の階層 | `lookup_sns` の元データ |
+| `<nonContextRules>` › `<nonContextRule>` | スキーマや要素に結び付けられないプロジェクト固有の規則。`<brDecisionRef>` と `<simplePara>`。一般的なコメントに使ってはならない | 手動確認の項目として返す |
+
+### 階層（レイヤー）の規則
+
+- すべてのデータモジュールは **ちょうど 1 つ**の BREX を `brexDmRef` で参照する。その BREX がさらに上位の BREX を参照し、連鎖は必ず S1000D 既定 BREX で終わる。既定 BREX は自分自身を参照する。
+- 下位の BREX は上位の BREX の**制限しかできない**（上位が A〜M を許すなら、下位は A〜H に絞れるが N を許せない）。
+- 下位は上位のルールを繰り返す必要がない。したがって**完全なルール集合を得るには連鎖全体を読み込む**必要がある。
+- 矛盾があるときは**上位の BREX が優先**する。矛盾の検出手順は Chap 7.9（Business rules processing）にある（未読。作業 6 の前に読む）。
+
+### BREX の DMC の規則（Chap 4.10.2.4）
+
+- 情報コードは `022`、アイテムロケーションコードは `D`。
+- 製品全体のルールなら SNS はすべて 0（`00-00-00` / `00-00-0000`）、組立コードは `00` または `0000`。
+- 複数の BREX を製品レベルで持つときは分解コード `NN` を `00` から連番にする。システム単位の BREX はシステムコード `SS` を入れる。
+- 1 つの CSDB オブジェクトが参照できる BREX は 1 つだけ。
+
+### 既定 BREX（Chap 4.10.3）
+
+- 内容は、設定可能属性の既定の値集合（Chap 3.9.6.1）、許可する情報コード（Chap 8.4.1）、許可する学習コード（Chap 8.5.1・8.5.2）、スキーマで表せない規則の集まり。
+- DMC は `S1000D-Y-04-10-0301-00A-022A-D` で、`Y` のシステム差異コードが仕様書の版ごとに変わる。**仕様書本文は Issue 7 を「I」としているが、同梱の既定 BREX ファイルの実際の値は「J」**。MCP は既定 BREX の DMC のこの桁を決め打ちにせず、ファイル名の `DMC-S1000D-*-04-10-0301-00A-022A-D` で探す。
+- 既定 BREX の `objectPath` は `//dml[descendant-or-self::dmlIdent[child::dmlCode[attribute::dmlType!="s"]] and …]` のように軸と述語を多用した XPath 1.0 で書かれている。XPath 1.0 を完全に実装したエンジンが必要（U-08）。
+
+### 実装への示唆
+
+```mermaid
+flowchart TB
+  DM["対象 DM"] -->|brexDmRef| B1["プロジェクト BREX"]
+  B1 -->|brexDmRef| B2["組織 BREX（任意）"]
+  B2 -->|brexDmRef| B0["既定 BREX（自己参照で終端）"]
+  B0 & B2 & B1 --> M["統合<br/>上位優先・下位は制限のみ"]
+  DM -->|noNamespaceSchemaLocation| CTX["rulesContext の選択<br/>共通 ＋ 該当スキーマ"]
+  M --> CTX --> EVAL["objectPath を XPath 1.0 で評価<br/>allowedObjectFlag と objectValue で判定"]
+  EVAL --> OUT["違反: ルール ID・objectUse・箇所・値・severity<br/>手動確認: nonContextRules"]
+```
+
 ## 利用条件（Issue 7）の確認結果
 
 2026-10-23 に、Issue 7 の PDF 冒頭の `S1000D-A-00-00-0000-00A-021A-D`（2025-07-28 付）を全文読みました。D-03 の判断は変わりません。要点は次のとおりです（私的な要約であり、法的な判断ではありません）。
