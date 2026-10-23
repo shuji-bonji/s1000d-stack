@@ -27,9 +27,6 @@ export default defineConfig({
           href: 'https://github.com/shuji-bonji/s1000d-core',
         },
       ],
-      editLink: {
-        baseUrl: 'https://github.com/shuji-bonji/s1000d-stack/edit/main/site/',
-      },
       sidebar: [
         { label: 'はじめに', slug: 'guide/getting-started' },
         {
