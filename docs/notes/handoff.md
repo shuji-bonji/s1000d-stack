@@ -1,10 +1,10 @@
-# 引き継ぎメモ（2026-10-24 09:10 JST 時点）
+# 引き継ぎメモ（2026-10-24 22:45 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
 > [!IMPORTANT]
 > 作業の前提は次の 3 つです。
-> 1. DECISIONS.md の決定事項は覆さない。変える必要があると判断したときは、理由を挙げて先に相談する。
+> 1. DECISIONS.md の決定事項（D-01〜D-16）は覆さない。変える必要があると判断したときは、理由を挙げて先に相談する。
 > 2. S1000D の仕様書・XSD・既定 BREX・公式サンプルは、どのリポジトリにも npm パッケージにもコミットしない（D-03）。置き場所は `s1000d-stack/specs/s1000d/`（git 管理外、D-06）。
 > 3. `docs/` の 3 文書（ROADMAP・DECISIONS・notes/background）は、ローカル `s1000d-stack/docs/` と claude.ai Project「S1000D Stack」のナレッジの両方に同じ内容を置く。片方だけ直さない。
 
@@ -18,7 +18,7 @@ flowchart LR
   style S1 fill:#dfe,stroke:#393
 ```
 
-**段階 1 は 2026-10-24 に完了しました。** 作業 1〜7 と、完了条件の 3 つ（自動テスト、既定 BREX での手動確認、サイト 9 ページの通読）がすべて済んでいます（ROADMAP「進捗」、notes/site-review.md）。次は U-01（公開の時期）の判断と、段階 2 の入口である U-08（XSD 検証の方式）の比較です。
+**段階 1 は 2026-10-24 に完了しました。** 作業 1〜7 と、完了条件の 3 つ（自動テスト、既定 BREX での手動確認、サイト 9 ページの通読）がすべて済んでいます（ROADMAP「進捗」、notes/site-review.md）。U-01（公開の時期）は「段階 2 が揃った時点」に決まり（D-16）、U-08（XSD 検証の方式）は `libxml2-wasm` に決まりました（D-15）。次は段階 2 の設計と実装です。
 
 ## リポジトリの状態
 
@@ -47,14 +47,14 @@ cd site && npm run build && npm run preview
 
 ## 次にやること（候補の順）
 
-1. **U-01（公開の時期）** を決める（利用者の判断）。hub を Public にするなら `deploy.yml` の push トリガーを戻し、GitHub Pages（Source: GitHub Actions）を有効にする。brex-mcp を npm に出すなら、初回は手動 publish、以後は Trusted Publisher（D-14）。
-2. **段階 2 の入口**: U-08（XSD 検証の方式。候補 `xmllint-wasm` と `libxml2-wasm`。判断材料は DECISIONS.md）を比較して決める → s1000d-reader-mcp / s1000d-verify-mcp / manual-model の設計。
+1. **段階 2 の設計**（2026-10-24 に利用者が「次のセッションは verify-mcp の設計から」と指示）: まず s1000d-verify-mcp の設計を書く。論点は (a) ツール案、(b) 応答の形（reader が「検証状態」として引用できる形にする）、(c) `SchemaValidator` インターフェースと `libxml2-wasm` の実装を s1000d-core に置くか verify-mcp に置くか。前提は XSD 検証が `libxml2-wasm`（D-15）、BREX 照合が s1000d-core の呼び出し（D-10）、比較の実測が `scripts/experiments/u08-xsd-compare.mjs`。続いて s1000d-reader-mcp（応答に版と検証状態を必ず含め、適用性の判定は reader が済ませる）、manual-model（S1000D に依存しない共通データモデル、D-01・D-09、名前は U-04）の順で設計を書き、ROADMAP に「段階 2 の作業」の表を足す。
+2. **公開（D-16）**: 段階 2 が揃ったら、D-16 に書いた 5 つの作業で hub と brex-mcp を公開する。
 3. **調査の宿題**: Bike Samples 105 件に既定 BREX への違反 55 件が出る原因（既定 BREX の厳しさか、サンプルの不備か）。学習サイトの題材になる。
 
 ## 新しいチャットの最初に読むもの
 
 1. ROADMAP.md（全体像と進捗）
-2. DECISIONS.md（D-01〜D-14 と未決 U-01〜U-09）
+2. DECISIONS.md（D-01〜D-16 と未決 U-03〜U-09）
 3. notes/background.md（仕様書の読解結果、配布物のファイル構成、設計のヒント）
 4. このメモ
 5. notes/site-review.md（サイト通読用の照合シート。通読は 2026-10-24 に完了。記述の根拠を探すときに参照）

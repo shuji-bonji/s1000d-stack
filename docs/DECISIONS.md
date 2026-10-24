@@ -144,18 +144,32 @@ flowchart LR
 - Trusted Publisher は既存パッケージにしか設定できないため、各パッケージの **初回だけは手動で** `npm publish --access public` を行い、その後に npm 側で Trusted Publisher（Repository と `publish.yml`）を登録します。s1000d-core は 2026-10-24 に 0.1.0 を手動公開済みで、npm 側の登録は作業中。
 - 手順は各リポジトリの `docs/RELEASE.md` に書きます。
 
+### D-15 XSD 検証は libxml2-wasm で行う（2026-10-24）
+
+- s1000d-verify-mcp（段階 2）の XML スキーマ検証には `libxml2-wasm` を使います。判断の根拠は「U-08 の比較結果（2026-10-24）」の実測です。要点は、Issue 7 の XSD 33 本と Bike Samples 106 件で `xmllint-wasm` と判定結果が同じで、コンパイル済みの `XsdValidator` を使い回せるため 106 件を 0.27 秒（`xmllint-wasm` は 7.8 秒）で検証できることです。
+- `xs:import` の解決に使う `xmlRegisterInputProvider` / `XmlBufferInputProvider` は `@alpha` 表記の API なので、XSD 検証は s1000d-core の `XmlEngine`（D-12）と同じく 1 つのインターフェース（仮称 `SchemaValidator`）の後ろに置き、API が変わっても差し替えられるようにします。
+- `XmlDocument` / `XsdValidator` は `dispose()` が必要です。検証器は CSDB 単位でスキーマごとに 1 つ作って使い回し、文書は検証のたびに破棄します。
+- DOCTYPE の `ENTITY` / `NOTATION` 宣言の読み取りは、引き続き s1000d-core（`@xmldom/xmldom`）が行います。`libxml2-wasm` には宣言を列挙する API が無いためです。
+- `libxml2-wasm` は ESM のみ、Node 18 以上です。MCP SDK v2 の要件（Node 22 以上、D-13）の範囲に収まります。
+
+### D-16 hub と brex-mcp の公開は段階 2 が揃った時点で行う（2026-10-24）
+
+- U-01 の判断です。s1000d-core は 2026-10-24 に公開済みですが、hub（学習サイト）と s1000d-brex-mcp の公開は、段階 2（s1000d-reader-mcp、s1000d-verify-mcp、manual-model）が揃った時点で行います。
+- 理由は、BREX の照合だけでは「XSD 未検証」の前提付きの結果になり、verify-mcp と一緒に出したほうが利用者が結果を正しく読めるためです。
+- 公開時の作業は次のとおりです。(1) hub を Public にし、GitHub Pages の Source を GitHub Actions にする。(2) `deploy.yml` の push トリガーを戻す。(3) brex-mcp を Public にし、初回だけ手動で `npm publish --access public`、その後 npm 側で Trusted Publisher を登録する（D-14）。(4) サイトの `guide/getting-started.md` と `mcp/brex-mcp.md` の「npm 未公開（開発中）」の note を消す。(5) `stack.json` の brex-mcp の status を `released` にする。
+
 ## 未決事項
 
 | ID | 内容 | 判断の材料 |
 |---|---|---|
-| U-01 | 最初の公開の時期 | 「すべて揃った時点」と「段階 1 の 3 つが揃った時点」のどちらにするか。BREX を扱う MCP は他に無いこと、Zenn Book「IETM入門」を公開済みであることは早い公開の理由になる。「揃った」の条件には、サイトの BREX・データモジュールの説明を仕様書と照合済みであることを含める。**2026-10-24 時点**: s1000d-core は公開済み。hub は Private のため GitHub Pages を有効にできず（Free プラン）、`deploy.yml` は `workflow_dispatch` だけにしてある。hub を Public にするときに push トリガーを戻す。brex-mcp を npm に公開したら、サイトの `guide/getting-started.md` と `mcp/brex-mcp.md` にある「npm 未公開（開発中）」の note を 2 つとも消す |
+| ~~U-01~~ | 最初の公開の時期 | **解決（2026-10-24）**: 段階 2 が揃った時点で hub と brex-mcp を公開する（D-16）。以下は経過。「すべて揃った時点」と「段階 1 の 3 つが揃った時点」のどちらにするか。BREX を扱う MCP は他に無いこと、Zenn Book「IETM入門」を公開済みであることは早い公開の理由になる。「揃った」の条件には、サイトの BREX・データモジュールの説明を仕様書と照合済みであることを含める。**2026-10-24 時点**: s1000d-core は公開済み。hub は Private のため GitHub Pages を有効にできず（Free プラン）、`deploy.yml` は `workflow_dispatch` だけにしてある。hub を Public にするときに push トリガーを戻す。brex-mcp を npm に公開したら、サイトの `guide/getting-started.md` と `mcp/brex-mcp.md` にある「npm 未公開（開発中）」の note を 2 つとも消す |
 | ~~U-02~~ | Issue 7 の利用条件の全文に、再配布や組み込みについての特別な許可があるか | **解決（2026-10-23）**: 無い。「Special usage rights」の対象は 8 区分の団体・企業・機関に限られる。D-03 に反映済み |
 | U-03 | 自作サンプルデータを共有パッケージに切り出す時期 | 2 つ目の MCP がテストで使い始めた時点を目安にする |
 | U-04 | 共通データモデルのパッケージ名 | `manual-model` は仮称 |
 | U-05 | 作成ツール・閲覧ソフトの製品名 | 一般の利用者向けの名前にする |
 | ~~U-06~~ | Starlight の日本語検索の精度 | **解決（2026-10-24）**: 生成された Pagefind の索引を Node から検索して確認。単語（照合・券売機・適用性・識別・商標）は期待どおり。Pagefind は日本語を単語に分けて索引するため、「データモジュール」のような複合語をそのまま入れると同じつながりで現れたページ（1 件）だけが返り、「データ モジュール」と空けると 9 件になる。サイトの見出しに主要な複合語をそのまま書くことで補う |
 | U-07 | Issue 4.2 に対応する時期 | 段階 2 で reader を作るときに判断する。Issue 4.2 以降の ICN メタデータファイル（IMF）を reader の対象に含めるかも一緒に判断する |
-| U-08 | XSD 検証の方式（段階 2）。XML の読み取りと XPath は D-12 で決定済み | 下記「U-08 の判断材料」と「U-08 の比較結果（2026-10-24）」。候補は `xmllint-wasm` と `libxml2-wasm`。**実測の結果、`libxml2-wasm` を推奨**（106 件で 0.27 秒対 7.8 秒、判定結果は同じ）。確定待ち |
+| ~~U-08~~ | XSD 検証の方式（段階 2）。XML の読み取りと XPath は D-12 で決定済み | **解決（2026-10-24）**: `libxml2-wasm` に確定（D-15）。根拠は下記「U-08 の判断材料」と「U-08 の比較結果（2026-10-24）」 |
 | ~~U-10~~ | s1000d-core の npm 公開の時期 | **解決（2026-10-24）**: brex-mcp の CI が `file:` 依存を解決できず落ちたため、core を先に `0.1.0` として npm に公開し、GitHub も Public にした。brex-mcp の依存は `^0.1.0`。hub と brex-mcp の公開（U-01）は従来どおり段階 1 が揃った時点で判断する |
 | U-09 | Skill のリポジトリ名の規則 | houki-hub に倣うなら `s1000d-<名前>-skill`（例: `s1000d-review-skill`）。段階 3 で Skill を作るときに決める |
 
@@ -206,6 +220,6 @@ libxml2 本体は、長年の保守担当者が退いて「公式に保守され
 - ENTITY / NOTATION の取り出しは既に s1000d-core にあるので、どちらを選んでも追加の実装は要らない。
 - libxml2 本体の保守状況の懸念は両者に共通で、判断の材料にならない。
 
-**推奨: XSD 検証は `libxml2-wasm` で行う（D-15 として確定する案）。** 確定は利用者の判断を待つ。
+**結論: XSD 検証は `libxml2-wasm` で行う。2026-10-24 に D-15 として確定した。**
 
 出典: [libxml2-wasm（GitHub）](https://github.com/jameslan/libxml2-wasm)、[xmllint-wasm（GitHub）](https://github.com/notengrafik/xmllint-wasm)、[libxmljs2 の README](https://cdn.jsdelivr.net/npm/libxmljs2@0.37.0/README.md)、[libxml2 が保守されなくなったという報道](https://www.linux.org/threads/linuxiac-libxml2-becomes-officially-unmaintained-after-maintainer-steps-down.59832/latest)
