@@ -168,7 +168,8 @@ flowchart LR
 | 作業 | 状態 |
 |---|---|
 | 設計 | 済み（2026-10-24）。`docs/design/` の 3 文書。同日に D-17（`SchemaValidator` の置き場所）・D-18（reader の検証の既定）・U-04（パッケージ名）を確定 |
-| 1〜10 | 未 |
+| 1 | core 側は済み（2026-10-24。`src/brex/locate.ts` に `locateBrex` / `findDefaultBrex` / `isDefaultBrexDmc` / `BrexLocateError`。自作データのテスト 9 件と配布物のテスト 1 件を追加し、46 件すべて通過。core の `2ab3a78`）。brex-mcp を core の関数に切り替える作業は、brex-mcp が npm の core を参照しているため（`^0.1.0`。`file:` 依存は CI で解決できない、U-10）、core 0.2.0 の公開（作業 5）の後に行う |
+| 2〜10 | 未 |
 
 ## 対象とする S1000D の版
 
