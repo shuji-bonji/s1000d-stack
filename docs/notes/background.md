@@ -186,6 +186,15 @@ flowchart TB
 | `internalRef` 566 件はすべて同じ文書内の `@id` に解決できる。`pmRef` 10 件のうち 4 件は CSDB に無い PMC（`SAFE1` など）を指す | — |
 | `dmRef` に `issueInfo` が付くものは 2 件だけ（`DMC-BRAKE-…`）。参照は原則として版を指定しない | `issueMismatch` が出ることは少ない。出たときは重要 |
 
+### XSD の写しについて（2026-10-25）
+
+verify-mcp の stdio の実機確認で、`S1000D_SPEC_DIR` の下に `brex.xsd` を含む `xml_schema_flat/` が 2 つ見つかりました。
+
+| 場所 | 内容 | 扱い |
+|---|---|---|
+| `xml-schema-package/S1000D Issue 7 XML Schema Package/xml_schema_flat/` | 配布物の XML Schema Package。`xs:import` は `schemaLocation="xml.xsd"` のように相対パス | **これを使う**。同じフォルダーの XSD を `XmlBufferInputProvider` に登録すれば import が解決する |
+| `data-dictionary/data_dictionary_7/Files/xml_schema_flat/` | データ辞書の表示用の写し。33 本すべてが上と差分あり。`xs:import` が `schemaLocation="http://www.w3.org/2001/xml.xsd"` のような絶対 URL | **使わない**。libxml2 がネットワークに出ようとして失敗する。core の `findSchemaDirs` と verify-mcp の `schemaDirs()` は `data_dictionary*` フォルダーを候補から除く |
+
 ### 適用性の評価で分かった配布物の性質（2026-10-25）
 
 段階 2 の作業 4 で、Bike Samples の ACT（`00W`）・CCT（`00Q`）・PCT（`00P`）を読み、PCT の 3 製品それぞれで DM 106 件の適用性を判定した結果です（core の `spec.test.ts` に固定）。
