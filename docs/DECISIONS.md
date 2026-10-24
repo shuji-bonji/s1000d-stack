@@ -56,7 +56,7 @@ GitHub は s1000d-core を除き Private です（s1000d-core は 2026-10-24 に
 | MCP | 1 | `shuji-bonji/s1000d-brex-mcp`（ローカルは 2026-10-23 に作成、未コミット） | `@shuji-bonji/s1000d-brex-mcp`（未公開） | `s1000d-stack/mcp/s1000d-brex-mcp` |
 | MCP | 2 | `shuji-bonji/s1000d-reader-mcp` | `@shuji-bonji/s1000d-reader-mcp` | `s1000d-stack/mcp/s1000d-reader-mcp` |
 | MCP | 2 | `shuji-bonji/s1000d-verify-mcp` | `@shuji-bonji/s1000d-verify-mcp` | `s1000d-stack/mcp/s1000d-verify-mcp` |
-| ライブラリ（未作成） | 2 | 未定 | `@shuji-bonji/manual-model`（仮） | `s1000d-stack/lib/` |
+| ライブラリ（未作成） | 2 | `shuji-bonji/experiential-manual-model`（U-04 で 2026-10-24 に確定） | `@shuji-bonji/experiential-manual-model` | `s1000d-stack/lib/experiential-manual-model` |
 | MCP | 3 | `shuji-bonji/s1000d-writer-mcp` | `@shuji-bonji/s1000d-writer-mcp` | `s1000d-stack/mcp/s1000d-writer-mcp` |
 | Skill（未作成） | 3 | 未定（名前の規則は U-09） | — | `s1000d-stack/skill/` |
 | app（未作成） | 3〜4 | 未定（製品名は U-05） | — | `s1000d-stack/app/` |
@@ -158,6 +158,22 @@ flowchart LR
 - 理由は、BREX の照合だけでは「XSD 未検証」の前提付きの結果になり、verify-mcp と一緒に出したほうが利用者が結果を正しく読めるためです。
 - 公開時の作業は次のとおりです。(1) hub を Public にし、GitHub Pages の Source を GitHub Actions にする。(2) `deploy.yml` の push トリガーを戻す。(3) brex-mcp を Public にし、初回だけ手動で `npm publish --access public`、その後 npm 側で Trusted Publisher を登録する（D-14）。(4) サイトの `guide/getting-started.md` と `mcp/brex-mcp.md` の「npm 未公開（開発中）」の note を消す。(5) `stack.json` の brex-mcp の status を `released` にする。
 
+### D-17 XSD 検証のインターフェースと実装は s1000d-core に置く（2026-10-24）
+
+- `SchemaValidator` インターフェース、検証状態の型 `VerificationStatus`、`S1000D_SPEC_DIR` から `xml_schema_flat/` を探す処理、`verifyDataModule()` は s1000d-core の本体に置きます。
+- `libxml2-wasm`（D-15）による実装は、s1000d-core のサブパス `@shuji-bonji/s1000d-core/xsd-libxml2` に置きます。`libxml2-wasm` は `peerDependencies` にし、`peerDependenciesMeta` で optional にします。XSD 検証を使わない brex-mcp は `libxml2-wasm` を入れずに済みます。
+- 理由: reader-mcp も応答に検証状態を含めるため XSD 検証が要り、verify-mcp に置くと reader に同じ実装を複製することになります（D-10 が避けた形）。D-15 の「`XmlEngine`（D-12）と同じく 1 つのインターフェースの後ろに置く」に沿って、`XmlEngine` と同じ core に置きます。
+- 代案として検討したもの: (A) verify-mcp に置く（reader に複製が要る）、(C) 別パッケージ `@shuji-bonji/s1000d-xsd` を作る（リポジトリと公開手順が 1 つ増える）。core が大きくなったときは (C) に分けます（D-10 の末尾と同じ）。
+- 詳細は [design/verify-mcp.md](./design/verify-mcp.md)「`SchemaValidator` と `libxml2-wasm` の置き場所」にあります。
+
+### D-18 reader-mcp は検証状態を自分で作り、既定では XSD 検証だけを行う（2026-10-24）
+
+- MCP サーバー同士は呼び合えないため、reader-mcp は verify-mcp に委譲せず、s1000d-core の `verifyDataModule()` を呼んで `VerificationStatus` を作り、すべての応答に含めます。verify-mcp も同じ関数を呼ぶので、2 つの MCP の検証状態は同じ形・同じ結果になります。
+- `read_data_module` の既定は XSD 検証だけ（`verify: "schema"`）です。XSD に違反した文書は要素の位置が仕様と違う可能性があり、本文の読み取り結果が信用できなくなるため、XSD は省きません。BREX の照合は本文の意味にはほとんど影響せず、1 件あたり 0.1 秒前後かかるため、`verify: "full"` を指定したときだけ行います。行わなかったときは `verification.brex.state` を `not-run` と明記します。
+- reader-mcp を単体で使うことも、verify-mcp と組み合わせることも想定します。単体で使ったときに「何を確認していないか」が応答に書かれていることが要点で、単体の利用を避ける必要はありません。
+- `notApplicable` と判定した要素は既定で残して印を付けます（`omitNotApplicable: true` で省けます）。
+- 詳細は [design/reader-mcp.md](./design/reader-mcp.md) にあります。
+
 ## 未決事項
 
 | ID | 内容 | 判断の材料 |
@@ -165,7 +181,7 @@ flowchart LR
 | ~~U-01~~ | 最初の公開の時期 | **解決（2026-10-24）**: 段階 2 が揃った時点で hub と brex-mcp を公開する（D-16）。以下は経過。「すべて揃った時点」と「段階 1 の 3 つが揃った時点」のどちらにするか。BREX を扱う MCP は他に無いこと、Zenn Book「IETM入門」を公開済みであることは早い公開の理由になる。「揃った」の条件には、サイトの BREX・データモジュールの説明を仕様書と照合済みであることを含める。**2026-10-24 時点**: s1000d-core は公開済み。hub は Private のため GitHub Pages を有効にできず（Free プラン）、`deploy.yml` は `workflow_dispatch` だけにしてある。hub を Public にするときに push トリガーを戻す。brex-mcp を npm に公開したら、サイトの `guide/getting-started.md` と `mcp/brex-mcp.md` にある「npm 未公開（開発中）」の note を 2 つとも消す |
 | ~~U-02~~ | Issue 7 の利用条件の全文に、再配布や組み込みについての特別な許可があるか | **解決（2026-10-23）**: 無い。「Special usage rights」の対象は 8 区分の団体・企業・機関に限られる。D-03 に反映済み |
 | U-03 | 自作サンプルデータを共有パッケージに切り出す時期 | 2 つ目の MCP がテストで使い始めた時点を目安にする |
-| U-04 | 共通データモデルのパッケージ名 | `manual-model` は仮称 |
+| ~~U-04~~ | 共通データモデルのパッケージ名 | **解決（2026-10-24）**: `@shuji-bonji/experiential-manual-model`（GitHub は `shuji-bonji/experiential-manual-model`、ローカルは `s1000d-stack/lib/experiential-manual-model`）。`manual-model` だけでは IETM や S1000D 一般のマニュアルのモデルと受け取られるため、「体験型」を表す `experiential` を入れる。npm で `experiential-manual-model` / `experiential-manual` / `experience-manual-model` / `xp-manual-model` が空いていることを 2026-10-24 に確認した。文書の中では引き続き「manual-model」と略して書くことがある |
 | U-05 | 作成ツール・閲覧ソフトの製品名 | 一般の利用者向けの名前にする |
 | ~~U-06~~ | Starlight の日本語検索の精度 | **解決（2026-10-24）**: 生成された Pagefind の索引を Node から検索して確認。単語（照合・券売機・適用性・識別・商標）は期待どおり。Pagefind は日本語を単語に分けて索引するため、「データモジュール」のような複合語をそのまま入れると同じつながりで現れたページ（1 件）だけが返り、「データ モジュール」と空けると 9 件になる。サイトの見出しに主要な複合語をそのまま書くことで補う |
 | U-07 | Issue 4.2 に対応する時期 | 段階 2 で reader を作るときに判断する。Issue 4.2 以降の ICN メタデータファイル（IMF）を reader の対象に含めるかも一緒に判断する |

@@ -1,12 +1,12 @@
-# 引き継ぎメモ（2026-10-24 22:45 JST 時点）
+# 引き継ぎメモ（2026-10-24 23:45 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
 > [!IMPORTANT]
 > 作業の前提は次の 3 つです。
-> 1. DECISIONS.md の決定事項（D-01〜D-16）は覆さない。変える必要があると判断したときは、理由を挙げて先に相談する。
+> 1. DECISIONS.md の決定事項（D-01〜D-18）は覆さない。変える必要があると判断したときは、理由を挙げて先に相談する。
 > 2. S1000D の仕様書・XSD・既定 BREX・公式サンプルは、どのリポジトリにも npm パッケージにもコミットしない（D-03）。置き場所は `s1000d-stack/specs/s1000d/`（git 管理外、D-06）。
-> 3. `docs/` の 3 文書（ROADMAP・DECISIONS・notes/background）は、ローカル `s1000d-stack/docs/` と claude.ai Project「S1000D Stack」のナレッジの両方に同じ内容を置く。片方だけ直さない。
+> 3. `docs/` の文書（ROADMAP・DECISIONS・notes/background・notes/handoff・design/ の 3 本）は、ローカル `s1000d-stack/docs/` と claude.ai Project「S1000D Stack」のナレッジの両方に同じ内容を置く。片方だけ直さない。
 
 ## いまどこにいるか
 
@@ -16,17 +16,19 @@ flowchart LR
   S2 --> S3["段階 3<br/>writer ＋ Skill ＋ 作成ツール"]
   S3 --> S4["段階 4<br/>閲覧ソフト"]
   style S1 fill:#dfe,stroke:#393
+  style S2 fill:#ffd,stroke:#993
 ```
 
-**段階 1 は 2026-10-24 に完了しました。** 作業 1〜7 と、完了条件の 3 つ（自動テスト、既定 BREX での手動確認、サイト 9 ページの通読）がすべて済んでいます（ROADMAP「進捗」、notes/site-review.md）。U-01（公開の時期）は「段階 2 が揃った時点」に決まり（D-16）、U-08（XSD 検証の方式）は `libxml2-wasm` に決まりました（D-15）。次は段階 2 の設計と実装です。
+**段階 1 は 2026-10-24 に完了し、段階 2 の設計を同日に書きました。** 設計は `docs/design/` の 3 文書（[verify-mcp.md](../design/verify-mcp.md)、[reader-mcp.md](../design/reader-mcp.md)、[manual-model.md](../design/manual-model.md)）で、作業の順序は ROADMAP「段階 2 の作業」の表（作業 1〜10）にあります。設計で出た 3 つの判断は同日に確定しました（D-17: XSD 検証の置き場所、D-18: reader の検証の既定、U-04: パッケージ名 `@shuji-bonji/experiential-manual-model`）。実装はまだ始めていません。
 
 ## リポジトリの状態
 
 | リポジトリ | 公開 | npm | 状態 |
 |---|---|---|---|
-| [shuji-bonji/s1000d-core](https://github.com/shuji-bonji/s1000d-core) | Public | `@shuji-bonji/s1000d-core` 0.1.0（2026-10-24、手動公開） | CI 通過。`publish.yml`（Trusted Publisher、タグ `v*` で起動）と `docs/RELEASE.md` をコミット済み。npm 側の Trusted Publisher 登録も済み（2026-10-24）。次の版からは `docs/RELEASE.md` の手順（version を上げてタグ `vX.Y.Z` を push）だけで公開される |
-| [shuji-bonji/s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | Private | 未公開 | CI 通過。core は npm の `^0.1.0` を参照 |
-| [shuji-bonji/s1000d-stack](https://github.com/shuji-bonji/s1000d-stack)（hub） | Private | — | README・`stack.json`・`scripts/generate-stack.mjs`・`site/`・`.github/workflows/`（`deploy.yml` は手動実行のみ、`stack-check.yml` は毎日）・`docs/` を作成し、コミット・push 済み（2026-10-24）。今後も git のコミット・push は利用者側で行う（開発機の接続フォルダーからは git のロックファイルが消せないため） |
+| [shuji-bonji/s1000d-core](https://github.com/shuji-bonji/s1000d-core) | Public | `@shuji-bonji/s1000d-core` 0.1.0（2026-10-24、手動公開） | CI 通過。`publish.yml`（Trusted Publisher、タグ `v*` で起動）と `docs/RELEASE.md` をコミット済み。npm 側の Trusted Publisher 登録も済み（2026-10-24）。次の版からは `docs/RELEASE.md` の手順（version を上げてタグ `vX.Y.Z` を push）だけで公開される。段階 2 の作業 1〜5 で 0.2.0 にする |
+| [shuji-bonji/s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | Private | 未公開 | CI 通過。core は npm の `^0.1.0` を参照。段階 2 の作業 1 で `services/brex-locator.ts` の探索を core に移す |
+| [shuji-bonji/s1000d-stack](https://github.com/shuji-bonji/s1000d-stack)（hub） | Private | — | README・`stack.json`・`scripts/generate-stack.mjs`・`site/`・`.github/workflows/`（`deploy.yml` は手動実行のみ、`stack-check.yml` は毎日）・`docs/` をコミット・push 済み（2026-10-24）。`docs/` の変更は 2026-10-24 夜にチャットからコミット済み（push は未）。**git のコミットはチャットから行ってよい**（2026-10-24 に利用者が指示。接続フォルダーの削除の許可を得れば git のロックファイルも消せる）。署名は利用者が後で付け直す |
+| `shuji-bonji/s1000d-verify-mcp`、`s1000d-reader-mcp`、`s1000d-writer-mcp` | Private | 未公開 | GitHub に作成済み、中身は空。ローカルの `mcp/` の下のフォルダーも空 |
 
 ローカルの配置は `/Users/bonji/workspace/shuji-bonji/s1000d-stack/` の下に `lib/s1000d-core`、`mcp/s1000d-brex-mcp`、`specs/s1000d/`（いずれも hub の `.gitignore` で除外）です。
 
@@ -47,17 +49,19 @@ cd site && npm run build && npm run preview
 
 ## 次にやること（候補の順）
 
-1. **段階 2 の設計**（2026-10-24 に利用者が「次のセッションは verify-mcp の設計から」と指示）: まず s1000d-verify-mcp の設計を書く。論点は (a) ツール案、(b) 応答の形（reader が「検証状態」として引用できる形にする）、(c) `SchemaValidator` インターフェースと `libxml2-wasm` の実装を s1000d-core に置くか verify-mcp に置くか。前提は XSD 検証が `libxml2-wasm`（D-15）、BREX 照合が s1000d-core の呼び出し（D-10）、比較の実測が `scripts/experiments/u08-xsd-compare.mjs`。続いて s1000d-reader-mcp（応答に版と検証状態を必ず含め、適用性の判定は reader が済ませる）、manual-model（S1000D に依存しない共通データモデル、D-01・D-09、名前は U-04）の順で設計を書き、ROADMAP に「段階 2 の作業」の表を足す。
-2. **公開（D-16）**: 段階 2 が揃ったら、D-16 に書いた 5 つの作業で hub と brex-mcp を公開する。
-3. **調査の宿題**: Bike Samples 105 件に既定 BREX への違反 55 件が出る原因（既定 BREX の厳しさか、サンプルの不備か）。学習サイトの題材になる。
+1. **段階 2 の作業 1**（既定 BREX の探索を brex-mcp から s1000d-core へ移す）から始める。小さく、既存のテストで確かめられる。
+2. **作業 2**（`SchemaValidator`、`libxml2-wasm` の実装、`VerificationStatus`、`verifyDataModule()`。D-17）。比較の実測は `scripts/experiments/u08-xsd-compare.mjs` にあり、`libxml2-wasm` の使い方（`xmlRegisterInputProvider`、`XsdValidator.fromDoc`、`dispose`）はそこから写せる。
+3. **作業 8**（experiential-manual-model）は core に依存しないので、1〜2 と並行して進められる。
+4. **公開（D-16）**: 段階 2 が揃ったら、D-16 に書いた 5 つの作業で hub と brex-mcp を公開する。
 
 ## 新しいチャットの最初に読むもの
 
-1. ROADMAP.md（全体像と進捗）
-2. DECISIONS.md（D-01〜D-16 と未決 U-03〜U-09）
+1. ROADMAP.md（全体像と進捗。段階 2 の作業の表）
+2. DECISIONS.md（D-01〜D-18 と未決 U-03・U-05・U-07・U-09）
 3. notes/background.md（仕様書の読解結果、配布物のファイル構成、設計のヒント）
 4. このメモ
-5. notes/site-review.md（サイト通読用の照合シート。通読は 2026-10-24 に完了。記述の根拠を探すときに参照）
+5. design/ の 3 文書（着手する作業に応じて）
+6. notes/site-review.md（サイト通読用の照合シート。通読は 2026-10-24 に完了。記述の根拠を探すときに参照）
 
 > [!NOTE]
 > 文章は GitHub のアラート記法（`> [!NOTE]` など）を使い、日付は JST で書きます。既定 BREX の DMC は `S1000D-Y-04-10-0301-00A-022A-D` で、システム差異コード（Y）が配布物のファイル名・仕様書本文・データ辞書で食い違うため、コードでは決め打ちしていません。

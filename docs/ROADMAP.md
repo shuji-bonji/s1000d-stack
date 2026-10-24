@@ -2,10 +2,11 @@
 
 LLM が S1000D の技術文書を正しく読み、プロジェクトの決まり（ビジネスルール）に沿って検査・作成できるようにするための MCP サーバー・共有ライブラリ・Skill と、体験型マニュアルの作成ツール・閲覧ソフトをまとめるプロジェクトです。
 
-- 作成日: 2026-10-23（JST）、更新日: 2026-10-24（JST）
+- 作成日: 2026-10-23（JST）、更新日: 2026-10-24（JST、段階 2 の作業を追記）
 - 構成の手本: [houki-hub](https://github.com/shuji-bonji/houki-hub)、[pdf-agent-stack](https://github.com/shuji-bonji/pdf-agent-stack)
 - 決定事項: [DECISIONS.md](./DECISIONS.md)
 - 調査メモ: [notes/background.md](./notes/background.md)
+- 段階 2 の設計: [design/verify-mcp.md](./design/verify-mcp.md)、[design/reader-mcp.md](./design/reader-mcp.md)、[design/manual-model.md](./design/manual-model.md)
 
 ## 目指すもの
 
@@ -25,7 +26,7 @@ flowchart TB
   end
   subgraph Lib["lib/"]
     CORE["s1000d-core<br/>DMC・ICN・データモジュールの読み取り<br/>BREX の照合（D-10）"]
-    MODEL["manual-model<br/>共通データモデル<br/>（S1000D に依存しない）"]
+    MODEL["experiential-manual-model<br/>共通データモデル<br/>（S1000D に依存しない）"]
   end
   subgraph Mcp["mcp/"]
     BREX["s1000d-brex-mcp"]
@@ -48,7 +49,7 @@ flowchart TB
   SK -.呼び出す.-> Mcp
 ```
 
-manual-model は s1000d-core に依存させません。一般向けの製品が S1000D の概念を抱え込まないようにするためです（D-01、D-09）。S1000D との変換関数は writer 側に置きます。
+experiential-manual-model（文書の中では「manual-model」と略します。U-04）は s1000d-core に依存させません。一般向けの製品が S1000D の概念を抱え込まないようにするためです（D-01、D-09）。S1000D との変換関数は writer 側に置きます。
 
 ## 段階
 
@@ -68,7 +69,7 @@ flowchart LR
   S3b --> S4
 ```
 
-## 段階 1 の作業
+## 段階 1 の作業（完了）
 
 | 順 | 作業 | 置き場所 |
 |---|---|---|
@@ -129,6 +130,45 @@ flowchart TB
 - 工程 3 では、対象 DM の `xsi:noNamespaceSchemaLocation` に合う `rulesContext` のブロックと、`rulesContext` 無しの共通ブロックを適用します。判定は `allowedObjectFlag`（`0` = あれば違反、`1` = 無ければ違反、`2` = あれば `objectValue` と照合）で行い、`objectValue` の `pattern` は XSD 正規表現を JavaScript の正規表現に変換して全体一致で評価します。詳細は notes/background.md の「BREX の章の読解結果」を参照してください。
 - 工程 3 で照合できるのは contextRules だけです。nonContextRules は人（または LLM）が読んで判断する項目として返します。
 - 工程 4 の違反報告には、ルール ID（`brDecisionRef/@brDecisionIdentNumber`）、`objectUse` の文章、違反箇所（XPath と行番号）、実際の値、`brSeverityLevel` を含めます。
+
+## 段階 2 の作業
+
+設計は `docs/design/` の 3 文書（2026-10-24 作成）にあります。core の変更を先に済ませ、2 つの MCP はそれを呼ぶだけにします（D-10 と同じ考え方）。
+
+```mermaid
+flowchart LR
+  C1["1. core: BREX の探索を brex-mcp から移す"] --> C2["2. core: SchemaValidator ＋ libxml2-wasm<br/>VerificationStatus"]
+  C2 --> C3["3. core: 参照の解決"]
+  C3 --> C4["4. core: 適用性の評価<br/>（ACT・CCT・PCT）"]
+  C4 --> C5["5. core: 本文の読み取り（5 種）<br/>→ core 0.2.0"]
+  C2 --> V["6. s1000d-verify-mcp"]
+  C5 --> R["7. s1000d-reader-mcp"]
+  M["8. manual-model（並行）"]
+  V & R & M --> S["9. サイトに 3 ページ追加"]
+  S --> P["10. 公開（D-16）"]
+```
+
+| 順 | 作業 | 置き場所 | 設計 |
+|---|---|---|---|
+| 1 | brex-mcp の `services/brex-locator.ts` にある既定 BREX の探索（`DMC-S1000D-*-04-10-0301-00A-022A-D*.XML` を探し、中身の DMC が一致するものを優先する）を s1000d-core に移し、brex-mcp はそれを呼ぶ形に直す。verify-mcp と重複させないため | lib/s1000d-core、mcp/s1000d-brex-mcp | verify-mcp.md「3. BREX の照合」 |
+| 2 | s1000d-core に `SchemaValidator` インターフェース、`VerificationStatus` の型、`S1000D_SPEC_DIR` から `xml_schema_flat/` を探す処理、`verifyDataModule()` を足す。`libxml2-wasm` の実装はサブパス `@shuji-bonji/s1000d-core/xsd-libxml2`（任意の peerDependency）に置く（D-17） | lib/s1000d-core | verify-mcp.md「SchemaValidator と libxml2-wasm の置き場所」 |
+| 3 | s1000d-core に参照の解決を足す: `dmRef`、`pmRef`（`parsePmcFileName` を追加）、ICN（`ENTITY` 宣言 → ファイル）、`internalRef`、`applicRefId`。`listDataModules` を PMC・DML・DDN・IMF・UPF も拾う `listCsdbObjects` に広げる | lib/s1000d-core | verify-mcp.md「4. 参照の解決」 |
+| 4 | s1000d-core に適用性の評価を足す: ACT・CCT・PCT の読み取り、`assert` / `evaluate` の評価、`product` との照合。範囲の書式は BREX の `matchesRange` を再利用する | lib/s1000d-core（`src/applic/`） | reader-mcp.md「適用性の判定」 |
+| 5 | s1000d-core に本文の読み取りを足す: `descript` / `proced` / `process` / `fault` / `pm` の 5 種を共通の形（`blocks` / `steps` / `flow`）に揃える。ここまでを core 0.2.0 として公開し（D-14 の手順）、brex-mcp の依存を `^0.2.0` に上げる | lib/s1000d-core（`src/content/`） | reader-mcp.md「本文の構造の返し方」 |
+| 6 | s1000d-verify-mcp を作る: 5 ツール（`verify_data_module` / `validate_schema` / `check_references` / `verify_csdb` / `list_schemas`）、`instructions`、自作データのテスト、配布物のテスト（Bike Samples 106 件が XSD に適合、既定 BREX への違反 55 件が brex-mcp と一致）。作業 2 が済めば着手できる。U-03（自作サンプルデータの共有パッケージ）はこのときに判断する | mcp/s1000d-verify-mcp | verify-mcp.md |
+| 7 | s1000d-reader-mcp を作る: 6 ツール（`list_data_modules` / `read_data_module` / `read_publication_module` / `resolve_reference` / `describe_applicability` / `read_icn_metadata`）、`instructions`、テスト | mcp/s1000d-reader-mcp | reader-mcp.md |
+| 8 | manual-model を作る: 型、JSON Schema、`validateManual`、`fromLegacyJson`、券売機の例 `examples/kenbaiki.manual.json`。core に依存しないので、作業 1〜7 と並行できる。名前は `@shuji-bonji/experiential-manual-model`（U-04） | lib/experiential-manual-model | manual-model.md |
+| 9 | サイトに「s1000d-verify-mcp」「s1000d-reader-mcp」「適用性」の 3 ページを足し、`stack.json` に verify / reader / manual-model を加える。既存の brex-mcp のページにある「XSD 未検証」の説明を verify-mcp への案内に直す | s1000d-stack/site、stack.json | — |
+| 10 | 公開（D-16 の 5 つの作業）と、verify-mcp・reader-mcp の初回の手動 `npm publish` と Trusted Publisher の登録（D-14） | hub、各 MCP | DECISIONS.md D-14・D-16 |
+
+調査の宿題（Bike Samples 105 件に既定 BREX への違反 55 件が出る原因）は作業 6 のテストで同じ数が出ることを確かめたうえで、作業 9 のサイトの題材として調べます。
+
+### 進捗（段階 2）
+
+| 作業 | 状態 |
+|---|---|
+| 設計 | 済み（2026-10-24）。`docs/design/` の 3 文書。同日に D-17（`SchemaValidator` の置き場所）・D-18（reader の検証の既定）・U-04（パッケージ名）を確定 |
+| 1〜10 | 未 |
 
 ## 対象とする S1000D の版
 
