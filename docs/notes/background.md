@@ -174,6 +174,18 @@ flowchart TB
 | Bike Samples 105 件を「自転車 BREX → 既定 BREX」の 2 層に照合すると、既定 BREX への違反が合計 55 件出る | 公式サンプルでも既定 BREX をすべて満たしてはいない。既定 BREX 側の厳しさ（例: `issueType` と `reasonForUpdate` の整合）かサンプル側の不備かは未調査。学習サイトで「既定 BREX は公式サンプルにも違反を出す」と書く材料になる |
 | 既定 BREX の `objectValue` には説明文（本文）が空のものがある（`securityClassification` の値など） | `lookup_value` の `meaning` が空配列になることがある。値の意味は仕様書の Chap 3.9.6.1 を参照させる |
 
+### 参照の解決で分かった配布物の性質（2026-10-25）
+
+段階 2 の作業 3 で、Bike Samples の DMC 106 件と PMC 4 件の参照をすべて集めて解決した結果です（core の `spec.test.ts` に固定）。
+
+| 事実 | 影響 |
+|---|---|
+| `dmRef` 1,843 件のうち 960 件が未解決。そのうち 954 件はモデル識別コード `S1000D` の DMC（仕様書の章を指す参照。ほぼすべてビジネスルール文書 `…-024A-D` の中）、6 件は `S1000DBIKE` で CSDB に無いもの | 仕様書の章への参照は CSDB に無いので未解決で正しい。verify-mcp と reader は、モデル識別コード `S1000D` への `dmRef` を「仕様書への参照」として未解決の一覧から分けて示す |
+| `applicRefId` 366 件のうち 64 件は、同じ文書の `applic/@id` ではなく `referencedApplicGroupRef/applicRef/@id` を指す（`@applicIdentValue` で別の DM の適用性文を指す形。S1000DLIGHTING の 5 件の DM） | `applicRefId` の解決は両方を受け付ける。`applicRef` 経由のものは `externalApplic` に `applicIdentValue` を入れて返す。適用性文の実体（別 DM）の解決は作業 4（適用性の評価）で扱う |
+| `graphic/@infoEntityIdent` 64 件のうち 1 件は、DOCTYPE で `ICN-C0419-S1000D0406-001-01.PNG` と宣言されているが、同梱されている実ファイルは同名の `.SVG` | 配布物側の不整合。`file-not-found` として報告する。拡張子の違いを許す「寛容な解決」は入れない（宣言どおりに置かれていないことは納品の検査で見つけたい事実） |
+| `internalRef` 566 件はすべて同じ文書内の `@id` に解決できる。`pmRef` 10 件のうち 4 件は CSDB に無い PMC（`SAFE1` など）を指す | — |
+| `dmRef` に `issueInfo` が付くものは 2 件だけ（`DMC-BRAKE-…`）。参照は原則として版を指定しない | `issueMismatch` が出ることは少ない。出たときは重要 |
+
 ### サイトの生成と検索（2026-10-24）
 
 - Astro 7.4 ＋ Starlight 0.42。Astro 7 は Node 22.23.4 以上を要求する（22.22 では起動しない）。GitHub Pages の deploy は Node 24 で動かす。
