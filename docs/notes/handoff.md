@@ -1,4 +1,4 @@
-# 引き継ぎメモ（2026-10-25 00:40 JST 時点）
+# 引き継ぎメモ（2026-10-25 01:20 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
@@ -19,13 +19,13 @@ flowchart LR
   style S2 fill:#ffd,stroke:#993
 ```
 
-**段階 1 は 2026-10-24 に完了し、段階 2 の設計を同日に書きました。** 設計は `docs/design/` の 3 文書（[verify-mcp.md](../design/verify-mcp.md)、[reader-mcp.md](../design/reader-mcp.md)、[manual-model.md](../design/manual-model.md)）で、作業の順序は ROADMAP「段階 2 の作業」の表（作業 1〜10）にあります。設計で出た 3 つの判断は同日に確定しました（D-17: XSD 検証の置き場所、D-18: reader の検証の既定、U-04: パッケージ名 `@shuji-bonji/experiential-manual-model`）。実装は作業 1〜3 が済み（core の `2ab3a78`・`55129b3`・`0479a07`、未 push）、次は作業 4 です。
+**段階 1 は 2026-10-24 に完了し、段階 2 の設計を同日に書きました。** 設計は `docs/design/` の 3 文書（[verify-mcp.md](../design/verify-mcp.md)、[reader-mcp.md](../design/reader-mcp.md)、[manual-model.md](../design/manual-model.md)）で、作業の順序は ROADMAP「段階 2 の作業」の表（作業 1〜10）にあります。設計で出た 3 つの判断は同日に確定しました（D-17: XSD 検証の置き場所、D-18: reader の検証の既定、U-04: パッケージ名 `@shuji-bonji/experiential-manual-model`）。実装は作業 1〜4 が済み（core の `2ab3a78`・`55129b3`・`0479a07`・`8cbc0a6`、未 push）、次は作業 5 です。
 
 ## リポジトリの状態
 
 | リポジトリ | 公開 | npm | 状態 |
 |---|---|---|---|
-| [shuji-bonji/s1000d-core](https://github.com/shuji-bonji/s1000d-core) | Public | `@shuji-bonji/s1000d-core` 0.1.0（2026-10-24、手動公開） | CI 通過。`publish.yml`（Trusted Publisher、タグ `v*` で起動）と `docs/RELEASE.md` をコミット済み。npm 側の Trusted Publisher 登録も済み（2026-10-24）。次の版からは `docs/RELEASE.md` の手順（version を上げてタグ `vX.Y.Z` を push）だけで公開される。段階 2 の作業 1〜3 をコミット済み（`2ab3a78`、`55129b3`、`0479a07`。push は未）。作業 5 の後に 0.2.0 にする |
+| [shuji-bonji/s1000d-core](https://github.com/shuji-bonji/s1000d-core) | Public | `@shuji-bonji/s1000d-core` 0.1.0（2026-10-24、手動公開） | CI 通過。`publish.yml`（Trusted Publisher、タグ `v*` で起動）と `docs/RELEASE.md` をコミット済み。npm 側の Trusted Publisher 登録も済み（2026-10-24）。次の版からは `docs/RELEASE.md` の手順（version を上げてタグ `vX.Y.Z` を push）だけで公開される。段階 2 の作業 1〜4 をコミット済み（`2ab3a78`、`55129b3`、`0479a07`、`8cbc0a6`。push は未）。作業 5 の後に 0.2.0 にする |
 | [shuji-bonji/s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | Private | 未公開 | CI 通過。core は npm の `^0.1.0` を参照。段階 2 の作業 1 で `services/brex-locator.ts` の探索を core に移す |
 | [shuji-bonji/s1000d-stack](https://github.com/shuji-bonji/s1000d-stack)（hub） | Private | — | README・`stack.json`・`scripts/generate-stack.mjs`・`site/`・`.github/workflows/`（`deploy.yml` は手動実行のみ、`stack-check.yml` は毎日）・`docs/` をコミット・push 済み（2026-10-24）。`docs/` の変更は 2026-10-24 夜にチャットからコミット済み（push は未）。**git のコミットはチャットから行ってよい**（2026-10-24 に利用者が指示。接続フォルダーの削除の許可を得れば git のロックファイルも消せる）。署名は利用者が後で付け直す |
 | `shuji-bonji/s1000d-verify-mcp`、`s1000d-reader-mcp`、`s1000d-writer-mcp` | Private | 未公開 | GitHub に作成済み、中身は空。ローカルの `mcp/` の下のフォルダーも空 |
@@ -52,8 +52,7 @@ cd site && npm run build && npm run preview
 
 ## 次にやること（候補の順）
 
-1. **作業 4**（適用性の評価: ACT・CCT・PCT の読み取り、`assert` / `evaluate` の評価、`product` との照合。`referencedApplicGroupRef/applicRef/@applicIdentValue` で別 DM の適用性文を指す形も扱う）。設計は design/reader-mcp.md「適用性の判定」。
-2. **作業 5**（本文の読み取り、core 0.2.0 の公開）。
+1. **作業 5**（本文の読み取り: `descript` / `proced` / `process` / `fault` / `pm` の 5 種を共通の形に揃える。設計は design/reader-mcp.md「本文の構造の返し方」）。済んだら core を 0.2.0 として公開し（`docs/RELEASE.md` の手順。version を上げてタグ `v0.2.0` を push）、brex-mcp の依存を `^0.2.0` に上げて `services/brex-locator.ts` を core の `locateBrex` に切り替える（作業 1 の残り）。
 3. **作業 8**（experiential-manual-model）は core に依存しないので、並行して進められる。
 4. **公開（D-16）**: 段階 2 が揃ったら、D-16 に書いた 5 つの作業で hub と brex-mcp を公開する。
 

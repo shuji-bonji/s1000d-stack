@@ -186,6 +186,17 @@ flowchart TB
 | `internalRef` 566 件はすべて同じ文書内の `@id` に解決できる。`pmRef` 10 件のうち 4 件は CSDB に無い PMC（`SAFE1` など）を指す | — |
 | `dmRef` に `issueInfo` が付くものは 2 件だけ（`DMC-BRAKE-…`）。参照は原則として版を指定しない | `issueMismatch` が出ることは少ない。出たときは重要 |
 
+### 適用性の評価で分かった配布物の性質（2026-10-25）
+
+段階 2 の作業 4 で、Bike Samples の ACT（`00W`）・CCT（`00Q`）・PCT（`00P`）を読み、PCT の 3 製品それぞれで DM 106 件の適用性を判定した結果です（core の `spec.test.ts` に固定）。
+
+| 事実 | 影響 |
+|---|---|
+| ACT は属性 `SerialNo`（primary）・`type`・`model`・`version`・`versrank`・`brakeSerialno` を定義するが、PCT の 3 製品はどれも `type` に値を割り当てていない。`type` を使う `assert` は 110 件あるため、PCT の製品で判定すると DM 全体の applic 106 件のうち 68〜70 件、要素の applic 366 件のうち 310〜324 件が「製品に `type` の値が無い」理由で undetermined になる | 判定の仕組みは正しく動いている（理由が 1 種類に集約される）。reader の `describe_applicability` は、ACT の属性のうち PCT が値を割り当てていないものを一覧で示し、利用者が `product` で補えるようにする |
+| PCT の条件 `SB-S001` の値は `Pre` / `Post` だが、CCT の `condType SB` の列挙は `PRE` と `POST-001~POST-999`。大文字小文字も書式も合わない | 値の比較は完全一致のままにする（配布物側の不整合として見えるべきもの）。reader は PCT の値が CCT の列挙に合わないことを警告として返せる |
+| `referencedApplicGroupRef/applicRef/@applicIdentValue`（`app-00000000AA057A-0001` の形、13 件の DM）が指す適用性リポジトリは、Bike Samples のどの DM にも無い（`00G` の DM の `applic` は `@applicIdentValue` を持たない） | 64 件の要素が「リポジトリに無い」理由で undetermined になる。core の `ApplicEvaluator` はリポジトリを `buildApplicRepository` で外から渡す形にしてあり、利用者が持っていれば解決できる |
+| `evaluate` の入れ子は 82 件。`andOr="or"` の中に `and` が並ぶ形（機種と版の組み合わせ）が典型 | 3 値評価の `and` / `or` で扱える。XPath や数式は出てこない |
+
 ### サイトの生成と検索（2026-10-24）
 
 - Astro 7.4 ＋ Starlight 0.42。Astro 7 は Node 22.23.4 以上を要求する（22.22 では起動しない）。GitHub Pages の deploy は Node 24 で動かす。
