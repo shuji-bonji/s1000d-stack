@@ -172,7 +172,8 @@ flowchart LR
 | 2 | 済み（2026-10-24、core の `55129b3`）。`src/xml/schema-validator.ts`（`SchemaValidator` ほかのインターフェース）、`src/xsd-libxml2.ts`（`Libxml2SchemaValidator`。サブパス `@shuji-bonji/s1000d-core/xsd-libxml2`、`libxml2-wasm` は任意の peerDependency）、`src/verify/`（`findSchemaDirs` / `locateXsd` / `VerificationStatus` / `verifyDataModule`）。XSD の版は `brex.xsd` 冒頭の `Issue number:` から読む（フォルダー名に頼らない）。自作 XSD の単体テスト 10 件と配布物のテスト 1 件（Bike Samples 106 件が適合、約 0.45 秒）を追加し、57 件すべて通過。`verifyDataModule` の `references` は作業 3 まで `not-run` |
 | 3 | 済み（2026-10-25、core の `0479a07`）。`src/pmc.ts`（PMC）、`src/csdb-index.ts`（`listCsdbObjects` / `CsdbIndex`。PMC・DML・DDN・IMF・UPF・ICN も拾う）、`src/refs/`（`collectReferences` / `resolveReferences`）、`verifyDataModule` の `references`。自作データのテスト 8 件と配布物のテスト 1 件を追加し、65 件すべて通過。Bike Samples で分かったこと（仕様書の章への `dmRef`、`referencedApplicGroupRef/applicRef` 経由の `applicRefId`、`.PNG` と宣言された ICN の実ファイルが `.SVG`）は notes/background.md「参照の解決で分かった配布物の性質」に記録 |
 | 4 | 済み（2026-10-25、core の `8cbc0a6`）。`src/applic/`（`readAct` / `readCct` / `readPct` / `readApplicStatements` / `evaluateApplic` / `ApplicEvaluator` / `buildApplicRepository`）。自作データのテスト 9 件と配布物のテスト 1 件を追加し、75 件すべて通過。Bike Samples で分かったこと（PCT が `type` に値を割り当てていない、PCT の条件値と CCT の列挙の不一致、`applicIdentValue` の先が配布物に無い）は notes/background.md「適用性の評価で分かった配布物の性質」に記録 |
-| 5〜10 | 未 |
+| 5 | core 側は済み（2026-10-25、core の `d7a4c0c`）。`src/content/`（`readContent` / `readContentFromXml` / `countNodes`）。自作データのテスト 7 件と配布物のテスト 1 件を追加し、84 件すべて通過。CHANGELOG に 0.2.0 の節を書き、`npm version minor` で `release: v0.2.0`（`911f3b5`）とタグ `v0.2.0` を作成済み。**npm への公開は、利用者が `git push origin main --tags` をした時点で `publish.yml` が行う（未）。** 公開後に brex-mcp の依存を `^0.2.0` に上げ、`services/brex-locator.ts` を core の `locateBrex` に切り替える（作業 1 の残り） |
+| 6〜10 | 未 |
 
 ## 対象とする S1000D の版
 
