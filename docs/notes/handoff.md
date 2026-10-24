@@ -1,4 +1,4 @@
-# 引き継ぎメモ（2026-10-24 JST 時点）
+# 引き継ぎメモ（2026-10-24 09:10 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
@@ -18,7 +18,7 @@ flowchart LR
   style S1 fill:#dfe,stroke:#393
 ```
 
-段階 1 の作業 1〜7 はすべて済んでいます（ROADMAP「進捗」）。段階 1 の完了条件のうち残っているのは **サイト 9 ページを利用者が通読して仕様書と矛盾がないか確かめること** だけです。
+**段階 1 は 2026-10-24 に完了しました。** 作業 1〜7 と、完了条件の 3 つ（自動テスト、既定 BREX での手動確認、サイト 9 ページの通読）がすべて済んでいます（ROADMAP「進捗」、notes/site-review.md）。次は U-01（公開の時期）の判断と、段階 2 の入口である U-08（XSD 検証の方式）の比較です。
 
 ## リポジトリの状態
 
@@ -47,10 +47,9 @@ cd site && npm run build && npm run preview
 
 ## 次にやること（候補の順）
 
-1. **利用者側**: サイト 9 ページの通読（`cd site && npm run build && npm run preview`）。段階 1 の最後の完了条件。ページごとの根拠と確認方法、機械的確認の結果は [notes/site-review.md](./site-review.md)（2026-10-24）にある。
-2. **U-01（公開の時期）** を決める。hub を Public にするなら `deploy.yml` の push トリガーを戻し、GitHub Pages（Source: GitHub Actions）を有効にする。brex-mcp を npm に出すなら、初回は手動 publish、以後は Trusted Publisher（D-14）。
-3. **段階 2 の入口**: U-08（XSD 検証の方式。候補 `xmllint-wasm` と `libxml2-wasm`。判断材料は DECISIONS.md）を比較して決める → s1000d-reader-mcp / s1000d-verify-mcp / manual-model の設計。
-4. **調査の宿題**: Bike Samples 105 件に既定 BREX への違反 55 件が出る原因（既定 BREX の厳しさか、サンプルの不備か）。学習サイトの題材になる。
+1. **U-01（公開の時期）** を決める（利用者の判断）。hub を Public にするなら `deploy.yml` の push トリガーを戻し、GitHub Pages（Source: GitHub Actions）を有効にする。brex-mcp を npm に出すなら、初回は手動 publish、以後は Trusted Publisher（D-14）。
+2. **段階 2 の入口**: U-08（XSD 検証の方式。候補 `xmllint-wasm` と `libxml2-wasm`。判断材料は DECISIONS.md）を比較して決める → s1000d-reader-mcp / s1000d-verify-mcp / manual-model の設計。
+3. **調査の宿題**: Bike Samples 105 件に既定 BREX への違反 55 件が出る原因（既定 BREX の厳しさか、サンプルの不備か）。学習サイトの題材になる。
 
 ## 新しいチャットの最初に読むもの
 
@@ -58,7 +57,7 @@ cd site && npm run build && npm run preview
 2. DECISIONS.md（D-01〜D-14 と未決 U-01〜U-09）
 3. notes/background.md（仕様書の読解結果、配布物のファイル構成、設計のヒント）
 4. このメモ
-5. notes/site-review.md（サイト通読用の照合シート。通読が済んだら不要）
+5. notes/site-review.md（サイト通読用の照合シート。通読は 2026-10-24 に完了。記述の根拠を探すときに参照）
 
 > [!NOTE]
 > 文章は GitHub のアラート記法（`> [!NOTE]` など）を使い、日付は JST で書きます。既定 BREX の DMC は `S1000D-Y-04-10-0301-00A-022A-D` で、システム差異コード（Y）が配布物のファイル名・仕様書本文・データ辞書で食い違うため、コードでは決め打ちしていません。
