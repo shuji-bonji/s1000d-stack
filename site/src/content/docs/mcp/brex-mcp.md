@@ -17,7 +17,7 @@ description: BREX を LLM が読み、データモジュールを BREX に照合
 
 ## できないこと
 
-- XML スキーマ（XSD）による検証は行いません。
+- XML スキーマ（XSD）による検証は行いません。XSD の検証と、XSD・BREX・参照をまとめた検証状態は [`s1000d-verify-mcp`](/s1000d-stack/mcp/verify-mcp/) が返します。
 - S1000D への準拠は判定しません。`passed: true` は「見つかったすべての層で、機械で検査できる BREX のルールに違反が無かった」ことだけを意味します。`nonContextRules` は `manualChecks` として返し、判断は人が行います。
 - 重大度コード（`brsl01`〜`brsl99`）の意味は解釈しません。
 
@@ -88,5 +88,5 @@ flowchart TB
 `kind` は `forbidden`（使ってはならない対象があった）、`missing`（必ず含める対象が無かった）、`value`（値が許可値に合わない）、`notation`（使っている図の形式が許可されていない）の 4 つです。
 
 :::note[公開の状態]
-`@shuji-bonji/s1000d-brex-mcp` は 2026-10-24 時点で npm 未公開（開発中）です。リポジトリから `npm install && npm run build` して `node dist/index.js` を起動できます。
+`@shuji-bonji/s1000d-brex-mcp` は 2026-10-25 時点で npm 未公開（開発中）です。段階 2 の部品（`s1000d-verify-mcp`・`s1000d-reader-mcp`）と一緒に公開します。リポジトリから `npm install && npm run build` して `node dist/index.js` を起動できます。
 :::

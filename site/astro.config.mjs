@@ -38,12 +38,15 @@ export default defineConfig({
               slug: 'guide/data-module-and-dmc',
             },
             { label: 'BREX（ビジネスルール交換）', slug: 'guide/brex' },
+            { label: '適用性（どの製品に当てはまるか）', slug: 'guide/applicability' },
           ],
         },
         {
           label: 'MCP サーバー',
           items: [
             { label: 's1000d-brex-mcp', slug: 'mcp/brex-mcp' },
+            { label: 's1000d-verify-mcp', slug: 'mcp/verify-mcp' },
+            { label: 's1000d-reader-mcp', slug: 'mcp/reader-mcp' },
             { label: 's1000d-core（ライブラリ）', slug: 'mcp/core' },
           ],
         },

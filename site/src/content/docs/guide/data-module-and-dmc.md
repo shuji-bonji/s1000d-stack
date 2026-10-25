@@ -25,7 +25,7 @@ flowchart TB
 | `dmTitle` | 技術名称（`techName`）と情報名（`infoName`） | 人が読む題名 |
 | `dmStatus/@issueType` | new / changed / … | 改版の種類 |
 | `security` | 機密区分 | 配布の制御 |
-| `applic` | どの機種・構成に当てはまるか | 適用性の判定（段階 2 の reader） |
+| `applic` | どの機種・構成に当てはまるか | [適用性](/s1000d-stack/guide/applicability/)の判定（`s1000d-reader-mcp`） |
 | `brexDmRef` | 従うべき BREX の DMC | BREX 照合の起点 |
 | `qualityAssurance` | 未検証 / 第 1 検証 / 第 2 検証 | 検証状態の明示 |
 

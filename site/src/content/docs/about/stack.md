@@ -15,13 +15,13 @@ flowchart TB
     DOCS["docs/ 計画と決定の記録"]
   end
   subgraph Lib["共有ライブラリ"]
-    CORE["s1000d-core<br/>公開済み（npm 0.1.0）"]
-    MODEL["manual-model<br/>予定（段階 2）"]
+    CORE["s1000d-core<br/>公開済み（npm 0.2.0）"]
+    MODEL["experiential-manual-model<br/>開発中（段階 2）"]
   end
   subgraph Mcp["MCP サーバー"]
     BREX["s1000d-brex-mcp<br/>開発中（段階 1）"]
-    R["s1000d-reader-mcp<br/>予定（段階 2）"]
-    V["s1000d-verify-mcp<br/>予定（段階 2）"]
+    R["s1000d-reader-mcp<br/>開発中（段階 2）"]
+    V["s1000d-verify-mcp<br/>開発中（段階 2）"]
     W["s1000d-writer-mcp<br/>予定（段階 3）"]
   end
   subgraph App["製品"]
@@ -39,13 +39,13 @@ flowchart TB
   SK -.-> Mcp
 ```
 
-| 部品 | 役割 | 状態（2026-10-24） |
+| 部品 | 役割 | 状態（2026-10-25） |
 | --- | --- | --- |
-| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | DMC・ICN・識別・状態部・BREX 照合の共有ライブラリ | npm 0.1.0 公開済み |
+| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | DMC・ICN・識別・状態部・BREX 照合・XSD 検証・参照の解決・適用性の評価・本文の読み取りの共有ライブラリ | npm 0.2.0 公開済み |
 | s1000d-brex-mcp | BREX の説明と照合（5 ツール） | 開発中。npm 未公開 |
-| s1000d-reader-mcp | データモジュールの本文を構造化して返す、参照の解決、適用性の判定 | 予定（段階 2） |
-| s1000d-verify-mcp | 公式 XSD による検証、BREX 照合、参照切れの検出 | 予定（段階 2） |
-| manual-model | 体験型マニュアルの共通データモデル（S1000D に依存しない） | 予定（段階 2） |
+| [s1000d-reader-mcp](/s1000d-stack/mcp/reader-mcp/) | データモジュールの本文を構造化して返す、参照の解決、適用性の判定（6 ツール） | 開発中。npm 未公開 |
+| [s1000d-verify-mcp](/s1000d-stack/mcp/verify-mcp/) | 公式 XSD による検証、BREX 照合、参照切れの検出（5 ツール） | 開発中。npm 未公開 |
+| experiential-manual-model | 体験型マニュアルの共通データモデル（S1000D に依存しない）。型・JSON Schema・検査・2021 年の作品からの変換 | 開発中。npm 未公開 |
 | s1000d-writer-mcp | 共通データモデルからデータモジュールを生成 | 予定（段階 3） |
 | Skill | experience-to-s1000d / s1000d-publish / s1000d-review | 構想（段階 3） |
 | 作成ツール・閲覧ソフト | 人が使う製品。AI が無くても動く | 構想（段階 3〜4） |
@@ -55,7 +55,7 @@ flowchart TB
 | 段階 | 成果物 | 完了の条件 |
 | --- | --- | --- |
 | 1 | hub（このサイト）、s1000d-core、s1000d-brex-mcp | 自作 BREX とデータモジュールで照合のテストが通る。既定 BREX を読み、自作データモジュールを照合して仕様書と矛盾しない。サイトの説明を仕様書と照合済み |
-| 2 | s1000d-reader-mcp、s1000d-verify-mcp、manual-model | 公式 XSD（利用者が入手したもの）による検証、参照の解決、適用性の判定ができる。reader の応答に版と検証状態を含める |
+| 2 | s1000d-reader-mcp、s1000d-verify-mcp、experiential-manual-model | 公式 XSD（利用者が入手したもの）による検証、参照の解決、適用性の判定ができる。reader の応答に版と検証状態を含める |
 | 3 | s1000d-writer-mcp、Skill、作成ツールの試作 | 券売機の例を共通データモデル経由で S1000D に出力し、verify を通る |
 | 4 | 閲覧ソフト | 共通データモデルを表示し、WebMCP で AI が操作を案内できる |
 
@@ -66,6 +66,8 @@ flowchart TB
 - **構成は houki-hub に揃える**。hub は構成表とサイトだけを持ち、各部品は独立したリポジトリです。
 - **BREX の照合処理は s1000d-core に置く**。brex-mcp と verify-mcp はそれを呼ぶだけにします。
 - **XML は @xmldom/xmldom、XPath は fontoxpath**。既定 BREX に XPath 2.0 の式があるためです。
+- **XSD の検証は libxml2-wasm**。XSD ごとに 1 回コンパイルして使い回せ、公式サンプル 106 件を 0.5 秒以内で検証できます。インターフェースと実装は s1000d-core に置き、verify-mcp と reader-mcp が同じものを使います。
+- **reader は適用性の式を LLM に渡さない**。判定はサーバーが行い、applicable / notApplicable / undetermined と表示文だけを返します。
 - **npm への公開は Trusted Publisher**。tag の push で GitHub Actions が OIDC で公開します。
 
 決定の経緯と未決事項は、hub リポジトリの `docs/DECISIONS.md` に番号付きで記録しています。

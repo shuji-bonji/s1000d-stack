@@ -52,21 +52,21 @@ const README_FILE = join(ROOT, 'README.md');
 const REGISTRY = [
   // ── 公開済み ────────────────────────────────────────────────
   { name: 's1000d-core',      dir: 'lib/s1000d-core',      npm: '@shuji-bonji/s1000d-core',      layer: 'core', form: 'library',    status: 'released',   public: true,
-    note: 'DMC・ICN の分解、識別・状態部の読み取り、BREX の読み取りと照合（連鎖・層別）、XML/XPath 層（@xmldom/xmldom ＋ fontoxpath）。全 MCP が依存' },
+    note: 'DMC・ICN・PMC の分解、識別・状態部の読み取り、BREX の読み取りと照合（連鎖・層別）、XSD 検証（SchemaValidator、実装は libxml2-wasm のサブパス）、参照の解決、適用性の 3 値評価、本文（descript / proced / process / fault / pm）の共通の形への読み取り、検証状態 VerificationStatus。全 MCP が依存' },
 
-  // ── 開発中（リポジトリはある。npm 未公開）────────────────────
+  // ── 開発中（リポジトリはある。npm 未公開。段階 2 が揃った時点で公開、D-16）────
   { name: 's1000d-brex-mcp',  dir: 'mcp/s1000d-brex-mcp',  npm: '@shuji-bonji/s1000d-brex-mcp',  layer: 'mcp',  form: 'mcp-server', status: 'developing', public: false,
     note: 'BREX を LLM が読み、データモジュールを BREX に照合する。explain_brex / lookup_sns / lookup_value / list_notations / check_against_brex の 5 tools。段階 1 の成果物' },
+  { name: 's1000d-verify-mcp', dir: 'mcp/s1000d-verify-mcp', npm: '@shuji-bonji/s1000d-verify-mcp', layer: 'mcp', form: 'mcp-server', status: 'developing', public: false,
+    note: '段階 2。利用者が入手した公式 XSD による検証 ＋ BREX 照合（core を呼ぶ）＋ 参照の解決を 1 つの検証状態にまとめる。verify_data_module / validate_schema / check_references / verify_csdb / list_schemas の 5 tools' },
+  { name: 's1000d-reader-mcp', dir: 'mcp/s1000d-reader-mcp', npm: '@shuji-bonji/s1000d-reader-mcp', layer: 'mcp', form: 'mcp-server', status: 'developing', public: false,
+    note: '段階 2。データモジュールの本文を構造化して返す、参照の解決、適用性の判定（式は LLM に渡さない）。応答に検証状態を含める。list_data_modules / read_data_module / read_publication_module / resolve_reference / describe_applicability / read_icn_metadata の 6 tools' },
+  { name: 'experiential-manual-model', dir: 'lib/experiential-manual-model', npm: '@shuji-bonji/experiential-manual-model', layer: 'model', form: 'library', status: 'developing', public: false,
+    note: '段階 2。体験型マニュアルの共通データモデル（型・JSON Schema・検査・2021 年の作品 JSON からの変換）。S1000D に依存しない。名前は U-04 で確定' },
   { name: 's1000d-stack',     dir: '.',                    npm: null,                            layer: 'hub',  form: 'site',       status: 'developing', public: false,
     note: '本リポジトリ。site/ に Astro Starlight の学習サイト（GitHub Pages で公開予定）' },
 
   // ── 予定・構想（ディレクトリも npm も無い。照合はしない）──────────
-  { name: 's1000d-reader-mcp', dir: 'mcp/s1000d-reader-mcp', npm: '@shuji-bonji/s1000d-reader-mcp', layer: 'mcp', form: 'mcp-server', status: 'planned', public: false,
-    note: '段階 2。データモジュールの本文を構造化して返す、参照の解決、適用性の判定。応答に版と検証状態を含める' },
-  { name: 's1000d-verify-mcp', dir: 'mcp/s1000d-verify-mcp', npm: '@shuji-bonji/s1000d-verify-mcp', layer: 'mcp', form: 'mcp-server', status: 'planned', public: false,
-    note: '段階 2。利用者が入手した公式 XSD による検証 ＋ BREX 照合（core を呼ぶ）＋ 参照切れの検出。XSD 検証の方式は U-08' },
-  { name: 'manual-model',      dir: 'lib/manual-model',      npm: '@shuji-bonji/manual-model',      layer: 'model', form: 'library',   status: 'planned', public: false,
-    note: '段階 2。体験型マニュアルの共通データモデル（状態・遷移・操作・適用範囲・注意・版）。S1000D に依存しない。名前は仮（U-04）' },
   { name: 's1000d-writer-mcp', dir: 'mcp/s1000d-writer-mcp', npm: '@shuji-bonji/s1000d-writer-mcp', layer: 'mcp', form: 'mcp-server', status: 'planned', public: false,
     note: '段階 3。共通データモデルからデータモジュール・パブリケーションモジュールを生成する。S1000D との変換関数はここに置く' },
   { name: 's1000d-skills',     dir: 'skill/',                npm: null,                             layer: 'procedure', form: 'skill',  status: 'concept', public: false,

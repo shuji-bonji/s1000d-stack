@@ -26,8 +26,11 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
   <Card title="仕様書は同梱しません" icon="warning">
     S1000D の仕様書・XML スキーマ・既定 BREX・公式サンプルは、利用条件により再配布できません。利用者ご自身で s1000d.org から入手し、置き場所を環境変数で指定します。
   </Card>
+  <Card title="検証して、読む" icon="document">
+    verify が XSD・BREX・参照をまとめて検証状態にし、reader がデータモジュールを見出し・手順・警告・図の構造で読み、どの製品に当てはまるかを判定して渡します。LLM に XML も適用性の式も見せません。
+  </Card>
   <Card title="この先" icon="rocket">
-    データモジュールの本文を読む reader、XSD と BREX で検証する verify、共通データモデルから S1000D を生成する writer、そして体験型マニュアルの作成ツールと閲覧ソフトへ広げます。
+    共通データモデルから S1000D を生成する writer、そして体験型マニュアルの作成ツールと閲覧ソフトへ広げます。共通データモデル experiential-manual-model は S1000D に依存しません。
   </Card>
 </CardGrid>
 

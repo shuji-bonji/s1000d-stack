@@ -24,6 +24,12 @@ npm install @shuji-bonji/s1000d-core
 | BREX への照合（1 層・複数層・連鎖） | `checkAgainstBrexLayer` / `checkAgainstBrexLayers` / `checkAgainstBrexChain` / `resolveBrexChain` |
 | フォルダーを CSDB と見なす解決器 | `listDataModules` / `findDataModule` / `createDirectoryBrexResolver` |
 | XML の読み取りと XPath の評価 | `XmlEngine` / `defaultXmlEngine` |
+| BREX の指定（パス・DMC・省略＝既定 BREX）から 1 つを決める | `locateBrex` / `findDefaultBrex` |
+| XSD の探索と検証（実装はサブパス `xsd-libxml2`） | `findSchemaDirs` / `locateXsd` / `SchemaValidator` / `Libxml2SchemaValidator` |
+| 参照（`dmRef` / `pmRef` / ICN / `internalRef` / `applicRefId`）の収集と解決 | `collectReferences` / `resolveReferences` / `CsdbIndex` |
+| 適用性（ACT・CCT・PCT の読み取り、`assert` / `evaluate` の 3 値評価） | `readAct` / `readCct` / `readPct` / `ApplicEvaluator` |
+| 本文（descript / proced / process / fault / pm）の共通の形への読み取り | `readContent` / `readContentFromXml` |
+| 1 件の検証（整形式・XSD・BREX・参照）をまとめた検証状態 | `verifyDataModule` / `VerificationStatus` |
 
 ```ts
 import { readFileSync } from 'node:fs';
@@ -49,6 +55,10 @@ BREX の `objectPath` は XPath で書かれ、既定 BREX には `descendant-or
 ### 照合処理はライブラリに置く
 
 BREX の照合は `s1000d-brex-mcp`（段階 1）と `s1000d-verify-mcp`（段階 2）の両方が使います。同じ処理を 2 つの MCP に別々に書くと結果が食い違うので、照合処理はこのライブラリに置き、MCP は呼ぶだけにしています。
+
+### XSD 検証は libxml2-wasm、実装はサブパスに
+
+XSD 検証は `libxml2-wasm` で行います。`xmllint-wasm` と比べ、Issue 7 の XSD 33 本と Bike Samples 106 件で判定が同じで、コンパイル済みの検証器を使い回せるため約 30 倍速かったからです。`xs:import` の解決に使う API が試験的な扱い（`@alpha`）なので、`XmlEngine` と同じく `SchemaValidator` インターフェースの後ろに置き、実装はサブパス `@shuji-bonji/s1000d-core/xsd-libxml2` から読み込みます。`libxml2-wasm` は任意の peerDependency なので、XSD 検証を使わない `s1000d-brex-mcp` は入れずに済みます。
 
 ### 配布物は含めない、テストは自作データで
 

@@ -59,15 +59,15 @@ flowchart TB
 
 <!-- stack:begin — scripts/generate-stack.mjs が生成。手で編集しない -->
 
-> 版は実測（2026-10-23 時点の `npm view`）。
+> 版は実測（2026-10-25 時点の `npm view`）。
 
 | リポジトリ | 役割 | 配布形態 | 状態 | 版 | npm |
 | --- | --- | --- | --- | --- | --- |
-| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | core | library | 公開済み | 0.1.0 | `@shuji-bonji/s1000d-core` |
+| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | core | library | 公開済み | 0.2.0 | `@shuji-bonji/s1000d-core` |
 | s1000d-brex-mcp | mcp | mcp-server | 開発中 | 0.1.0 | — |
-| s1000d-reader-mcp | mcp | mcp-server | 予定 | — | — |
-| s1000d-verify-mcp | mcp | mcp-server | 予定 | — | — |
-| manual-model | model | library | 予定 | — | — |
+| s1000d-verify-mcp | mcp | mcp-server | 開発中 | 0.1.0 | — |
+| s1000d-reader-mcp | mcp | mcp-server | 開発中 | 0.1.0 | — |
+| experiential-manual-model | model | library | 開発中 | 0.1.0 | — |
 | s1000d-writer-mcp | mcp | mcp-server | 予定 | — | — |
 | s1000d-skills | procedure | skill | 構想 | — | — |
 | manual-editor | app | app | 構想 | — | — |
