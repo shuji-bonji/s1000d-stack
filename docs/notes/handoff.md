@@ -1,4 +1,4 @@
-# 引き継ぎメモ（2026-10-26 00:10 JST 時点）
+# 引き継ぎメモ（2026-10-26 00:20 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
@@ -19,7 +19,7 @@ flowchart LR
   style S2 fill:#ffd,stroke:#993
 ```
 
-**段階 1 は 2026-10-24 に完了し、段階 2 の設計を同日に書きました。** 設計は `docs/design/` の 3 文書（[verify-mcp.md](../design/verify-mcp.md)、[reader-mcp.md](../design/reader-mcp.md)、[manual-model.md](../design/manual-model.md)）で、作業の順序は ROADMAP「段階 2 の作業」の表（作業 1〜10）にあります。設計で出た 3 つの判断は同日に確定しました（D-17: XSD 検証の置き場所、D-18: reader の検証の既定、U-04: パッケージ名 `@shuji-bonji/experiential-manual-model`）。実装は作業 1〜8 が済み（段階 2 の 3 部品 verify-mcp・reader-mcp・experiential-manual-model がすべて動く状態）、core 0.2.0 は npm に公開済みです（2026-10-25）。作業 9（サイト）も済み、残りは作業 10（公開）です。**2026-10-25 に次の目標を「CSDB 製品に組み込める基盤」と決め（D-19）、段階 2.5（修正提案・`CsdbSource`・HTTP transport・DML/DDN）を ROADMAP に足しました。設計は design/agent-platform.md。**
+**段階 1 は 2026-10-24 に完了し、段階 2 の設計を同日に書きました。** 設計は `docs/design/` の 3 文書（[verify-mcp.md](../design/verify-mcp.md)、[reader-mcp.md](../design/reader-mcp.md)、[manual-model.md](../design/manual-model.md)）で、作業の順序は ROADMAP「段階 2 の作業」の表（作業 1〜10）にあります。設計で出た 3 つの判断は同日に確定しました（D-17: XSD 検証の置き場所、D-18: reader の検証の既定、U-04: パッケージ名 `@shuji-bonji/experiential-manual-model`）。実装は作業 1〜8 が済み（段階 2 の 3 部品 verify-mcp・reader-mcp・experiential-manual-model がすべて動く状態）、core 0.2.0 は npm に公開済みです（2026-10-25）。作業 9（サイト）も済み、残りは作業 10（公開）です。**2026-10-25 に次の目標を「CSDB 製品に組み込める基盤」と決め（D-19）、段階 2.5（修正提案・`CsdbSource`・HTTP transport・DML/DDN・概要モード・機密区分）を ROADMAP に足しました。LLM 活用時の注意点 5 つへの対応と、段階 4 の最初の成果物にする簡易な技術マニュアルの Web システム（基盤の参照実装、技術は U-10）も同じ設計文書に記録してあります。設計は design/agent-platform.md。**
 
 ## リポジトリの状態
 
@@ -92,7 +92,7 @@ cd site && npm run build && npm run preview
 ## 新しいチャットの最初に読むもの
 
 1. ROADMAP.md（全体像と進捗。段階 2 の作業の表）
-2. DECISIONS.md（D-01〜D-19 と未決 U-03・U-05・U-07・U-09）
+2. DECISIONS.md（D-01〜D-19 と未決 U-03・U-05・U-07・U-09・U-10）
 3. notes/background.md（仕様書の読解結果、配布物のファイル構成、設計のヒント）
 4. このメモ
 5. design/ の 4 文書（着手する作業に応じて。agent-platform.md が次の目標）

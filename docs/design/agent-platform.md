@@ -87,6 +87,48 @@ verify-mcp に `suggest_fixes` を足します。入力は `verify_data_module` 
 - **エージェントは製品側が組む。** このスタックは core・MCP・Skill（手順）を提供し、Author / Reviewer / Translator / Project Manager の役割分担や UI は製品の設計に任せる。段階 3 の Skill（`s1000d-review` など）は、組み込むときの手順の見本になる。
 - **仕様書・XSD・既定 BREX は同梱しない**（D-03）。製品ベンダーは自社で配布物を持っているので、`S1000D_SPEC_DIR` 方式はそのまま使える。
 
+## LLM 活用時の注意点とこのスタックの対応
+
+S1000D を LLM で扱うときに挙げられる注意点（2026-10-25 に利用者が整理したもの）を、このスタックで何がどこまで対応できているか、何を足すかに分けて記録します。
+
+| 注意点 | 対応済み（段階 1〜2） | 足すもの |
+|---|---|---|
+| **仕様の複雑さ**: Issue（版）が複数あり、プロジェクト固有の BREX が加わるため、スキーマ検証だけでは足りない | XSD・BREX の連鎖・参照・適用性を 1 つの検証状態にまとめる（verify）。版は `schemaLocation` から読み分け、XSD は `brex.xsd` の版で選ぶ。BREX は連鎖を既定 BREX までたどって層ごとに照合する | Issue 4.2 の対応（U-07）。段階 2.5 では「版が違う DM が混ざった CSDB」で `verify_csdb` が版ごとに XSD を選ぶことを確かめる |
+| **公式スキーマの入手性**: XSD は登録ユーザー向けの配布で、オープンに再利用できない。近似スキーマで検証する例もある | 近似スキーマは作らない。利用者が入手した本物の XSD を `S1000D_SPEC_DIR` から読み、無ければ `schema-not-found` と明記する（D-03、D-15）。製品ベンダーは配布物を持っているので、組み込みではこの方式がそのまま使える | `list_schemas` の案内を製品向けに整える（どの zip をどこに展開するか）。近似スキーマを使う実装との違い（「検証した」と「本物で検証した」の区別）をサイトに書く |
+| **処理上の留意点**: 適用性や参照関係を失わないよう前処理が要る。テキスト化すると論理情報が欠ける。XML が冗長で、コンテキスト長を消費する | reader は XML をテキスト化せず、構造（節・手順・警告・図・参照）を保った木にする。適用性は判定して結果だけを渡し、参照は題名付きで解決する。`maxNodes`・`section`・`omitNotApplicable` で量を絞れる | **概要モード**: `read_data_module` に `section: "outline"`（見出し・手順の番号と最初の 1 文・警告の数だけ）を足し、LLM が全文を読む前に当たりを付けられるようにする。節点ごとの文字数を返して、LLM 側が予算を立てられるようにする |
+| **生成時の課題**: LLM に XML を直接出力させると、スキーマ準拠や参照の整合性を保証しにくい | 段階 2.5 の `suggest_fixes` は候補を core が決め、LLM は候補の外の値を出さない | **段階 3 の writer は LLM に XML を書かせない**。LLM は共通データモデル（experiential-manual-model）か、writer の構造化された入力（題名・段落・手順・参照の DMC）を出し、XML は writer が組み立てて、verify に通らなければ `suggest_fixes` の候補で直す「生成 → 検証 → 修正」の繰り返しにする。DMC・ICN の採番、`brexDmRef`、`issueInfo` は writer が付ける |
+| **その他**: 図（CGM など）・マルチメディア、機密区分、専門用語（Simplified Technical English など）への対応が別途要る | 図は ICN として参照を解決し、`hotspot` の `applicationStructureIdent` を返す。使ってよい形式は BREX の `list_notations` で読む。機密区分（`securityClassification`）は識別・状態部にそのまま返す | **図の中身は読まない**（CGM の描画・画像の理解はこのスタックの対象外。製品側が表示用の変換物を持つ。experiential-manual-model の `Asset.display` と同じ考え方）。**機密区分は応答の先頭に出し、エージェントが扱いを決められるようにする**（`verification` と同じく必ず付ける項目にする）。**STE（ASD-STE100）は ASD の仕様で利用条件が要る**ため、辞書を同梱せず、利用者が持つ用語集を Skill から参照する形にする（段階 3 の `s1000d-review` の一部） |
+
+これらのうち、段階 2.5 で行うのは「概要モード」「版が混ざった CSDB の確認」「機密区分を必ず付ける」「近似スキーマとの違いの説明」の 4 つです。writer の方針と STE は段階 3 に入れます。
+
+## 参照実装: 簡易な技術マニュアルの Web システム
+
+2026-10-25 に利用者が「これらを参照に、簡易的な技術マニュアル等の Web システムの構築も目指すことが望ましい」と決めました。この基盤を使う側の実物を 1 つ持ち、組み込みの形を製品ベンダーに示すためのものです。段階 4 の閲覧ソフトの最初の成果物として置きます。
+
+### できること（最小）
+
+| 機能 | 使う部品 |
+|---|---|
+| CSDB のフォルダーを開き、PM の目次からデータモジュールをたどる | core `CsdbIndex`、`readPublicationModule`（reader-mcp と同じ呼び出し） |
+| データモジュールを表示する（節・手順・警告・図・表・参照） | core `readContent` の `ContentNode` 木をそのまま HTML にする。XML をテキスト化しない |
+| 製品（applicability）を選ぶと、当てはまらない節・手順が消える | core `ApplicEvaluator`。判定は表示側では行わない |
+| 参照をクリックすると参照先の DM・図へ移る。無いものは「無い」と表示する | core `collectReferences` / `resolveReference` |
+| 各ページの先頭に版（issue）・検証状態・機密区分を表示する | `VerificationStatus`、`securityClassification`（段階 2.5 作業 7） |
+| AI に質問する欄（任意）。答えは reader-mcp の応答だけから作る | reader-mcp の HTTP transport（段階 2.5 作業 4）。ブラウザー側は WebMCP（段階 4 の条件） |
+
+### しないこと
+
+- オーサリング（書く・直す）は持たない。作成ツール（段階 3）の仕事です。
+- 図の中身（CGM の描画）は扱わない。表示用の SVG・PNG を製品側が用意する前提で、ICN の参照先をそのまま `<img>` にします。
+- 認証・権限・マルチテナントは持たない（D-19 の境界と同じ）。
+- 検索エンジンや全文検索は持たない。目次と参照でたどる範囲に限ります。
+
+### 位置付け
+
+- この基盤の「最初の利用者」であり、reader・verify・適用性の API が製品から使える形になっているかを確かめる場です。API に足りないものは、この Web システムを作る中で core・MCP 側に戻します。
+- S1000D の CSDB を直接表示します。体験型マニュアル（experiential-manual-model）を表示する閲覧ソフトは、この後に同じ部品で作ります。
+- 技術の選定（SvelteKit・PWA など）は U-10 として未決にし、段階 3 の作成ツールの試作と合わせて決めます。
+
 ## 作業（段階 2.5）
 
 | 順 | 作業 | 置き場所 |
@@ -96,6 +138,8 @@ verify-mcp に `suggest_fixes` を足します。入力は `verify_data_module` 
 | 3 | core に `CsdbSource` インターフェース（フォルダー実装を既定に）。`CsdbIndex` はその上に載せる | lib/s1000d-core |
 | 4 | 各 MCP に HTTP transport の起動オプション | mcp/* |
 | 5 | core に DML・DDN の読み取りと照合。verify-mcp `verify_csdb` と reader-mcp `list_data_modules` に反映 | lib/s1000d-core、mcp/* |
-| 6 | サイトに「組み込み基盤」のページ（4 つの要件と境界） | s1000d-stack/site |
+| 6 | サイトに「組み込み基盤」のページ（4 つの要件と境界、LLM 活用時の注意点への対応、近似スキーマとの違い） | s1000d-stack/site |
+| 7 | reader-mcp に概要モード（`section: "outline"`）と節点ごとの文字数。DM 全体と各節の `securityClassification` を応答の先頭に必ず付ける | lib/s1000d-core、mcp/s1000d-reader-mcp |
+| 8 | 版（Issue）が混ざった CSDB での `verify_csdb`（XSD を版ごとに選ぶ）の確認。Issue 4.2 の XSD が無い間は自作の `xml_schema_flat/` で確かめる | mcp/s1000d-verify-mcp |
 
-comment DM の生成と翻訳向けの API は、段階 3 の writer の作業に入れます。
+comment DM の生成、翻訳向けの API、「LLM に XML を書かせない」writer の方針、STE の用語集の参照は、段階 3 の writer と Skill の作業に入れます。

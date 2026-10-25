@@ -60,8 +60,8 @@ experiential-manual-model（文書の中では「manual-model」と略します�
 | 1 | s1000d-stack（サイトの骨組みと用語の説明）、s1000d-core、s1000d-brex-mcp | **自動**: 自作 BREX と自作データモジュールで、BREX の説明と照合のテストが CI で通る（2026-10-23 済み）。**手動**: 既定の BREX（利用者が入手したもの）を `explain_brex` で読み、自作データモジュールを照合して、結果が仕様書の BREX の章の記述と矛盾しないことを確認済み（2026-10-23 済み。券売機の説明 DM は既定 BREX の 243 ルールに違反なし）。**サイト**: BREX・データモジュールの説明を仕様書と照合済み（2026-10-24 に、作業 3 で読んだ Chap 4.10.2〜4.10.3・7.9 と既定 BREX の実測に基づいて執筆。2026-10-24 に利用者が 9 ページを通読し、仕様書との矛盾が無いことを確認済み。確認の根拠は [notes/site-review.md](./notes/site-review.md)）。**段階 1 は 2026-10-24 に完了** |
 | 2 | s1000d-reader-mcp、s1000d-verify-mcp、manual-model | 公式 XSD（利用者が入手したもの）による検証、参照の解決、適用性の判定ができる。reader の応答には対象データモジュールの版（issue）と検証状態を必ず含め、適用性の判定は reader が済ませてから LLM に渡す |
 | 2.5 | 修正提案（verify-mcp `suggest_fixes`）、`CsdbSource` インターフェース、HTTP transport、DML・DDN の読み取り、サイトの「組み込み基盤」のページ | LLM エージェントがスキーマ検証・クロスリファレンスチェック・適用性チェック・修正提案の 4 つをできる。修正提案の候補は core が決め、LLM は候補の外の値を出さない。CSDB をフォルダー以外（製品のデータベース・API）から読める |
-| 3 | s1000d-writer-mcp、Skill（experience-to-s1000d / s1000d-publish / s1000d-review）、作成ツールの試作、comment DM の生成、翻訳向けの文の抜き出しと差し戻し | 券売機の例を共通データモデル経由で S1000D に出力し、verify を通る |
-| 4 | 閲覧ソフト | 共通データモデルを表示し、WebMCP で AI が操作を案内できる |
+| 3 | s1000d-writer-mcp（LLM に XML を書かせず、構造化された入力から組み立てて「生成 → 検証 → 修正」を回す）、Skill（experience-to-s1000d / s1000d-publish / s1000d-review。STE の用語集は利用者のものを参照）、作成ツールの試作、comment DM の生成、翻訳向けの文の抜き出しと差し戻し | 券売機の例を共通データモデル経由で S1000D に出力し、verify を通る |
+| 4 | 閲覧ソフト。最初の成果物は、S1000D の CSDB を直接表示する簡易な技術マニュアルの Web システム（基盤の参照実装。設計は [design/agent-platform.md](./design/agent-platform.md)「参照実装」）。その後に共通データモデルを表示する閲覧ソフト | 簡易 Web マニュアルで、PM の目次から DM をたどり、製品を選ぶと当てはまらない節が消え、参照先へ移れ、各ページに版・検証状態・機密区分が出る。閲覧ソフトは共通データモデルを表示し、WebMCP で AI が操作を案内できる |
 
 ```mermaid
 flowchart LR
@@ -195,14 +195,16 @@ flowchart LR
 | 3 | core に `CsdbSource` インターフェース（フォルダー実装を既定）。`CsdbIndex` をその上に載せ、製品側が自分の CSDB を差し込めるようにする | lib/s1000d-core |
 | 4 | 各 MCP に HTTP（Streamable HTTP）transport の起動オプション。認証・権限は製品側の責務 | mcp/* |
 | 5 | core に DML・DDN の読み取りと、CSDB との照合（「DML にあるのに無い」「版が違う」）。verify-mcp と reader-mcp に反映 | lib/s1000d-core、mcp/* |
-| 6 | サイトに「組み込み基盤」のページ（4 つの要件、境界、製品側が組む部分） | s1000d-stack/site |
+| 6 | サイトに「組み込み基盤」のページ（4 つの要件、境界、製品側が組む部分、LLM 活用時の注意点への対応、近似スキーマとの違い） | s1000d-stack/site |
+| 7 | reader-mcp に概要モード（`section: "outline"`: 見出し・手順の番号と最初の 1 文・警告の数）と節点ごとの文字数。機密区分（`securityClassification`）を応答の先頭に必ず付ける | lib/s1000d-core、mcp/s1000d-reader-mcp |
+| 8 | 版が混ざった CSDB での `verify_csdb` の確認（XSD を版ごとに選ぶ） | mcp/s1000d-verify-mcp |
 
 ### 進捗（段階 2.5）
 
 | 作業 | 状態 |
 |---|---|
 | 設計 | 済み（2026-10-25、design/agent-platform.md、D-19） |
-| 1〜6 | 未 |
+| 1〜8 | 未 |
 
 ## 対象とする S1000D の版
 
