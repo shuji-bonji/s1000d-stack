@@ -20,11 +20,13 @@ export default defineConfig({
       locales: {
         root: { label: '日本語', lang: 'ja' },
       },
+      // hub が Private だった段階 1 では公開済みの s1000d-core に向けていた。
+      // サイトは hub を Public にした時点（D-16）で公開されるので、hub に向ける
       social: [
         {
           icon: 'github',
           label: 'GitHub',
-          href: 'https://github.com/shuji-bonji/s1000d-core',
+          href: 'https://github.com/shuji-bonji/s1000d-stack',
         },
       ],
       sidebar: [
