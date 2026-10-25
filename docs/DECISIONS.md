@@ -56,7 +56,7 @@ GitHub は s1000d-core を除き Private です（s1000d-core は 2026-10-24 に
 | MCP | 1 | `shuji-bonji/s1000d-brex-mcp`（ローカルは 2026-10-23 に作成、未コミット） | `@shuji-bonji/s1000d-brex-mcp`（未公開） | `s1000d-stack/mcp/s1000d-brex-mcp` |
 | MCP | 2 | `shuji-bonji/s1000d-reader-mcp` | `@shuji-bonji/s1000d-reader-mcp` | `s1000d-stack/mcp/s1000d-reader-mcp` |
 | MCP | 2 | `shuji-bonji/s1000d-verify-mcp` | `@shuji-bonji/s1000d-verify-mcp` | `s1000d-stack/mcp/s1000d-verify-mcp` |
-| ライブラリ（未作成） | 2 | `shuji-bonji/experiential-manual-model`（U-04 で 2026-10-24 に確定） | `@shuji-bonji/experiential-manual-model` | `s1000d-stack/lib/experiential-manual-model` |
+| ライブラリ | 2 | `shuji-bonji/experiential-manual-model`（U-04 で 2026-10-24 に確定。ローカルは 2026-10-25 に作成、GitHub は未作成） | `@shuji-bonji/experiential-manual-model`（未公開） | `s1000d-stack/lib/experiential-manual-model` |
 | MCP | 3 | `shuji-bonji/s1000d-writer-mcp` | `@shuji-bonji/s1000d-writer-mcp` | `s1000d-stack/mcp/s1000d-writer-mcp` |
 | Skill（未作成） | 3 | 未定（名前の規則は U-09） | — | `s1000d-stack/skill/` |
 | app（未作成） | 3〜4 | 未定（製品名は U-05） | — | `s1000d-stack/app/` |

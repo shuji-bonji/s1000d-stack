@@ -120,6 +120,9 @@ classDiagram
 | `Admonition` | 注意書き。`level` は 3 段階に固定し、S1000D の `warning` / `caution` / `note` に 1 対 1 で対応させる | `supplementaryExplanation` |
 | `Term` | 用語と説明。閲覧ソフトの用語集と、S1000D の `definitionList` に使う | （無し） |
 
+> [!NOTE]
+> 2026-10-25 に GitHub から取得した実物の `JSON.json` は、README から推測した表記と違っていました。最上位は `purchaseTypes`（`displayAreas` ではない）、画面の id は `screenID`、遷移先は `destination`（`screenTransitionDestination` ではない）です。`fromLegacyJson` は両方の表記を読みます。中身は 5 話題・79 画面・212 ボタン（rect 142、circle 70）で、`rect` の `coords` が 5 つあるボタンが 2 件ありました。
+
 ### 2021 年の JSON で足りなかったもの（追加する理由）
 
 | 不足 | 追加 |

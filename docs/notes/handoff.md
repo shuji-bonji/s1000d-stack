@@ -1,4 +1,4 @@
-# 引き継ぎメモ（2026-10-25 11:50 JST 時点）
+# 引き継ぎメモ（2026-10-25 12:40 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
@@ -19,7 +19,7 @@ flowchart LR
   style S2 fill:#ffd,stroke:#993
 ```
 
-**段階 1 は 2026-10-24 に完了し、段階 2 の設計を同日に書きました。** 設計は `docs/design/` の 3 文書（[verify-mcp.md](../design/verify-mcp.md)、[reader-mcp.md](../design/reader-mcp.md)、[manual-model.md](../design/manual-model.md)）で、作業の順序は ROADMAP「段階 2 の作業」の表（作業 1〜10）にあります。設計で出た 3 つの判断は同日に確定しました（D-17: XSD 検証の置き場所、D-18: reader の検証の既定、U-04: パッケージ名 `@shuji-bonji/experiential-manual-model`）。実装は作業 1〜7 が済み（段階 2 の 3 部品のうち verify-mcp と reader-mcp が動く状態）、core 0.2.0 は npm に公開済みです（2026-10-25）。次は作業 8（experiential-manual-model）と作業 9（サイト）です。
+**段階 1 は 2026-10-24 に完了し、段階 2 の設計を同日に書きました。** 設計は `docs/design/` の 3 文書（[verify-mcp.md](../design/verify-mcp.md)、[reader-mcp.md](../design/reader-mcp.md)、[manual-model.md](../design/manual-model.md)）で、作業の順序は ROADMAP「段階 2 の作業」の表（作業 1〜10）にあります。設計で出た 3 つの判断は同日に確定しました（D-17: XSD 検証の置き場所、D-18: reader の検証の既定、U-04: パッケージ名 `@shuji-bonji/experiential-manual-model`）。実装は作業 1〜8 が済み（段階 2 の 3 部品 verify-mcp・reader-mcp・experiential-manual-model がすべて動く状態）、core 0.2.0 は npm に公開済みです（2026-10-25）。残りは作業 9（サイト）と作業 10（公開）です。
 
 ## リポジトリの状態
 
@@ -30,9 +30,10 @@ flowchart LR
 | [shuji-bonji/s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | Private | 未公開 | 最初の実装を push 済み（`686fb58`）。5 ツール、テスト 13＋5 件、stdio の実機確認済み |
 | [shuji-bonji/s1000d-stack](https://github.com/shuji-bonji/s1000d-stack)（hub） | Private | — | README・`stack.json`・`scripts/generate-stack.mjs`・`site/`・`.github/workflows/`（`deploy.yml` は手動実行のみ、`stack-check.yml` は毎日）・`docs/` をコミット・push 済み（2026-10-24）。`docs/` の変更は 2026-10-24 夜にチャットからコミット済み（push は未）。**git のコミットはチャットから行ってよい**（2026-10-24 に利用者が指示。接続フォルダーの削除の許可を得れば git のロックファイルも消せる）。署名は利用者が後で付け直す |
 | [shuji-bonji/s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | Private | 未公開 | 最初の実装を push 済み（`6e567c7`）。6 ツール、テスト 14＋5 件、stdio の実機確認済み |
+| `shuji-bonji/experiential-manual-model` | （未作成） | 未公開 | ローカル `lib/experiential-manual-model` に最初の実装をコミット済み（`09f9d2c`、`main`）。GitHub のリポジトリは利用者が作って push する |
 | `shuji-bonji/s1000d-writer-mcp` | Private | 未公開 | GitHub に作成済み、中身は空（段階 3） |
 
-ローカルの配置は `/Users/bonji/workspace/shuji-bonji/s1000d-stack/` の下に `lib/s1000d-core`、`mcp/s1000d-brex-mcp`、`mcp/s1000d-verify-mcp`、`mcp/s1000d-reader-mcp`、`specs/s1000d/`（いずれも hub の `.gitignore` で除外）です。
+ローカルの配置は `/Users/bonji/workspace/shuji-bonji/s1000d-stack/` の下に `lib/s1000d-core`、`mcp/s1000d-brex-mcp`、`mcp/s1000d-verify-mcp`、`mcp/s1000d-reader-mcp`、`lib/experiential-manual-model`、`specs/s1000d/`（いずれも hub の `.gitignore` で除外）です。
 
 ## 動かし方（確認用）
 
@@ -50,6 +51,9 @@ cd mcp/s1000d-verify-mcp && npm test
 S1000D_SPEC_TESTS=1 npm test
 cd mcp/s1000d-reader-mcp && npm test
 
+# experiential-manual-model（配布物を使わない）
+cd lib/experiential-manual-model && npm test
+
 # サイト（Node 22.23.4 以上）
 cd site && npm run build && npm run preview
 ```
@@ -59,7 +63,7 @@ cd site && npm run build && npm run preview
 
 ## 次にやること（候補の順）
 
-1. **作業 8**（experiential-manual-model）。core に依存しない。設計は design/manual-model.md。`lib/experiential-manual-model` に新しいリポジトリを作る（GitHub の `shuji-bonji/experiential-manual-model` は未作成なので、利用者が作ってから push）。
+1. **experiential-manual-model の push（利用者の作業）**: GitHub に `shuji-bonji/experiential-manual-model`（Private）を作り、`lib/experiential-manual-model` で `git remote add origin git@github.com:shuji-bonji/experiential-manual-model.git && git push -u origin main`。npm への公開は D-16 のとおり段階 2 が揃った時点（初回は手動 `npm publish`、D-14）。
 2. **作業 9**（サイトに verify-mcp・reader-mcp・適用性の 3 ページ、`stack.json` に verify / reader / manual-model）。
 3. **core 0.2.1 の公開**（利用者の作業、急がない）: `findSchemaDirs` のデータ辞書除外（`a0e9eb6`）と vitest 4 への更新。手順は `docs/RELEASE.md`（`npm version patch`）。verify-mcp と reader-mcp は自分でも同じ除外をしているので、0.2.0 のままでも動く。
 4. **公開（D-16）**: 作業 9 の後に、hub・brex-mcp・verify-mcp・reader-mcp を公開する（各 MCP の初回は手動 `npm publish`、D-14）。

@@ -175,7 +175,8 @@ flowchart LR
 | 5 | 済み（2026-10-25）。`src/content/`（`readContent` / `readContentFromXml` / `countNodes`）。自作データのテスト 7 件と配布物のテスト 1 件を追加し、84 件すべて通過。**core 0.2.0 を npm に公開済み**（2026-10-25、利用者がタグ `v0.2.0` を push。`latest`、サブパス `./xsd-libxml2` と任意の peerDependency `libxml2-wasm`、provenance 付き）。作業 1 の残り（brex-mcp の切り替え）も済み: 依存を `^0.2.0` に上げ、`services/brex-locator.ts` は core の `locateBrex` を呼ぶだけにした（brex-mcp の `edfe6e2`、15 件すべて通過、`libxml2-wasm` は入らない） |
 | 6 | 済み（2026-10-25、verify-mcp の `686fb58`）。5 ツール（`verify_data_module` / `validate_schema` / `check_references` / `verify_csdb` / `list_schemas`）、`instructions`、自作データのテスト 13 件、配布物のテスト 5 件（Bike Samples の DMC 106 件＋ PMC 4 件がすべて XSD 適合、BREX の連鎖が解決。110 件で約 16 秒）、stdio の実機確認。実機確認で見つけた「データ辞書の中の XSD の写し（import が絶対 URL）」は verify-mcp 側で除外し、core にも同じ除外を入れた（core の `a0e9eb6`、**0.2.1 として未公開**）。npm への公開は D-16 のとおり段階 2 が揃った時点 |
 | 7 | 済み（2026-10-25、reader-mcp の `6e567c7`）。6 ツール（`list_data_modules` / `read_data_module` / `read_publication_module` / `resolve_reference` / `describe_applicability` / `read_icn_metadata`）、`instructions`、自作データのテスト 14 件（ACT・手順 DM・PM のフィクスチャを追加）、配布物のテスト 5 件、stdio の実機確認。D-18 のとおり既定は XSD 検証だけ、`product` 無しは `undetermined` ＋ `displayText`。適用性リポジトリは CSDB から集める。npm への公開は D-16 のとおり段階 2 が揃った時点 |
-| 8〜10 | 未 |
+| 8 | 済み（2026-10-25、`lib/experiential-manual-model` の `09f9d2c`。GitHub の `shuji-bonji/experiential-manual-model` は未作成、未 push）。型・JSON Schema・`validateManual`・`fromLegacyJson`・`numberSteps`・券売機の例 `examples/kenbaiki.manual.json`。実行時の依存なし。テスト 10 件（2021 年の `JSON.json` 79 画面・212 ボタンが読め、検査と JSON Schema を通る）。2021 年の JSON の実際のフィールド名は README の推測と違い `purchaseTypes` / `screenID` / `destination` だった（両方読む） |
+| 9〜10 | 未 |
 | 保守 | 2026-10-25: 4 リポジトリの `vitest` を 2.1 → 4.1 に上げた（2.x の依存に脆弱性の報告 6 件。開発時だけの依存。`npm audit` 0 件）。brex-mcp の CI の Node を 22・24 に揃えた（`engines` が >=22 のため） |
 
 ## 対象とする S1000D の版
