@@ -1,4 +1,4 @@
-# 引き継ぎメモ（2026-10-25 22:30 JST 時点）
+# 引き継ぎメモ（2026-10-25 22:40 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
@@ -59,7 +59,25 @@ cd site && npm run build && npm run preview
 ```
 
 > [!TIP]
-> チャットから開発機に接続した Linux VM（aarch64）では、VM の npm 10.9.9 が macOS の npm 12 が書いた lock を読めず `npm install` が `Cannot read properties of null (reading 'edgesOut')` で失敗することがある。そのときは `npx -y npm@12 install` を使う。vitest を動かすには、macOS 側で入れた `node_modules` に Linux 用の rollup が無いため、各リポジトリで `npm install --no-save @rollup/rollup-linux-arm64-gnu` が 1 回要ります（`--no-save` なので `package.json` と lock は変わらない）。VM の npm は 10.9.9 で、`npm install` をすると lock から `libc` の項目が消える差分が出る（新しい npm が書く項目。害は無い）。
+> チャットから開発機に接続した Linux VM（aarch64）では、**Mac の `node_modules` を使わない**。`node_modules` は 1 つのフォルダーを 2 つの OS で見ることになり、npm が OS に合うネイティブモジュール（rolldown の binding）だけを残すため、片方で `npm install` するともう片方が壊れる（2026-10-25 に判明。WebAssembly 版の binding への切り替えも、他のパッケージが要求する別の版の `@emnapi/*` と衝突して動かなかった）。VM では `~/vmrun.sh <s1000d-stack からの相対パス> <コマンド>` を使う。リポジトリを `~/vm/s1000d-stack/` に rsync（`node_modules`・`dist`・`.git` を除く）して `npm ci` し、そこでコマンドを実行する。`specs/` は Mac 側へのシンボリックリンクなので配布物のテストも動く。例: `S1000D_SPEC_TESTS=1 ~/vmrun.sh lib/s1000d-core npx vitest --run`、`~/vmrun.sh site npm run build`。`~/vmrun.sh` は VM のホームにあり、セッションをまたいで残らないことがあるので、無ければ下の内容で作り直す。
+>
+> ```sh
+> #!/usr/bin/env bash
+> set -euo pipefail
+> REL="$1"; shift
+> SRC="$HOME/mnt/s1000d-stack/$REL"; DST="$HOME/vm/s1000d-stack/$REL"
+> mkdir -p "$DST"
+> rsync -a --delete --exclude node_modules --exclude dist --exclude .git --exclude '.astro' "$SRC/" "$DST/"
+> ln -sfn "$HOME/mnt/s1000d-stack/specs" "$HOME/vm/s1000d-stack/specs"
+> cd "$DST"
+> if [ ! -d node_modules ] || [ ! -f node_modules/.lock-hash ] || [ "$(md5sum package-lock.json | cut -d' ' -f1)" != "$(cat node_modules/.lock-hash)" ]; then
+>   npx -y npm@12 ci --no-audit --no-fund >/dev/null 2>&1 || npx -y npm@12 install --no-audit --no-fund >/dev/null
+>   md5sum package-lock.json | cut -d' ' -f1 > node_modules/.lock-hash
+> fi
+> exec "$@"
+> ```
+>
+> VM の npm は 10.9.9 で、Mac の npm 12 が書いた lock を読めず `Cannot read properties of null (reading 'edgesOut')` で失敗することがあるので、npm は `npx -y npm@12` で呼ぶ。
 
 ## 次にやること（候補の順）
 
