@@ -1,4 +1,4 @@
-# 引き継ぎメモ（2026-10-26 00:20 JST 時点）
+# 引き継ぎメモ（2026-10-26 00:40 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
@@ -19,7 +19,7 @@ flowchart LR
   style S2 fill:#ffd,stroke:#993
 ```
 
-**段階 1 は 2026-10-24 に完了し、段階 2 の設計を同日に書きました。** 設計は `docs/design/` の 3 文書（[verify-mcp.md](../design/verify-mcp.md)、[reader-mcp.md](../design/reader-mcp.md)、[manual-model.md](../design/manual-model.md)）で、作業の順序は ROADMAP「段階 2 の作業」の表（作業 1〜10）にあります。設計で出た 3 つの判断は同日に確定しました（D-17: XSD 検証の置き場所、D-18: reader の検証の既定、U-04: パッケージ名 `@shuji-bonji/experiential-manual-model`）。実装は作業 1〜8 が済み（段階 2 の 3 部品 verify-mcp・reader-mcp・experiential-manual-model がすべて動く状態）、core 0.2.0 は npm に公開済みです（2026-10-25）。作業 9（サイト）も済み、残りは作業 10（公開）です。**2026-10-25 に次の目標を「CSDB 製品に組み込める基盤」と決め（D-19）、段階 2.5（修正提案・`CsdbSource`・HTTP transport・DML/DDN・概要モード・機密区分）を ROADMAP に足しました。LLM 活用時の注意点 5 つへの対応と、段階 4 の最初の成果物にする簡易な技術マニュアルの Web システム（基盤の参照実装、技術は U-10）も同じ設計文書に記録してあります。設計は design/agent-platform.md。**
+**段階 1 は 2026-10-24 に完了し、段階 2 の設計を同日に書きました。** 設計は `docs/design/` の 3 文書（[verify-mcp.md](../design/verify-mcp.md)、[reader-mcp.md](../design/reader-mcp.md)、[manual-model.md](../design/manual-model.md)）で、作業の順序は ROADMAP「段階 2 の作業」の表（作業 1〜10）にあります。設計で出た 3 つの判断は同日に確定しました（D-17: XSD 検証の置き場所、D-18: reader の検証の既定、U-04: パッケージ名 `@shuji-bonji/experiential-manual-model`）。実装は作業 1〜8 が済み（段階 2 の 3 部品 verify-mcp・reader-mcp・experiential-manual-model がすべて動く状態）、core 0.2.0 は npm に公開済みです（2026-10-25）。作業 9（サイト）も済み、残りは作業 10（公開）で、手順は下の「次にやること」にチェックリストで書いてあります。**2026-10-25 に次の目標を「CSDB 製品に組み込める基盤」と決め（D-19）、段階 2.5（修正提案・`CsdbSource`・HTTP transport・DML/DDN・概要モード・機密区分）を ROADMAP に足しました。LLM 活用時の注意点 5 つへの対応と、段階 4 の最初の成果物にする簡易な技術マニュアルの Web システム（基盤の参照実装、技術は U-10）も同じ設計文書に記録してあります。設計は design/agent-platform.md。**
 
 ## リポジトリの状態
 
@@ -28,7 +28,7 @@ flowchart LR
 | [shuji-bonji/s1000d-core](https://github.com/shuji-bonji/s1000d-core) | Public | `@shuji-bonji/s1000d-core` **0.2.0**（2026-10-25、タグ push → `publish.yml`） | 公開は `docs/RELEASE.md` の手順（`npm version` でタグを付けて push）。0.2.0 の後に `a0e9eb6`（`findSchemaDirs` のデータ辞書除外）と vitest 4 への更新が未公開で、0.2.1 の材料 |
 | [shuji-bonji/s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | Private | 未公開 | core `^0.2.0` を参照し、BREX の探索は core の `locateBrex` に任せた（`edfe6e2`、push 済み）。npm 公開は D-16 のとおり段階 2 が揃った時点 |
 | [shuji-bonji/s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | Private | 未公開 | 最初の実装を push 済み（`686fb58`）。5 ツール、テスト 13＋5 件、stdio の実機確認済み |
-| [shuji-bonji/s1000d-stack](https://github.com/shuji-bonji/s1000d-stack)（hub） | Private | — | README・`stack.json`・`scripts/generate-stack.mjs`・`site/`・`.github/workflows/`（`deploy.yml` は手動実行のみ、`stack-check.yml` は毎日）・`docs/` をコミット・push 済み（2026-10-24）。`docs/` の変更は 2026-10-24 夜にチャットからコミット済み（push は未）。**git のコミットはチャットから行ってよい**（2026-10-24 に利用者が指示。接続フォルダーの削除の許可を得れば git のロックファイルも消せる）。署名は利用者が後で付け直す |
+| [shuji-bonji/s1000d-stack](https://github.com/shuji-bonji/s1000d-stack)（hub） | Private | — | README・`stack.json`・`scripts/generate-stack.mjs`・`site/`・`.github/workflows/`（`deploy.yml` は手動実行のみ、`stack-check.yml` は毎日）・`docs/` をコミット・push 済み（2026-10-24）。`docs/`・サイト・REGISTRY の変更を 2026-10-25 夜にチャットからコミット済み（2026-10-25 深夜の 3 件 `e981c5f` 以降は push 未）。**git のコミットはチャットから行ってよい**（2026-10-24 に利用者が指示。接続フォルダーの削除の許可を得れば git のロックファイルも消せる）。署名は利用者が後で付け直す |
 | [shuji-bonji/s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | Private | 未公開 | 最初の実装を push 済み（`6e567c7`）。6 ツール、テスト 14＋5 件、stdio の実機確認済み |
 | [shuji-bonji/experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | Private | 未公開 | 最初の実装を push 済み（`09f9d2c`） |
 | `shuji-bonji/s1000d-writer-mcp` | Private | 未公開 | GitHub に作成済み、中身は空（段階 3） |
@@ -79,15 +79,53 @@ cd site && npm run build && npm run preview
 >
 > VM の npm は 10.9.9 で、Mac の npm 12 が書いた lock を読めず `Cannot read properties of null (reading 'edgesOut')` で失敗することがあるので、npm は `npx -y npm@12` で呼ぶ。
 
-## 次にやること（候補の順）
+## 次にやること: 作業 10（公開、D-16）
 
-1. **サイトの新しい 3 ページの通読（利用者の作業）**: `site/src/content/docs/guide/applicability.md`、`mcp/verify-mcp.md`、`mcp/reader-mcp.md`。記述の根拠は notes/background.md「参照の解決で分かった配布物の性質」「適用性の評価で分かった配布物の性質」「XSD の写しについて」と、各 MCP の README・テスト。`cd site && npm run build && npm run preview` で確認できる。直したいところがあれば、このチャットか新しいチャットで指示する。
-2. **作業 10（公開、D-16）**: 通読が済んだら。(1) hub を Public にし GitHub Pages の Source を GitHub Actions にする。(2) `deploy.yml` の push トリガーを戻す。(3) brex-mcp・verify-mcp・reader-mcp・experiential-manual-model を Public にし、初回だけ手動で `npm publish --access public`、その後 npm 側で Trusted Publisher を登録する（D-14。各リポジトリに `publish.yml` と `docs/RELEASE.md` を core と同じ形で足す必要がある。未作成）。(4) サイトの `guide/getting-started.md`・`mcp/brex-mcp.md`・`mcp/verify-mcp.md`・`mcp/reader-mcp.md` の「npm 未公開（開発中）」の note を消す。(5) `generate-stack.mjs` の REGISTRY で 4 つを `released` にして `stack.json` と README を再生成する。
-3. **段階 2.5 の作業 1〜2**（core の `suggestFixes()` と verify-mcp の `suggest_fixes`）。作業 10 と並行できる。設計は design/agent-platform.md。
-4. **core 0.2.1 の公開**（利用者の作業、急がない）: `findSchemaDirs` のデータ辞書除外（`a0e9eb6`）と vitest 4 への更新。手順は `docs/RELEASE.md`（`npm version patch`）。verify-mcp と reader-mcp は自分でも同じ除外をしているので、0.2.0 のままでも動く。
-4. **公開（D-16）**: 作業 9 の後に、hub・brex-mcp・verify-mcp・reader-mcp を公開する（各 MCP の初回は手動 `npm publish`、D-14）。
-3. **作業 8**（experiential-manual-model）は core に依存しないので、並行して進められる。
-4. **公開（D-16）**: 段階 2 が揃ったら、D-16 に書いた 5 つの作業で hub と brex-mcp を公開する。
+段階 2 の実装とサイトは揃っているので、次のチャットの仕事は**公開**です。利用者がやること（GitHub・npm の操作）と、チャットでやること（ファイルの追加・書き換え）を分けて書きます。順番は上から。
+
+### 10-0 前提（利用者。チャットを始める前に）
+
+- [ ] hub の未 push のコミット（3 件: `e981c5f`・`ea24872`・このメモの更新）に署名し直して push する
+- [ ] `site` と 5 リポジトリで `npm install` を 1 回ずつ実行する（VM 側の作業で Mac の `node_modules` が一時的に壊れたため。手順は上の TIP）
+- [ ] サイトの新しい 3 ページ（`guide/applicability.md`、`mcp/verify-mcp.md`、`mcp/reader-mcp.md`）を通読し、直したい箇所があれば新しいチャットの最初に伝える
+
+### 10-1 公開用のファイルを 4 リポジトリに足す（チャット）
+
+brex-mcp・verify-mcp・reader-mcp・experiential-manual-model に、core と同じ形で次を足す。core の実物は `lib/s1000d-core/.github/workflows/publish.yml` と `lib/s1000d-core/docs/RELEASE.md`。
+
+- [ ] `.github/workflows/publish.yml`（タグ `v*` の push で test → publish。publish は Node 24・`permissions: id-token: write`・`npm publish --provenance --access public`。Trusted Publisher 前提で Secrets のトークンは使わない。package.json の version とタグの一致を確かめる step も同じ）
+- [ ] `docs/RELEASE.md`（`npm version patch|minor` → `git push --follow-tags` の手順。初回だけ手動 `npm publish --access public` が要ることを明記）
+- [ ] `package.json` の `files`・`repository`・`publishConfig` を core と揃える（`engines` は各リポジトリの現状のまま。core と experiential-manual-model は `>=20`、MCP 3 つは `>=22`）
+- [ ] 各 README の先頭の「npm 未公開（開発中）」の note を消す
+- [ ] 各 CHANGELOG の「未リリース」を `0.1.0` に切る（日付は公開日の JST）
+
+### 10-2 GitHub と npm の操作（利用者）
+
+- [ ] hub `s1000d-stack` を Public にし、Settings → Pages の Source を **GitHub Actions** にする
+- [ ] brex-mcp・verify-mcp・reader-mcp・experiential-manual-model を Public にする
+- [ ] 4 パッケージを初回だけ手動で公開する: 各リポジトリで `npm run build && npm publish --access public`（D-14。順番は experiential-manual-model → brex-mcp → verify-mcp → reader-mcp。MCP 3 つは core `^0.2.0` を使うので core は公開済みでよい）
+- [ ] npm 側で 4 パッケージに Trusted Publisher（GitHub Actions、リポジトリ名と `publish.yml`）を登録する
+- [ ] 公開できたことを `npm view @shuji-bonji/<name> version` で確認し、チャットに伝える
+
+### 10-3 サイトと hub の仕上げ（チャット。10-2 の後）
+
+- [ ] `.github/workflows/deploy.yml` の push トリガー（`main` への push で配備）を戻す。いまは `workflow_dispatch` のみ
+- [ ] `site/src/content/docs/guide/getting-started.md`・`mcp/brex-mcp.md`・`mcp/verify-mcp.md`・`mcp/reader-mcp.md` の「npm 未公開（開発中）」の note を消し、`npx @shuji-bonji/...` の手順が実物と合うことを確かめる
+- [ ] `scripts/generate-stack.mjs` の REGISTRY で 4 つの `status` を `released` にし、`node scripts/generate-stack.mjs` で `stack.json` と README を再生成する
+- [ ] `~/vmrun.sh site npm run build` でサイトが通ることを確かめる（13 ページ、内部リンク切れ無し）
+- [ ] ROADMAP「段階 2 の作業」の進捗の行で作業 10 を「済み」にし、段階 2 の完了日（JST）を書く。DECISIONS の D-16 に公開日を追記する。このメモの「リポジトリの状態」の表を Public / npm 版に更新する
+- [ ] hub をコミットする（署名は利用者）。push で `deploy.yml` が走り、GitHub Pages に配備される
+
+### 10-4 公開後の確認（利用者）
+
+- [ ] GitHub Pages の URL でサイトが開き、ヘッダーの GitHub リンクが `shuji-bonji/s1000d-stack` を指す
+- [ ] `stack-check.yml`（毎日）が緑になる
+- [ ] Claude Desktop などから `npx -y @shuji-bonji/s1000d-brex-mcp` で起動できる（`S1000D_SPEC_DIR` を付けて）
+
+### その後の候補
+
+1. **段階 2.5 の作業 1〜2**（core `suggestFixes()` と verify-mcp `suggest_fixes`）。設計は design/agent-platform.md「修正提案の設計」。作業 10 と並行できる。
+2. **core 0.2.1 の公開**（利用者、急がない）: `findSchemaDirs` のデータ辞書除外と vitest 4 への更新。手順は `lib/s1000d-core/docs/RELEASE.md`（`npm version patch`）。verify-mcp と reader-mcp は自分でも同じ除外をしているので、0.2.0 のままでも動く。
 
 ## 新しいチャットの最初に読むもの
 
