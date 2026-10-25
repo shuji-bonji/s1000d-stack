@@ -7,11 +7,13 @@ LLM が S1000D の技術文書を正しく読み、プロジェクトの決ま�
 - 決定事項: [DECISIONS.md](./DECISIONS.md)
 - 調査メモ: [notes/background.md](./notes/background.md)
 - 段階 2 の設計: [design/verify-mcp.md](./design/verify-mcp.md)、[design/reader-mcp.md](./design/reader-mcp.md)、[design/manual-model.md](./design/manual-model.md)
+- 段階 2.5 の設計: [design/agent-platform.md](./design/agent-platform.md)
 
 ## 目指すもの
 
 1. **一般向け**: 画面や機器の操作を体験しながら学べるマニュアルを、軽い Web 形式で作れるようにします（2021 年の作品 [experience_based_operation_explanation](https://github.com/shuji-bonji/experience_based_operation_explanation) の再構築）。
 2. **産業向け**: 同じデータを S1000D のデータモジュールとして出力・検査できるようにし、部品メーカーや技術マニュアル制作会社の作業を支援します。
+3. **組み込み基盤**（2026-10-25 に追加、D-19）: CSDB 製品にオーサリング支援・レビュー・翻訳・プロジェクト管理の AI エージェントを組み込めるようにする基盤を目指します。最低限の要件は、LLM エージェントが**スキーマ検証・クロスリファレンスチェック・適用性チェック・修正提案**をできることです。決定論的に確かめられることは core が行い、LLM は文章の生成と説明に限ります。設計は [design/agent-platform.md](./design/agent-platform.md)。
 
 専門家エージェント（MCP と Skill）を先に作り、それを開発の道具として使いながら製品（作成ツール・閲覧ソフト）を作ります。
 
@@ -57,13 +59,15 @@ experiential-manual-model（文書の中では「manual-model」と略します�
 |---|---|---|
 | 1 | s1000d-stack（サイトの骨組みと用語の説明）、s1000d-core、s1000d-brex-mcp | **自動**: 自作 BREX と自作データモジュールで、BREX の説明と照合のテストが CI で通る（2026-10-23 済み）。**手動**: 既定の BREX（利用者が入手したもの）を `explain_brex` で読み、自作データモジュールを照合して、結果が仕様書の BREX の章の記述と矛盾しないことを確認済み（2026-10-23 済み。券売機の説明 DM は既定 BREX の 243 ルールに違反なし）。**サイト**: BREX・データモジュールの説明を仕様書と照合済み（2026-10-24 に、作業 3 で読んだ Chap 4.10.2〜4.10.3・7.9 と既定 BREX の実測に基づいて執筆。2026-10-24 に利用者が 9 ページを通読し、仕様書との矛盾が無いことを確認済み。確認の根拠は [notes/site-review.md](./notes/site-review.md)）。**段階 1 は 2026-10-24 に完了** |
 | 2 | s1000d-reader-mcp、s1000d-verify-mcp、manual-model | 公式 XSD（利用者が入手したもの）による検証、参照の解決、適用性の判定ができる。reader の応答には対象データモジュールの版（issue）と検証状態を必ず含め、適用性の判定は reader が済ませてから LLM に渡す |
-| 3 | s1000d-writer-mcp、Skill（experience-to-s1000d / s1000d-publish / s1000d-review）、作成ツールの試作 | 券売機の例を共通データモデル経由で S1000D に出力し、verify を通る |
+| 2.5 | 修正提案（verify-mcp `suggest_fixes`）、`CsdbSource` インターフェース、HTTP transport、DML・DDN の読み取り、サイトの「組み込み基盤」のページ | LLM エージェントがスキーマ検証・クロスリファレンスチェック・適用性チェック・修正提案の 4 つをできる。修正提案の候補は core が決め、LLM は候補の外の値を出さない。CSDB をフォルダー以外（製品のデータベース・API）から読める |
+| 3 | s1000d-writer-mcp、Skill（experience-to-s1000d / s1000d-publish / s1000d-review）、作成ツールの試作、comment DM の生成、翻訳向けの文の抜き出しと差し戻し | 券売機の例を共通データモデル経由で S1000D に出力し、verify を通る |
 | 4 | 閲覧ソフト | 共通データモデルを表示し、WebMCP で AI が操作を案内できる |
 
 ```mermaid
 flowchart LR
   S1["段階 1<br/>hub ＋ core ＋ brex"] --> S2["段階 2<br/>reader ＋ verify ＋ model"]
-  S2 --> S3["段階 3<br/>writer ＋ Skill ＋ 作成ツール"]
+  S2 --> S25["段階 2.5<br/>修正提案 ＋ 組み込みの土台"]
+  S25 --> S3["段階 3<br/>writer ＋ Skill ＋ 作成ツール"]
   S2 --> S3b["段階 3（並行）<br/>作成ツールの試作"]
   S3 --> S4["段階 4<br/>閲覧ソフト"]
   S3b --> S4
@@ -179,6 +183,26 @@ flowchart LR
 | 9 | 済み（2026-10-25、hub の `bd61c95`）。サイトに `guide/applicability`・`mcp/verify-mcp`・`mcp/reader-mcp` を追加し、brex-mcp・guide/brex・about/stack・core・index・getting-started を 2026-10-25 時点に直した。`generate-stack.mjs` の REGISTRY を更新し `stack.json` と README の表を再生成（npm 照合は一致）。13 ページがビルドでき、内部リンクの切れは無い。**新しい 3 ページの通読（記述と仕様書・実装の照合）は利用者が行う**（段階 1 の notes/site-review.md と同じ要領） |
 | 10 | 未。作業 9 の通読が済んだら D-16 の手順で公開する |
 | 保守 | 2026-10-25: 4 リポジトリの `vitest` を 2.1 → 4.1 に上げた（2.x の依存に脆弱性の報告 6 件。開発時だけの依存。`npm audit` 0 件）。brex-mcp の CI の Node を 22・24 に揃えた（`engines` が >=22 のため） |
+
+## 段階 2.5 の作業（組み込み基盤に向けて）
+
+設計は [design/agent-platform.md](./design/agent-platform.md)。段階 2 の作業 10（公開）と並行して進められます。
+
+| 順 | 作業 | 置き場所 |
+|---|---|---|
+| 1 | core に `suggestFixes()` と `Fix` 型。BREX の 4 種の違反（許可値・取り除く・足す・NOTATION）、未解決の参照（別の版・近い DMC・拡張子違いの ICN・近い id）、適用性の判定不能（足りない属性と ACT・PCT の値）の候補を決定論的に決める。XSD 違反は XSD の定義（`xs:enumeration` など）を読んで候補にする | lib/s1000d-core（`src/fix/`） |
+| 2 | verify-mcp に `suggest_fixes`。`instructions` に「候補の外の値を提案しない」「`confidence: none` なら利用者に聞く」 | mcp/s1000d-verify-mcp |
+| 3 | core に `CsdbSource` インターフェース（フォルダー実装を既定）。`CsdbIndex` をその上に載せ、製品側が自分の CSDB を差し込めるようにする | lib/s1000d-core |
+| 4 | 各 MCP に HTTP（Streamable HTTP）transport の起動オプション。認証・権限は製品側の責務 | mcp/* |
+| 5 | core に DML・DDN の読み取りと、CSDB との照合（「DML にあるのに無い」「版が違う」）。verify-mcp と reader-mcp に反映 | lib/s1000d-core、mcp/* |
+| 6 | サイトに「組み込み基盤」のページ（4 つの要件、境界、製品側が組む部分） | s1000d-stack/site |
+
+### 進捗（段階 2.5）
+
+| 作業 | 状態 |
+|---|---|
+| 設計 | 済み（2026-10-25、design/agent-platform.md、D-19） |
+| 1〜6 | 未 |
 
 ## 対象とする S1000D の版
 

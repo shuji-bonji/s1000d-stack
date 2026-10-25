@@ -1,12 +1,12 @@
-# 引き継ぎメモ（2026-10-25 22:40 JST 時点）
+# 引き継ぎメモ（2026-10-26 00:10 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
 > [!IMPORTANT]
 > 作業の前提は次の 3 つです。
-> 1. DECISIONS.md の決定事項（D-01〜D-18）は覆さない。変える必要があると判断したときは、理由を挙げて先に相談する。
+> 1. DECISIONS.md の決定事項（D-01〜D-19）は覆さない。変える必要があると判断したときは、理由を挙げて先に相談する。
 > 2. S1000D の仕様書・XSD・既定 BREX・公式サンプルは、どのリポジトリにも npm パッケージにもコミットしない（D-03）。置き場所は `s1000d-stack/specs/s1000d/`（git 管理外、D-06）。
-> 3. `docs/` の文書（ROADMAP・DECISIONS・notes/background・notes/handoff・design/ の 3 本）は、ローカル `s1000d-stack/docs/` と claude.ai Project「S1000D Stack」のナレッジの両方に同じ内容を置く。片方だけ直さない。
+> 3. `docs/` の文書（ROADMAP・DECISIONS・notes/background・notes/handoff・design/ の 4 本）は、ローカル `s1000d-stack/docs/` と claude.ai Project「S1000D Stack」のナレッジの両方に同じ内容を置く。片方だけ直さない。
 
 ## いまどこにいるか
 
@@ -19,7 +19,7 @@ flowchart LR
   style S2 fill:#ffd,stroke:#993
 ```
 
-**段階 1 は 2026-10-24 に完了し、段階 2 の設計を同日に書きました。** 設計は `docs/design/` の 3 文書（[verify-mcp.md](../design/verify-mcp.md)、[reader-mcp.md](../design/reader-mcp.md)、[manual-model.md](../design/manual-model.md)）で、作業の順序は ROADMAP「段階 2 の作業」の表（作業 1〜10）にあります。設計で出た 3 つの判断は同日に確定しました（D-17: XSD 検証の置き場所、D-18: reader の検証の既定、U-04: パッケージ名 `@shuji-bonji/experiential-manual-model`）。実装は作業 1〜8 が済み（段階 2 の 3 部品 verify-mcp・reader-mcp・experiential-manual-model がすべて動く状態）、core 0.2.0 は npm に公開済みです（2026-10-25）。作業 9（サイト）も済み、残りは作業 10（公開）です。
+**段階 1 は 2026-10-24 に完了し、段階 2 の設計を同日に書きました。** 設計は `docs/design/` の 3 文書（[verify-mcp.md](../design/verify-mcp.md)、[reader-mcp.md](../design/reader-mcp.md)、[manual-model.md](../design/manual-model.md)）で、作業の順序は ROADMAP「段階 2 の作業」の表（作業 1〜10）にあります。設計で出た 3 つの判断は同日に確定しました（D-17: XSD 検証の置き場所、D-18: reader の検証の既定、U-04: パッケージ名 `@shuji-bonji/experiential-manual-model`）。実装は作業 1〜8 が済み（段階 2 の 3 部品 verify-mcp・reader-mcp・experiential-manual-model がすべて動く状態）、core 0.2.0 は npm に公開済みです（2026-10-25）。作業 9（サイト）も済み、残りは作業 10（公開）です。**2026-10-25 に次の目標を「CSDB 製品に組み込める基盤」と決め（D-19）、段階 2.5（修正提案・`CsdbSource`・HTTP transport・DML/DDN）を ROADMAP に足しました。設計は design/agent-platform.md。**
 
 ## リポジトリの状態
 
@@ -83,7 +83,8 @@ cd site && npm run build && npm run preview
 
 1. **サイトの新しい 3 ページの通読（利用者の作業）**: `site/src/content/docs/guide/applicability.md`、`mcp/verify-mcp.md`、`mcp/reader-mcp.md`。記述の根拠は notes/background.md「参照の解決で分かった配布物の性質」「適用性の評価で分かった配布物の性質」「XSD の写しについて」と、各 MCP の README・テスト。`cd site && npm run build && npm run preview` で確認できる。直したいところがあれば、このチャットか新しいチャットで指示する。
 2. **作業 10（公開、D-16）**: 通読が済んだら。(1) hub を Public にし GitHub Pages の Source を GitHub Actions にする。(2) `deploy.yml` の push トリガーを戻す。(3) brex-mcp・verify-mcp・reader-mcp・experiential-manual-model を Public にし、初回だけ手動で `npm publish --access public`、その後 npm 側で Trusted Publisher を登録する（D-14。各リポジトリに `publish.yml` と `docs/RELEASE.md` を core と同じ形で足す必要がある。未作成）。(4) サイトの `guide/getting-started.md`・`mcp/brex-mcp.md`・`mcp/verify-mcp.md`・`mcp/reader-mcp.md` の「npm 未公開（開発中）」の note を消す。(5) `generate-stack.mjs` の REGISTRY で 4 つを `released` にして `stack.json` と README を再生成する。
-3. **core 0.2.1 の公開**（利用者の作業、急がない）: `findSchemaDirs` のデータ辞書除外（`a0e9eb6`）と vitest 4 への更新。手順は `docs/RELEASE.md`（`npm version patch`）。verify-mcp と reader-mcp は自分でも同じ除外をしているので、0.2.0 のままでも動く。
+3. **段階 2.5 の作業 1〜2**（core の `suggestFixes()` と verify-mcp の `suggest_fixes`）。作業 10 と並行できる。設計は design/agent-platform.md。
+4. **core 0.2.1 の公開**（利用者の作業、急がない）: `findSchemaDirs` のデータ辞書除外（`a0e9eb6`）と vitest 4 への更新。手順は `docs/RELEASE.md`（`npm version patch`）。verify-mcp と reader-mcp は自分でも同じ除外をしているので、0.2.0 のままでも動く。
 4. **公開（D-16）**: 作業 9 の後に、hub・brex-mcp・verify-mcp・reader-mcp を公開する（各 MCP の初回は手動 `npm publish`、D-14）。
 3. **作業 8**（experiential-manual-model）は core に依存しないので、並行して進められる。
 4. **公開（D-16）**: 段階 2 が揃ったら、D-16 に書いた 5 つの作業で hub と brex-mcp を公開する。
@@ -91,10 +92,10 @@ cd site && npm run build && npm run preview
 ## 新しいチャットの最初に読むもの
 
 1. ROADMAP.md（全体像と進捗。段階 2 の作業の表）
-2. DECISIONS.md（D-01〜D-18 と未決 U-03・U-05・U-07・U-09）
+2. DECISIONS.md（D-01〜D-19 と未決 U-03・U-05・U-07・U-09）
 3. notes/background.md（仕様書の読解結果、配布物のファイル構成、設計のヒント）
 4. このメモ
-5. design/ の 3 文書（着手する作業に応じて）
+5. design/ の 4 文書（着手する作業に応じて。agent-platform.md が次の目標）
 6. notes/site-review.md（サイト通読用の照合シート。通読は 2026-10-24 に完了。記述の根拠を探すときに参照）
 
 > [!NOTE]
