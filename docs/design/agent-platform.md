@@ -15,7 +15,7 @@ LLM エージェントが CSDB の中で次の 4 つをできることを、最�
 | スキーマ検証 | 済み。verify-mcp `validate_schema` / `verify_data_module`（core `verifyDataModule`、`Libxml2SchemaValidator`） | verify-mcp |
 | クロスリファレンスチェック | 済み。verify-mcp `check_references`（`dmRef` / `pmRef` / ICN / `internalRef` / `applicRefId`、理由付き）。DML・DDN との照合は未 | verify-mcp |
 | 適用性チェック | 済み。reader-mcp `describe_applicability` / `read_data_module`（core `ApplicEvaluator`、3 値判定） | reader-mcp |
-| **修正提案** | **未**。違反・未解決・判定不能のそれぞれについて、「何を」「どこで」「どの値に」直せばよいかの候補を返す | verify-mcp に `suggest_fixes` を足す（処理は core） |
+| **修正提案** | 実装済み（2026-10-27、npm 未公開）。core `suggestFixes()`、verify-mcp `suggest_fixes`。違反・未解決・判定不能のそれぞれについて、「何を」「どこで」「どの値に」直せばよいかの候補を返す | verify-mcp（処理は core） |
 
 ## 修正提案の設計
 
@@ -66,9 +66,22 @@ export interface Fix {
 
 点数は出しません（background.md「change-request-locator から取り入れたい設計」）。`confidence` は 3 段階です。
 
+実装（2026-10-27、core `src/fix/types.ts`）では、上の形に次の項目を足しました。どれも省略できます。
+
+| 項目 | 置き場所 | 用途 |
+|---|---|---|
+| `valueForm` | 候補 | `single` / `range` / `pattern`。BREX の `objectValue` と XSD の `xs:pattern` を書き方ごと渡す。`range` と `pattern` は値ではなく制約なので、確からしさは `several` にする |
+| `target` | 候補 | 直す対象（`@属性名`、要素名、`dmRefIdent/issueInfo`、製品の属性 id など） |
+| `note` | 修正 | 候補を決められない理由や、選ぶときの注意（仕様書の章への参照である、など） |
+| `brSeverityLevel` | 修正 | BREX 違反の重大度（解釈しない） |
+
+`action: 'provide'` は文書の変更ではなく、適用性の判定に使う製品の値を与える候補です。確からしさは「候補が 1 つで値が決まる（取り除くを含む）」なら `exact`、「候補が複数、または値が範囲・正規表現・未定」なら `several`、「候補なし」なら `none` です（`confidenceOf`）。
+
 ### ツール
 
 verify-mcp に `suggest_fixes` を足します。入力は `verify_data_module` と同じ（`path` / `xml` / `csdbDirs`）で、内部で検証してから候補を付けます。応答は `verification` と `fixes[]`。`instructions` に「候補の外の値を提案しない」「`confidence: none` のときは利用者に聞く」を書きます。
+
+実装（2026-10-27）では、入力に `skip`・`product`（適用性を見る製品。省くと適用性は見ない）・`includeSpecificationReferences`（既定 false）・`maxFixes`（既定 200）・`maxCandidates`（既定 20）を足し、応答に `fixCount`・`byConfidence`・`omitted`・`applicability` を足しました。仕様書の章への `dmRef` は Bike Samples の 1 件の BR 文書だけで 100 件を超え、候補も無いので、既定では件数だけを返します。
 
 ## 組み込みに要る広げ方
 
