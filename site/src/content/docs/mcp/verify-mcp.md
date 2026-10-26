@@ -1,57 +1,57 @@
 ---
 title: s1000d-verify-mcp
-description: XSD 検証・BREX 照合・参照の解決を行い、結果を 1 つの検証状態にまとめて返す MCP サーバーの設定とツールを説明します。
+description: The configuration and tools of the MCP server that validates against XSD, checks against BREX, resolves references, and returns the results as a single verification status.
 ---
 
-`s1000d-verify-mcp` は、データモジュールを XML スキーマ（XSD）で検証し、BREX の連鎖に照合し、参照（`dmRef`・`pmRef`・ICN・`internalRef`・`applicRefId`）が解決できるかを確かめて、結果を 1 つの**検証状態**（`verification`）にまとめて返す MCP サーバーです。5 つのツールを持ちます。検証状態は `s1000d-reader-mcp` が本文の応答に埋め込むものと同じ形で、どちらも共有ライブラリ `s1000d-core` の同じ関数で作ります。
+`s1000d-verify-mcp` is an MCP server that validates a data module against the XML schema (XSD), checks it against the BREX (Business Rules Exchange) chain, confirms that its references (`dmRef`, `pmRef`, ICN, `internalRef` and `applicRefId`) can be resolved, and returns the results as a single **verification status** (`verification`). It has 5 tools. The verification status has the same shape as the one `s1000d-reader-mcp` embeds in its content responses; both are built by the same function in the shared library `s1000d-core`.
 
-## できること
+## What it does
 
-| ツール | 内容 |
+| Tool | Description |
 | --- | --- |
-| `verify_data_module` | データモジュール 1 件を、整形式 → XSD → BREX の連鎖 → 参照の順に検証し、`verification` と各工程の詳細（XSD 違反の行番号、BREX 違反の箇所、未解決の参照と理由）を返します。`skip` で工程を省けます |
-| `validate_schema` | XSD 検証だけを行います。使う XSD は `xsi:noNamespaceSchemaLocation` のファイル名で決め、`S1000D_SPEC_DIR` の下の `xml_schema_flat/` から探します。版は `brex.xsd` 冒頭の `Issue number:` から読みます |
-| `check_references` | 参照を 5 種類集め、参照先の有無を理由付き（`not-found` / `no-entity-declaration` / `file-not-found` / `no-such-id` / `no-csdb`）で返します。仕様書の章への `dmRef`（モデル識別コード `S1000D`）は参照切れではないので別枠にします |
-| `verify_csdb` | フォルダーの中の CSDB オブジェクト（既定は DMC と PMC）をまとめて検証し、1 件ごとの検証状態と件数の集計を返します。`offset` と `limit` で分けて読み、`reportPath` で詳細を JSON に書き出せます |
-| `list_schemas` | `S1000D_SPEC_DIR` の下で見つかった `xml_schema_flat/` の一覧（版、XSD の数、スキーマ名）を返します。`schema-not-found` の原因を調べるのに使います |
+| `verify_data_module` | Verifies one data module in the order well-formedness → XSD → BREX chain → references, and returns `verification` together with the details of each step (line numbers of XSD violations, locations of BREX violations, unresolved references and their reasons). Steps can be skipped with `skip` |
+| `validate_schema` | Runs XSD validation only. The XSD to use is chosen by the file name in `xsi:noNamespaceSchemaLocation` and looked up in `xml_schema_flat/` under `S1000D_SPEC_DIR`. The issue is read from `Issue number:` at the top of `brex.xsd` |
+| `check_references` | Collects references of 5 kinds and returns whether each target exists, with a reason (`not-found` / `no-entity-declaration` / `file-not-found` / `no-such-id` / `no-csdb`). A `dmRef` to a chapter of the specification (model identification code `S1000D`) is not a broken reference, so it is reported separately |
+| `verify_csdb` | Verifies the CSDB objects in a folder (DMC and PMC by default) in one run, and returns the verification status of each object and a count summary. Read the results in parts with `offset` and `limit`, and write the details to JSON with `reportPath` |
+| `list_schemas` | Returns the list of `xml_schema_flat/` folders found under `S1000D_SPEC_DIR` (issue, number of XSDs, schema names). Use it to find the cause of `schema-not-found` |
 
-## 検証状態の読み方
+## Reading the verification status
 
 ```mermaid
 flowchart LR
-  IN["データモジュール"] --> W["整形式"] --> X["XSD<br/>valid / invalid /<br/>schema-not-found / not-run"]
-  X --> B["BREX の連鎖<br/>passed / violations /<br/>incomplete / not-run"]
-  B --> R["参照<br/>resolved / unresolved / not-run"]
+  IN["Data module"] --> W["Well-formedness"] --> X["XSD<br/>valid / invalid /<br/>schema-not-found / not-run"]
+  X --> B["BREX chain<br/>passed / violations /<br/>incomplete / not-run"]
+  B --> R["References<br/>resolved / unresolved / not-run"]
   R --> V["verification"]
 ```
 
-| 項目 | 値 | 意味 |
+| Field | Value | Meaning |
 | --- | --- | --- |
-| `schema.state` | `valid` | XSD を見つけて検証し、違反が 0 |
-| | `invalid` | 違反あり。`errorCount` と、行番号付きの libxml2 の文章 |
-| | `schema-not-found` | XSD が見つからない。`reason` に理由（`S1000D_SPEC_DIR` 未設定、`xml_schema_flat/` 無し、版が合わない、など） |
-| | `not-run` | `skip` で省いた、または整形式でない |
-| `brex.state` | `passed` | すべての層で違反 0、評価できなかったルール 0、未解決の BREX 0 |
-| | `violations` | 違反あり |
-| | `incomplete` | 違反は 0 だが、連鎖の途中の BREX が無いか、評価できないルールがある。検査されていない部分がある |
-| `references.state` | `resolved` / `unresolved` | 未解決の参照が 0 か 1 以上か |
+| `schema.state` | `valid` | The XSD was found, validation ran, and there are 0 violations |
+| | `invalid` | There are violations. `errorCount` and the libxml2 messages with line numbers |
+| | `schema-not-found` | The XSD was not found. `reason` says why (`S1000D_SPEC_DIR` not set, no `xml_schema_flat/`, issue does not match, and so on) |
+| | `not-run` | Skipped with `skip`, or the document is not well-formed |
+| `brex.state` | `passed` | 0 violations in every layer, 0 rules that could not be evaluated, 0 unresolved BREX |
+| | `violations` | There are violations |
+| | `incomplete` | 0 violations, but a BREX in the middle of the chain is missing or some rules cannot be evaluated. Part of the document has not been checked |
+| `references.state` | `resolved` / `unresolved` | Whether the number of unresolved references is 0 or 1 or more |
 
-:::caution[`schema-not-found` は `valid` ではありません]
-XSD が見つからなかったときは検証が行われていないだけで、文書が正しいことを意味しません。`list_schemas` で配布物の置き方を確かめてください。XSD に違反した文書では要素の位置が仕様と違う可能性があるため、BREX の違反が誤って出たり隠れたりします。`schema.state` が `invalid` のときは BREX の結果を参考程度に読んでください（応答の `_notes` にも書きます）。
+:::caution[`schema-not-found` is not `valid`]
+When the XSD is not found, validation simply did not run; it does not mean the document is correct. Use `list_schemas` to confirm how the distribution is laid out. In a document that violates the XSD, elements may not be where the specification puts them, so BREX violations can be reported wrongly or hidden. When `schema.state` is `invalid`, treat the BREX results as indicative only (the response says so in `_notes` as well).
 :::
 
-## できないこと
+## What it does not do
 
-- **S1000D への準拠は判定しません。** `valid` と `passed` は「XSD と、機械で検査できる BREX のルールに誤りが無かった」ことだけを意味します。`nonContextRules`（文章で書かれた取り決め）は `manualChecks` として返し、判断は人が行います。プロジェクトのビジネスルール文書はどのツールの対象でもありません。
-- BREX のルールの説明や値の意味は返しません。それは [`s1000d-brex-mcp`](/s1000d-stack/mcp/brex-mcp/) の `explain_brex` / `lookup_value` の仕事です。重大度コード（`brsl01`〜`brsl99`）はそのまま返します。
-- 適用性（どの製品に当てはまるか）は判定しません。`check_references` は `applicRefId` の参照先があるかだけを見ます。判定は [`s1000d-reader-mcp`](/s1000d-stack/mcp/reader-mcp/) が行います。
+- **It does not judge conformance to S1000D®.** `valid` and `passed` mean only that no errors were found against the XSD and the BREX rules that a machine can check. `nonContextRules` (rules written as prose) are returned as `manualChecks`, and a person makes the judgement. The project's business rules document is not the subject of any tool.
+- It does not return explanations of BREX rules or the meaning of values. That is the job of `explain_brex` / `lookup_value` in [`s1000d-brex-mcp`](/s1000d-stack/mcp/brex-mcp/). Severity codes (`brsl01` to `brsl99`) are returned as they are.
+- It does not evaluate applicability (which product the content applies to). `check_references` only checks whether the target of `applicRefId` exists. Evaluation is done by [`s1000d-reader-mcp`](/s1000d-stack/mcp/reader-mcp/).
 
-## 設定
+## Configuration
 
-| 環境変数 | 内容 |
+| Environment variable | Description |
 | --- | --- |
-| `S1000D_SPEC_DIR` | S1000D の配布物を展開したフォルダー。XSD（`xml_schema_flat/`。内側の「XML Schema Package」の zip を展開しておく）と既定 BREX をこの下から探します |
-| `S1000D_CSDB_DIR` | プロジェクトのデータモジュールが置かれたフォルダー。`:`（Windows は `;`）区切りで複数指定できます。参照先の DM・PM・ICN ファイルと、連鎖の途中の BREX をここから探します |
+| `S1000D_SPEC_DIR` | The folder where the S1000D distribution is extracted. The XSDs (`xml_schema_flat/`; extract the inner "XML Schema Package" zip beforehand) and the default BREX are looked up under it |
+| `S1000D_CSDB_DIR` | The folder that holds the project's data modules. Several folders can be given, separated by `:` (`;` on Windows). The referenced DM, PM and ICN files, and the BREX in the middle of the chain, are looked up here |
 
 ```json
 {
@@ -68,16 +68,16 @@ XSD が見つからなかったときは検証が行われていないだけで�
 }
 ```
 
-## XSD の探し方
+## How XSDs are found
 
-配布物の中には `brex.xsd` を含む `xml_schema_flat/` が 2 つあります。XML Schema Package のものと、データ辞書（`data_dictionary_7/Files/`）の中の写しです。写しの方は `xs:import` が `http://www.w3.org/2001/xml.xsd` のような絶対 URL で、libxml2 がネットワークに出ようとして失敗するため、使いません。XML Schema Package 側の XSD は `xml.xsd` のように相対パスで import しているので、同じフォルダーの XSD をまとめて登録すれば解決します。
+The distribution contains 2 `xml_schema_flat/` folders that include `brex.xsd`: the one in the XML Schema Package, and a copy inside the data dictionary (`data_dictionary_7/Files/`). The copy is not used, because its `xs:import` uses absolute URLs such as `http://www.w3.org/2001/xml.xsd`, and libxml2 tries to go out to the network and fails. The XSDs on the XML Schema Package side import with relative paths such as `xml.xsd`, so registering all the XSDs in the same folder together resolves them.
 
-XSD 検証は `libxml2-wasm`（libxml2 の WebAssembly 版）で行い、XSD ごとに 1 回コンパイルして使い回します。Issue 7 の Bike Samples 106 件を 0.5 秒以内で検証できます。採用の経緯（`xmllint-wasm` との比較）は hub リポジトリの `docs/DECISIONS.md` の D-15 にあります。
+XSD validation is done with `libxml2-wasm` (the WebAssembly build of libxml2); each XSD is compiled once and reused. The 106 Bike Samples of Issue 7 can be validated in under 0.5 seconds. The background to this choice (the comparison with `xmllint-wasm`) is in D-15 of `docs/DECISIONS.md` in the hub repository.
 
-## 公式サンプルで分かること
+## What the official samples show
 
-Bike Samples の DMC 106 件と PMC 4 件は、すべて Issue 7 の XSD に適合します。一方、`dmRef` 1,843 件のうち 954 件はモデル識別コード `S1000D` の DMC、つまり仕様書の章への参照で、CSDB には無いので未解決になります（ほぼすべてビジネスルール文書 `…-024A-D` の中）。`check_references` はこれを `specificationReferences` として別枠で返し、`unresolved` には入れません。また、DOCTYPE で `.PNG` と宣言された ICN の実ファイルが `.SVG` という不整合が 1 件あり、`file-not-found` として報告されます。拡張子の違いを許す寛容な解決は入れていません。宣言どおりに置かれていないことは、納品の検査で見つけたい事実だからです。
+All 106 DMCs and 4 PMCs of the Bike Samples conform to the Issue 7 XSD. On the other hand, 954 of the 1,843 `dmRef` elements point to DMCs with the model identification code `S1000D`, that is, to chapters of the specification; they are not in the CSDB, so they are unresolved (almost all of them inside the business rules document `…-024A-D`). `check_references` returns these separately as `specificationReferences` and does not count them in `unresolved`. There is also 1 inconsistency where an ICN declared as `.PNG` in the DOCTYPE has an actual file with the extension `.SVG`, which is reported as `file-not-found`. No lenient resolution that tolerates a different extension is included, because a file that is not placed as declared is exactly the kind of fact a delivery inspection should find.
 
-:::note[公開の状態]
-`@shuji-bonji/s1000d-verify-mcp` は 2026-10-25 時点で npm 未公開（開発中）です。段階 2 の部品が揃った時点で `s1000d-brex-mcp` と一緒に公開します。リポジトリから `npm install && npm run build` して `node dist/index.js` を起動できます。
+:::note[Release status]
+As of 2026-10-25, `@shuji-bonji/s1000d-verify-mcp` is not yet published on npm (in development). It will be published together with `s1000d-brex-mcp` once the stage 2 components are complete. From the repository, run `npm install && npm run build` and start it with `node dist/index.js`.
 :::

@@ -25,9 +25,11 @@ export default defineConfig({
       favicon: '/favicon.svg',
       description:
         'LLM が S1000D® の技術文書を読み、BREX（ビジネスルール）に沿って検査・作成するための MCP サーバー・ライブラリ・Skill と、体験型マニュアルの作成ツール・閲覧ソフトの学習サイト',
+      // D-22: ルートは英語、日本語は /ja/。一次執筆は日本語（ja/ 配下）で、英語は翻訳。
       defaultLocale: 'root',
       locales: {
-        root: { label: '日本語', lang: 'ja' },
+        root: { label: 'English', lang: 'en' },
+        ja: { label: '日本語', lang: 'ja' },
       },
       // hub が Private だった段階 1 では公開済みの s1000d-core に向けていた。
       // サイトは hub を Public にした時点（D-16）で公開されるので、hub に向ける
@@ -40,25 +42,28 @@ export default defineConfig({
       ],
       sidebar: [
         {
-          label: 'ガイド',
+          label: 'Guide',
+          translations: { ja: 'ガイド' },
           items: [
-            { label: 'S1000D Stack とは', slug: 'guide/overview' },
-            { label: '導入手順', slug: 'guide/getting-started' },
-            { label: '全体構成と進み方', slug: 'guide/architecture' },
-            { label: '仕様書の扱いと商標', slug: 'guide/license' },
+            { label: 'What S1000D Stack is', translations: { ja: 'S1000D Stack とは' }, slug: 'guide/overview' },
+            { label: 'Getting started', translations: { ja: '導入手順' }, slug: 'guide/getting-started' },
+            { label: 'Architecture and stages', translations: { ja: '全体構成と進み方' }, slug: 'guide/architecture' },
+            { label: 'Specification files and trademarks', translations: { ja: '仕様書の扱いと商標' }, slug: 'guide/license' },
           ],
         },
         {
-          label: 'S1000D を知る',
+          label: 'Understanding S1000D',
+          translations: { ja: 'S1000D を知る' },
           items: [
-            { label: 'IETM と S1000D', slug: 'guide/ietm-and-s1000d' },
-            { label: 'データモジュールと DMC', slug: 'guide/data-module-and-dmc' },
-            { label: 'BREX（ビジネスルール交換）', slug: 'guide/brex' },
-            { label: '適用性（どの製品に当てはまるか）', slug: 'guide/applicability' },
+            { label: 'IETM and S1000D', translations: { ja: 'IETM と S1000D' }, slug: 'guide/ietm-and-s1000d' },
+            { label: 'Data modules and the DMC', translations: { ja: 'データモジュールと DMC' }, slug: 'guide/data-module-and-dmc' },
+            { label: 'BREX (Business Rules Exchange)', translations: { ja: 'BREX（ビジネスルール交換）' }, slug: 'guide/brex' },
+            { label: 'Applicability', translations: { ja: '適用性（どの製品に当てはまるか）' }, slug: 'guide/applicability' },
           ],
         },
         {
-          label: 'MCP サーバー',
+          label: 'MCP servers',
+          translations: { ja: 'MCP サーバー' },
           items: [
             { label: 's1000d-brex-mcp', slug: 'mcp/brex-mcp' },
             { label: 's1000d-verify-mcp', slug: 'mcp/verify-mcp' },
@@ -66,12 +71,14 @@ export default defineConfig({
           ],
         },
         {
-          label: 'ライブラリ',
+          label: 'Libraries',
+          translations: { ja: 'ライブラリ' },
           items: [{ label: 's1000d-core', slug: 'lib/s1000d-core' }],
         },
         {
-          label: 'ユースケース',
-          items: [{ label: '3 つの使い方（見取り図）', slug: 'use-cases' }],
+          label: 'Use cases',
+          translations: { ja: 'ユースケース' },
+          items: [{ label: 'Three ways to use it', translations: { ja: '3 つの使い方（見取り図）' }, slug: 'use-cases' }],
         },
       ],
       customCss: ['./src/styles/custom.css'],

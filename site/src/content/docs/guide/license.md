@@ -1,50 +1,50 @@
 ---
-title: 仕様書の扱いと商標
-description: S1000D の配布物をこのプロジェクトが同梱しない理由と、商標・ライセンスの扱いを説明します。
+title: Specification files and trademarks
+description: Why this project does not include the S1000D distribution, and how trademarks and licenses are handled.
 ---
 
-このプロジェクトは、S1000D の仕様書・XML スキーマ・既定 BREX・公式サンプルをどのリポジトリにもパッケージにも含めていません。利用者ご自身で入手したものを読み込む方式にしています。この判断の根拠と、商標・ライセンスの扱いをまとめます。
+This project does not include the S1000D® specification, XML schemas, default BREX (Business Rules Exchange) or official samples in any repository or package; it reads the files the user has obtained. This page summarises the reasoning behind that decision and how trademarks and licenses are handled.
 
-## 配布物を同梱しない理由
+## Why the distribution is not included
 
-S1000D の配布物（仕様書 PDF、XML スキーマ、例、ダウンロードページのその他の情報）には利用条件が付いています。Issue 7 の仕様書冒頭にあるデータモジュール `S1000D-A-00-00-0000-00A-021A-D` を読んだ結果の要点は次のとおりです。これは私的な要約であり、法的な判断ではありません。
+The S1000D distribution (the specification PDF, XML schemas, examples and the other information on the download page) comes with terms of use. The main points, as read from the data module `S1000D-A-00-00-0000-00A-021A-D` at the start of the Issue 7 specification, are as follows. This is a private summary and not a legal judgement.
 
-| 条項 | 内容 | このプロジェクトへの影響 |
+| Clause | Content | Effect on this project |
 | --- | --- | --- |
-| License to use | 条件を守る限り、利用・技術情報の製造・訓練の提供について非独占的な許諾を与える | 仕様に沿ったツールを作って提供することは許諾の範囲内 |
-| Special usage rights | 仕様書の複製・公開を無償で認める相手は、ASD・AIA・A4A の会員企業や加盟国の国防省など 8 区分に限られる | 個人の開発者は含まれない。再配布の許可は無い |
-| Definitions | 「S1000D suite of information」は仕様書、例（XML インスタンス・PDF・スタイルシート）、XML スキーマ、ダウンロードページのその他の情報を含む | XSD・サンプル・既定 BREX・データ辞書も同じ条件 |
-| Intellectual property rights | 明示的に与えた権利以外はすべて留保 | 再配布は与えられていない |
-| No modifications | 改変・翻案・翻訳を禁止。ビジネスルールの追加は可 | 仕様書の章を翻訳して掲載しない。自作 BREX は「ビジネスルールの追加」に当たる |
+| License to use | Grants a non-exclusive license to use the specification, produce technical information and provide training, as long as the conditions are observed | Building and providing tools that follow the specification is within the license |
+| Special usage rights | Those allowed to reproduce and publish the specification free of charge are limited to 8 categories, such as member companies of ASD, AIA and A4A and the ministries of defence of member nations | Individual developers are not included. There is no permission to redistribute |
+| Definitions | The "S1000D suite of information" includes the specification, the examples (XML instances, PDFs and stylesheets), the XML schemas and the other information on the download page | The XSD, samples, default BREX and data dictionary fall under the same conditions |
+| Intellectual property rights | All rights not expressly granted are reserved | Redistribution is not granted |
+| No modifications | Prohibits modification, adaptation and translation. Adding business rules is allowed | Chapters of the specification are not translated and published. A self-written BREX counts as "adding business rules" |
 
-このため、次のように扱っています。
+For these reasons, the project handles the files as follows.
 
-- npm パッケージとリポジトリには、自分で書いたコードと自作のデータだけを入れます。
-- MCP サーバーは、利用者が入手した配布物を環境変数 `S1000D_SPEC_DIR` で指定する方式にします。
-- テストは自作のデータモジュールと自作の BREX で行います。配布物を使うテストは、利用者の環境でだけ動きます。
-- このサイトは、仕様書の章を日本語に置き換える書き方はせず、概念を自分の言葉と構成で説明します。要素名・属性名（`dmCode`、`objectPath` など）はそのまま使います。
+- The npm packages and repositories contain only self-written code and self-made data.
+- The MCP servers take the distribution the user has obtained through the `S1000D_SPEC_DIR` environment variable.
+- Tests run on self-made data modules and a self-written BREX. Tests that use the distribution run only in the user's environment.
+- This site does not rewrite chapters of the specification into another language; it explains the concepts in its own words and its own structure. Element and attribute names (`dmCode`, `objectPath` and so on) are used as they are.
 
-:::note[同じ判断をしている例]
-Python の S1000D MCP サーバー `i2oss/s1000d-mcp` は「公式 XSD は再配布できない」として自作のサブセット XSD を使い、Oxygen XML の S1000D フレームワークはスキーマを同梱せず利用者に入手させています。
+:::note[Examples of the same decision]
+The Python S1000D MCP server `i2oss/s1000d-mcp` uses a self-made subset XSD because "the official XSD cannot be redistributed", and the S1000D framework for Oxygen XML does not include the schemas and has the user obtain them.
 :::
 
-## 商標
+## Trademarks
 
-S1000D™ は ASD（Aerospace, Security and Defence Industries Association of Europe）の商標で、S1000D® は EU で登録された商標です。このプロジェクトは ASD とは無関係で、承認も提携も受けていません。パッケージ名とリポジトリ名に `s1000d` を含めているのは、扱う対象（BREX、DMC、データモジュール）が S1000D の概念であることを示すためです。次の 3 点を守ります。
+S1000D™ is a trademark of ASD (Aerospace, Security and Defence Industries Association of Europe), and S1000D® is a trademark registered in the EU. This is a personal project and is not affiliated with ASD; it is neither endorsed by nor partnered with ASD. The package and repository names contain `s1000d` to show that what they handle (BREX, DMCs, data modules) are S1000D concepts. The project keeps to the following 3 points.
 
-1. 自分の名前空間に置く（`@shuji-bonji/s1000d-…`、`shuji-bonji/s1000d-…`）
-2. README とパッケージの説明に、ASD とは無関係であること、S1000D® が ASD の登録商標であることを書く
-3. 「公式」「認定」と受け取られる表現やロゴを使わない
+1. Stay in its own namespace (`@shuji-bonji/s1000d-…`, `shuji-bonji/s1000d-…`)
+2. State in the README and the package description that the project is not affiliated with ASD and that S1000D® is a registered trademark of ASD
+3. Use no wording or logos that could be taken as "official" or "certified"
 
-## ライセンス
+## Licenses
 
-| 対象 | ライセンス |
+| Subject | License |
 | --- | --- |
-| コード（s1000d-core、各 MCP、製品、スクリプト） | MIT |
-| このサイトの文章 | CC BY 4.0 |
-| 自作のサンプルデータ（券売機の例など） | MIT |
+| Code (s1000d-core, each MCP server, products, scripts) | MIT |
+| The text of this site | CC BY 4.0 |
+| Self-made sample data (the ticket machine example and others) | MIT |
 
-## 参照
+## References
 
-- [S1000D 公式サイト](https://s1000d.org/) / [Terms of Use](https://s1000d.org/?page_id=108)
-- [S1000D Framework License Agreement（Oxygen XML）](https://www.oxygenxml.com/addons/oxygenxml.s1000d.framework_license.html)
+- [S1000D official site](https://s1000d.org/) / [Terms of Use](https://s1000d.org/?page_id=108)
+- [S1000D Framework License Agreement (Oxygen XML)](https://www.oxygenxml.com/addons/oxygenxml.s1000d.framework_license.html)

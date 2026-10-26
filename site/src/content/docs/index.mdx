@@ -1,15 +1,15 @@
 ---
 title: S1000D Stack
-description: LLM が S1000D® の技術文書を読み、BREX（ビジネスルール）に沿って検査・作成するための MCP サーバー・ライブラリ・Skill と、体験型マニュアルの作成ツール・閲覧ソフト
+description: MCP servers, libraries and Skills that let an LLM read S1000D® technical documents and check and create them in line with BREX (business rules), plus an authoring tool and a viewer for experiential manuals
 template: splash
 hero:
   image:
     light: ../../assets/logo/c-light.svg
     dark: ../../assets/logo/c-dark.svg
     alt: S1000D Stack
-  tagline: S1000D® の技術文書を、LLM がプロジェクトの決まり（BREX、Business Rules Exchange）に沿って読み、検査し、作れるようにする道具の束ねです。
+  tagline: A set of tools that lets an LLM read, check and create S1000D® technical documents in line with the rules agreed for a project (BREX, Business Rules Exchange).
   actions:
-    - text: S1000D Stack とは
+    - text: What S1000D Stack is
       link: /s1000d-stack/guide/overview/
       icon: right-arrow
     - text: GitHub
@@ -20,56 +20,56 @@ hero:
 
 import { CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-## 部品
+## Components
 
 <CardGrid>
   <LinkCard
     title="s1000d-brex-mcp"
-    description="顧客やプロジェクトから渡された BREX（Business Rules Exchange）を、どの要素に何を求めているかが分かる文章にして一覧にします。データモジュールを BREX の連鎖（プロジェクト → 組織 → S1000D 既定 BREX）に各層ごとに照合し、違反を箇所・値・ルール ID・重大度付きで返します。"
+    description="Lists the BREX (Business Rules Exchange) you were given by a customer or project as sentences that say what is required of each element. Checks data modules against each layer of the BREX chain (project → organisation → S1000D default BREX) and returns every violation with its location, value, rule ID and severity level."
     href="/s1000d-stack/mcp/brex-mcp/"
   />
   <LinkCard
     title="s1000d-verify-mcp"
-    description="公式 XSD による検証、BREX 照合、参照切れの検出をまとめて行い、1 つの検証状態にして返します。納品前の確認と、reader に渡す前の下ごしらえに使います。"
+    description="Performs validation against the official XSD, the BREX check and broken reference detection together, and returns them as a single verification status. Use it for checks before delivery and as preparation before passing data to the reader."
     href="/s1000d-stack/mcp/verify-mcp/"
   />
   <LinkCard
     title="s1000d-reader-mcp"
-    description="データモジュールを見出し・手順・警告・図の構造で LLM に渡します。どの製品に当てはまるか（適用性）はサーバーが判定し、結果だけを渡します。LLM に XML も適用性の式も見せません。"
+    description="Passes data modules to the LLM as a structure of headings, steps, warnings and illustrations. Which product the content applies to (applicability) is evaluated by the server, and only the result is passed on. The LLM sees neither XML nor applicability expressions."
     href="/s1000d-stack/mcp/reader-mcp/"
   />
   <LinkCard
-    title="s1000d-core（ライブラリ）"
-    description="DMC・ICN の分解、識別・状態部の読み取り、BREX 照合、XSD 検証、参照の解決、適用性の評価を 3 つの MCP サーバーが共有するライブラリです。npm に公開済みです。"
+    title="s1000d-core (library)"
+    description="A library shared by the three MCP servers for splitting DMCs and ICNs, reading the identification and status section, BREX checks, XSD validation, reference resolution and applicability evaluation. Published on npm."
     href="/s1000d-stack/lib/s1000d-core/"
   />
 </CardGrid>
 
-## 読む
+## Read
 
 <CardGrid>
   <LinkCard
-    title="導入手順"
-    description="S1000D の配布物の入手、環境変数の指定、MCP クライアントへの登録から最初の操作まで。"
+    title="Getting started"
+    description="From obtaining the S1000D distribution, setting the environment variable and registering with an MCP client to the first operation."
     href="/s1000d-stack/guide/getting-started/"
   />
   <LinkCard
-    title="ユースケース"
-    description="渡された BREX を読んで照合する、既存のデータモジュールを検証して読む、軽い Web 形式のマニュアルから S1000D へ出力する。3 つの使い方の見取り図です。"
+    title="Use cases"
+    description="Read the BREX you were given and check against it, validate and read existing data modules, and output S1000D from a manual in a lightweight web format. An overview of the three ways to use it."
     href="/s1000d-stack/use-cases/"
   />
   <LinkCard
-    title="全体構成と進み方"
-    description="hub・ライブラリ・MCP サーバー・Skill・製品の構成と、段階 1〜4 の成果物と完了の条件。この先の writer、作成ツール、閲覧ソフトの位置づけもここにあります。"
+    title="Architecture and stages"
+    description="The structure of the hub, libraries, MCP servers, Skills and products, with the deliverables and completion criteria of stages 1–4. The place of the future writer, authoring tool and viewer is also described here."
     href="/s1000d-stack/guide/architecture/"
   />
   <LinkCard
-    title="仕様書の扱いと商標"
-    description="S1000D の仕様書・XML スキーマ・既定 BREX・公式サンプルは利用条件により再配布できないため同梱しません。利用者ご自身で s1000d.org から入手し、置き場所を環境変数で指定します。"
+    title="Specification files and trademarks"
+    description="The S1000D specification, XML schemas, default BREX and official samples are not included, because their terms of use do not grant redistribution. Obtain them from s1000d.org yourself and point an environment variable at their location."
     href="/s1000d-stack/guide/license/"
   />
 </CardGrid>
 
-:::note[商標について]
-このプロジェクトは ASD（Aerospace, Security and Defence Industries Association of Europe）とは無関係の個人プロジェクトです。S1000D® は ASD の登録商標です。
+:::note[Trademark]
+This is a personal project and is not affiliated with ASD (Aerospace, Security and Defence Industries Association of Europe). S1000D® is a registered trademark of ASD.
 :::

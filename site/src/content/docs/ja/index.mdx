@@ -1,0 +1,75 @@
+---
+title: S1000D Stack
+description: LLM が S1000D® の技術文書を読み、BREX（ビジネスルール）に沿って検査・作成するための MCP サーバー・ライブラリ・Skill と、体験型マニュアルの作成ツール・閲覧ソフト
+template: splash
+hero:
+  image:
+    light: ../../../assets/logo/c-light.svg
+    dark: ../../../assets/logo/c-dark.svg
+    alt: S1000D Stack
+  tagline: S1000D® の技術文書を、LLM がプロジェクトの決まり（BREX、Business Rules Exchange）に沿って読み、検査し、作れるようにする道具の束ねです。
+  actions:
+    - text: S1000D Stack とは
+      link: /s1000d-stack/ja/guide/overview/
+      icon: right-arrow
+    - text: GitHub
+      link: https://github.com/shuji-bonji/s1000d-stack
+      icon: external
+      variant: minimal
+---
+
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+## 部品
+
+<CardGrid>
+  <LinkCard
+    title="s1000d-brex-mcp"
+    description="顧客やプロジェクトから渡された BREX（Business Rules Exchange）を、どの要素に何を求めているかが分かる文章にして一覧にします。データモジュールを BREX の連鎖（プロジェクト → 組織 → S1000D 既定 BREX）に各層ごとに照合し、違反を箇所・値・ルール ID・重大度付きで返します。"
+    href="/s1000d-stack/ja/mcp/brex-mcp/"
+  />
+  <LinkCard
+    title="s1000d-verify-mcp"
+    description="公式 XSD による検証、BREX 照合、参照切れの検出をまとめて行い、1 つの検証状態にして返します。納品前の確認と、reader に渡す前の下ごしらえに使います。"
+    href="/s1000d-stack/ja/mcp/verify-mcp/"
+  />
+  <LinkCard
+    title="s1000d-reader-mcp"
+    description="データモジュールを見出し・手順・警告・図の構造で LLM に渡します。どの製品に当てはまるか（適用性）はサーバーが判定し、結果だけを渡します。LLM に XML も適用性の式も見せません。"
+    href="/s1000d-stack/ja/mcp/reader-mcp/"
+  />
+  <LinkCard
+    title="s1000d-core（ライブラリ）"
+    description="DMC・ICN の分解、識別・状態部の読み取り、BREX 照合、XSD 検証、参照の解決、適用性の評価を 3 つの MCP サーバーが共有するライブラリです。npm に公開済みです。"
+    href="/s1000d-stack/ja/lib/s1000d-core/"
+  />
+</CardGrid>
+
+## 読む
+
+<CardGrid>
+  <LinkCard
+    title="導入手順"
+    description="S1000D の配布物の入手、環境変数の指定、MCP クライアントへの登録から最初の操作まで。"
+    href="/s1000d-stack/ja/guide/getting-started/"
+  />
+  <LinkCard
+    title="ユースケース"
+    description="渡された BREX を読んで照合する、既存のデータモジュールを検証して読む、軽い Web 形式のマニュアルから S1000D へ出力する。3 つの使い方の見取り図です。"
+    href="/s1000d-stack/ja/use-cases/"
+  />
+  <LinkCard
+    title="全体構成と進み方"
+    description="hub・ライブラリ・MCP サーバー・Skill・製品の構成と、段階 1〜4 の成果物と完了の条件。この先の writer、作成ツール、閲覧ソフトの位置づけもここにあります。"
+    href="/s1000d-stack/ja/guide/architecture/"
+  />
+  <LinkCard
+    title="仕様書の扱いと商標"
+    description="S1000D の仕様書・XML スキーマ・既定 BREX・公式サンプルは利用条件により再配布できないため同梱しません。利用者ご自身で s1000d.org から入手し、置き場所を環境変数で指定します。"
+    href="/s1000d-stack/ja/guide/license/"
+  />
+</CardGrid>
+
+:::note[商標について]
+このプロジェクトは ASD（Aerospace, Security and Defence Industries Association of Europe）とは無関係の個人プロジェクトです。S1000D® は ASD の登録商標です。
+:::

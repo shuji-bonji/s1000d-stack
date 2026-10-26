@@ -1,90 +1,90 @@
 ---
 title: s1000d-reader-mcp
-description: データモジュールを XML ではなく構造として読み、適用性を判定し、検証状態を添えて返す MCP サーバーの設定とツールを説明します。
+description: Configuration and tools of the MCP server that reads data modules as structure rather than XML, evaluates applicability, and returns the result with its verification status.
 ---
 
-`s1000d-reader-mcp` は、データモジュールとパブリケーションモジュールを LLM が**構造として**読むための MCP サーバーです。見出しの階層、番号付きの手順、警告・注意・注記、図（ICN）、表、参照先の題名を保ったまま返し、どの製品に当てはまるか（[適用性](/s1000d-stack/guide/applicability/)）はサーバーが判定して結果だけを渡します。すべての応答に「どこまで検証済みか」（`verification`）が付きます。6 つのツールを持ちます。
+`s1000d-reader-mcp` is an MCP server that lets an LLM read data modules and publication modules **as structure**. It returns the heading hierarchy, numbered steps, warnings, cautions and notes, illustrations (ICN), tables and the titles of referenced targets intact, and the server evaluates which product the content applies to ([applicability](/s1000d-stack/guide/applicability/)) and passes on only the result. Every response carries "how far it has been verified" (`verification`). It has 6 tools.
 
-## できること
+## What it does
 
-| ツール | 内容 |
+| Tool | Description |
 | --- | --- |
-| `list_data_modules` | CSDB の中のデータモジュール（指定すれば PM・DML・DDN・IMF・UPF も）を、DMC・題名・版・言語・スキーマ名・適用性の表示文付きで一覧にします。モデル識別コード・システムコード・情報コード・スキーマ名・題名の文字で絞れます |
-| `read_data_module` | データモジュール 1 件を構造で読みます。識別・状態部、本文の木、参照（題名付き）、検証状態。`product` を渡すとブロックごとに `applicable` / `notApplicable` / `undetermined` を付けます |
-| `read_publication_module` | パブリケーションモジュールを目次として読みます。`pmEntry` の木と、各 `dmRef` / `pmRef` の解決先（ファイル・題名・版） |
-| `resolve_reference` | DMC・PMC・ICN を CSDB のファイルに解決します。ICN は参照元の DOCTYPE 宣言（ファイル名と NOTATION）も返します |
-| `describe_applicability` | 適用性の語彙を返します。ACT の製品属性、CCT の条件、PCT の製品、文書の `applic` 文（id と表示文）、PCT が値を割り当てていない属性。ここでは何も判定しません |
-| `read_icn_metadata` | ICN メタデータファイル（IMF）を読みます。ICN・版・題名・キーワード・機密区分と、状態部の項目の一覧 |
+| `list_data_modules` | Lists the data modules in the CSDB (and, if requested, PM, DML, DDN, IMF and UPF as well) with DMC, title, issue, language, schema name and the display text of their applicability. The list can be narrowed by model identification code, system code, information code, schema name and characters in the title |
+| `read_data_module` | Reads one data module as structure: the identification and status section, the content tree, references (with titles) and the verification status. When `product` is passed, each block is marked `applicable` / `notApplicable` / `undetermined` |
+| `read_publication_module` | Reads a publication module as a table of contents: the `pmEntry` tree and the resolved target (file, title, issue) of each `dmRef` / `pmRef` |
+| `resolve_reference` | Resolves a DMC, PMC or ICN to a file in the CSDB. For an ICN it also returns the DOCTYPE declaration of the referencing file (file name and NOTATION) |
+| `describe_applicability` | Returns the applicability vocabulary: the product attributes of the ACT, the conditions of the CCT, the products of the PCT, the `applic` statements in the document (id and display text), and the attributes to which the PCT assigns no value. Nothing is evaluated here |
+| `read_icn_metadata` | Reads an ICN metadata file (IMF): ICN, issue, title, keywords, security classification, and a list of the items in the status section |
 
-## 本文の形
+## Shape of the content
 
-内容部の XML はそのまま返さず、データモジュールの種類ごとの読み取り部分が共通の形（節点の木）に揃えます。
+The XML of the content section is not returned as is; the reading code for each type of data module brings it into a common shape (a tree of nodes).
 
 ```mermaid
 flowchart LR
-  D["descript<br/>説明"] --> T
-  P["proced<br/>手順"] --> T
-  PR["process<br/>プロセス（分岐）"] --> T
-  F["fault<br/>故障探求"] --> T
-  PM["pm<br/>目次"] --> T["共通の形<br/>section / para / list / table / figure / admonition<br/>step（番号 1、1.1）/ requirements / sequence / if / dialog / entry"]
-  O["それ以外の種類"] --> U["structured: false<br/>識別・状態部だけ"]
+  D["descript<br/>descriptive"] --> T
+  P["proced<br/>procedural"] --> T
+  PR["process<br/>process (branching)"] --> T
+  F["fault<br/>fault isolation"] --> T
+  PM["pm<br/>table of contents"] --> T["Common shape<br/>section / para / list / table / figure / admonition<br/>step (numbered 1, 1.1) / requirements / sequence / if / dialog / entry"]
+  O["Other types"] --> U["structured: false<br/>identification and status section only"]
 ```
 
-- 手順には `1`、`1.1` のような番号を組み立てて付けます。
-- 段落の中の参照は `[→ DMC 題名]` の形で文に埋め込み、`refs` にも集めます。参照先の題名は CSDB から読みます。LLM が DMC だけを見て中身を推測しないためです。
-- 要件（`preliminaryRqmts` / `closeRqmts`）は「conditions: … / persons: … / support equipment: …」の 1 文に要約します。
-- 故障探求の問いと答えは `question` と `choices`（答えごとの次の手順の id）にします。
-- 読み取り部分が知らない要素は捨てず、`kind: "unknown"` として文だけを残し、`content.unknownElements` に名前と数を返します。読み取り部分を広げる材料になります。Issue 7 の Bike Samples では、`descript` と `pm` に未知の要素は無く、`proced` の未知は回路遮断器（`circuitBreaker…`）の群だけです。
+- Steps are given constructed numbers such as `1` and `1.1`.
+- References inside a paragraph are embedded in the sentence in the form `[→ DMC title]` and also collected in `refs`. The title of the referenced target is read from the CSDB, so that the LLM does not guess the content from the DMC alone.
+- Requirements (`preliminaryRqmts` / `closeRqmts`) are summarised in one sentence: "conditions: … / persons: … / support equipment: …".
+- Fault isolation questions and answers become `question` and `choices` (the id of the next step for each answer).
+- Elements that the reading code does not know are not discarded: they are kept as `kind: "unknown"` with their text only, and their names and counts are returned in `content.unknownElements`. This gives material for extending the reading code. In the Issue 7 Bike Samples, `descript` and `pm` have no unknown elements, and the only unknown elements in `proced` are the circuit breaker group (`circuitBreaker…`).
 
-## 適用性と検証状態
+## Applicability and verification status
 
-`product` を渡さないときは、適用性はすべて `undetermined` で、`displayText`（人が読む適用範囲の文）だけを返します。`assert` の式はどんなときも返しません。適用性の仕組み（ACT・CCT・PCT、式の評価）は [適用性のページ](/s1000d-stack/guide/applicability/)に書いています。
+When `product` is not passed, every applicability state is `undetermined`, and only `displayText` (the human-readable statement of the applicable range) is returned. The `assert` expressions are never returned. How applicability works (ACT, CCT, PCT and the evaluation of expressions) is described on the [applicability page](/s1000d-stack/guide/applicability/).
 
-### 3 値の読み方
+### Reading the three states
 
-| 状態 | 意味 | LLM の読み方 |
+| State | Meaning | How the LLM reads it |
 | --- | --- | --- |
-| `applicable` | 渡した製品に当てはまる | そのまま使う |
-| `notApplicable` | 当てはまらない | 答えに混ぜない。`omitNotApplicable` で本文から省ける |
-| `undetermined` | 判定できない。`reason` に「製品に `type` の値が無い」「`product` が渡されていない」「適用性リポジトリに無い」などの理由 | 「当てはまらない」と読まない。足りない値を利用者に聞く |
+| `applicable` | Applies to the product passed | Use as is |
+| `notApplicable` | Does not apply | Do not mix into the answer. `omitNotApplicable` can leave it out of the content |
+| `undetermined` | Cannot be evaluated. `reason` gives the cause, such as "the product has no value for `type`", "`product` was not passed" or "not in the applicability repository" | Do not read as "does not apply". Ask the user for the missing value |
 
-`and` / `or` が確定した枝で足りなかった値は理由に含めません。
+Values that were missing in an `and` / `or` branch that was already decided are not included in the reason.
 
-### 製品の値をどう決めるか
+### Choosing the product values
 
-`describe_applicability` が、対象データモジュールの ACT・CCT・PCT を CSDB から探して、使える属性と値、PCT に登録された製品、文書の中の `applic` 文の一覧を返します。LLM はこれを見て利用者に「どの機種ですか」と聞き、答えを `product` として `read_data_module` に渡します。
+`describe_applicability` finds the ACT, CCT and PCT of the target data module in the CSDB and returns the attributes and values that can be used, the products registered in the PCT, and a list of the `applic` statements in the document. The LLM looks at this, asks the user "which model is it?", and passes the answer to `read_data_module` as `product`.
 
-PCT に登録された製品をそのまま渡すこともできますが、PCT が値を割り当てていない属性があると、その属性を使う文は `undetermined` のままになります。`describe_applicability` はそのような属性を `propertiesNotAssignedInPct` として一覧にするので、不足分を補ってください。
+A product registered in the PCT can be passed as is, but if there are attributes to which the PCT assigns no value, the statements that use those attributes stay `undetermined`. `describe_applicability` lists such attributes as `propertiesNotAssignedInPct`, so fill in what is missing.
 
-### 別のデータモジュールにある適用性文
+### Applicability statements in another data module
 
-`referencedApplicGroupRef/applicRef` が `applicIdentValue` で指す `applic` 文は、`S1000D_CSDB_DIR` の中から `applic/@applicIdentValue` を持つデータモジュール（適用性リポジトリ）を集めて解決します。見つからなければ「リポジトリに無い」理由で `undetermined` になります。
+An `applic` statement that `referencedApplicGroupRef/applicRef` points to by `applicIdentValue` is resolved by collecting the data modules in `S1000D_CSDB_DIR` that have `applic/@applicIdentValue` (the applicability repository). If it is not found, the state is `undetermined` with the reason "not in the repository".
 
-### 検証状態
+### Verification status
 
-検証は既定で XSD だけを行います（`verify: "schema"`）。`verify: "full"` で BREX の連鎖への照合と参照の解決も行い、`verify: "none"` で省きます。省いた工程は `not-run`、XSD が見つからなければ `schema-not-found` と明記され、どちらも `valid` ではありません。XSD に違反した文書は要素の位置が仕様と違う可能性があるため、本文の読み取りも疑ってください。
+By default, verification runs only the XSD (`verify: "schema"`). `verify: "full"` also checks against the BREX (Business Rules Exchange) chain and resolves references, and `verify: "none"` skips verification. A skipped step is stated explicitly as `not-run`, and a missing XSD as `schema-not-found`; neither is `valid`. A document that violates the XSD may have elements in positions that differ from the specification, so treat the reading of its content with suspicion as well.
 
 ```mermaid
 flowchart LR
-  Q["LLM の問い"] --> L["list_data_modules<br/>題名・版・スキーマ名で一覧"]
-  L --> DA["describe_applicability<br/>属性と値、PCT の製品"]
-  DA --> RD["read_data_module（product 付き）<br/>本文の木 ＋ 判定 ＋ verification"]
-  RD --> RR["resolve_reference<br/>DMC・PMC・ICN → ファイル"]
-  PM["read_publication_module<br/>目次"] --> RD
+  Q["LLM's question"] --> L["list_data_modules<br/>list by title, issue, schema name"]
+  L --> DA["describe_applicability<br/>attributes and values, PCT products"]
+  DA --> RD["read_data_module (with product)<br/>content tree + evaluation + verification"]
+  RD --> RR["resolve_reference<br/>DMC, PMC, ICN → file"]
+  PM["read_publication_module<br/>table of contents"] --> RD
 ```
 
-## できないこと
+## What it does not do
 
-- **要約・翻訳はしません。** 要約に要る材料（見出し、手順の番号、警告の種類、参照先）を落とさずに返すのが仕事です。
-- **S1000D への準拠は判定しません。** XSD・BREX の違反の中身は [`s1000d-verify-mcp`](/s1000d-stack/mcp/verify-mcp/)、BREX のルールの説明は [`s1000d-brex-mcp`](/s1000d-stack/mcp/brex-mcp/) で読んでください。
-- 本文を構造化しているのは `descript` / `proced` / `process` / `fault` / `pm` の 5 種です。他の種類は `content.structured: false` で、識別・状態部だけを返します。
+- **It does not summarise or translate.** Its job is to return the material a summary needs (headings, step numbers, warning types, reference targets) without omitting anything.
+- **It does not judge conformance to S1000D®.** Read the details of XSD and BREX violations with [`s1000d-verify-mcp`](/s1000d-stack/mcp/verify-mcp/), and the explanation of BREX rules with [`s1000d-brex-mcp`](/s1000d-stack/mcp/brex-mcp/).
+- The content is structured for 5 types: `descript` / `proced` / `process` / `fault` / `pm`. Other types return `content.structured: false` and only the identification and status section.
 
-## 設定
+## Configuration
 
-| 環境変数 | 内容 |
+| Environment variable | Description |
 | --- | --- |
-| `S1000D_SPEC_DIR` | S1000D の配布物を展開したフォルダー。XSD と既定 BREX をこの下から探します |
-| `S1000D_CSDB_DIR` | プロジェクトのデータモジュールが置かれたフォルダー。`:`（Windows は `;`）区切りで複数指定できます。DMC での読み取り、参照先、ACT・CCT・PCT、適用性リポジトリをここから探します |
+| `S1000D_SPEC_DIR` | The folder where the S1000D distribution was extracted. The XSD and the default BREX are looked up under it |
+| `S1000D_CSDB_DIR` | The folder that holds the project's data modules. Several folders can be given, separated by `:` (`;` on Windows). Reading by DMC, reference targets, the ACT, CCT and PCT, and the applicability repository are looked up here |
 
 ```json
 {
@@ -101,9 +101,9 @@ flowchart LR
 }
 ```
 
-## 応答の例
+## Example response
 
-`read_data_module` の手順 1 件は次の形です（Bike Samples の手順データモジュールを、PCT の製品に `type` を補って読んだもの）。
+One step from `read_data_module` has the following shape (a procedural data module from the Bike Samples, read with `type` added to a PCT product).
 
 ```json
 {
@@ -121,6 +121,6 @@ flowchart LR
 }
 ```
 
-:::note[公開の状態]
-`@shuji-bonji/s1000d-reader-mcp` は 2026-10-25 時点で npm 未公開（開発中）です。段階 2 の部品が揃った時点で公開します。リポジトリから `npm install && npm run build` して `node dist/index.js` を起動できます。
+:::note[Release status]
+As of 2026-10-25, `@shuji-bonji/s1000d-reader-mcp` is not yet published on npm (under development). It will be published once the stage 2 components are complete. You can run `npm install && npm run build` from the repository and start it with `node dist/index.js`.
 :::

@@ -1,53 +1,53 @@
 ---
-title: 3 つの使い方（見取り図）
-description: s1000d-stack の MCP サーバーと Skill をどのような場面で使うかを、3 つの使い方に分けて説明します。
+title: Three ways to use it
+description: Explains in which situations the MCP servers and Skills of s1000d-stack are used, divided into three ways of using them.
 ---
 
-s1000d-stack は、S1000D の技術文書を LLM が BREX に沿って読み、検査し、作れるようにする道具の束ねです。ここでは、その道具をどの場面でどう組み合わせるかを 3 つに分けて説明します。1 と 2 は既存の S1000D データを扱う使い方、3 は S1000D を持たない現場から S1000D を作る使い方です。
+s1000d-stack is a set of tools that lets an LLM read, check and create S1000D® technical documents in line with BREX (Business Rules Exchange). This page explains how to combine those tools in which situation, divided into three use cases. Use cases 1 and 2 work with existing S1000D data; use case 3 creates S1000D from a workplace that does not have S1000D.
 
 ```mermaid
 flowchart LR
-  subgraph In["入力"]
-    BX["渡された BREX"]
-    DM["既存のデータモジュール"]
-    WEB["軽い Web 形式のマニュアル"]
+  subgraph In["Input"]
+    BX["BREX you were given"]
+    DM["Existing data modules"]
+    WEB["Manual in a lightweight web format"]
   end
-  BX --> U1["1. BREX を読んで照合する<br/>brex-mcp"]
-  DM --> U2["2. 検証して読む<br/>verify-mcp → reader-mcp"]
-  WEB --> U3["3. S1000D に出力する<br/>experiential-manual-model → writer-mcp"]
+  BX --> U1["1. Read the BREX and check against it<br/>brex-mcp"]
+  DM --> U2["2. Validate, then read<br/>verify-mcp → reader-mcp"]
+  WEB --> U3["3. Output S1000D<br/>experiential-manual-model → writer-mcp"]
   U3 --> U2
 ```
 
-## 1. 渡された BREX を読んで、データモジュールを照合する
+## 1. Read the BREX you were given and check data modules against it
 
-顧客やプロジェクトから BREX データモジュールを渡された制作者が、その内容を把握し、作ったデータモジュールが決まりに合っているかを納品前に確かめる使い方です。
+An author who receives a BREX data module from a customer or project uses this to understand its content and to confirm, before delivery, that the data modules they produced follow the rules.
 
-- `explain_brex` が BREX のルールを「どの要素に何を求めているか」が分かる文章にして一覧にします
-- `check_against_brex` がデータモジュールを BREX の連鎖（プロジェクト → 組織 → S1000D 既定 BREX）に照合し、違反を箇所（XPath と行番号）・値・ルール ID・重大度付きで返します
-- `lookup_value` が属性値や SNS（システム番号）の意味を引きます
+- `explain_brex` lists the BREX rules as sentences that say what is required of each element
+- `check_against_brex` checks a data module against the BREX chain (project → organisation → S1000D default BREX) and returns every violation with its location (XPath and line number), value, rule ID and severity level
+- `lookup_value` looks up the meaning of attribute values and SNS (standard numbering system) codes
 
-使う部品は [s1000d-brex-mcp](/s1000d-stack/mcp/brex-mcp/) です。BREX そのものの説明は [BREX（ビジネスルール交換）](/s1000d-stack/guide/brex/) にあります。
+The component to use is [s1000d-brex-mcp](/s1000d-stack/mcp/brex-mcp/). BREX itself is explained in [BREX (Business Rules Exchange)](/s1000d-stack/guide/brex/).
 
-## 2. 既存のデータモジュールを検証して、LLM に読ませる
+## 2. Validate existing data modules and let the LLM read them
 
-既存の CSDB（`DMC-….XML` が置かれたフォルダー）を対象に、LLM が整備手順や故障情報を根拠付きで答えられるようにする使い方です。XML をそのまま LLM に渡すのではなく、先に検証し、構造化した本文だけを渡します。
+This use case targets an existing CSDB (a folder holding `DMC-….XML` files) and lets the LLM answer questions about maintenance procedures and fault information with evidence. Instead of handing the XML to the LLM as it is, it validates first and passes only the structured content.
 
-- [s1000d-verify-mcp](/s1000d-stack/mcp/verify-mcp/) が公式 XSD による検証・BREX 照合・参照切れの検出をまとめて行い、検証状態を付けます
-- [s1000d-reader-mcp](/s1000d-stack/mcp/reader-mcp/) がデータモジュールを見出し・手順・警告・図の構造で返し、参照先を解決し、どの製品に当てはまるか（適用性）を判定します。適用性の式は LLM に渡さず、applicable / notApplicable / undetermined と表示文だけを返します
+- [s1000d-verify-mcp](/s1000d-stack/mcp/verify-mcp/) performs validation against the official XSD, the BREX check and broken reference detection together, and attaches a verification status
+- [s1000d-reader-mcp](/s1000d-stack/mcp/reader-mcp/) returns the data module as a structure of headings, steps, warnings and illustrations, resolves reference targets and evaluates which product it applies to (applicability). It does not pass applicability expressions to the LLM; it returns only applicable / notApplicable / undetermined and the display text
 
-## 3. 軽い Web 形式のマニュアルを作り、必要になったら S1000D に出力する
+## 3. Author in a lightweight web format, then output S1000D when needed
 
-S1000D を導入していない現場でも、画面や機器の操作を体験しながら学べるマニュアルを Web 形式で作り、顧客から S1000D を求められた時点でデータモジュールとして出力する使い方です。この道筋を作るのが段階 2〜4 の目標です（[全体構成と進み方](/s1000d-stack/guide/architecture/)）。作成ツールと閲覧ソフトの操作説明は製品のサイトに置き、ここでは流れだけを書きます。
+In this use case, a workplace that has not adopted S1000D creates a manual in a web format that teaches screen and equipment operation through hands-on experience, and outputs it as data modules at the point when a customer asks for S1000D. Building this path is the goal of stages 2–4 ([Architecture and stages](/s1000d-stack/guide/architecture/)). Instructions for the authoring tool and the viewer live on the product site; this page describes only the flow.
 
-この使い方が成り立つ根拠は、2021 年の作品 [experience_based_operation_explanation](https://github.com/shuji-bonji/experience_based_operation_explanation)（指定席券売機の操作説明）のデータ構造が、S1000D の考え方と次のように対応することです。
+This use case rests on the fact that the data structure of the 2021 work [experience_based_operation_explanation](https://github.com/shuji-bonji/experience_based_operation_explanation) (operating instructions for a reserved-seat ticket machine) corresponds to the ideas of S1000D as follows.
 
-| 体験型マニュアルの JSON | S1000D |
+| Experiential manual JSON | S1000D |
 | --- | --- |
-| 画面のスクリーンショットと説明文 | 図（ICN で参照）とデータモジュールの内容部 |
-| `screenId` | DMC（データモジュールコード） |
-| ボタンと遷移先 | プロセスデータモジュール（提示順の制御） |
-| 購入方法ごとのまとまり | パブリケーションモジュール |
-| JSON を 1 か所で管理し使い回す | CSDB からの単一ソース・複数出力 |
-| `index.html` と JavaScript | IETM（閲覧ソフト） |
+| Screen screenshots and explanatory text | Illustrations (referenced by ICN) and the content section of a data module |
+| `screenId` | DMC (data module code) |
+| Buttons and their destinations | Process data module (controls the order of presentation) |
+| Grouping per purchase method | Publication module |
+| JSON managed in one place and reused | Single source, multiple outputs from the CSDB |
+| `index.html` and JavaScript | IETM (viewer) |
 
-この対応を、S1000D に依存しない共通データモデル experiential-manual-model として定め、s1000d-writer-mcp がそこからデータモジュールを生成します。生成したデータモジュールは使い方 2 の verify-mcp で検証できるため、出力の正しさを S1000D の側から確かめられます。
+This correspondence is defined as experiential-manual-model, a common data model that does not depend on S1000D, and s1000d-writer-mcp generates data modules from it. The generated data modules can be validated with verify-mcp from use case 2, so the correctness of the output can be confirmed from the S1000D side.

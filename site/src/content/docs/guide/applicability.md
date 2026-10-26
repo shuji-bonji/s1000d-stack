@@ -1,65 +1,65 @@
 ---
-title: 適用性（どの製品に当てはまるか）
-description: S1000D の適用性の仕組み（ACT・CCT・PCT と applic 文）と、式がどう評価されるかを説明します。
+title: Applicability
+description: How applicability works in S1000D (ACT, CCT, PCT and applic statements) and how the expressions are evaluated.
 ---
 
-S1000D のデータモジュールは、1 つの文書で複数の機種・構成を扱えるように作られています。「この段落は MV-60 だけ」「この手順は改修 001 を適用した後の機体だけ」のような条件を **適用性（applicability）** と呼び、文書の中に機械が読める形で書きます。読み手は、自分の製品に当てはまらない段落を混ぜて読まないために、この仕組みを押さえておく必要があります。
+S1000D® data modules are designed so that one document can cover several models and configurations. A condition such as "this paragraph applies only to the MV-60" or "this procedure applies only to aircraft after modification 001 has been applied" is called **applicability**, and it is written inside the document in a machine-readable form. Readers need to understand this mechanism so that they do not read paragraphs that do not apply to their own product along with the ones that do.
 
-## 3 つの表と applic 文
+## The three tables and the applic statement
 
 ```mermaid
 flowchart LR
-  ACT["ACT（applicCrossRefTable、情報コード 00W）<br/>製品属性の定義: model、version、…<br/>取り得る値の列挙やパターン"]
-  CCT["CCT（condCrossRefTable、00Q）<br/>条件の定義: 改修 001 の適用前・後、など"]
-  PCT["PCT（productCrossRefTable、00P）<br/>実在する製品ごとの値の組<br/>製造番号 1B070643 は model=Brook trekker、version=Mk9、…"]
+  ACT["ACT (applicCrossRefTable, information code 00W)<br/>defines product attributes: model, version, …<br/>enumerates or patterns the possible values"]
+  CCT["CCT (condCrossRefTable, 00Q)<br/>defines conditions: before or after modification 001, etc."]
+  PCT["PCT (productCrossRefTable, 00P)<br/>a set of values for each real product<br/>serial number 1B070643 is model=Brook trekker, version=Mk9, …"]
   ACT --> CCT
   ACT --> PCT
-  DM["データモジュール<br/>識別・状態部の applic（文書全体）<br/>referencedApplicGroup の applic（段落・手順ごと）"] -- applicCrossRefTableRef --> ACT
+  DM["Data module<br/>applic in the identification and status section (whole document)<br/>applic in referencedApplicGroup (per paragraph or step)"] -- applicCrossRefTableRef --> ACT
 ```
 
-| 要素 | 内容 |
+| Element | Content |
 | --- | --- |
-| ACT の `productAttribute` | 属性の id（`model` など）、人が読む名前、取り得る値（`enumeration` の列挙や `valuePattern` の正規表現）。`productIdentifier="primary"` が付いた属性（製造番号など）が製品を識別します |
-| CCT の `condType` / `cond` | 条件の種類（改修の適用状況、など）と個々の条件。値の書き方は `condType` の列挙で決まります |
-| PCT の `product` | 実在する製品 1 つ分の値の組。`assign` が属性・条件ごとに値を割り当てます。利用者が「自分の製品」を選ぶときの出発点になります |
-| `applic` | 条件の文。`displayText`（人が読む文）と、`assert`（1 つの属性・条件に対する「この値のどれか」）を `evaluate`（and / or）で結んだ式を持ちます。識別・状態部の `applic` は文書全体の適用範囲、`referencedApplicGroup` の `applic` は要素が `applicRefId` で指す個別の適用範囲です |
+| `productAttribute` in the ACT | The attribute id (such as `model`), a human-readable name and the possible values (an `enumeration` list or a `valuePattern` regular expression). The attribute marked `productIdentifier="primary"` (a serial number, for example) identifies the product |
+| `condType` / `cond` in the CCT | The kind of condition (whether a modification is applied, etc.) and the individual conditions. How values are written is determined by the enumeration in `condType` |
+| `product` in the PCT | The set of values for one real product. `assign` assigns a value to each attribute and condition. This is the starting point when a user selects "my product" |
+| `applic` | The condition statement. It holds `displayText` (a human-readable sentence) and an expression in which `assert` elements ("one of these values" for a single attribute or condition) are joined by `evaluate` (and / or). The `applic` in the identification and status section is the scope of the whole document; an `applic` in `referencedApplicGroup` is the individual scope that an element points to with `applicRefId` |
 
-`assert` の値（`applicPropertyValues`）の書き方は 3 通りで、BREX の許可値と同じです。
+The value of an `assert` (`applicPropertyValues`) can be written in three ways, the same as an allowed value in a BREX (Business Rules Exchange).
 
-| 書き方 | 例 | 意味 |
+| Form | Example | Meaning |
 | --- | --- | --- |
-| 単一値 | `Mk9` | その値と一致 |
-| `\|` 区切り | `Mk1\|Mk9` | どれか 1 つと一致 |
-| `~` の範囲 | `1~3`、`POST-001~POST-999` | 共通の接頭辞＋数字の範囲に入る |
+| Single value | `Mk9` | Matches that value |
+| `\|`-separated | `Mk1\|Mk9` | Matches any one of them |
+| `~` range | `1~3`, `POST-001~POST-999` | Falls within a numeric range with a common prefix |
 
-## 式の評価のしかた
+## How expressions are evaluated
 
-ある製品にある要素が当てはまるかは、次の手順で決まります。
+Whether an element applies to a given product is decided by the following steps.
 
-1. 製品の属性と条件の値（PCT の 1 行、または利用者が指定した値の組）を用意します。
-2. `assert` ごとに、製品の値が `applicPropertyValues` のどれかに一致するかを見ます。製品にその属性の値が無ければ、その `assert` は判定できません。
-3. `evaluate` の `and` は 1 つでも偽があれば偽、`or` は 1 つでも真があれば真と確定します。
-4. 要素の適用範囲は、その要素（または最も近い祖先）の `applicRefId` が指す `applic` と、文書全体の `applic` を and で結んだものです。
+1. Prepare the product's attribute and condition values (one row of the PCT, or a set of values the user specifies).
+2. For each `assert`, check whether the product's value matches one of the `applicPropertyValues`. If the product has no value for that attribute, that `assert` cannot be evaluated.
+3. In `evaluate`, `and` is settled as false as soon as one operand is false, and `or` is settled as true as soon as one operand is true.
+4. The scope of an element is the `applic` pointed to by the `applicRefId` of that element (or of its nearest ancestor), joined by `and` with the `applic` of the whole document.
 
-`and` と `or` の入れ子や範囲の書式を読み違えると、当てはまらない段落を当てはまると判断してしまいます。この評価は人や LLM が式を読んで行うものではなく、機械が行うものです。
+Misreading the nesting of `and` and `or` or the range format leads to judging a paragraph as applicable when it is not. This evaluation is not something a person or an LLM does by reading the expression; a machine does it.
 
-### 別のデータモジュールにある適用性文
+### Applicability statements in another data module
 
-`referencedApplicGroupRef/applicRef` は、`applicIdentValue` で別のデータモジュール（適用性リポジトリ）にある `applic` 文を指す書き方です。文書の中に式が無いため、評価には CSDB の中からリポジトリを見つける必要があります。
+`referencedApplicGroupRef/applicRef` is a way of pointing, with `applicIdentValue`, to an `applic` statement in another data module (an applicability repository). Because the expression is not in the document, evaluation requires finding the repository within the CSDB.
 
-## このスタックでは
+## In this stack
 
-判定は `s1000d-reader-mcp` が上の手順で行い、LLM には `assert` と `evaluate` の式を渡さず、ブロックごとの結果（`applicable` / `notApplicable` / `undetermined`）と `displayText`、判定できなかった理由だけを渡します。`undetermined` は「当てはまらない」ではなく「製品に値が足りない」「リポジトリが無い」などで判定できなかった状態です。
+`s1000d-reader-mcp` performs the evaluation by the steps above. It does not pass the `assert` and `evaluate` expressions to the LLM; it passes only the result for each block (`applicable` / `notApplicable` / `undetermined`), the `displayText` and the reason when evaluation was not possible. `undetermined` does not mean "does not apply"; it is the state in which evaluation was not possible because, for example, the product lacks a value or the repository is missing.
 
 ```mermaid
 flowchart LR
-  P["product<br/>（利用者が選んだ属性と条件の値）"] --> EV
-  DM["データモジュール<br/>applic 文"] --> EV["reader の判定<br/>assert → evaluate（and / or）"]
-  EV --> R["ブロックごとに<br/>applicable / notApplicable / undetermined<br/>＋ displayText ＋ 理由"]
+  P["product<br/>(attribute and condition values selected by the user)"] --> EV
+  DM["Data module<br/>applic statements"] --> EV["Evaluation by the reader<br/>assert → evaluate (and / or)"]
+  EV --> R["Per block<br/>applicable / notApplicable / undetermined<br/>+ displayText + reason"]
 ```
 
-製品の値をどう決めるか（`describe_applicability`）、3 値をどう読むか、適用性リポジトリの解決は [s1000d-reader-mcp](/s1000d-stack/mcp/reader-mcp/#適用性と検証状態) に書いています。判定の論理は共有ライブラリ `s1000d-core` の `ApplicEvaluator` にあり、`s1000d-reader-mcp` と段階 3 の `s1000d-writer-mcp`（出力時に適用性を付ける）が同じものを使います。ACT・CCT・PCT の読み取り（`readAct` / `readCct` / `readPct`）、PCT の 1 行から製品を作る `productFromPct`、評価（`evaluateApplic`）も同じライブラリにあります。
+How the product values are decided (`describe_applicability`), how to read the three states, and how applicability repositories are resolved are described in [s1000d-reader-mcp](/s1000d-stack/mcp/reader-mcp/#applicability-and-verification-status). The evaluation logic lives in `ApplicEvaluator` in the shared library `s1000d-core`, and `s1000d-reader-mcp` and the stage 3 `s1000d-writer-mcp` (which attaches applicability on output) use the same one. Reading the ACT, CCT and PCT (`readAct` / `readCct` / `readPct`), building a product from one row of the PCT (`productFromPct`) and evaluation (`evaluateApplic`) are in the same library too.
 
-:::note[公式サンプルで分かったこと]
-Issue 7 の Bike Samples では、ACT が属性 `type` を定義し 110 件の `assert` が使っているのに、PCT の 3 製品はどれも `type` に値を割り当てていません。PCT の製品で判定すると、要素の `applic` 366 件のうち 310〜324 件が「製品に `type` の値が無い」理由で `undetermined` になります。また、PCT の条件値 `Pre` / `Post` は CCT の列挙 `PRE` / `POST-001~POST-999` と大文字小文字も書式も合いません。このスタックは値の比較を完全一致のままにしてあり、配布物側の不整合がそのまま見えます。`applicIdentValue` で指す先の適用性リポジトリも Bike Samples には入っておらず、該当する 64 件は「リポジトリに無い」理由で `undetermined` になります。
+:::note[What the official samples show]
+In the Issue 7 Bike Samples, the ACT defines the attribute `type` and 110 `assert` elements use it, yet none of the 3 products in the PCT assigns a value to `type`. When evaluated against a PCT product, 310–324 of the 366 element-level `applic` statements become `undetermined` for the reason "the product has no value for `type`". In addition, the condition values `Pre` / `Post` in the PCT match neither the case nor the format of the CCT enumeration `PRE` / `POST-001~POST-999`. This stack deliberately keeps value comparison as an exact match, so the inconsistencies on the distribution side show through as they are. The applicability repository pointed to by `applicIdentValue` is also not included in the Bike Samples, so the 64 statements concerned become `undetermined` for the reason "not in the repository".
 :::

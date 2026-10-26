@@ -1,42 +1,42 @@
 ---
-title: IETM と S1000D
-description: 利用者が画面で使う IETM と、その元データの作り方を定める S1000D の関係を説明します。
+title: IETM and S1000D
+description: How the IETM that users work with on screen relates to S1000D, which defines how its source data is produced.
 ---
 
-IETM は整備員や操作員が画面上で対話的に使う電子技術マニュアルで、S1000D はその元データ（データモジュール）を作成・管理・交換するための国際仕様です。IETM が「何を作るか」、S1000D が「どう作るか」に当たります。
+An IETM is an electronic technical manual that maintenance and operating personnel use interactively on screen; S1000D® is the international specification for producing, managing and exchanging its source data (data modules). The IETM is "what to produce", and S1000D is "how to produce it".
 
-## 2 つの言葉の出どころ
+## Where the two terms come from
 
 | | IETM | S1000D |
 | --- | --- | --- |
-| 何を指すか | 利用者が画面で使う対話型の技術マニュアル（成果物） | 技術文書の元データの作り方・識別・保管・交換の決まり（仕様） |
-| 始まり | 1992 年、米国防総省の 3 つの軍用規格（MIL-M-87268 / MIL-D-87269 / MIL-Q-87270） | 欧州の ASD が始め、現在は ASD・AIA・A4A（旧 ATA）が共同で保守 |
-| 段階の分け方 | Class 0〜5 の機能分類（現在は機能マトリクスで要件を定める） | 出力先を IETP（対話型の技術文書群）と呼び、IETM はその中の個々のマニュアルを指すことが多い |
+| What it refers to | An interactive technical manual that users work with on screen (the deliverable) | The rules for producing, identifying, storing and exchanging the source data of technical documents (the specification) |
+| Origin | 1992, three US Department of Defense military standards (MIL-M-87268 / MIL-D-87269 / MIL-Q-87270) | Started by ASD in Europe; now maintained jointly by ASD, AIA and A4A (formerly ATA) |
+| How levels are divided | Functional classes Class 0–5 (requirements are now defined with a functionality matrix) | The output is called an IETP (a set of interactive technical publications), and IETM usually refers to an individual manual within it |
 
-米国防総省は 2005 年に S1000D を採用しており、現在の IETM の多くは S1000D のデータから作られます。ただし IETM は S1000D が無くても作れますし、S1000D のデータから紙や PDF だけを出力することもできます。
+The US Department of Defense adopted S1000D in 2005, and most IETMs today are produced from S1000D data. However, an IETM can be produced without S1000D, and S1000D data can be output as paper or PDF only.
 
-## データの流れ
+## Data flow
 
 ```mermaid
 flowchart LR
-  subgraph S1000D["S1000D が定める範囲"]
-    DM["データモジュール<br/>（DMC で識別される XML）"] --> CSDB["CSDB<br/>（共通ソースデータベース）"]
-    CSDB --> PM["パブリケーションモジュール<br/>（どの DM をどの順に）"]
-    BREX["BREX<br/>（プロジェクトの決まり）"] -. 検査 .-> DM
+  subgraph S1000D["Scope defined by S1000D"]
+    DM["Data module<br/>(XML identified by a DMC)"] --> CSDB["CSDB<br/>(common source database)"]
+    CSDB --> PM["Publication module<br/>(which DMs, in which order)"]
+    BREX["BREX<br/>(project rules)"] -. checks .-> DM
   end
-  PM --> PDF["紙・PDF"]
-  PM --> IETP["IETP / IETM<br/>（閲覧ソフトで対話的に）"]
+  PM --> PDF["Paper / PDF"]
+  PM --> IETP["IETP / IETM<br/>(interactive, in a viewer)"]
 ```
 
-- **データモジュール**は、それ単体で完結する最小の情報単位です。説明・手順・故障情報・部品情報・BREX など種類ごとにスキーマが分かれています。
-- **CSDB** はデータモジュールを格納・管理する場所です。S1000D はその機能を定めますが、特定のソフトウェアは定めません。このスタックでは、`DMC-….XML` の名前でファイルが置かれたフォルダーを CSDB と見なします。
-- **パブリケーションモジュール**は、どのデータモジュールをどの順に並べるかを定めます。出版物の目次に当たります。
-- **BREX** はデータモジュールの種類の 1 つで、プロジェクトで合意した決まりのうち機械で検査できるものを XML で書きます。詳しくは [BREX](/s1000d-stack/guide/brex/) で説明します。
+- A **data module** is the smallest unit of information that is complete on its own. Each kind of content has its own schema: descriptions, procedures, fault information, parts information, BREX and so on.
+- The **CSDB** is where data modules are stored and managed. S1000D defines its functions but does not prescribe any particular software. In this stack, a folder that holds files named `DMC-….XML` is treated as a CSDB.
+- A **publication module** defines which data modules appear in which order. It corresponds to the table of contents of a publication.
+- **BREX (Business Rules Exchange)** is one kind of data module. It expresses in XML those rules agreed for a project that can be checked by machine. [BREX](/s1000d-stack/guide/brex/) explains this in detail.
 
-## 日本での状況
+## S1000D in Japan
 
-国内では「電子技術マニュアル」「電子マニュアル」「技術指令書」といった言い方が使われ、IETM に定着した訳語はありません。公開情報から確認できる範囲では、S1000D の国内利用は海外の機体メーカーや防衛事業に部品を納めるメーカーと、その制作を受託する技術マニュアル制作会社が中心です。三菱リージョナルジェット（MRJ）の開発では供給企業に S1000D 4.0.1 と MRJ 用のビジネスルールが要求されました。技術マニュアル制作会社の寄稿では、ビジネスルールの数は 450 を超えるとされています。
+In Japan, terms such as "electronic technical manual", "electronic manual" and "technical order" are used, and no established Japanese translation of IETM exists. As far as public information shows, domestic use of S1000D centres on manufacturers that deliver parts to foreign aircraft manufacturers or defence programs, and on the technical publication companies contracted to produce their documentation. In the development of the Mitsubishi Regional Jet (MRJ), suppliers were required to use S1000D 4.0.1 and the MRJ business rules. According to an article contributed by a technical publication company, the number of business rules exceeds 450.
 
-:::tip[もっと詳しく]
-IETM の歴史、クラス分類、S1000D の概念の全体像は、Zenn Book [IETM入門 — 概念から S1000D まで](https://zenn.dev/shuji_bonji/books/ietm-overview) に章を分けて書いています。このサイトは、スタックを使うために必要な範囲に絞っています。この関係を踏まえて、このスタックが S1000D をどう使うかは [ユースケース](/s1000d-stack/use-cases/) に分けて書いています。
+:::tip[Further reading]
+The history of IETMs, their class levels and the overall picture of S1000D concepts are covered chapter by chapter in the Zenn Book "IETM入門 — 概念から S1000D まで" (in Japanese) at [https://zenn.dev/shuji_bonji/books/ietm-overview](https://zenn.dev/shuji_bonji/books/ietm-overview). This site is limited to what you need to use the stack. Building on this relationship, how this stack uses S1000D is described separately under [Use cases](/s1000d-stack/use-cases/).
 :::

@@ -1,32 +1,32 @@
 ---
-title: 導入手順
-description: s1000d-stack を使い始めるために用意するものと、MCP サーバーの登録から最初の操作までを説明します。
+title: Getting started
+description: What you need before using s1000d-stack, from registering the MCP server to the first requests you can make.
 ---
 
-`s1000d-stack` を使い始めるために用意するものと、最初の操作を説明します。この道具が何をするものかは [S1000D Stack とは](/s1000d-stack/guide/overview/) をご覧ください。
+This page explains what you need before using `s1000d-stack` and the first steps to take. For what this set of tools does, see [What S1000D Stack is](/s1000d-stack/guide/overview/).
 
-## 用意するもの
+## What you need
 
 ```mermaid
 flowchart LR
-  A["s1000d.org で配布物を入手<br/>（利用条件に同意）"] --> B["フォルダーに展開<br/>内側の zip も展開する"]
-  B --> C["S1000D_SPEC_DIR にそのフォルダーを指定"]
-  D["自分のデータモジュールと BREX<br/>（CSDB のフォルダー）"] --> E["S1000D_CSDB_DIR に指定"]
-  C --> F["s1000d-brex-mcp を MCP クライアントに登録"]
+  A["Obtain the distribution from s1000d.org<br/>(accept the terms of use)"] --> B["Extract it into a folder<br/>extract the inner zip files too"]
+  B --> C["Point S1000D_SPEC_DIR at that folder"]
+  D["Your own data modules and BREX<br/>(the CSDB folder)"] --> E["Point S1000D_CSDB_DIR at it"]
+  C --> F["Register s1000d-brex-mcp in your MCP client"]
   E --> F
 ```
 
-1. **S1000D の配布物**。[s1000d.org](https://s1000d.org/) のダウンロードページから、対象の版（最初の対象は Issue 7）の zip を入手し、展開します。配布物の中に既定 BREX（`DMC-S1000D-*-04-10-0301-00A-022A-D_*.XML`）と XML スキーマが入っています。
-2. **Node.js 22 以上**。MCP サーバーは `npx` で起動できます。
-3. **MCP クライアント**。Claude Desktop や Claude Code など、MCP サーバーを登録できるものです。
+1. **The S1000D® distribution.** From the download page at [s1000d.org](https://s1000d.org/), obtain the zip for the target issue (the first target is Issue 7) and extract it. The distribution contains the default BREX (Business Rules Exchange) data module (`DMC-S1000D-*-04-10-0301-00A-022A-D_*.XML`) and the XML schemas.
+2. **Node.js 22 or later.** The MCP servers can be started with `npx`.
+3. **An MCP client.** Something that can register MCP servers, such as Claude Desktop or Claude Code.
 
-:::caution[配布物は再配布できません]
-S1000D の仕様書・XML スキーマ・既定 BREX・公式サンプルの利用条件は、非独占的な利用を許諾するだけで、再配布の権利を与えていません。このプロジェクトのパッケージにはそれらを含めず、利用者ご自身で入手したものを環境変数 `S1000D_SPEC_DIR` で指定する方式にしています。詳しくは[仕様書の扱いと商標](/s1000d-stack/guide/license/)をご覧ください。
+:::caution[The distribution cannot be redistributed]
+The terms of use for the S1000D specification, XML schemas, default BREX and official samples grant non-exclusive use only and do not grant redistribution. They are therefore not included in any package or repository: obtain them from s1000d.org yourself and point the `S1000D_SPEC_DIR` environment variable at the extracted folder. For details, see [Specification files and trademarks](/s1000d-stack/guide/license/).
 :::
 
-## 最初の一歩
+## First steps
 
-Claude Desktop の設定ファイル（`claude_desktop_config.json`）に次を足して再起動します。
+Add the following to the Claude Desktop configuration file (`claude_desktop_config.json`) and restart it.
 
 ```json
 {
@@ -43,19 +43,19 @@ Claude Desktop の設定ファイル（`claude_desktop_config.json`）に次を�
 }
 ```
 
-登録できたら、次のように頼んでみてください。
+Once it is registered, try asking for things like these.
 
-- 「既定 BREX のうち、descript（説明データモジュール）に関わるルールを 20 件、分かりやすく説明して」 → `explain_brex`
-- 「このデータモジュール（パス）を BREX に照合して、違反を一覧にして」 → `check_against_brex`
-- 「`securityClassification` の `01` はこの BREX では何を意味する？」 → `lookup_value`
+- "From the default BREX, explain 20 rules that concern descript (descriptive data modules) in plain terms" → `explain_brex`
+- "Check this data module (path) against the BREX and list the violations" → `check_against_brex`
+- "What does `01` for `securityClassification` mean in this BREX?" → `lookup_value`
 
-:::note[s1000d-brex-mcp の公開について]
-`@shuji-bonji/s1000d-brex-mcp`、`@shuji-bonji/s1000d-verify-mcp`、`@shuji-bonji/s1000d-reader-mcp` は 2026-10-25 時点で npm 未公開（開発中）です。公開までは、リポジトリを clone して `npm install && npm run build` し、`node dist/index.js` を `command` に指定して使えます。共有ライブラリ `@shuji-bonji/s1000d-core`（0.2.0）は npm に公開済みです。
+:::note[Publication of s1000d-brex-mcp]
+As of 2026-10-25, `@shuji-bonji/s1000d-brex-mcp`, `@shuji-bonji/s1000d-verify-mcp` and `@shuji-bonji/s1000d-reader-mcp` are not yet published on npm (they are under development). Until they are published, clone the repository, run `npm install && npm run build`, and set `node dist/index.js` as the `command`. The shared library `@shuji-bonji/s1000d-core` (0.2.0) is already published on npm.
 :::
 
-## 次に読むもの
+## What to read next
 
-- S1000D を初めて触る方は [IETM と S1000D](/s1000d-stack/guide/ietm-and-s1000d/) から
-- この道具の全体像は [S1000D Stack とは](/s1000d-stack/guide/overview/) と [ユースケース](/s1000d-stack/use-cases/) へ
-- BREX を渡された方は [BREX（ビジネスルール交換）](/s1000d-stack/guide/brex/) と [s1000d-brex-mcp](/s1000d-stack/mcp/brex-mcp/) へ
-- 概念を体系的に学びたい方は Zenn Book [IETM入門 — 概念から S1000D まで](https://zenn.dev/shuji_bonji/books/ietm-overview) へ
+- If you are new to S1000D, start with [IETM and S1000D](/s1000d-stack/guide/ietm-and-s1000d/)
+- For the overall picture of this set of tools, go to [What S1000D Stack is](/s1000d-stack/guide/overview/) and [Use cases](/s1000d-stack/use-cases/)
+- If you have been handed a BREX, go to [BREX (Business Rules Exchange)](/s1000d-stack/guide/brex/) and [s1000d-brex-mcp](/s1000d-stack/mcp/brex-mcp/)
+- To learn the concepts systematically, go to the Zenn Book [IETM入門 — 概念から S1000D まで](https://zenn.dev/shuji_bonji/books/ietm-overview) (in Japanese)

@@ -217,6 +217,23 @@ flowchart LR
 - ASD の S1000D 公式ロゴの要素（書体・配色・形）は使っていません（D-02）。
 - 表示箇所はサイトのヘッダー（`astro.config.mjs` の `logo`、題名の文字は残す）、トップページの hero（`index.mdx` の `hero.image`）、favicon の 3 つです。
 
+### D-22 英語をルートにし、日本語を /ja/ と README.ja.md で提供する（2026-10-26）
+
+サイトと各リポジトリの README を、pdf-agent-stack と同じ構成にします。
+
+| 対象 | 英語 | 日本語 |
+|---|---|---|
+| サイト | `site/src/content/docs/` 直下（ルート locale、`lang: en`） | `site/src/content/docs/ja/`（`/s1000d-stack/ja/…`） |
+| README | `README.md`（冒頭に `**English** \| [日本語](./README.ja.md)`） | `README.ja.md` |
+| `package.json` の description、ツールの description、応答の `reason` 文 | 英語（すでに英語） | — |
+| `docs/`（DECISIONS・ROADMAP・notes） | — | 日本語のまま（開発メモ） |
+
+- 理由: 利用者の大半は海外（ASD・AIA・A4A の会員企業）で、npm と MCP のレジストリは英語で検索される。パッケージの説明文がすでに英語なので、README とサイトだけ日本語では整合しない。pdf-agent-stack の i18n 方針（ルート = 英語、`/ja/` = 日本語、一次執筆は日本語）に揃える。
+- 一次執筆は日本語。英語は翻訳先で、日本語から訳し仕様書の英文は開かない（D-03）。用語は `notes/glossary.md`、書き方は `notes/en-writing-guide.md`。
+- Starlight の fallback は英語 → 日本語の一方向（英語ページが無いとルートが 404）なので、**ページの完了条件は「日本語と英語の両方が揃うこと」**にする。
+- 公開（作業 10、D-16）の前に行う。公開後に日本語を `/` から `/ja/` へ動かすと外部リンクが切れるため。
+- 翻訳は Claude で行い xcomet で採点、低得点の文は DeepL の訳と比べて採用する。最初の 1 ページ（`guide/overview.md`）は Claude と DeepL の両方で訳して比較し、以後の分担を決める。
+
 ## 未決事項
 
 | ID | 内容 | 判断の材料 |

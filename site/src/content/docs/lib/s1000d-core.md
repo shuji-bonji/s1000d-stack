@@ -1,9 +1,9 @@
 ---
-title: s1000d-core（ライブラリ）
-description: 全 MCP が共有する TypeScript ライブラリ @shuji-bonji/s1000d-core の機能と設計を説明します。
+title: s1000d-core (library)
+description: The features and design of @shuji-bonji/s1000d-core, the TypeScript library shared by every MCP server in this stack.
 ---
 
-`@shuji-bonji/s1000d-core` は、S1000D のデータモジュールを読み、BREX に照合するための TypeScript ライブラリです。`s1000d-brex-mcp` をはじめ、このスタックの MCP サーバーはすべてこのライブラリを使います。S1000D との対応を 1 か所に集め、MCP ごとに別々の解釈をしないためです。
+`@shuji-bonji/s1000d-core` is a TypeScript library for reading S1000D® data modules and checking them against BREX (Business Rules Exchange). Every MCP server in this stack, starting with `s1000d-brex-mcp`, uses this library. It keeps the mapping to S1000D in one place, so that each MCP server does not interpret the specification on its own.
 
 [GitHub](https://github.com/shuji-bonji/s1000d-core) / [npm](https://www.npmjs.com/package/@shuji-bonji/s1000d-core)
 
@@ -11,25 +11,25 @@ description: 全 MCP が共有する TypeScript ライブラリ @shuji-bonji/s10
 npm install @shuji-bonji/s1000d-core
 ```
 
-## できること
+## What it does
 
-| 機能 | 関数 |
+| Feature | Functions |
 | --- | --- |
-| DMC の分解・組み立て（学習コード付きも可） | `parseDmc` / `formatDmc` / `sameDmc` / `isBrexDmc` |
-| DMC のファイル名（発行情報・言語・拡張子）の分解・組み立て | `parseDmcFileName` / `formatDmcFileName` |
-| ICN（MIC 基準・CAGE 基準）の分解・組み立て | `parseIcn` / `formatIcn` / `parseIcnFileName` |
-| `xsi:noNamespaceSchemaLocation` からスキーマ名と版を推定 | `parseSchemaLocation` |
-| 識別・状態部の読み取り | `readDataModuleInfo` / `readIdentAndStatus` / `readDmRef` |
-| BREX の読み取りと SNS 検索 | `readBrex` / `allRules` / `lookupSns` |
-| BREX への照合（1 層・複数層・連鎖） | `checkAgainstBrexLayer` / `checkAgainstBrexLayers` / `checkAgainstBrexChain` / `resolveBrexChain` |
-| フォルダーを CSDB と見なす解決器 | `listDataModules` / `findDataModule` / `createDirectoryBrexResolver` |
-| XML の読み取りと XPath の評価 | `XmlEngine` / `defaultXmlEngine` |
-| BREX の指定（パス・DMC・省略＝既定 BREX）から 1 つを決める | `locateBrex` / `findDefaultBrex` |
-| XSD の探索と検証（実装はサブパス `xsd-libxml2`） | `findSchemaDirs` / `locateXsd` / `SchemaValidator` / `Libxml2SchemaValidator` |
-| 参照（`dmRef` / `pmRef` / ICN / `internalRef` / `applicRefId`）の収集と解決 | `collectReferences` / `resolveReferences` / `CsdbIndex` |
-| 適用性（ACT・CCT・PCT の読み取り、`assert` / `evaluate` の 3 値評価） | `readAct` / `readCct` / `readPct` / `ApplicEvaluator` |
-| 本文（descript / proced / process / fault / pm）の共通の形への読み取り | `readContent` / `readContentFromXml` |
-| 1 件の検証（整形式・XSD・BREX・参照）をまとめた検証状態 | `verifyDataModule` / `VerificationStatus` |
+| Parse and format a DMC (with or without a learn code) | `parseDmc` / `formatDmc` / `sameDmc` / `isBrexDmc` |
+| Parse and format a DMC file name (issue information, language, extension) | `parseDmcFileName` / `formatDmcFileName` |
+| Parse and format an ICN (MIC-based and CAGE-based) | `parseIcn` / `formatIcn` / `parseIcnFileName` |
+| Infer the schema name and issue from `xsi:noNamespaceSchemaLocation` | `parseSchemaLocation` |
+| Read the identification and status section | `readDataModuleInfo` / `readIdentAndStatus` / `readDmRef` |
+| Read a BREX and look up SNS codes | `readBrex` / `allRules` / `lookupSns` |
+| Check against BREX (one layer, several layers, a chain) | `checkAgainstBrexLayer` / `checkAgainstBrexLayers` / `checkAgainstBrexChain` / `resolveBrexChain` |
+| Resolver that treats a folder as a CSDB | `listDataModules` / `findDataModule` / `createDirectoryBrexResolver` |
+| Read XML and evaluate XPath | `XmlEngine` / `defaultXmlEngine` |
+| Pick one BREX from how it is specified (path, DMC, or omitted = default BREX) | `locateBrex` / `findDefaultBrex` |
+| Find and validate against XSD (implementation in the `xsd-libxml2` subpath) | `findSchemaDirs` / `locateXsd` / `SchemaValidator` / `Libxml2SchemaValidator` |
+| Collect and resolve references (`dmRef` / `pmRef` / ICN / `internalRef` / `applicRefId`) | `collectReferences` / `resolveReferences` / `CsdbIndex` |
+| Applicability (read the ACT, CCT and PCT; three-valued evaluation of `assert` / `evaluate`) | `readAct` / `readCct` / `readPct` / `ApplicEvaluator` |
+| Read content (descript / proced / process / fault / pm) into a common shape | `readContent` / `readContentFromXml` |
+| Verification status that combines one data module's checks (well-formedness, XSD, BREX, references) | `verifyDataModule` / `VerificationStatus` |
 
 ```ts
 import { readFileSync } from 'node:fs';
@@ -44,30 +44,30 @@ for (const layer of report.layers) {
 }
 ```
 
-## 設計上の判断
+## Design decisions
 
-### XML は @xmldom/xmldom、XPath は fontoxpath
+### XML with @xmldom/xmldom, XPath with fontoxpath
 
-BREX の `objectPath` は XPath で書かれ、既定 BREX には `descendant-or-self::` や `not(…)` を多用した式が並びます。Issue 7 の既定 BREX 274 件を調べたところ、1 件が XPath 2.0 の構文（`for … return some … satisfies`）で、XPath 1.0 だけのエンジンでは評価できませんでした。そのため XPath 3.1 を実装する `fontoxpath` を採用し、DOM には `@xmldom/xmldom` を使っています。両方を `XmlEngine` インターフェースの後ろに置き、差し替えられるようにしています。
+The `objectPath` of a BREX rule is written in XPath, and the default BREX is full of expressions that lean on `descendant-or-self::` and `not(…)`. A survey of the 274 rules in the Issue 7 default BREX found one that uses XPath 2.0 syntax (`for … return some … satisfies`), which an XPath 1.0-only engine cannot evaluate. The library therefore uses `fontoxpath`, which implements XPath 3.1, and `@xmldom/xmldom` for the DOM. Both sit behind the `XmlEngine` interface so that they can be replaced.
 
-実装で踏んだ点を 2 つ記録しておきます。`fontoxpath` は属性を選ぶと節点ではなく文字列を返すので、違反箇所の行番号を保つには先に節点集合として評価する必要があります。`@xmldom/xmldom` 0.9 は致命的な構文エラーを例外で投げるので、エンジン側で捕まえて揃えています。
+Two points hit during implementation are worth recording. `fontoxpath` returns strings rather than nodes when an expression selects attributes, so the expression has to be evaluated as a node set first to keep the line number of each violation. `@xmldom/xmldom` 0.9 throws fatal syntax errors as exceptions, so the engine catches them and reports them in a uniform way.
 
-### 照合処理はライブラリに置く
+### The check logic lives in the library
 
-BREX の照合は `s1000d-brex-mcp`（段階 1）と `s1000d-verify-mcp`（段階 2）の両方が使います。同じ処理を 2 つの MCP に別々に書くと結果が食い違うので、照合処理はこのライブラリに置き、MCP は呼ぶだけにしています。
+Both `s1000d-brex-mcp` (stage 1) and `s1000d-verify-mcp` (stage 2) check against BREX. Writing the same logic separately in two MCP servers would let the results diverge, so the check logic lives in this library and the MCP servers only call it.
 
-### XSD 検証は libxml2-wasm、実装はサブパスに
+### XSD validation with libxml2-wasm, implementation in a subpath
 
-XSD 検証は `libxml2-wasm` で行います。`xmllint-wasm` と比べ、Issue 7 の XSD 33 本と Bike Samples 106 件で判定が同じで、コンパイル済みの検証器を使い回せるため約 30 倍速かったからです。`xs:import` の解決に使う API が試験的な扱い（`@alpha`）なので、`XmlEngine` と同じく `SchemaValidator` インターフェースの後ろに置き、実装はサブパス `@shuji-bonji/s1000d-core/xsd-libxml2` から読み込みます。`libxml2-wasm` は任意の peerDependency なので、XSD 検証を使わない `s1000d-brex-mcp` は入れずに済みます。
+XSD validation uses `libxml2-wasm`. Compared with `xmllint-wasm`, it gave the same verdicts on the 33 Issue 7 XSD files and the 106 Bike Samples, and it was about 30 times faster because a compiled validator can be reused. The API used to resolve `xs:import` is marked experimental (`@alpha`), so, like `XmlEngine`, the validator sits behind the `SchemaValidator` interface, and the implementation is loaded from the subpath `@shuji-bonji/s1000d-core/xsd-libxml2`. `libxml2-wasm` is an optional peerDependency, so `s1000d-brex-mcp`, which does not use XSD validation, does not have to install it.
 
-### 配布物は含めない、テストは自作データで
+### No distribution files included; tests use self-made data
 
-S1000D の仕様書・XSD・既定 BREX・公式サンプルは再配布できないため、パッケージにもリポジトリにも含めていません。CI で動くテストは自作のデータ（架空の指定席券売機 `KENBAIKI` の説明データモジュールと、2 層の自作 BREX）だけを使います。配布物を使うテストは `S1000D_SPEC_TESTS=1` を付けたときだけ動き、利用者が入手した配布物を `S1000D_SPEC_DIR` から読みます。
+The S1000D specification, XSDs, default BREX and official samples cannot be redistributed, so they are not included in the package or the repository. The tests that run in CI use only self-made data: descriptive data modules for a fictional reserved-seat ticket machine, `KENBAIKI`, and a two-layer self-made BREX. Tests that use the distribution files run only when `S1000D_SPEC_TESTS=1` is set, and read the files the user obtained from `S1000D_SPEC_DIR`.
 
-### 配布物の中の不整合に備える
+### Prepared for inconsistencies in the distribution files
 
-配布物のデータ辞書には、ファイル名の DMC と中身の DMC が一致しない見本があります。素朴に探すと「J を探す → 中身が X のファイルが返る → X の親は J」という循環に入り、1 つのデータモジュールの照合に 2 分以上かかりました。連鎖のたどり方は訪れた参照を記録し、解決器は中身の DMC が参照と一致するファイルを優先するようにして、配布物のサンプル 117 件（Bike Samples 106 を含む）の照合を約 10 秒に収めています。
+The data dictionary in the distribution contains samples whose DMC in the file name does not match the DMC inside the file. A naive lookup falls into a loop: look for J, get back a file whose content is X, and X's parent is J. Checking a single data module took more than 2 minutes. The chain traversal now records the references it has visited, and the resolver prefers a file whose internal DMC matches the reference. Checking the 117 samples in the distribution (including the 106 Bike Samples) now takes about 10 seconds.
 
-## 公開と版
+## Publishing and versions
 
-npm への公開は、`v*` の tag を push したときに GitHub Actions が Trusted Publisher（OIDC）で行います。0.x の間、`^0.1.0` のような依存は minor をまたぎません。このライブラリの minor を上げたときは、MCP 側の依存範囲も上げて公開し直します。
+Publishing to npm happens in GitHub Actions as a Trusted Publisher (OIDC) when a `v*` tag is pushed. While the version is 0.x, a dependency such as `^0.1.0` does not cross minor versions. When this library's minor version goes up, the dependency ranges of the MCP servers are raised and published again as well.
