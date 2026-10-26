@@ -49,6 +49,10 @@ Once it is registered, try asking for things like these.
 - "Check this data module (path) against the BREX and list the violations" → `check_against_brex`
 - "What does `01` for `securityClassification` mean in this BREX?" → `lookup_value`
 
+:::tip[In Claude Code, the servers can also be installed as plugins]
+The three MCP servers are listed on the MCP Registry (`io.github.shuji-bonji/s1000d-brex-mcp` and so on) and in the personal marketplace [shuji-bonji/claude-plugins](https://github.com/shuji-bonji/claude-plugins) (category `s1000d`). In Claude Code, run `claude plugin marketplace add shuji-bonji/claude-plugins` and then `claude plugin install s1000d-brex-mcp@shuji-bonji`. The plugin sets no environment variables, so start Claude Code from a shell in which `S1000D_SPEC_DIR` and `S1000D_CSDB_DIR` are set.
+:::
+
 
 ## What to read next
 

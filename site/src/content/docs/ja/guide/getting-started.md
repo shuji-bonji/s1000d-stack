@@ -49,6 +49,10 @@ Claude Desktop の設定ファイル（`claude_desktop_config.json`）に次を�
 - 「このデータモジュール（パス）を BREX に照合して、違反を一覧にして」 → `check_against_brex`
 - 「`securityClassification` の `01` はこの BREX では何を意味する？」 → `lookup_value`
 
+:::tip[Claude Code では plugin からも入れられます]
+3 つの MCP サーバーは MCP Registry（`io.github.shuji-bonji/s1000d-brex-mcp` など）と、個人の marketplace [shuji-bonji/claude-plugins](https://github.com/shuji-bonji/claude-plugins)（category `s1000d`）に載せています。Claude Code では `claude plugin marketplace add shuji-bonji/claude-plugins` の後に `claude plugin install s1000d-brex-mcp@shuji-bonji` で入ります。plugin は環境変数を設定しないので、`S1000D_SPEC_DIR` と `S1000D_CSDB_DIR` を設定したシェルから Claude Code を起動してください。
+:::
+
 
 ## 次に読むもの
 

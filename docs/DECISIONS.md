@@ -236,6 +236,15 @@ flowchart LR
 - 翻訳は Claude で行い xcomet で採点、低得点の文は DeepL の訳と比べて採用する。最初の 1 ページ（`guide/overview.md`）は Claude と DeepL の両方で訳して比較し、以後の分担を決める。
 - **実施済み（2026-10-26）**: サイト 13 ページと README 6 本を英語化し、`site/scripts/check-i18n.mjs`（`npm run check:i18n`）で ja / en の構造の一致を検査する。`scripts/generate-stack.mjs --readme` は README.md と README.ja.md の両方の表を更新する。経過は `notes/i18n-trial.md`。
 
+### D-23 MCP サーバーは MCP Registry と claude-plugins marketplace に載せ、ライブラリは載せない（2026-10-27）
+
+- 対象は s1000d-brex-mcp・s1000d-verify-mcp・s1000d-reader-mcp の 3 本。s1000d-core と experiential-manual-model はライブラリなので、どちらにも載せません。
+- MCP Registry: 名前は `io.github.shuji-bonji/<repo>`。`package.json` の `mcpName` とリポジトリ直下の `server.json`（npm には同梱しない）で登録し、版を上げるたびに `mcp-publisher publish` を手で実行します（pdf-agent-stack の `docs/specs/30-registry-and-marketplace-release.md` と同じ手順）。Registry は npm に公開済みの版の `mcpName` で所有を確かめるため、登録には `mcpName` 入りの版が必要で、0.1.1 をそのために出しました。
+- claude-plugins marketplace（`shuji-bonji/claude-plugins`）: MCP 1 本につき plugin 1 件（pdf family と同じ）。各リポジトリの `.claude-plugin/plugin.json` が実体で、marketplace.json は一覧用の台帳。category は `s1000d` を新設しました。
+- plugin の `mcpServers` には `env` を書きません。`S1000D_SPEC_DIR` と `S1000D_CSDB_DIR` は Claude Code を起動するシェルの環境変数が子プロセスに引き継がれる形で渡します。`${VAR}` 展開が plugin の `mcpServers` で効くか未確認で、展開されずに文字列のまま渡ると既定 BREX が見つからない失敗になるためです。README と marketplace の「利用上の注意」に書いて補います。
+- 版が乗る場所は 5 つ（`package.json`、`plugin.json`、`server.json` の 2 か所、npm、marketplace.json）。`scripts/sync-plugin-version.mjs` を `npm version` の version フックに掛けて前の 3 つを揃え、marketplace.json は claude-plugins 側で `node scripts/marketplace-version-check.mjs --write` で揃えます。
+- **実施済み（2026-10-27 JST）**: 3 本の 0.1.1 を `publish.yml` 経由で npm に公開（03:37〜03:39）、MCP Registry に `active` で登録（03:48〜03:49）、claude-plugins 0.7.0 に収録（`4d8df7b`）。`claude plugin install s1000d-brex-mcp@shuji-bonji` が成功することを確認。
+
 ## 未決事項
 
 | ID | 内容 | 判断の材料 |

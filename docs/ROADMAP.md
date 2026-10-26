@@ -2,7 +2,7 @@
 
 LLM が S1000D の技術文書を正しく読み、プロジェクトの決まり（ビジネスルール）に沿って検査・作成できるようにするための MCP サーバー・共有ライブラリ・Skill と、体験型マニュアルの作成ツール・閲覧ソフトをまとめるプロジェクトです。
 
-- 作成日: 2026-10-23（JST）、更新日: 2026-10-26（JST、段階 2 の完了を記録）
+- 作成日: 2026-10-23（JST）、更新日: 2026-10-27（JST、Registry と marketplace への登録を記録）
 - 構成の手本: [houki-hub](https://github.com/shuji-bonji/houki-hub)、[pdf-agent-stack](https://github.com/shuji-bonji/pdf-agent-stack)
 - 決定事項: [DECISIONS.md](./DECISIONS.md)
 - 調査メモ: [notes/background.md](./notes/background.md)
@@ -164,6 +164,7 @@ flowchart LR
 | 8 | manual-model を作る: 型、JSON Schema、`validateManual`、`fromLegacyJson`、券売機の例 `examples/kenbaiki.manual.json`。core に依存しないので、作業 1〜7 と並行できる。名前は `@shuji-bonji/experiential-manual-model`（U-04） | lib/experiential-manual-model | manual-model.md |
 | 9 | サイトに「s1000d-verify-mcp」「s1000d-reader-mcp」「適用性」の 3 ページを足し、`stack.json` に verify / reader / manual-model を加える。既存の brex-mcp のページにある「XSD 未検証」の説明を verify-mcp への案内に直す | s1000d-stack/site、stack.json | — |
 | 10 | 公開（D-16 の 5 つの作業）と、verify-mcp・reader-mcp の初回の手動 `npm publish` と Trusted Publisher の登録（D-14） | hub、各 MCP | DECISIONS.md D-14・D-16 |
+| 11 | MCP 3 本を MCP Registry（`io.github.shuji-bonji/*`）と claude-plugins marketplace に載せる（D-23） | 各 MCP、claude-plugins | DECISIONS.md D-23 |
 
 調査の宿題（Bike Samples 105 件に既定 BREX への違反 55 件が出る原因）は作業 6 のテストで同じ数が出ることを確かめたうえで、作業 9 のサイトの題材として調べます。
 
@@ -182,7 +183,7 @@ flowchart LR
 | 8 | 済み（2026-10-25、`lib/experiential-manual-model` の `09f9d2c`。GitHub の `shuji-bonji/experiential-manual-model` は未作成、未 push）。型・JSON Schema・`validateManual`・`fromLegacyJson`・`numberSteps`・券売機の例 `examples/kenbaiki.manual.json`。実行時の依存なし。テスト 10 件（2021 年の `JSON.json` 79 画面・212 ボタンが読め、検査と JSON Schema を通る）。2021 年の JSON の実際のフィールド名は README の推測と違い `purchaseTypes` / `screenID` / `destination` だった（両方読む） |
 | 9 | 済み（2026-10-25、hub の `bd61c95`）。サイトに `guide/applicability`・`mcp/verify-mcp`・`mcp/reader-mcp` を追加し、brex-mcp・guide/brex・about/stack・core・index・getting-started を 2026-10-25 時点に直した。`generate-stack.mjs` の REGISTRY を更新し `stack.json` と README の表を再生成（npm 照合は一致）。13 ページがビルドでき、内部リンクの切れは無い。**新しい 3 ページの通読（記述と仕様書・実装の照合）は利用者が行う**（段階 1 の notes/site-review.md と同じ要領） |
 | 10 | 済み（2026-10-26）。4 パッケージ（`@shuji-bonji/experiential-manual-model`・`s1000d-brex-mcp`・`s1000d-verify-mcp`・`s1000d-reader-mcp`）の 0.1.0 を 16:24〜16:26 JST に手動で `npm publish` し、npm 側で Trusted Publisher を登録。4 リポジトリと hub を Public にし、GitHub Pages の Source を GitHub Actions にした。各リポジトリに `publish.yml`・`docs/RELEASE.md`・CHANGELOG 0.1.0 を追加。サイトの「npm 未公開」の note 4 か所（×2 言語）と `guide/architecture.md` の状態、hub README の「できること」と全体像の図を現状に直し、`deploy.yml` の push トリガーを戻し、REGISTRY の 4 つを `released` にして `stack.json` と README の表を再生成（npm 照合は 5 つとも一致）。サイトは 28 ページ（14 × 2 言語）がビルドでき、`check:i18n` ok、内部リンク切れ無し。手順の記録は notes/handoff.md の 10-0〜10-4。**段階 2 は 2026-10-26 に完了** |
-| 保守 | 2026-10-25: 4 リポジトリの `vitest` を 2.1 → 4.1 に上げた（2.x の依存に脆弱性の報告 6 件。開発時だけの依存。`npm audit` 0 件）。brex-mcp の CI の Node を 22・24 に揃えた（`engines` が >=22 のため） |
+| 11 | 済み（2026-10-27）。3 本に `mcpName`・`server.json`・`.claude-plugin/plugin.json`・`scripts/sync-plugin-version.mjs` を足して 0.1.1 を `publish.yml` 経由で公開（`npm version patch` → `git push --follow-tags`。Trusted Publisher の初回動作確認を兼ねた）。`mcp-publisher publish` で Registry に `active` で登録。claude-plugins に category `s1000d` を新設して 3 件を収録（marketplace 0.7.0）。`claude plugin install s1000d-brex-mcp@shuji-bonji` が成功 || 保守 | 2026-10-25: 4 リポジトリの `vitest` を 2.1 → 4.1 に上げた（2.x の依存に脆弱性の報告 6 件。開発時だけの依存。`npm audit` 0 件）。brex-mcp の CI の Node を 22・24 に揃えた（`engines` が >=22 のため） |
 
 ## 段階 2.5 の作業（組み込み基盤に向けて）
 
