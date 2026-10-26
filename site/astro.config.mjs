@@ -56,6 +56,7 @@ export default defineConfig({
           label: 'このプロジェクトについて',
           items: [
             { label: '構成と進み方', slug: 'about/stack' },
+            { label: 'ユースケース', slug: 'about/use-cases' },
             { label: '仕様書の扱いと商標', slug: 'about/license' },
           ],
         },
