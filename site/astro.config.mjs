@@ -14,6 +14,15 @@ export default defineConfig({
     mermaid({ theme: 'neutral', autoTheme: true }),
     starlight({
       title: 'S1000D Stack',
+      // ロゴは C 案（六角形 = CSDB、3 段 = データモジュール、外の点 = LLM に結果だけを渡す）。
+      // A 案（S のモノグラム）は S2000M などへ広げたときに合わないため不採用（D-21）。
+      // 元ファイルは src/assets/logo/ にあり、public/favicon.svg は favicon-c.svg と同じ内容。
+      logo: {
+        light: './src/assets/logo/c-light.svg',
+        dark: './src/assets/logo/c-dark.svg',
+        alt: 'S1000D Stack',
+      },
+      favicon: '/favicon.svg',
       description:
         'LLM が S1000D® の技術文書を読み、BREX（ビジネスルール）に沿って検査・作成するための MCP サーバー・ライブラリ・Skill と、体験型マニュアルの作成ツール・閲覧ソフトの学習サイト',
       defaultLocale: 'root',

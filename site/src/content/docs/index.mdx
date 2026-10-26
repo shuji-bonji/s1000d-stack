@@ -3,6 +3,10 @@ title: S1000D Stack
 description: LLM が S1000D® の技術文書を読み、BREX（ビジネスルール）に沿って検査・作成するための MCP サーバー・ライブラリ・Skill と、体験型マニュアルの作成ツール・閲覧ソフト
 template: splash
 hero:
+  image:
+    light: ../../assets/logo/c-light.svg
+    dark: ../../assets/logo/c-dark.svg
+    alt: S1000D Stack
   tagline: S1000D® の技術文書を、LLM がプロジェクトの決まり（BREX、Business Rules Exchange）に沿って読み、検査し、作れるようにする道具の束ねです。
   actions:
     - text: S1000D Stack とは
@@ -14,29 +18,56 @@ hero:
       variant: minimal
 ---
 
-import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-<CardGrid stagger>
-  <Card title="BREX を読む" icon="open-book">
-    顧客やプロジェクトから渡された BREX（Business Rules Exchange）データモジュールを、「どの要素に何を求めているか」が分かる文章にして一覧にします。SNS（システム番号）や属性値の意味も引けます。
-  </Card>
-  <Card title="データモジュールを照合する" icon="approve-check">
-    データモジュールを、参照している BREX の連鎖（プロジェクト → 組織 → S1000D 既定 BREX）に各層ごとに照合し、違反を箇所（XPath と行番号）・値・ルール ID・重大度付きで返します。
-  </Card>
-  <Card title="仕様書は同梱しません" icon="warning">
-    S1000D の仕様書・XML スキーマ・既定 BREX・公式サンプルは、利用条件により再配布できません。利用者ご自身で s1000d.org から入手し、置き場所を環境変数で指定します。
-  </Card>
-  <Card title="検証して、読む" icon="document">
-    verify が XSD・BREX・参照をまとめて検証状態にし、reader がデータモジュールを見出し・手順・警告・図の構造で読み、どの製品に当てはまるかを判定して渡します。LLM に XML も適用性の式も見せません。
-  </Card>
-  <Card title="この先" icon="rocket">
-    共通データモデルから S1000D を生成する writer、そして体験型マニュアルの作成ツールと閲覧ソフトへ広げます。共通データモデル experiential-manual-model は S1000D に依存しません。
-  </Card>
-</CardGrid>
+## 部品
 
 <CardGrid>
-  <LinkCard title="導入手順" description="配布物の入手、環境変数、MCP クライアントへの登録から最初の操作まで。" href="/s1000d-stack/guide/getting-started/" />
-  <LinkCard title="ユースケース" description="渡された BREX を読む、既存のデータモジュールを検証して読む、軽い Web 形式から S1000D へ出力する。" href="/s1000d-stack/use-cases/" />
+  <LinkCard
+    title="s1000d-brex-mcp"
+    description="顧客やプロジェクトから渡された BREX（Business Rules Exchange）を、どの要素に何を求めているかが分かる文章にして一覧にします。データモジュールを BREX の連鎖（プロジェクト → 組織 → S1000D 既定 BREX）に各層ごとに照合し、違反を箇所・値・ルール ID・重大度付きで返します。"
+    href="/s1000d-stack/mcp/brex-mcp/"
+  />
+  <LinkCard
+    title="s1000d-verify-mcp"
+    description="公式 XSD による検証、BREX 照合、参照切れの検出をまとめて行い、1 つの検証状態にして返します。納品前の確認と、reader に渡す前の下ごしらえに使います。"
+    href="/s1000d-stack/mcp/verify-mcp/"
+  />
+  <LinkCard
+    title="s1000d-reader-mcp"
+    description="データモジュールを見出し・手順・警告・図の構造で LLM に渡します。どの製品に当てはまるか（適用性）はサーバーが判定し、結果だけを渡します。LLM に XML も適用性の式も見せません。"
+    href="/s1000d-stack/mcp/reader-mcp/"
+  />
+  <LinkCard
+    title="s1000d-core（ライブラリ）"
+    description="DMC・ICN の分解、識別・状態部の読み取り、BREX 照合、XSD 検証、参照の解決、適用性の評価を 3 つの MCP サーバーが共有するライブラリです。npm に公開済みです。"
+    href="/s1000d-stack/lib/s1000d-core/"
+  />
+</CardGrid>
+
+## 読む
+
+<CardGrid>
+  <LinkCard
+    title="導入手順"
+    description="S1000D の配布物の入手、環境変数の指定、MCP クライアントへの登録から最初の操作まで。"
+    href="/s1000d-stack/guide/getting-started/"
+  />
+  <LinkCard
+    title="ユースケース"
+    description="渡された BREX を読んで照合する、既存のデータモジュールを検証して読む、軽い Web 形式のマニュアルから S1000D へ出力する。3 つの使い方の見取り図です。"
+    href="/s1000d-stack/use-cases/"
+  />
+  <LinkCard
+    title="全体構成と進み方"
+    description="hub・ライブラリ・MCP サーバー・Skill・製品の構成と、段階 1〜4 の成果物と完了の条件。この先の writer、作成ツール、閲覧ソフトの位置づけもここにあります。"
+    href="/s1000d-stack/guide/architecture/"
+  />
+  <LinkCard
+    title="仕様書の扱いと商標"
+    description="S1000D の仕様書・XML スキーマ・既定 BREX・公式サンプルは利用条件により再配布できないため同梱しません。利用者ご自身で s1000d.org から入手し、置き場所を環境変数で指定します。"
+    href="/s1000d-stack/guide/license/"
+  />
 </CardGrid>
 
 :::note[商標について]
