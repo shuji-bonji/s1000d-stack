@@ -233,6 +233,7 @@ flowchart LR
 - Starlight の fallback は英語 → 日本語の一方向（英語ページが無いとルートが 404）なので、**ページの完了条件は「日本語と英語の両方が揃うこと」**にする。
 - 公開（作業 10、D-16）の前に行う。公開後に日本語を `/` から `/ja/` へ動かすと外部リンクが切れるため。
 - 翻訳は Claude で行い xcomet で採点、低得点の文は DeepL の訳と比べて採用する。最初の 1 ページ（`guide/overview.md`）は Claude と DeepL の両方で訳して比較し、以後の分担を決める。
+- **実施済み（2026-10-26）**: サイト 13 ページと README 6 本を英語化し、`site/scripts/check-i18n.mjs`（`npm run check:i18n`）で ja / en の構造の一致を検査する。`scripts/generate-stack.mjs --readme` は README.md と README.ja.md の両方の表を更新する。経過は `notes/i18n-trial.md`。
 
 ## 未決事項
 

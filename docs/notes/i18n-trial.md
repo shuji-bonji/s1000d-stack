@@ -56,3 +56,11 @@ Claude の訳で xcomet が低く採点したのは 7・9・11 で、いずれ�
 - xcomet は 108 段落のうち 30 段落（applicability・architecture・brex）に実施し、平均 0.832、critical 0。0.7 未満の 4 段落は、長文で識別子が多いもの（採点が下がりやすい）と、D-01 の `BREX (Business Rules Exchange)` の展開を「原文に無い」として減点したものだった。意味の誤りは無かったが、brex.md の 2 文と applicability.md の 1 文を読みやすく直した。
 - 残り 78 段落は xcomet を省き、通読で代えた。理由: 1 回の採点で段落対を 2〜3 万文字送る必要があり、通読済みのページでは得るものが少ない。以後は「人が通読しないページ」または「改訳した段落」に絞って xcomet を使う。
 - 作業用エージェントが「判断に迷った」と報告した語: 技術指令書 → technical order、機能マトリクス → functionality matrix、改修 001 → modification 001、券売機 → ticket (vending) machine、本社コード → head office code。glossary.md に足す候補。
+
+## README 6 本（2026-10-26 JST、同日）
+
+- hub、s1000d-core、experiential-manual-model、s1000d-brex-mcp、s1000d-verify-mcp、s1000d-reader-mcp の `README.md` を英語にし、従来の日本語を `README.ja.md` に移した。見出し直下（バッジがあればその下）に言語切替行（`**English** | [日本語](./README.ja.md)` / `[English](./README.md) | **日本語**`）を置いた。
+- `scripts/generate-stack.mjs --readme` は `README.md`（英語の表: Repository / Layer / Form / Status / Version / npm、状態は released / in development / planned / concept）と `README.ja.md`（日本語の表）の両方を差し替えるようにした。目印 `<!-- stack:begin -->` / `<!-- stack:end -->` は共通。
+- hub の README は、サイトが 2 言語になったことに合わせ、両言語とも「学習サイト（英語がルート、日本語は /ja/）」に直し、`README.ja.md` からサイトへのリンクは `/ja/` 付きにした。
+- 下書きはサイトと同じ要領（作業用エージェント 6 体）。通読で直したもの: hub のコードブロック内の日本語コメント（英語版では訳す）、core の見出し「What it can do」→「What it does」、verify の License 行の `S1000D®`、reader の「positions the specification does not define」→「positions that differ from the specification」。
+- **内容が古い箇所（日本語側の問題。翻訳では直していない）**: hub README の「できること（段階 1）」と全体像の図（reader / verify が「予定」のまま）、brex-mcp README の WARNING（「XSD 検証は段階 2 の verify-mcp で予定」のまま）。段階 2 の 3 部品が動いている現状に合わせて日本語版を直し、英語版に反映する作業が別に要る。

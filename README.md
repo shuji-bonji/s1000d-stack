@@ -2,49 +2,51 @@
 
 <p align="center"><img src="site/public/images/logo.svg" alt="S1000D Stack" width="160"></p>
 
-LLM が S1000D® の技術文書を正しく読み、プロジェクトの決まり（ビジネスルール）に沿って検査・作成できるようにするための MCP サーバー・共有ライブラリ・Skill と、画面や機器の操作を体験しながら学べるマニュアルの作成ツール・閲覧ソフトをまとめるプロジェクトです。
+**English** | [日本語](./README.ja.md)
 
-このリポジトリは構成表（`stack.json`）と学習サイト（`site/`）、計画と決定の記録（`docs/`）だけを持ちます。各部品は独立したリポジトリです。
+s1000d-stack is a project that brings together the MCP servers, shared libraries and Skills that let an LLM read technical documents written in S1000D® correctly and check and create them according to the rules agreed for a project (business rules), together with an authoring tool and a viewer for manuals that teach through hands-on operation of screens and equipment.
+
+This repository holds only the stack manifest (`stack.json`), the documentation site (`site/`) and the record of plans and decisions (`docs/`). Each component is an independent repository.
 
 > [!IMPORTANT]
-> このプロジェクトは ASD（Aerospace, Security and Defence Industries Association of Europe）とは無関係の個人プロジェクトです。S1000D® は ASD の登録商標です。
-> S1000D の仕様書・XML スキーマ・既定 BREX・公式サンプルは、利用条件により再配布できないため、どのリポジトリにも含まれていません。利用者ご自身で [s1000d.org](https://s1000d.org/) から入手し、展開したフォルダーを環境変数 `S1000D_SPEC_DIR` で指定してください。
+> This is a personal project and is not affiliated with ASD (Aerospace, Security and Defence Industries Association of Europe). S1000D® is a registered trademark of ASD.
+> The S1000D specification, XML schemas, default BREX and official samples are not included in any package or repository, because their terms of use do not grant redistribution. Obtain them from [s1000d.org](https://s1000d.org/) and point the `S1000D_SPEC_DIR` environment variable at the extracted folder.
 
-## できること（段階 1）
+## What it does (stage 1)
 
-部品メーカーや技術マニュアル制作会社が、顧客から渡された BREX（Business Rules Exchange）を理解し、自分たちのデータモジュールがそれに従っているかを確かめる作業を、LLM から行えるようにします。
+Lets parts manufacturers and technical publication companies use an LLM to understand the BREX (Business Rules Exchange) handed over by a customer and to confirm that their own data modules follow it.
 
-| 部品 | 役割 |
+| Component | Role |
 | --- | --- |
-| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | DMC・ICN の分解、識別・状態部の読み取り、BREX の読み取りと照合。全 MCP が依存する共有ライブラリ（npm: `@shuji-bonji/s1000d-core`） |
-| s1000d-brex-mcp | BREX のルールを人が読める形で一覧にし（`explain_brex`）、SNS や属性値の意味を引き（`lookup_sns` / `lookup_value`）、使える図の形式を返し（`list_notations`）、データモジュールを BREX の連鎖に照合する（`check_against_brex`）MCP サーバー |
+| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | Splits DMCs and ICNs, reads the identification and status section, reads and checks against BREX. The shared library that every MCP depends on (npm: `@shuji-bonji/s1000d-core`) |
+| s1000d-brex-mcp | An MCP server that lists BREX rules in a form people can read (`explain_brex`), looks up the meaning of SNS and attribute values (`lookup_sns` / `lookup_value`), returns the illustration formats that may be used (`list_notations`), and checks data modules against the BREX chain (`check_against_brex`) |
 
-照合は S1000D Issue 7 の Chap 4.10.2（BREX data module）と Chap 7.9（Business rules processing）に沿い、`brexDmRef` の連鎖（プロジェクト → 組織 → 既定 BREX）を各層に個別に当てます。XML スキーマ（XSD）による検証と、文章で書かれた取り決め（nonContextRules）の判断は含みません。
+The check follows Chap 4.10.2 (BREX data module) and Chap 7.9 (Business rules processing) of S1000D Issue 7, and applies the `brexDmRef` chain (project → organisation → default BREX) to each layer separately. It does not include validation against the XML schema (XSD) or judgement of agreements written as prose (nonContextRules).
 
-## 全体像
+## Overview
 
 ```mermaid
 flowchart TB
-  subgraph Hub["s1000d-stack（構成表とサイトだけを持つ）"]
-    SITE["site/<br/>Astro Starlight の学習サイト"]
-    STACK["stack.json<br/>構成の正典"]
-    DOCS["docs/<br/>ROADMAP・DECISIONS・notes"]
+  subgraph Hub["s1000d-stack (holds only the stack manifest and the site)"]
+    SITE["site/<br/>documentation site built with Astro Starlight"]
+    STACK["stack.json<br/>canonical source of the stack"]
+    DOCS["docs/<br/>ROADMAP, DECISIONS, notes"]
   end
   subgraph Lib["lib/"]
-    CORE["s1000d-core<br/>DMC・ICN・識別・状態部・BREX 照合"]
-    MODEL["manual-model<br/>共通データモデル（S1000D に依存しない）"]
+    CORE["s1000d-core<br/>DMC, ICN, identification and status section, BREX check"]
+    MODEL["manual-model<br/>common data model (independent of S1000D)"]
   end
   subgraph Mcp["mcp/"]
     BREX["s1000d-brex-mcp"]
-    R["s1000d-reader-mcp（予定）"]
-    V["s1000d-verify-mcp（予定）"]
-    W["s1000d-writer-mcp（予定）"]
+    R["s1000d-reader-mcp (planned)"]
+    V["s1000d-verify-mcp (planned)"]
+    W["s1000d-writer-mcp (planned)"]
   end
   subgraph App["app/"]
-    ED["作成ツール（構想）"]
-    VW["閲覧ソフト（構想）"]
+    ED["authoring tool (concept)"]
+    VW["viewer (concept)"]
   end
-  SK["skill/<br/>変換・作成・受入検査の手順（構想）"]
+  SK["skill/<br/>procedures for conversion, authoring and acceptance checks (concept)"]
   BREX --> CORE
   R --> CORE
   V --> CORE
@@ -52,60 +54,60 @@ flowchart TB
   W --> MODEL
   ED --> MODEL
   VW --> MODEL
-  SK -.呼び出す.-> Mcp
+  SK -.calls.-> Mcp
 ```
 
-専門家エージェント（MCP と Skill）を先に作り、それを開発の道具として使いながら製品（作成ツール・閲覧ソフト）を作ります。S1000D との対応関係は共通データモデルとその変換関数に集め、エージェントと製品が別々に解釈しないようにします。製品は AI が無くても動く状態を保ちます。
+The expert agents (MCP and Skills) come first; the products (authoring tool and viewer) are built while using those agents as development tools. The mapping to S1000D is gathered into the common data model and its conversion functions, so that the agents and the products do not interpret it separately. The products stay usable without AI.
 
-## 構成表
+## Stack manifest
 
 <!-- stack:begin — scripts/generate-stack.mjs が生成。手で編集しない -->
 
-> 版は実測（2026-10-25 時点の `npm view`）。
+> Versions are measured (`npm view` as of 2026-10-26).
 
-| リポジトリ | 役割 | 配布形態 | 状態 | 版 | npm |
+| Repository | Layer | Form | Status | Version | npm |
 | --- | --- | --- | --- | --- | --- |
-| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | core | library | 公開済み | 0.2.0 | `@shuji-bonji/s1000d-core` |
-| s1000d-brex-mcp | mcp | mcp-server | 開発中 | 0.1.0 | — |
-| s1000d-verify-mcp | mcp | mcp-server | 開発中 | 0.1.0 | — |
-| s1000d-reader-mcp | mcp | mcp-server | 開発中 | 0.1.0 | — |
-| experiential-manual-model | model | library | 開発中 | 0.1.0 | — |
-| s1000d-writer-mcp | mcp | mcp-server | 予定 | — | — |
-| s1000d-skills | procedure | skill | 構想 | — | — |
-| manual-editor | app | app | 構想 | — | — |
-| manual-viewer | app | app | 構想 | — | — |
+| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | core | library | released | 0.2.0 | `@shuji-bonji/s1000d-core` |
+| s1000d-brex-mcp | mcp | mcp-server | in development | 0.1.0 | — |
+| s1000d-verify-mcp | mcp | mcp-server | in development | 0.1.0 | — |
+| s1000d-reader-mcp | mcp | mcp-server | in development | 0.1.0 | — |
+| experiential-manual-model | model | library | in development | 0.1.0 | — |
+| s1000d-writer-mcp | mcp | mcp-server | planned | — | — |
+| s1000d-skills | procedure | skill | concept | — | — |
+| manual-editor | app | app | concept | — | — |
+| manual-viewer | app | app | concept | — | — |
 
 <!-- stack:end -->
 
-`stack.json` は `scripts/generate-stack.mjs` が npm とローカルの実測から生成します。手で書くのはスクリプトの `REGISTRY` だけです。
+`scripts/generate-stack.mjs` generates `stack.json` from measurements of npm and the local checkouts. The only part written by hand is the script's `REGISTRY`.
 
 ```sh
-node scripts/generate-stack.mjs            # 生成（手元）
-node scripts/generate-stack.mjs --readme   # README の表も差し替える
-node scripts/generate-stack.mjs --check    # CI。npm と stack.json がずれていれば exit 1
+node scripts/generate-stack.mjs            # generate (locally)
+node scripts/generate-stack.mjs --readme   # also replace the tables in README.md and README.ja.md
+node scripts/generate-stack.mjs --check    # CI: exit 1 if npm and stack.json disagree
 ```
 
-## リポジトリの構成
+## Repository layout
 
 ```text
 s1000d-stack/
-├── README.md
-├── stack.json          構成表（生成物）
-├── scripts/            stack.json の生成・照合
-├── site/               学習サイト（Astro Starlight）
+├── README.md           English (README.ja.md is Japanese)
+├── stack.json          stack manifest (generated)
+├── scripts/            generates and checks stack.json
+├── site/               documentation site (Astro Starlight; English, Japanese under /ja/)
 ├── docs/
-│   ├── ROADMAP.md      目的・段階・作業手順・進捗
-│   ├── DECISIONS.md    決定事項（D-01〜）と未決事項（U-01〜）
-│   └── notes/          調査メモ（IETM・S1000D・BREX、配布物の性質、仕様書の読解結果）
-├── specs/              S1000D の配布物（git 管理外。利用者が置く）
-└── lib/ mcp/ skill/ app/   各リポジトリの作業コピー（git 管理外）
+│   ├── ROADMAP.md      goals, stages, work procedure, progress (Japanese)
+│   ├── DECISIONS.md    decisions (D-01–) and open items (U-01–) (Japanese)
+│   └── notes/          research notes on IETM, S1000D, BREX, the distribution files and the specification (Japanese)
+├── specs/              S1000D distribution files (not in git; placed by the user)
+└── lib/ mcp/ skill/ app/   working copies of each repository (not in git)
 ```
 
-`lib/`・`mcp/`・`skill/`・`app/` は `.gitignore` で除外した作業コピーの置き場で、clone しても中身は入りません。構成は [houki-hub](https://github.com/shuji-bonji/houki-hub)、[pdf-agent-stack](https://github.com/shuji-bonji/pdf-agent-stack) と同じです。
+`lib/`, `mcp/`, `skill/` and `app/` are places for working copies excluded by `.gitignore`; cloning does not fill them. The layout is the same as [houki-hub](https://github.com/shuji-bonji/houki-hub) and [pdf-agent-stack](https://github.com/shuji-bonji/pdf-agent-stack).
 
-## 学習サイト
+## Documentation site
 
-`site/` は Astro Starlight で作る日本語の学習サイトです。IETM と S1000D の関係、データモジュールと DMC、BREX の仕組み、このスタックの使い方を、仕様書の翻訳ではなく自分の言葉で説明します。概念の入門は Zenn Book [IETM入門 — 概念から S1000D まで](https://zenn.dev/shuji_bonji/books/ietm-overview) にあり、サイトはこのスタックの利用者向けの説明に絞ります。
+`site/` is a documentation site built with Astro Starlight, in English with a Japanese version under `/ja/`. It explains the relationship between IETM and S1000D, data modules and DMCs, how BREX works, and how to use this stack, in its own words rather than as a translation of the specification. An introduction to the concepts is in the Zenn Book [IETM入門 — 概念から S1000D まで](https://zenn.dev/shuji_bonji/books/ietm-overview) (in Japanese); the site is limited to explanations for users of this stack.
 
 ```sh
 cd site
@@ -113,11 +115,11 @@ npm install
 npm run dev
 ```
 
-## 関連
+## Related
 
-- [Zenn Book「IETM入門 — 概念から S1000D まで」](https://zenn.dev/shuji_bonji/books/ietm-overview)
-- [houki-hub](https://github.com/shuji-bonji/houki-hub) / [pdf-agent-stack](https://github.com/shuji-bonji/pdf-agent-stack) — 同じ構成の束ね
+- [Zenn Book "IETM入門 — 概念から S1000D まで"](https://zenn.dev/shuji_bonji/books/ietm-overview)
+- [houki-hub](https://github.com/shuji-bonji/houki-hub) / [pdf-agent-stack](https://github.com/shuji-bonji/pdf-agent-stack) — sets of tools with the same layout
 
-## ライセンス
+## License
 
-コードは MIT、サイトの文章は CC BY 4.0、自作のサンプルデータは MIT です（`docs/DECISIONS.md` D-11）。
+Code is MIT, the site's text is CC BY 4.0, and the sample data created for this project is MIT (`docs/DECISIONS.md` D-11).

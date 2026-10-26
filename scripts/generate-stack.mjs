@@ -9,7 +9,7 @@
  *
  *   node scripts/generate-stack.mjs            # 生成（手元）
  *   node scripts/generate-stack.mjs --check    # 照合のみ（CI）。ずれていれば exit 1
- *   node scripts/generate-stack.mjs --readme   # README.md の表を差し替え
+ *   node scripts/generate-stack.mjs --readme   # README.md（英語）と README.ja.md（日本語）の表を差し替え
  *   node scripts/generate-stack.mjs --root /path/to/s1000d-stack
  *
  * 依存なし（Node 20+）。
@@ -189,22 +189,41 @@ function printSummary(stack) {
   if (unpushed.length) console.log(`  ・未 push: ${unpushed.map((r) => `${r.name}(${r.local.unpushedCommits})`).join(', ')}`);
 }
 
-const STATUS_JA = { released: '公開済み', developing: '開発中', planned: '予定', concept: '構想' };
+const STATUS = {
+  ja: { released: '公開済み', developing: '開発中', planned: '予定', concept: '構想' },
+  en: { released: 'released', developing: 'in development', planned: 'planned', concept: 'concept' },
+};
+const TABLE_TEXT = {
+  ja: {
+    note: (d) => `> 版は実測（${d} 時点の \`npm view\`）。`,
+    head: '| リポジトリ | 役割 | 配布形態 | 状態 | 版 | npm |',
+  },
+  en: {
+    note: (d) => `> Versions are measured (\`npm view\` as of ${d}).`,
+    head: '| Repository | Layer | Form | Status | Version | npm |',
+  },
+};
 
-function renderReadmeTable(stack) {
+// README.md は英語、README.ja.md は日本語（D-22）。表はどちらも同じ目印の間に生成する。
+const README_FILES = [
+  { file: README_FILE, lang: 'en' },
+  { file: join(ROOT, 'README.ja.md'), lang: 'ja' },
+];
+
+function renderReadmeTable(stack, lang = 'ja') {
   const row = (r) => {
     const ver = r.published ?? r.local?.version ?? '—';
     const npm = r.npm && r.status === 'released' ? `\`${r.npm}\`` : '—';
     const link = r.public ? `[${r.name}](https://github.com/shuji-bonji/${r.name})` : r.name;
-    return `| ${link} | ${r.layer} | ${r.form} | ${STATUS_JA[r.status]} | ${ver} | ${npm} |`;
+    return `| ${link} | ${r.layer} | ${r.form} | ${STATUS[lang][r.status]} | ${ver} | ${npm} |`;
   };
   const rows = stack.repos.filter((r) => r.layer !== 'hub').map(row);
   return [
     '<!-- stack:begin — scripts/generate-stack.mjs が生成。手で編集しない -->',
     '',
-    `> 版は実測（${stack.generatedAt.slice(0, 10)} 時点の \`npm view\`）。`,
+    TABLE_TEXT[lang].note(stack.generatedAt.slice(0, 10)),
     '',
-    '| リポジトリ | 役割 | 配布形態 | 状態 | 版 | npm |',
+    TABLE_TEXT[lang].head,
     '| --- | --- | --- | --- | --- | --- |',
     ...rows,
     '',
@@ -213,21 +232,24 @@ function renderReadmeTable(stack) {
 }
 
 function updateReadme(stack) {
-  if (!existsSync(README_FILE)) {
-    console.log(`\n  README.md が無いので表だけ出力します:\n`);
-    console.log(renderReadmeTable(stack));
-    return;
+  for (const { file, lang } of README_FILES) {
+    const name = file.slice(ROOT.length + 1);
+    if (!existsSync(file)) {
+      console.log(`\n  ${name} が無いので表だけ出力します:\n`);
+      console.log(renderReadmeTable(stack, lang));
+      continue;
+    }
+    const src = readFileSync(file, 'utf8');
+    const begin = src.indexOf('<!-- stack:begin');
+    const end = src.indexOf('<!-- stack:end -->');
+    if (begin < 0 || end < 0) {
+      console.log(`\n  ${name} に <!-- stack:begin --> / <!-- stack:end --> が無いので差し替えません。`);
+      console.log(renderReadmeTable(stack, lang));
+      continue;
+    }
+    writeFileSync(file, src.slice(0, begin) + renderReadmeTable(stack, lang) + src.slice(end + '<!-- stack:end -->'.length));
+    console.log(`\n  ${name} の表を更新しました`);
   }
-  const src = readFileSync(README_FILE, 'utf8');
-  const begin = src.indexOf('<!-- stack:begin');
-  const end = src.indexOf('<!-- stack:end -->');
-  if (begin < 0 || end < 0) {
-    console.log('\n  README.md に <!-- stack:begin --> / <!-- stack:end --> が無いので差し替えません。');
-    console.log(renderReadmeTable(stack));
-    return;
-  }
-  writeFileSync(README_FILE, src.slice(0, begin) + renderReadmeTable(stack) + src.slice(end + '<!-- stack:end -->'.length));
-  console.log(`\n  README.md の表を更新しました`);
 }
 
 if (flag('check')) {
