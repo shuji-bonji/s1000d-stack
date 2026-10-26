@@ -5,6 +5,8 @@ description: The configuration and tools of the MCP server that validates agains
 
 `s1000d-verify-mcp` is an MCP server that validates a data module against the XML schema (XSD), checks it against the BREX (Business Rules Exchange) chain, confirms that its references (`dmRef`, `pmRef`, ICN, `internalRef` and `applicRefId`) can be resolved, and returns the results as a single **verification status** (`verification`). It has 5 tools. The verification status has the same shape as the one `s1000d-reader-mcp` embeds in its content responses; both are built by the same function in the shared library `s1000d-core`.
 
+[GitHub](https://github.com/shuji-bonji/s1000d-verify-mcp) / [npm](https://www.npmjs.com/package/@shuji-bonji/s1000d-verify-mcp)
+
 ## What it does
 
 | Tool | Description |

@@ -5,6 +5,8 @@ description: BREX を LLM が読み、データモジュールを BREX に照合
 
 `s1000d-brex-mcp` は、BREX データモジュールを人が読める形にし、データモジュールを BREX の連鎖に照合する MCP サーバーです。5 つのツールを持ち、Claude Desktop や Claude Code から使えます。
 
+[GitHub](https://github.com/shuji-bonji/s1000d-brex-mcp) / [npm](https://www.npmjs.com/package/@shuji-bonji/s1000d-brex-mcp)
+
 ## できること
 
 | ツール | 内容 |

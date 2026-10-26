@@ -5,6 +5,8 @@ description: XSD 検証・BREX 照合・参照の解決を行い、結果を 1 �
 
 `s1000d-verify-mcp` は、データモジュールを XML スキーマ（XSD）で検証し、BREX の連鎖に照合し、参照（`dmRef`・`pmRef`・ICN・`internalRef`・`applicRefId`）が解決できるかを確かめて、結果を 1 つの**検証状態**（`verification`）にまとめて返す MCP サーバーです。5 つのツールを持ちます。検証状態は `s1000d-reader-mcp` が本文の応答に埋め込むものと同じ形で、どちらも共有ライブラリ `s1000d-core` の同じ関数で作ります。
 
+[GitHub](https://github.com/shuji-bonji/s1000d-verify-mcp) / [npm](https://www.npmjs.com/package/@shuji-bonji/s1000d-verify-mcp)
+
 ## できること
 
 | ツール | 内容 |

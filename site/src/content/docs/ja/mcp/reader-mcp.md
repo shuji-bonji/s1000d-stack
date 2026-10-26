@@ -5,6 +5,8 @@ description: データモジュールを XML ではなく構造として読み�
 
 `s1000d-reader-mcp` は、データモジュールとパブリケーションモジュールを LLM が**構造として**読むための MCP サーバーです。見出しの階層、番号付きの手順、警告・注意・注記、図（ICN）、表、参照先の題名を保ったまま返し、どの製品に当てはまるか（[適用性](/s1000d-stack/ja/guide/applicability/)）はサーバーが判定して結果だけを渡します。すべての応答に「どこまで検証済みか」（`verification`）が付きます。6 つのツールを持ちます。
 
+[GitHub](https://github.com/shuji-bonji/s1000d-reader-mcp) / [npm](https://www.npmjs.com/package/@shuji-bonji/s1000d-reader-mcp)
+
 ## できること
 
 | ツール | 内容 |

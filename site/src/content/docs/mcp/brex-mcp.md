@@ -5,6 +5,8 @@ description: Configuration and tools of the MCP server that lets an LLM read a B
 
 `s1000d-brex-mcp` is an MCP server that turns a BREX (Business Rules Exchange) data module into a form people can read, and checks data modules against the BREX chain. It has 5 tools and can be used from Claude Desktop and Claude Code.
 
+[GitHub](https://github.com/shuji-bonji/s1000d-brex-mcp) / [npm](https://www.npmjs.com/package/@shuji-bonji/s1000d-brex-mcp)
+
 ## What it does
 
 | Tool | Description |

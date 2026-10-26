@@ -5,6 +5,8 @@ description: Configuration and tools of the MCP server that reads data modules a
 
 `s1000d-reader-mcp` is an MCP server that lets an LLM read data modules and publication modules **as structure**. It returns the heading hierarchy, numbered steps, warnings, cautions and notes, illustrations (ICN), tables and the titles of referenced targets intact, and the server evaluates which product the content applies to ([applicability](/s1000d-stack/guide/applicability/)) and passes on only the result. Every response carries "how far it has been verified" (`verification`). It has 6 tools.
 
+[GitHub](https://github.com/shuji-bonji/s1000d-reader-mcp) / [npm](https://www.npmjs.com/package/@shuji-bonji/s1000d-reader-mcp)
+
 ## What it does
 
 | Tool | Description |
