@@ -121,6 +121,3 @@ One step from `read_data_module` has the following shape (a procedural data modu
 }
 ```
 
-:::note[Release status]
-As of 2026-10-25, `@shuji-bonji/s1000d-reader-mcp` is not yet published on npm (under development). It will be published once the stage 2 components are complete. You can run `npm install && npm run build` from the repository and start it with `node dist/index.js`.
-:::

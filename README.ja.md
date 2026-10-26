@@ -12,16 +12,19 @@ LLM が S1000D® の技術文書を正しく読み、プロジェクトの決ま
 > このプロジェクトは ASD（Aerospace, Security and Defence Industries Association of Europe）とは無関係の個人プロジェクトです。S1000D® は ASD の登録商標です。
 > S1000D の仕様書・XML スキーマ・既定 BREX・公式サンプルは、利用条件により再配布できないため、どのリポジトリにも含まれていません。利用者ご自身で [s1000d.org](https://s1000d.org/) から入手し、展開したフォルダーを環境変数 `S1000D_SPEC_DIR` で指定してください。
 
-## できること（段階 1）
+## できること
 
-部品メーカーや技術マニュアル制作会社が、顧客から渡された BREX（Business Rules Exchange）を理解し、自分たちのデータモジュールがそれに従っているかを確かめる作業を、LLM から行えるようにします。
+段階 1（BREX の理解と照合）と段階 2（検証と構造での読み取り）が揃っています。部品メーカーや技術マニュアル制作会社が、顧客から渡された BREX（Business Rules Exchange）を理解し、自分たちのデータモジュールが XML スキーマ（XSD）と BREX に従っているかを確かめ、データモジュールを XML ではなく構造として読む作業を、LLM から行えるようにします。
 
 | 部品 | 役割 |
 | --- | --- |
-| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | DMC・ICN の分解、識別・状態部の読み取り、BREX の読み取りと照合。全 MCP が依存する共有ライブラリ（npm: `@shuji-bonji/s1000d-core`） |
-| s1000d-brex-mcp | BREX のルールを人が読める形で一覧にし（`explain_brex`）、SNS や属性値の意味を引き（`lookup_sns` / `lookup_value`）、使える図の形式を返し（`list_notations`）、データモジュールを BREX の連鎖に照合する（`check_against_brex`）MCP サーバー |
+| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | DMC・ICN の分解、識別・状態部の読み取り、BREX の読み取りと照合、XSD 検証、参照の解決、適用性の評価、本文の読み取り。全 MCP が依存する共有ライブラリ（npm: `@shuji-bonji/s1000d-core`） |
+| [s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | BREX のルールを人が読める形で一覧にし（`explain_brex`）、SNS や属性値の意味を引き（`lookup_sns` / `lookup_value`）、使える図の形式を返し（`list_notations`）、データモジュールを BREX の連鎖に照合する（`check_against_brex`）MCP サーバー |
+| [s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | データモジュール 1 件を整形式 → XSD → BREX の連鎖 → 参照の順に検証し（`verify_data_module`）、XSD 検証だけ（`validate_schema`）、参照の解決（`check_references`）、フォルダー全体の検証（`verify_csdb`）、見つかった XSD の一覧（`list_schemas`）を行う MCP サーバー。結果は 1 つの検証状態（`verification`）にまとめて返す |
+| [s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | データモジュールとパブリケーションモジュールを構造として読み（`read_data_module` / `read_publication_module`）、CSDB の一覧と参照の解決（`list_data_modules` / `resolve_reference`）、適用性の語彙（`describe_applicability`）、ICN メタデータ（`read_icn_metadata`）を返す MCP サーバー。どの製品に当てはまるかはサーバーが判定し、すべての応答に検証状態が付く |
+| [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | 体験型操作マニュアルの共通データモデル（TypeScript の型・JSON Schema・検査・2021 年の JSON からの変換）。S1000D に依存しない（npm: `@shuji-bonji/experiential-manual-model`） |
 
-照合は S1000D Issue 7 の Chap 4.10.2（BREX data module）と Chap 7.9（Business rules processing）に沿い、`brexDmRef` の連鎖（プロジェクト → 組織 → 既定 BREX）を各層に個別に当てます。XML スキーマ（XSD）による検証と、文章で書かれた取り決め（nonContextRules）の判断は含みません。
+BREX への照合は S1000D Issue 7 の Chap 4.10.2（BREX data module）と Chap 7.9（Business rules processing）に沿い、`brexDmRef` の連鎖（プロジェクト → 組織 → 既定 BREX）を各層に個別に当てます。XSD 検証は、利用者が入手した配布物の XSD で行います。文章で書かれた取り決め（nonContextRules）の判断と、S1000D への準拠の判定は、どの部品にも含みません。
 
 ## 全体像
 
@@ -33,13 +36,13 @@ flowchart TB
     DOCS["docs/<br/>ROADMAP・DECISIONS・notes"]
   end
   subgraph Lib["lib/"]
-    CORE["s1000d-core<br/>DMC・ICN・識別・状態部・BREX 照合"]
-    MODEL["manual-model<br/>共通データモデル（S1000D に依存しない）"]
+    CORE["s1000d-core<br/>DMC・ICN・識別・状態部・BREX 照合<br/>XSD・参照・適用性・本文"]
+    MODEL["experiential-manual-model<br/>共通データモデル（S1000D に依存しない）"]
   end
   subgraph Mcp["mcp/"]
     BREX["s1000d-brex-mcp"]
-    R["s1000d-reader-mcp（予定）"]
-    V["s1000d-verify-mcp（予定）"]
+    R["s1000d-reader-mcp"]
+    V["s1000d-verify-mcp"]
     W["s1000d-writer-mcp（予定）"]
   end
   subgraph App["app/"]
@@ -68,10 +71,10 @@ flowchart TB
 | リポジトリ | 役割 | 配布形態 | 状態 | 版 | npm |
 | --- | --- | --- | --- | --- | --- |
 | [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | core | library | 公開済み | 0.2.0 | `@shuji-bonji/s1000d-core` |
-| s1000d-brex-mcp | mcp | mcp-server | 開発中 | 0.1.0 | — |
-| s1000d-verify-mcp | mcp | mcp-server | 開発中 | 0.1.0 | — |
-| s1000d-reader-mcp | mcp | mcp-server | 開発中 | 0.1.0 | — |
-| experiential-manual-model | model | library | 開発中 | 0.1.0 | — |
+| [s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | mcp | mcp-server | 公開済み | 0.1.0 | `@shuji-bonji/s1000d-brex-mcp` |
+| [s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | mcp | mcp-server | 公開済み | 0.1.0 | `@shuji-bonji/s1000d-verify-mcp` |
+| [s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | mcp | mcp-server | 公開済み | 0.1.0 | `@shuji-bonji/s1000d-reader-mcp` |
+| [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | model | library | 公開済み | 0.1.0 | `@shuji-bonji/experiential-manual-model` |
 | s1000d-writer-mcp | mcp | mcp-server | 予定 | — | — |
 | s1000d-skills | procedure | skill | 構想 | — | — |
 | manual-editor | app | app | 構想 | — | — |

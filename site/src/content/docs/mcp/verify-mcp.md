@@ -78,6 +78,3 @@ XSD validation is done with `libxml2-wasm` (the WebAssembly build of libxml2); e
 
 All 106 DMCs and 4 PMCs of the Bike Samples conform to the Issue 7 XSD. On the other hand, 954 of the 1,843 `dmRef` elements point to DMCs with the model identification code `S1000D`, that is, to chapters of the specification; they are not in the CSDB, so they are unresolved (almost all of them inside the business rules document `…-024A-D`). `check_references` returns these separately as `specificationReferences` and does not count them in `unresolved`. There is also 1 inconsistency where an ICN declared as `.PNG` in the DOCTYPE has an actual file with the extension `.SVG`, which is reported as `file-not-found`. No lenient resolution that tolerates a different extension is included, because a file that is not placed as declared is exactly the kind of fact a delivery inspection should find.
 
-:::note[Release status]
-As of 2026-10-25, `@shuji-bonji/s1000d-verify-mcp` is not yet published on npm (in development). It will be published together with `s1000d-brex-mcp` once the stage 2 components are complete. From the repository, run `npm install && npm run build` and start it with `node dist/index.js`.
-:::

@@ -16,12 +16,12 @@ flowchart TB
   end
   subgraph Lib["共有ライブラリ"]
     CORE["s1000d-core<br/>公開済み（npm 0.2.0）"]
-    MODEL["experiential-manual-model<br/>開発中（段階 2）"]
+    MODEL["experiential-manual-model<br/>公開済み（npm 0.1.0）"]
   end
   subgraph Mcp["MCP サーバー"]
-    BREX["s1000d-brex-mcp<br/>開発中（段階 1）"]
-    R["s1000d-reader-mcp<br/>開発中（段階 2）"]
-    V["s1000d-verify-mcp<br/>開発中（段階 2）"]
+    BREX["s1000d-brex-mcp<br/>公開済み（npm 0.1.0）"]
+    R["s1000d-reader-mcp<br/>公開済み（npm 0.1.0）"]
+    V["s1000d-verify-mcp<br/>公開済み（npm 0.1.0）"]
     W["s1000d-writer-mcp<br/>予定（段階 3）"]
   end
   subgraph App["製品"]
@@ -39,13 +39,13 @@ flowchart TB
   SK -.-> Mcp
 ```
 
-| 部品 | 役割 | 状態（2026-10-25） |
+| 部品 | 役割 | 状態（2026-10-26） |
 | --- | --- | --- |
 | [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | DMC・ICN・識別・状態部・BREX 照合・XSD 検証・参照の解決・適用性の評価・本文の読み取りの共有ライブラリ | npm 0.2.0 公開済み |
-| s1000d-brex-mcp | BREX の説明と照合（5 ツール） | 開発中。npm 未公開 |
-| [s1000d-reader-mcp](/s1000d-stack/ja/mcp/reader-mcp/) | データモジュールの本文を構造化して返す、参照の解決、適用性の判定（6 ツール） | 開発中。npm 未公開 |
-| [s1000d-verify-mcp](/s1000d-stack/ja/mcp/verify-mcp/) | 公式 XSD による検証、BREX 照合、参照切れの検出（5 ツール） | 開発中。npm 未公開 |
-| experiential-manual-model | 体験型マニュアルの共通データモデル（S1000D に依存しない）。型・JSON Schema・検査・2021 年の作品からの変換 | 開発中。npm 未公開 |
+| [s1000d-brex-mcp](/s1000d-stack/ja/mcp/brex-mcp/) | BREX の説明と照合（5 ツール） | npm 0.1.0 公開済み |
+| [s1000d-reader-mcp](/s1000d-stack/ja/mcp/reader-mcp/) | データモジュールの本文を構造化して返す、参照の解決、適用性の判定（6 ツール） | npm 0.1.0 公開済み |
+| [s1000d-verify-mcp](/s1000d-stack/ja/mcp/verify-mcp/) | 公式 XSD による検証、BREX 照合、参照切れの検出（5 ツール） | npm 0.1.0 公開済み |
+| [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | 体験型マニュアルの共通データモデル（S1000D に依存しない）。型・JSON Schema・検査・2021 年の作品からの変換 | npm 0.1.0 公開済み |
 | s1000d-writer-mcp | 共通データモデルからデータモジュールを生成 | 予定（段階 3） |
 | Skill | experience-to-s1000d / s1000d-publish / s1000d-review | 構想（段階 3） |
 | 作成ツール・閲覧ソフト | 人が使う製品。AI が無くても動く | 構想（段階 3〜4） |

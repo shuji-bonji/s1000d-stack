@@ -2,7 +2,7 @@
 
 LLM が S1000D の技術文書を正しく読み、プロジェクトの決まり（ビジネスルール）に沿って検査・作成できるようにするための MCP サーバー・共有ライブラリ・Skill と、体験型マニュアルの作成ツール・閲覧ソフトをまとめるプロジェクトです。
 
-- 作成日: 2026-10-23（JST）、更新日: 2026-10-24（JST、段階 2 の作業を追記）
+- 作成日: 2026-10-23（JST）、更新日: 2026-10-26（JST、段階 2 の完了を記録）
 - 構成の手本: [houki-hub](https://github.com/shuji-bonji/houki-hub)、[pdf-agent-stack](https://github.com/shuji-bonji/pdf-agent-stack)
 - 決定事項: [DECISIONS.md](./DECISIONS.md)
 - 調査メモ: [notes/background.md](./notes/background.md)
@@ -58,7 +58,7 @@ experiential-manual-model（文書の中では「manual-model」と略します�
 | 段階 | 成果物 | 完了の条件 |
 |---|---|---|
 | 1 | s1000d-stack（サイトの骨組みと用語の説明）、s1000d-core、s1000d-brex-mcp | **自動**: 自作 BREX と自作データモジュールで、BREX の説明と照合のテストが CI で通る（2026-10-23 済み）。**手動**: 既定の BREX（利用者が入手したもの）を `explain_brex` で読み、自作データモジュールを照合して、結果が仕様書の BREX の章の記述と矛盾しないことを確認済み（2026-10-23 済み。券売機の説明 DM は既定 BREX の 243 ルールに違反なし）。**サイト**: BREX・データモジュールの説明を仕様書と照合済み（2026-10-24 に、作業 3 で読んだ Chap 4.10.2〜4.10.3・7.9 と既定 BREX の実測に基づいて執筆。2026-10-24 に利用者が 9 ページを通読し、仕様書との矛盾が無いことを確認済み。確認の根拠は [notes/site-review.md](./notes/site-review.md)）。**段階 1 は 2026-10-24 に完了** |
-| 2 | s1000d-reader-mcp、s1000d-verify-mcp、manual-model | 公式 XSD（利用者が入手したもの）による検証、参照の解決、適用性の判定ができる。reader の応答には対象データモジュールの版（issue）と検証状態を必ず含め、適用性の判定は reader が済ませてから LLM に渡す |
+| 2 | s1000d-reader-mcp、s1000d-verify-mcp、manual-model | 公式 XSD（利用者が入手したもの）による検証、参照の解決、適用性の判定ができる。reader の応答には対象データモジュールの版（issue）と検証状態を必ず含め、適用性の判定は reader が済ませてから LLM に渡す。**段階 2 は 2026-10-26 に完了**（3 部品と brex-mcp を npm に公開、hub と学習サイトを公開） |
 | 2.5 | 修正提案（verify-mcp `suggest_fixes`）、`CsdbSource` インターフェース、HTTP transport、DML・DDN の読み取り、サイトの「組み込み基盤」のページ | LLM エージェントがスキーマ検証・クロスリファレンスチェック・適用性チェック・修正提案の 4 つをできる。修正提案の候補は core が決め、LLM は候補の外の値を出さない。CSDB をフォルダー以外（製品のデータベース・API）から読める |
 | 3 | s1000d-writer-mcp（LLM に XML を書かせず、構造化された入力から組み立てて「生成 → 検証 → 修正」を回す）、Skill（experience-to-s1000d / s1000d-publish / s1000d-review。STE の用語集は利用者のものを参照）、作成ツールの試作、comment DM の生成、翻訳向けの文の抜き出しと差し戻し | 券売機の例を共通データモデル経由で S1000D に出力し、verify を通る |
 | 4 | 閲覧ソフト。最初の成果物は、S1000D の CSDB を直接表示する簡易な技術マニュアルの Web システム（基盤の参照実装。設計は [design/agent-platform.md](./design/agent-platform.md)「参照実装」）。その後に共通データモデルを表示する閲覧ソフト | 簡易 Web マニュアルで、PM の目次から DM をたどり、製品を選ぶと当てはまらない節が消え、参照先へ移れ、各ページに版・検証状態・機密区分が出る。閲覧ソフトは共通データモデルを表示し、WebMCP で AI が操作を案内できる |
@@ -181,7 +181,7 @@ flowchart LR
 | 7 | 済み（2026-10-25、reader-mcp の `6e567c7`）。6 ツール（`list_data_modules` / `read_data_module` / `read_publication_module` / `resolve_reference` / `describe_applicability` / `read_icn_metadata`）、`instructions`、自作データのテスト 14 件（ACT・手順 DM・PM のフィクスチャを追加）、配布物のテスト 5 件、stdio の実機確認。D-18 のとおり既定は XSD 検証だけ、`product` 無しは `undetermined` ＋ `displayText`。適用性リポジトリは CSDB から集める。npm への公開は D-16 のとおり段階 2 が揃った時点 |
 | 8 | 済み（2026-10-25、`lib/experiential-manual-model` の `09f9d2c`。GitHub の `shuji-bonji/experiential-manual-model` は未作成、未 push）。型・JSON Schema・`validateManual`・`fromLegacyJson`・`numberSteps`・券売機の例 `examples/kenbaiki.manual.json`。実行時の依存なし。テスト 10 件（2021 年の `JSON.json` 79 画面・212 ボタンが読め、検査と JSON Schema を通る）。2021 年の JSON の実際のフィールド名は README の推測と違い `purchaseTypes` / `screenID` / `destination` だった（両方読む） |
 | 9 | 済み（2026-10-25、hub の `bd61c95`）。サイトに `guide/applicability`・`mcp/verify-mcp`・`mcp/reader-mcp` を追加し、brex-mcp・guide/brex・about/stack・core・index・getting-started を 2026-10-25 時点に直した。`generate-stack.mjs` の REGISTRY を更新し `stack.json` と README の表を再生成（npm 照合は一致）。13 ページがビルドでき、内部リンクの切れは無い。**新しい 3 ページの通読（記述と仕様書・実装の照合）は利用者が行う**（段階 1 の notes/site-review.md と同じ要領） |
-| 10 | 未。作業 9 の通読が済んだら D-16 の手順で公開する |
+| 10 | 済み（2026-10-26）。4 パッケージ（`@shuji-bonji/experiential-manual-model`・`s1000d-brex-mcp`・`s1000d-verify-mcp`・`s1000d-reader-mcp`）の 0.1.0 を 16:24〜16:26 JST に手動で `npm publish` し、npm 側で Trusted Publisher を登録。4 リポジトリと hub を Public にし、GitHub Pages の Source を GitHub Actions にした。各リポジトリに `publish.yml`・`docs/RELEASE.md`・CHANGELOG 0.1.0 を追加。サイトの「npm 未公開」の note 4 か所（×2 言語）と `guide/architecture.md` の状態、hub README の「できること」と全体像の図を現状に直し、`deploy.yml` の push トリガーを戻し、REGISTRY の 4 つを `released` にして `stack.json` と README の表を再生成（npm 照合は 5 つとも一致）。サイトは 28 ページ（14 × 2 言語）がビルドでき、`check:i18n` ok、内部リンク切れ無し。手順の記録は notes/handoff.md の 10-0〜10-4。**段階 2 は 2026-10-26 に完了** |
 | 保守 | 2026-10-25: 4 リポジトリの `vitest` を 2.1 → 4.1 に上げた（2.x の依存に脆弱性の報告 6 件。開発時だけの依存。`npm audit` 0 件）。brex-mcp の CI の Node を 22・24 に揃えた（`engines` が >=22 のため） |
 
 ## 段階 2.5 の作業（組み込み基盤に向けて）

@@ -87,6 +87,3 @@ flowchart TB
 
 `kind` は `forbidden`（使ってはならない対象があった）、`missing`（必ず含める対象が無かった）、`value`（値が許可値に合わない）、`notation`（使っている図の形式が許可されていない）の 4 つです。
 
-:::note[公開の状態]
-`@shuji-bonji/s1000d-brex-mcp` は 2026-10-25 時点で npm 未公開（開発中）です。段階 2 の部品（`s1000d-verify-mcp`・`s1000d-reader-mcp`）と一緒に公開します。リポジトリから `npm install && npm run build` して `node dist/index.js` を起動できます。
-:::

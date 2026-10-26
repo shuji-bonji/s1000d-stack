@@ -5,18 +5,14 @@ name: Deploy site to GitHub Pages
 # 初回は GitHub の Settings → Pages → Source を "GitHub Actions" にしておく必要がある。
 # 公開先: https://shuji-bonji.github.io/s1000d-stack/
 #
-# リポジトリが Private の間は Pages を有効にできない（Free プラン）ため、push では動かさず
-# 手動実行（workflow_dispatch）だけにしてある。hub を Public にしたら（DECISIONS U-01）、
-# 下の push トリガーのコメントを外す。
-#
-# on:
-#   push:
-#     branches: [main]
-#     paths:
-#       - 'site/**'
-#       - '.github/workflows/deploy.yml'
+# hub は 2026-10-26 に Public にした（DECISIONS D-16）。main への push で配備する。手動実行も残す。
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
 permissions:

@@ -121,6 +121,3 @@ flowchart LR
 }
 ```
 
-:::note[公開の状態]
-`@shuji-bonji/s1000d-reader-mcp` は 2026-10-25 時点で npm 未公開（開発中）です。段階 2 の部品が揃った時点で公開します。リポジトリから `npm install && npm run build` して `node dist/index.js` を起動できます。
-:::

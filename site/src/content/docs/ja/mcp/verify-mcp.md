@@ -78,6 +78,3 @@ XSD 検証は `libxml2-wasm`（libxml2 の WebAssembly 版）で行い、XSD ご
 
 Bike Samples の DMC 106 件と PMC 4 件は、すべて Issue 7 の XSD に適合します。一方、`dmRef` 1,843 件のうち 954 件はモデル識別コード `S1000D` の DMC、つまり仕様書の章への参照で、CSDB には無いので未解決になります（ほぼすべてビジネスルール文書 `…-024A-D` の中）。`check_references` はこれを `specificationReferences` として別枠で返し、`unresolved` には入れません。また、DOCTYPE で `.PNG` と宣言された ICN の実ファイルが `.SVG` という不整合が 1 件あり、`file-not-found` として報告されます。拡張子の違いを許す寛容な解決は入れていません。宣言どおりに置かれていないことは、納品の検査で見つけたい事実だからです。
 
-:::note[公開の状態]
-`@shuji-bonji/s1000d-verify-mcp` は 2026-10-25 時点で npm 未公開（開発中）です。段階 2 の部品が揃った時点で `s1000d-brex-mcp` と一緒に公開します。リポジトリから `npm install && npm run build` して `node dist/index.js` を起動できます。
-:::

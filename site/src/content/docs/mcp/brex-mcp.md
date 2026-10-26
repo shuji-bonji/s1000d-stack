@@ -87,6 +87,3 @@ One violation from `check_against_brex` has the following shape.
 
 `kind` is one of 4 values: `forbidden` (a target that must not be used was present), `missing` (a target that must be included was absent), `value` (the value does not match an allowed value) and `notation` (the illustration format in use is not allowed).
 
-:::note[Release status]
-As of 2026-10-25, `@shuji-bonji/s1000d-brex-mcp` is not yet published on npm (in development). It will be published together with the stage 2 components (`s1000d-verify-mcp` and `s1000d-reader-mcp`). You can run it from the repository with `npm install && npm run build` and then start `node dist/index.js`.
-:::

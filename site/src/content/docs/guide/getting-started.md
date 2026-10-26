@@ -49,9 +49,6 @@ Once it is registered, try asking for things like these.
 - "Check this data module (path) against the BREX and list the violations" → `check_against_brex`
 - "What does `01` for `securityClassification` mean in this BREX?" → `lookup_value`
 
-:::note[Publication of s1000d-brex-mcp]
-As of 2026-10-25, `@shuji-bonji/s1000d-brex-mcp`, `@shuji-bonji/s1000d-verify-mcp` and `@shuji-bonji/s1000d-reader-mcp` are not yet published on npm (they are under development). Until they are published, clone the repository, run `npm install && npm run build`, and set `node dist/index.js` as the `command`. The shared library `@shuji-bonji/s1000d-core` (0.2.0) is already published on npm.
-:::
 
 ## What to read next
 

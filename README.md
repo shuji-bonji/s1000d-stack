@@ -12,16 +12,19 @@ This repository holds only the stack manifest (`stack.json`), the documentation 
 > This is a personal project and is not affiliated with ASD (Aerospace, Security and Defence Industries Association of Europe). S1000D® is a registered trademark of ASD.
 > The S1000D specification, XML schemas, default BREX and official samples are not included in any package or repository, because their terms of use do not grant redistribution. Obtain them from [s1000d.org](https://s1000d.org/) and point the `S1000D_SPEC_DIR` environment variable at the extracted folder.
 
-## What it does (stage 1)
+## What it does
 
-Lets parts manufacturers and technical publication companies use an LLM to understand the BREX (Business Rules Exchange) handed over by a customer and to confirm that their own data modules follow it.
+Stage 1 (understanding and checking against BREX) and stage 2 (verification and reading as structure) are complete. Parts manufacturers and technical publication companies can use an LLM to understand the BREX (Business Rules Exchange) handed over by a customer, to confirm that their own data modules follow the XML schema (XSD) and the BREX, and to read data modules as structure rather than as XML.
 
 | Component | Role |
 | --- | --- |
-| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | Splits DMCs and ICNs, reads the identification and status section, reads and checks against BREX. The shared library that every MCP depends on (npm: `@shuji-bonji/s1000d-core`) |
-| s1000d-brex-mcp | An MCP server that lists BREX rules in a form people can read (`explain_brex`), looks up the meaning of SNS and attribute values (`lookup_sns` / `lookup_value`), returns the illustration formats that may be used (`list_notations`), and checks data modules against the BREX chain (`check_against_brex`) |
+| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | Splits DMCs and ICNs, reads the identification and status section, reads and checks against BREX, validates against the XSD, resolves references, evaluates applicability and reads the content section. The shared library that every MCP depends on (npm: `@shuji-bonji/s1000d-core`) |
+| [s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | An MCP server that lists BREX rules in a form people can read (`explain_brex`), looks up the meaning of SNS and attribute values (`lookup_sns` / `lookup_value`), returns the illustration formats that may be used (`list_notations`), and checks data modules against the BREX chain (`check_against_brex`) |
+| [s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | An MCP server that validates one data module in the order well-formedness → XSD → BREX chain → references (`verify_data_module`), runs XSD validation only (`validate_schema`), resolves references (`check_references`), validates a whole folder (`verify_csdb`) and lists the XSDs it found (`list_schemas`). The results are returned combined into a single verification status (`verification`) |
+| [s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | An MCP server that reads data modules and publication modules as structure (`read_data_module` / `read_publication_module`), lists a CSDB and resolves references (`list_data_modules` / `resolve_reference`), returns the applicability vocabulary (`describe_applicability`) and reads ICN metadata (`read_icn_metadata`). The server evaluates which product the content applies to, and every response carries the verification status |
+| [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | The common data model for experiential operation manuals (TypeScript types, JSON Schema, validation and a converter from the 2021 JSON). Independent of S1000D (npm: `@shuji-bonji/experiential-manual-model`) |
 
-The check follows Chap 4.10.2 (BREX data module) and Chap 7.9 (Business rules processing) of S1000D Issue 7, and applies the `brexDmRef` chain (project → organisation → default BREX) to each layer separately. It does not include validation against the XML schema (XSD) or judgement of agreements written as prose (nonContextRules).
+The BREX check follows Chap 4.10.2 (BREX data module) and Chap 7.9 (Business rules processing) of S1000D Issue 7, and applies the `brexDmRef` chain (project → organisation → default BREX) to each layer separately. XSD validation uses the XSDs from the S1000D distribution you obtained. Judgement of agreements written as prose (nonContextRules) and judgement of conformance to S1000D are not included in any component.
 
 ## Overview
 
@@ -33,13 +36,13 @@ flowchart TB
     DOCS["docs/<br/>ROADMAP, DECISIONS, notes"]
   end
   subgraph Lib["lib/"]
-    CORE["s1000d-core<br/>DMC, ICN, identification and status section, BREX check"]
-    MODEL["manual-model<br/>common data model (independent of S1000D)"]
+    CORE["s1000d-core<br/>DMC, ICN, identification and status section, BREX check<br/>XSD, references, applicability, content"]
+    MODEL["experiential-manual-model<br/>common data model (independent of S1000D)"]
   end
   subgraph Mcp["mcp/"]
     BREX["s1000d-brex-mcp"]
-    R["s1000d-reader-mcp (planned)"]
-    V["s1000d-verify-mcp (planned)"]
+    R["s1000d-reader-mcp"]
+    V["s1000d-verify-mcp"]
     W["s1000d-writer-mcp (planned)"]
   end
   subgraph App["app/"]
@@ -68,10 +71,10 @@ The expert agents (MCP and Skills) come first; the products (authoring tool and 
 | Repository | Layer | Form | Status | Version | npm |
 | --- | --- | --- | --- | --- | --- |
 | [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | core | library | released | 0.2.0 | `@shuji-bonji/s1000d-core` |
-| s1000d-brex-mcp | mcp | mcp-server | in development | 0.1.0 | — |
-| s1000d-verify-mcp | mcp | mcp-server | in development | 0.1.0 | — |
-| s1000d-reader-mcp | mcp | mcp-server | in development | 0.1.0 | — |
-| experiential-manual-model | model | library | in development | 0.1.0 | — |
+| [s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | mcp | mcp-server | released | 0.1.0 | `@shuji-bonji/s1000d-brex-mcp` |
+| [s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | mcp | mcp-server | released | 0.1.0 | `@shuji-bonji/s1000d-verify-mcp` |
+| [s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | mcp | mcp-server | released | 0.1.0 | `@shuji-bonji/s1000d-reader-mcp` |
+| [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | model | library | released | 0.1.0 | `@shuji-bonji/experiential-manual-model` |
 | s1000d-writer-mcp | mcp | mcp-server | planned | — | — |
 | s1000d-skills | procedure | skill | concept | — | — |
 | manual-editor | app | app | concept | — | — |

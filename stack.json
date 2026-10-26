@@ -6,7 +6,7 @@
     "layer = 役割 / form = 配布形態（誰が起動するか）/ status = released・developing・planned・concept。",
     "developing はリポジトリで開発中で npm 未公開。planned / concept はディレクトリも npm も無い。"
   ],
-  "generatedAt": "2026-10-26T05:10:17.627Z",
+  "generatedAt": "2026-10-26T07:37:53.757Z",
   "generatedBy": "scripts/generate-stack.mjs",
   "npmScope": "@shuji-bonji",
   "repos": [
@@ -23,7 +23,7 @@
       "local": {
         "version": "0.2.0",
         "tag": "v0.2.0",
-        "dirty": true,
+        "dirty": false,
         "unpushedCommits": 0
       },
       "consistency": {
@@ -37,19 +37,19 @@
       "npm": "@shuji-bonji/s1000d-brex-mcp",
       "layer": "mcp",
       "form": "mcp-server",
-      "status": "developing",
-      "public": false,
+      "status": "released",
+      "public": true,
       "note": "BREX を LLM が読み、データモジュールを BREX に照合する。explain_brex / lookup_sns / lookup_value / list_notations / check_against_brex の 5 tools。段階 1 の成果物",
-      "published": null,
+      "published": "0.1.0",
       "local": {
         "version": "0.1.0",
         "tag": null,
-        "dirty": true,
+        "dirty": false,
         "unpushedCommits": 0
       },
       "consistency": {
-        "status": "developing",
-        "detail": "npm 未公開（開発中）。照合対象外"
+        "status": "match",
+        "detail": "0.1.0"
       }
     },
     {
@@ -58,19 +58,19 @@
       "npm": "@shuji-bonji/s1000d-verify-mcp",
       "layer": "mcp",
       "form": "mcp-server",
-      "status": "developing",
-      "public": false,
+      "status": "released",
+      "public": true,
       "note": "段階 2。利用者が入手した公式 XSD による検証 ＋ BREX 照合（core を呼ぶ）＋ 参照の解決を 1 つの検証状態にまとめる。verify_data_module / validate_schema / check_references / verify_csdb / list_schemas の 5 tools",
-      "published": null,
+      "published": "0.1.0",
       "local": {
         "version": "0.1.0",
         "tag": null,
-        "dirty": true,
+        "dirty": false,
         "unpushedCommits": 0
       },
       "consistency": {
-        "status": "developing",
-        "detail": "npm 未公開（開発中）。照合対象外"
+        "status": "match",
+        "detail": "0.1.0"
       }
     },
     {
@@ -79,19 +79,19 @@
       "npm": "@shuji-bonji/s1000d-reader-mcp",
       "layer": "mcp",
       "form": "mcp-server",
-      "status": "developing",
-      "public": false,
+      "status": "released",
+      "public": true,
       "note": "段階 2。データモジュールの本文を構造化して返す、参照の解決、適用性の判定（式は LLM に渡さない）。応答に検証状態を含める。list_data_modules / read_data_module / read_publication_module / resolve_reference / describe_applicability / read_icn_metadata の 6 tools",
-      "published": null,
+      "published": "0.1.0",
       "local": {
         "version": "0.1.0",
         "tag": null,
-        "dirty": true,
+        "dirty": false,
         "unpushedCommits": 0
       },
       "consistency": {
-        "status": "developing",
-        "detail": "npm 未公開（開発中）。照合対象外"
+        "status": "match",
+        "detail": "0.1.0"
       }
     },
     {
@@ -100,19 +100,19 @@
       "npm": "@shuji-bonji/experiential-manual-model",
       "layer": "model",
       "form": "library",
-      "status": "developing",
-      "public": false,
+      "status": "released",
+      "public": true,
       "note": "段階 2。体験型マニュアルの共通データモデル（型・JSON Schema・検査・2021 年の作品 JSON からの変換）。S1000D に依存しない。名前は U-04 で確定",
-      "published": null,
+      "published": "0.1.0",
       "local": {
         "version": "0.1.0",
         "tag": null,
-        "dirty": true,
+        "dirty": false,
         "unpushedCommits": 0
       },
       "consistency": {
-        "status": "developing",
-        "detail": "npm 未公開（開発中）。照合対象外"
+        "status": "match",
+        "detail": "0.1.0"
       }
     },
     {
@@ -122,8 +122,8 @@
       "layer": "hub",
       "form": "site",
       "status": "developing",
-      "public": false,
-      "note": "本リポジトリ。site/ に Astro Starlight の学習サイト（GitHub Pages で公開予定）",
+      "public": true,
+      "note": "本リポジトリ。site/ に Astro Starlight の学習サイト（GitHub Pages で公開。英語がルート、日本語は /ja/）",
       "published": null,
       "local": {
         "version": null,

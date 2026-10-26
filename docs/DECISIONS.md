@@ -141,7 +141,7 @@ flowchart LR
 ### D-14 npm への公開は Trusted Publisher で行う（2026-10-24）
 
 - 各パッケージの公開は、`v*` の tag を push したときに GitHub Actions が OIDC で `npm publish --provenance --access public` を実行する方式にします（houki-abbreviations の `publish.yml` と同じ）。`NPM_TOKEN` は Secrets に置きません。
-- Trusted Publisher は既存パッケージにしか設定できないため、各パッケージの **初回だけは手動で** `npm publish --access public` を行い、その後に npm 側で Trusted Publisher（Repository と `publish.yml`）を登録します。s1000d-core は 2026-10-24 に 0.1.0 を手動公開済みで、npm 側の登録は作業中。
+- Trusted Publisher は既存パッケージにしか設定できないため、各パッケージの **初回だけは手動で** `npm publish --access public` を行い、その後に npm 側で Trusted Publisher（Repository と `publish.yml`）を登録します。s1000d-core は 2026-10-24 に 0.1.0 を手動公開し、Trusted Publisher を登録済み（0.2.0 はタグ push で公開）。残りの 4 パッケージは 2026-10-26 に 0.1.0 を手動公開し、同日に Trusted Publisher を登録済み。
 - 手順は各リポジトリの `docs/RELEASE.md` に書きます。
 
 ### D-15 XSD 検証は libxml2-wasm で行う（2026-10-24）
@@ -157,6 +157,7 @@ flowchart LR
 - U-01 の判断です。s1000d-core は 2026-10-24 に公開済みですが、hub（学習サイト）と s1000d-brex-mcp の公開は、段階 2（s1000d-reader-mcp、s1000d-verify-mcp、manual-model）が揃った時点で行います。
 - 理由は、BREX の照合だけでは「XSD 未検証」の前提付きの結果になり、verify-mcp と一緒に出したほうが利用者が結果を正しく読めるためです。
 - 公開時の作業は次のとおりです。(1) hub を Public にし、GitHub Pages の Source を GitHub Actions にする。(2) `deploy.yml` の push トリガーを戻す。(3) brex-mcp を Public にし、初回だけ手動で `npm publish --access public`、その後 npm 側で Trusted Publisher を登録する（D-14）。(4) サイトの `guide/getting-started.md` と `mcp/brex-mcp.md` の「npm 未公開（開発中）」の note を消す。(5) `stack.json` の brex-mcp の status を `released` にする。
+- **公開日: 2026-10-26（JST）。** 4 パッケージ（experiential-manual-model → brex-mcp → verify-mcp → reader-mcp の順）の 0.1.0 を手動で `npm publish` し、Trusted Publisher を登録。4 リポジトリと hub を Public にし、Pages の Source を GitHub Actions にした。上の (1)〜(5) はすべて済み（(4) は verify-mcp・reader-mcp のページと英語版も含めて 8 か所）。段階 2 の完了日でもある。
 
 ### D-17 XSD 検証のインターフェースと実装は s1000d-core に置く（2026-10-24）
 

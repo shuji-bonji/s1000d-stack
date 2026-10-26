@@ -49,9 +49,6 @@ Claude Desktop の設定ファイル（`claude_desktop_config.json`）に次を�
 - 「このデータモジュール（パス）を BREX に照合して、違反を一覧にして」 → `check_against_brex`
 - 「`securityClassification` の `01` はこの BREX では何を意味する？」 → `lookup_value`
 
-:::note[s1000d-brex-mcp の公開について]
-`@shuji-bonji/s1000d-brex-mcp`、`@shuji-bonji/s1000d-verify-mcp`、`@shuji-bonji/s1000d-reader-mcp` は 2026-10-25 時点で npm 未公開（開発中）です。公開までは、リポジトリを clone して `npm install && npm run build` し、`node dist/index.js` を `command` に指定して使えます。共有ライブラリ `@shuji-bonji/s1000d-core`（0.2.0）は npm に公開済みです。
-:::
 
 ## 次に読むもの
 
