@@ -5,8 +5,8 @@ template: splash
 hero:
   tagline: S1000D® の技術文書を、LLM がプロジェクトの決まり（BREX、Business Rules Exchange）に沿って読み、検査し、作れるようにする道具の束ねです。
   actions:
-    - text: はじめに
-      link: /s1000d-stack/guide/getting-started/
+    - text: S1000D Stack とは
+      link: /s1000d-stack/guide/overview/
       icon: right-arrow
     - text: GitHub
       link: https://github.com/shuji-bonji/s1000d-stack
@@ -14,7 +14,7 @@ hero:
       variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 <CardGrid stagger>
   <Card title="BREX を読む" icon="open-book">
@@ -32,6 +32,11 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
   <Card title="この先" icon="rocket">
     共通データモデルから S1000D を生成する writer、そして体験型マニュアルの作成ツールと閲覧ソフトへ広げます。共通データモデル experiential-manual-model は S1000D に依存しません。
   </Card>
+</CardGrid>
+
+<CardGrid>
+  <LinkCard title="導入手順" description="配布物の入手、環境変数、MCP クライアントへの登録から最初の操作まで。" href="/s1000d-stack/guide/getting-started/" />
+  <LinkCard title="ユースケース" description="渡された BREX を読む、既存のデータモジュールを検証して読む、軽い Web 形式から S1000D へ出力する。" href="/s1000d-stack/use-cases/" />
 </CardGrid>
 
 :::note[商標について]

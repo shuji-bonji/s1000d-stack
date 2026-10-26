@@ -1,9 +1,9 @@
 ---
 title: 適用性（どの製品に当てはまるか）
-description: S1000D の適用性の仕組み（ACT・CCT・PCT と applic）と、s1000d-reader-mcp がそれをどう判定して LLM に渡すかを説明します。
+description: S1000D の適用性の仕組み（ACT・CCT・PCT と applic 文）と、式がどう評価されるかを説明します。
 ---
 
-S1000D のデータモジュールは、1 つの文書で複数の機種・構成を扱えるように作られています。「この段落は MV-60 だけ」「この手順は改修 001 を適用した後の機体だけ」のような条件を **適用性（applicability）** と呼び、文書の中に機械が読める形で書きます。LLM がマニュアルを読んで答えるとき、利用者の製品に当てはまらない段落を混ぜて答えてしまわないために、この仕組みを押さえておく必要があります。
+S1000D のデータモジュールは、1 つの文書で複数の機種・構成を扱えるように作られています。「この段落は MV-60 だけ」「この手順は改修 001 を適用した後の機体だけ」のような条件を **適用性（applicability）** と呼び、文書の中に機械が読める形で書きます。読み手は、自分の製品に当てはまらない段落を混ぜて読まないために、この仕組みを押さえておく必要があります。
 
 ## 3 つの表と applic 文
 
@@ -32,9 +32,24 @@ flowchart LR
 | `\|` 区切り | `Mk1\|Mk9` | どれか 1 つと一致 |
 | `~` の範囲 | `1~3`、`POST-001~POST-999` | 共通の接頭辞＋数字の範囲に入る |
 
-## LLM に式を渡さない
+## 式の評価のしかた
 
-`assert` と `evaluate` の式を LLM に見せて「この製品に当てはまるか」を判断させると、`and` と `or` の入れ子や範囲の書式を読み違えることがあります。このスタックでは、判定は `s1000d-reader-mcp` が行い、LLM には結果だけを渡します。
+ある製品にある要素が当てはまるかは、次の手順で決まります。
+
+1. 製品の属性と条件の値（PCT の 1 行、または利用者が指定した値の組）を用意します。
+2. `assert` ごとに、製品の値が `applicPropertyValues` のどれかに一致するかを見ます。製品にその属性の値が無ければ、その `assert` は判定できません。
+3. `evaluate` の `and` は 1 つでも偽があれば偽、`or` は 1 つでも真があれば真と確定します。
+4. 要素の適用範囲は、その要素（または最も近い祖先）の `applicRefId` が指す `applic` と、文書全体の `applic` を and で結んだものです。
+
+`and` と `or` の入れ子や範囲の書式を読み違えると、当てはまらない段落を当てはまると判断してしまいます。この評価は人や LLM が式を読んで行うものではなく、機械が行うものです。
+
+### 別のデータモジュールにある適用性文
+
+`referencedApplicGroupRef/applicRef` は、`applicIdentValue` で別のデータモジュール（適用性リポジトリ）にある `applic` 文を指す書き方です。文書の中に式が無いため、評価には CSDB の中からリポジトリを見つける必要があります。
+
+## このスタックでは
+
+判定は `s1000d-reader-mcp` が上の手順で行い、LLM には `assert` と `evaluate` の式を渡さず、ブロックごとの結果（`applicable` / `notApplicable` / `undetermined`）と `displayText`、判定できなかった理由だけを渡します。`undetermined` は「当てはまらない」ではなく「製品に値が足りない」「リポジトリが無い」などで判定できなかった状態です。
 
 ```mermaid
 flowchart LR
@@ -43,30 +58,8 @@ flowchart LR
   EV --> R["ブロックごとに<br/>applicable / notApplicable / undetermined<br/>＋ displayText ＋ 理由"]
 ```
 
-判定は 3 値です。
-
-| 状態 | 意味 | LLM の読み方 |
-| --- | --- | --- |
-| `applicable` | 渡した製品に当てはまる | そのまま使う |
-| `notApplicable` | 当てはまらない | 答えに混ぜない。`omitNotApplicable` で本文から省ける |
-| `undetermined` | 判定できない。`reason` に「製品に `type` の値が無い」「`product` が渡されていない」などの理由 | 「当てはまらない」と読まない。足りない値を利用者に聞く |
-
-`and` は 1 つでも偽があれば偽、`or` は 1 つでも真があれば真と確定します。確定した枝で足りなかった値は理由に含めません。要素の判定は、その要素（または最も近い祖先）の `applicRefId` が指す `applic` と、文書全体の `applic` を and で結んだものです。
-
-## 製品の値をどう決めるか
-
-`s1000d-reader-mcp` の `describe_applicability` が、対象データモジュールの ACT・CCT・PCT を CSDB から探して、使える属性と値、PCT に登録された製品、文書の中の `applic` 文の一覧を返します。LLM はこれを見て利用者に「どの機種ですか」と聞き、答えを `product` として `read_data_module` に渡します。
-
-PCT に登録された製品をそのまま渡すこともできますが、PCT が値を割り当てていない属性があると、その属性を使う文は `undetermined` のままになります。`describe_applicability` はそのような属性を `propertiesNotAssignedInPct` として一覧にするので、不足分を補ってください。
+製品の値をどう決めるか（`describe_applicability`）、3 値をどう読むか、適用性リポジトリの解決は [s1000d-reader-mcp](/s1000d-stack/mcp/reader-mcp/#適用性と検証状態) に書いています。判定の論理は共有ライブラリ `s1000d-core` の `ApplicEvaluator` にあり、`s1000d-reader-mcp` と段階 3 の `s1000d-writer-mcp`（出力時に適用性を付ける）が同じものを使います。ACT・CCT・PCT の読み取り（`readAct` / `readCct` / `readPct`）、PCT の 1 行から製品を作る `productFromPct`、評価（`evaluateApplic`）も同じライブラリにあります。
 
 :::note[公式サンプルで分かったこと]
-Issue 7 の Bike Samples では、ACT が属性 `type` を定義し 110 件の `assert` が使っているのに、PCT の 3 製品はどれも `type` に値を割り当てていません。PCT の製品で判定すると、要素の `applic` 366 件のうち 310〜324 件が「製品に `type` の値が無い」理由で `undetermined` になります。判定の仕組みは正しく動いており、理由が 1 種類に集約されることで、補うべき値がはっきりします。また、PCT の条件値 `Pre` / `Post` は CCT の列挙 `PRE` / `POST-001~POST-999` と大文字小文字も書式も合いません。値の比較は完全一致のままにしてあり、配布物側の不整合がそのまま見えます。
+Issue 7 の Bike Samples では、ACT が属性 `type` を定義し 110 件の `assert` が使っているのに、PCT の 3 製品はどれも `type` に値を割り当てていません。PCT の製品で判定すると、要素の `applic` 366 件のうち 310〜324 件が「製品に `type` の値が無い」理由で `undetermined` になります。また、PCT の条件値 `Pre` / `Post` は CCT の列挙 `PRE` / `POST-001~POST-999` と大文字小文字も書式も合いません。このスタックは値の比較を完全一致のままにしてあり、配布物側の不整合がそのまま見えます。`applicIdentValue` で指す先の適用性リポジトリも Bike Samples には入っておらず、該当する 64 件は「リポジトリに無い」理由で `undetermined` になります。
 :::
-
-## 別のデータモジュールにある適用性文
-
-`referencedApplicGroupRef/applicRef` は、`applicIdentValue` で別のデータモジュール（適用性リポジトリ）にある `applic` 文を指す書き方です。reader は CSDB の中から `applic/@applicIdentValue` を持つデータモジュールを集めて解決します。Bike Samples には指す先が入っていないため、該当する 64 件は「リポジトリに無い」理由で `undetermined` になります。
-
-## このスタックでの実装
-
-判定の論理は共有ライブラリ `s1000d-core` の `ApplicEvaluator` にあり、`s1000d-reader-mcp` と段階 3 の `s1000d-writer-mcp`（出力時に適用性を付ける）が同じものを使います。ACT・CCT・PCT の読み取り（`readAct` / `readCct` / `readPct`）、PCT の 1 行から製品を作る `productFromPct`、評価（`evaluateApplic`）も同じライブラリにあります。

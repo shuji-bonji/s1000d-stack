@@ -16,7 +16,7 @@ flowchart TB
   C --> X["種類ごとの要素<br/>description / procedure / brex / …"]
 ```
 
-識別・状態部には、本文を読まなくても分かる管理情報が集まっています。このプロジェクトの `s1000d-core` は、まずここを読みます。
+識別・状態部には、本文を読まなくても分かる管理情報が集まっています。
 
 | 要素 | 入っているもの | 何に使うか |
 | --- | --- | --- |
@@ -25,11 +25,11 @@ flowchart TB
 | `dmTitle` | 技術名称（`techName`）と情報名（`infoName`） | 人が読む題名 |
 | `dmStatus/@issueType` | new / changed / … | 改版の種類 |
 | `security` | 機密区分 | 配布の制御 |
-| `applic` | どの機種・構成に当てはまるか | [適用性](/s1000d-stack/guide/applicability/)の判定（`s1000d-reader-mcp`） |
+| `applic` | どの機種・構成に当てはまるか | [適用性](/s1000d-stack/guide/applicability/)の判定 |
 | `brexDmRef` | 従うべき BREX の DMC | BREX 照合の起点 |
 | `qualityAssurance` | 未検証 / 第 1 検証 / 第 2 検証 | 検証状態の明示 |
 
-内容部はデータモジュールの種類ごとに違います。種類はルート要素 `dmodule` の `xsi:noNamespaceSchemaLocation` が指すスキーマのファイル名（`descript.xsd`、`proced.xsd`、`brex.xsd` など）で分かります。この URL には版も入っており（`http://www.s1000d.org/S1000D_7/xml_schema_flat/descript.xsd` なら Issue 7）、`s1000d-core` はここから版と種類を推定します。
+内容部はデータモジュールの種類ごとに違います。種類はルート要素 `dmodule` の `xsi:noNamespaceSchemaLocation` が指すスキーマのファイル名（`descript.xsd`、`proced.xsd`、`brex.xsd` など）で分かります。この URL には版も入っており（`http://www.s1000d.org/S1000D_7/xml_schema_flat/descript.xsd` なら Issue 7）、ここから版と種類が分かります。
 
 ## DMC の読み方
 
@@ -67,7 +67,7 @@ DMC-KENBAIKI-A-10-20-00-00A-040A-D_002-01_JA-JP.XML
     └── DMC ──────────────────────┘ └発行┘ └言語┘
 ```
 
-`_002-01` が発行番号と作業中番号、`_JA-JP` が言語と国です。`s1000d-core` の `parseDmcFileName` はこの形を分解し、`readDataModuleInfo` は中身の `dmCode` と突き合わせられます。
+`_002-01` が発行番号と作業中番号、`_JA-JP` が言語と国です。
 
 :::note[配布物の見本には例外があります]
 S1000D 配布物のデータ辞書に含まれる見本ファイルには、`DMC-…_01-06.xml` のように発行情報ではなく例の通し番号が付いたものや、ファイル名の DMC と中身の DMC が一致しないものがあります。説明用の見本であり、CSDB の形ではありません。
@@ -75,11 +75,17 @@ S1000D 配布物のデータ辞書に含まれる見本ファイルには、`DMC
 
 ## 図と ICN
 
-図や動画はデータモジュールの XML には入らず、ICN（Information Control Number）で参照します。ICN には MIC を基にした書式と CAGE コードを基にした書式があり、`s1000d-core` の `parseIcn` は両方を分解します。ファイル形式は ICN に含まれず、DOCTYPE の `ENTITY` 宣言と `NOTATION` 宣言で対応付けます。使ってよい形式はプロジェクトの BREX（`notationRuleList`）で決めます。
+図や動画はデータモジュールの XML には入らず、ICN（Information Control Number）で参照します。ICN には MIC を基にした書式と CAGE コードを基にした書式があります。ファイル形式は ICN に含まれず、DOCTYPE の `ENTITY` 宣言と `NOTATION` 宣言で対応付けます。使ってよい形式はプロジェクトの BREX（`notationRuleList`）で決めます。
 
-## このプロジェクトでの使い方
+## このスタックでは
 
-`s1000d-core` の関数で、ここに書いた情報をそのまま取り出せます。
+共有ライブラリ `s1000d-core` が、ここに書いた情報を次の順で取り出します。
+
+- 識別・状態部をまず読み、`xsi:noNamespaceSchemaLocation` の URL から版と種類を推定します（`readDataModuleInfo`）
+- ファイル名を `parseDmcFileName` で分解し、中身の `dmCode` と突き合わせます
+- ICN は `parseIcn` が MIC 基準・CAGE 基準の両方の書式を分解します
+
+関数はそのまま呼べます。
 
 ```ts
 import { readFileSync } from 'node:fs';

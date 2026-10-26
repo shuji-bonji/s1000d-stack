@@ -30,15 +30,20 @@ export default defineConfig({
         },
       ],
       sidebar: [
-        { label: 'はじめに', slug: 'guide/getting-started' },
+        {
+          label: 'ガイド',
+          items: [
+            { label: 'S1000D Stack とは', slug: 'guide/overview' },
+            { label: '導入手順', slug: 'guide/getting-started' },
+            { label: '全体構成と進み方', slug: 'guide/architecture' },
+            { label: '仕様書の扱いと商標', slug: 'guide/license' },
+          ],
+        },
         {
           label: 'S1000D を知る',
           items: [
             { label: 'IETM と S1000D', slug: 'guide/ietm-and-s1000d' },
-            {
-              label: 'データモジュールと DMC',
-              slug: 'guide/data-module-and-dmc',
-            },
+            { label: 'データモジュールと DMC', slug: 'guide/data-module-and-dmc' },
             { label: 'BREX（ビジネスルール交換）', slug: 'guide/brex' },
             { label: '適用性（どの製品に当てはまるか）', slug: 'guide/applicability' },
           ],
@@ -49,16 +54,15 @@ export default defineConfig({
             { label: 's1000d-brex-mcp', slug: 'mcp/brex-mcp' },
             { label: 's1000d-verify-mcp', slug: 'mcp/verify-mcp' },
             { label: 's1000d-reader-mcp', slug: 'mcp/reader-mcp' },
-            { label: 's1000d-core（ライブラリ）', slug: 'mcp/core' },
           ],
         },
         {
-          label: 'このプロジェクトについて',
-          items: [
-            { label: '構成と進み方', slug: 'about/stack' },
-            { label: 'ユースケース', slug: 'about/use-cases' },
-            { label: '仕様書の扱いと商標', slug: 'about/license' },
-          ],
+          label: 'ライブラリ',
+          items: [{ label: 's1000d-core', slug: 'lib/s1000d-core' }],
+        },
+        {
+          label: 'ユースケース',
+          items: [{ label: '3 つの使い方（見取り図）', slug: 'use-cases' }],
         },
       ],
       customCss: ['./src/styles/custom.css'],

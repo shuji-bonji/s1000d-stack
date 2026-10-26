@@ -60,7 +60,7 @@
 | 仕様書・XSD・既定 BREX・公式サンプルは再配布できない | PDF 冒頭の利用条件 `S1000D-A-00-00-0000-00A-021A-D` 条項 3・4.1・4.3 | PDF 冒頭 3 ページ。background.md「利用条件（Issue 7）の確認結果」と照らす |
 | 商標の note | D-02 | 不要 |
 
-### 3.2 はじめに（`guide/getting-started.md`）
+### 3.2 導入手順（`guide/getting-started.md`。2026-10-26 に「はじめに」から改題し、定義の段落と「誰のための道具か」の表を `guide/overview.md` へ移した）
 
 | サイトの記述 | 根拠 | 読者の確認方法 |
 |---|---|---|
@@ -138,7 +138,7 @@
 | ツール 5 つ、引数、応答の形、環境変数、`unresolvedBrex` / `skipped` / `manualChecks` の読み方 | 実装 | 不要（§1） |
 | npm 未公開の note | — | §2 の #6 |
 
-### 3.7 s1000d-core（`mcp/core.md`）
+### 3.7 s1000d-core（`mcp/core.md`。2026-10-26 に `lib/s1000d-core.md` へ移動）
 
 | サイトの記述 | 根拠 | 読者の確認方法 |
 |---|---|---|
@@ -150,7 +150,7 @@
 | データ辞書の見本の循環、117 件を約 10 秒 | background.md の実測 | §2 の #3 |
 | Trusted Publisher、0.x の `^0.1.0` は minor をまたがない | D-14、semver の規則 | 不要 |
 
-### 3.8 構成と進み方（`about/stack.md`）
+### 3.8 全体構成と進み方（`about/stack.md`。2026-10-26 に `guide/architecture.md` へ移動）
 
 このページは ROADMAP.md と DECISIONS.md の要約で、仕様書との照合対象はありません。確かめるのは文書との整合だけです。
 
@@ -161,7 +161,10 @@
 | 決めていること 6 項目 | D-01、D-03、D-04、D-10、D-12、D-14 | 不要 |
 | 対象の版（Issue 7 → 4.2） | ROADMAP「対象とする S1000D の版」 | 不要 |
 
-### 3.9 仕様書の扱いと商標（`about/license.md`）
+### 3.9 仕様書の扱いと商標（`about/license.md`。2026-10-26 に `guide/license.md` へ移動）
+
+> [!NOTE]
+> 2026-10-26 に `guide/overview.md`（S1000D Stack とは）と `use-cases/index.md`（3 つの使い方）を追加しました。この 2 ページの照合表は未作成です。次の通読で 3.10・3.11 として足してください。
 
 | サイトの記述 | 根拠 | 読者の確認方法 |
 |---|---|---|

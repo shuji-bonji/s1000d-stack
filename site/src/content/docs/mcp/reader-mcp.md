@@ -38,7 +38,29 @@ flowchart LR
 
 ## 適用性と検証状態
 
-`product` を渡さないときは、適用性はすべて `undetermined` で、`displayText`（人が読む適用範囲の文）だけを返します。`assert` の式はどんなときも返しません。手順は [適用性のページ](/s1000d-stack/guide/applicability/)にまとめてあります。
+`product` を渡さないときは、適用性はすべて `undetermined` で、`displayText`（人が読む適用範囲の文）だけを返します。`assert` の式はどんなときも返しません。適用性の仕組み（ACT・CCT・PCT、式の評価）は [適用性のページ](/s1000d-stack/guide/applicability/)に書いています。
+
+### 3 値の読み方
+
+| 状態 | 意味 | LLM の読み方 |
+| --- | --- | --- |
+| `applicable` | 渡した製品に当てはまる | そのまま使う |
+| `notApplicable` | 当てはまらない | 答えに混ぜない。`omitNotApplicable` で本文から省ける |
+| `undetermined` | 判定できない。`reason` に「製品に `type` の値が無い」「`product` が渡されていない」「適用性リポジトリに無い」などの理由 | 「当てはまらない」と読まない。足りない値を利用者に聞く |
+
+`and` / `or` が確定した枝で足りなかった値は理由に含めません。
+
+### 製品の値をどう決めるか
+
+`describe_applicability` が、対象データモジュールの ACT・CCT・PCT を CSDB から探して、使える属性と値、PCT に登録された製品、文書の中の `applic` 文の一覧を返します。LLM はこれを見て利用者に「どの機種ですか」と聞き、答えを `product` として `read_data_module` に渡します。
+
+PCT に登録された製品をそのまま渡すこともできますが、PCT が値を割り当てていない属性があると、その属性を使う文は `undetermined` のままになります。`describe_applicability` はそのような属性を `propertiesNotAssignedInPct` として一覧にするので、不足分を補ってください。
+
+### 別のデータモジュールにある適用性文
+
+`referencedApplicGroupRef/applicRef` が `applicIdentValue` で指す `applic` 文は、`S1000D_CSDB_DIR` の中から `applic/@applicIdentValue` を持つデータモジュール（適用性リポジトリ）を集めて解決します。見つからなければ「リポジトリに無い」理由で `undetermined` になります。
+
+### 検証状態
 
 検証は既定で XSD だけを行います（`verify: "schema"`）。`verify: "full"` で BREX の連鎖への照合と参照の解決も行い、`verify: "none"` で省きます。省いた工程は `not-run`、XSD が見つからなければ `schema-not-found` と明記され、どちらも `valid` ではありません。XSD に違反した文書は要素の位置が仕様と違う可能性があるため、本文の読み取りも疑ってください。
 
