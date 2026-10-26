@@ -1,4 +1,4 @@
-# 引き継ぎメモ（2026-10-27 04:40 JST 時点）
+# 引き継ぎメモ（2026-10-27 05:30 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
@@ -32,9 +32,9 @@ flowchart LR
 
 | リポジトリ | 公開 | npm | 状態 |
 |---|---|---|---|
-| [shuji-bonji/s1000d-core](https://github.com/shuji-bonji/s1000d-core) | Public | `@shuji-bonji/s1000d-core` **0.2.0**（2026-10-25、タグ push → `publish.yml`） | 公開は `docs/RELEASE.md` の手順（`npm version` でタグを付けて push）。0.2.0 の後に `a0e9eb6`（`findSchemaDirs` のデータ辞書除外）、vitest 4 への更新、**`cdbdb19`（修正提案 `suggestFixes`、段階 2.5 の作業 1）** が未公開。新しい API を足したので次は **0.3.0**（`npm version minor`） |
+| [shuji-bonji/s1000d-core](https://github.com/shuji-bonji/s1000d-core) | Public | `@shuji-bonji/s1000d-core` **0.2.0**（2026-10-25、タグ push → `publish.yml`） | 公開は `docs/RELEASE.md` の手順（`npm version` でタグを付けて push）。0.2.0 の後に `a0e9eb6`（`findSchemaDirs` のデータ辞書除外）、vitest 4 への更新、**`f9940dd`（修正提案 `suggestFixes`、段階 2.5 の作業 1）と `5d26288`（NOTATION の照合の修正）** が未公開。新しい API を足したので次は **0.3.0**（`npm version minor`） |
 | [shuji-bonji/s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | Public | `@shuji-bonji/s1000d-brex-mcp` **0.1.1**（2026-10-27 03:37 JST、`publish.yml` 経由。0.1.0 は 10-26 に手動公開） | 5 ツール。core `^0.2.0`。MCP Registry `io.github.shuji-bonji/s1000d-brex-mcp` 0.1.1、claude-plugins `s1000d-brex-mcp` 0.1.1。版を上げるときは `docs/RELEASE.md`（`npm version` → `git push --follow-tags` → `mcp-publisher publish` → claude-plugins の `--write`） |
-| [shuji-bonji/s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | Public | `@shuji-bonji/s1000d-verify-mcp` **0.1.1**（2026-10-27 03:39 JST、同上） | 5 ツール、テスト 13＋5 件。Registry・claude-plugins に 0.1.1。**ローカルに `606e153`（`suggest_fixes`、6 ツール目、テスト 17＋6 件）があり未 push**。core 0.3.0 を使うので、core の公開後に依存を上げてから push する |
+| [shuji-bonji/s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | Public | `@shuji-bonji/s1000d-verify-mcp` **0.1.1**（2026-10-27 03:39 JST、同上） | 5 ツール、テスト 13＋5 件。Registry・claude-plugins に 0.1.1。**ローカルに `0c6ef76`（`suggest_fixes`、6 ツール目、テスト 17＋6 件）があり未 push**。core 0.3.0 を使うので、core の公開後に依存を上げてから push する（[Issue #1](https://github.com/shuji-bonji/s1000d-verify-mcp/issues/1)） |
 | [shuji-bonji/s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | Public | `@shuji-bonji/s1000d-reader-mcp` **0.1.1**（2026-10-27 03:37 JST、同上） | 6 ツール、テスト 14＋5 件。Registry・claude-plugins に 0.1.1 |
 | [shuji-bonji/experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | Public | `@shuji-bonji/experiential-manual-model` **0.1.0**（2026-10-26 16:26 JST、同上） | 型・JSON Schema・`validateManual`・`fromLegacyJson`。`schema/` と `examples/` も配布物に含む |
 | [shuji-bonji/s1000d-stack](https://github.com/shuji-bonji/s1000d-stack)（hub） | Public（2026-10-26） | — | 学習サイトは https://shuji-bonji.github.io/s1000d-stack/ （英語。日本語は `/ja/`）。`deploy.yml` は `main` への push（`site/**` と自身）で配備、`stack-check.yml` は毎日。**git のコミットはチャットから行ってよい**（2026-10-24 に利用者が指示。接続フォルダーの削除の許可を得れば git のロックファイルも消せる）。署名は利用者が後で付け直す |
@@ -89,13 +89,14 @@ cd site && npm run build && npm run preview
 ## 次にやること
 
 1. **10-4 公開後の確認**（利用者。下のチェックリスト）。加えて、`S1000D_SPEC_DIR` を設定したシェルから Claude Code を起動し、plugin で入れた `s1000d-brex` が `/mcp` で接続済みになり `explain_brex` が動くことを確かめる（plugin の `mcpServers` に `env` を書かない判断、D-23）。動かなければ `plugin.json` に `env` を足す案を検討する。
-2. **core 0.3.0 の公開**（利用者）: `lib/s1000d-core` の未 push のコミット `cdbdb19` に署名し直して push し（`a0e9eb6`・vitest 4・README の英語化は push 済み・未公開）、`npm version minor` → `git push --follow-tags`（`docs/RELEASE.md`）。CHANGELOG の「未リリース（0.3.0 に向けて）」の見出しを `0.3.0 (日付)` に直してから行う。旧「core 0.2.1 の公開」はこれに含める。
-3. **verify-mcp 0.2.0 の公開**（2 の後）: `mcp/s1000d-verify-mcp` で `npm install @shuji-bonji/s1000d-core@^0.3.0`（package.json と lock を更新）→ テスト → コミット → `606e153` と合わせて署名・push → `npm version minor` → `mcp-publisher publish` → claude-plugins の `--write`（`docs/RELEASE.md` の手順 6）。CHANGELOG の「未リリース（0.2.0 に向けて）」を切る。
-4. **サイトの `mcp/verify-mcp.md` に `suggest_fixes` を足す**（日本語 → 英語、`npm run check:i18n`）。3 の公開に合わせる。段階 2.5 の作業 6（「組み込み基盤」のページ）と一緒でもよい。
-5. **段階 2.5 の作業 3**（core に `CsdbSource` インターフェース）。設計は design/agent-platform.md「組み込みに要る広げ方」。
-6. 調べること（作業 1 で見つけた）: Bike Samples の BREX は `notationRule` が `allowedNotationFlag="0"`（Flash の除外）の 1 件だけで、core の `allowedNotations` はこれを「許可された NOTATION が 0 件」と読むため、cgm・png・svg などを使う 36 件がすべて NOTATION の違反になっている（Bike Samples の「既定 BREX への違反 55 件」の大半はこれ）。除外だけの notationRuleList を「除外したもの以外はすべて許可」と読むべきかを、仕様書 Chap 4.10.2.2 の notationRule の節で確かめてから core を直す（BREX の照合規則の変更なので、直す前に相談する）。いまは修正提案が `confidence: none` と注記を返す。
-7. reader-mcp の `services/context.ts` の `findApplicTables` を core の `findApplicTables` に置き換える（core 0.3.0 の後。処理は同じ）。
-8. `notes/site-review.md` に `guide/overview.md` と `use-cases/index.md` の照合表（3.10・3.11）を足す（任意）。
+2. **core 0.3.0 の公開**（利用者）: `lib/s1000d-core` の未 push のコミット `f9940dd`（修正提案）と `5d26288`（NOTATION の照合の修正）を push し（署名済みは `f9940dd` まで。`5d26288` は 2026-10-27 05:20 頃の追加で未署名）、CHANGELOG の「未リリース（0.3.0 に向けて）」の見出しを `0.3.0 (日付)` に直してから `npm version minor` → `git push --follow-tags`（`docs/RELEASE.md`）。`a0e9eb6`・vitest 4・README の英語化は push 済み・未公開で、これも 0.3.0 に入る。
+3. core 0.3.0 の公開後に、次の Issue を片付ける。どれも手順を Issue に書いてある。
+   - [verify-mcp #1](https://github.com/shuji-bonji/s1000d-verify-mcp/issues/1): 依存を `^0.3.0` に上げ、`0c6ef76`（`suggest_fixes`）と一緒に push して 0.2.0 として公開する（Registry・marketplace も）
+   - [brex-mcp #1](https://github.com/shuji-bonji/s1000d-brex-mcp/issues/1): 依存を上げ、`list_notations` の `effectiveFor` を core の `notationPolicy` に切り替える（除外だけの層で `null` にならないように）
+   - [reader-mcp #1](https://github.com/shuji-bonji/s1000d-reader-mcp/issues/1): `services/context.ts` の `findApplicTables` を core の関数に置き換える
+   - [s1000d-stack #4](https://github.com/shuji-bonji/s1000d-stack/issues/4): verify-mcp 0.2.0 の後に、サイト（`guide/brex.md` の NOTATION の行、`mcp/verify-mcp.md` の `suggest_fixes`、`lib/s1000d-core.md`、日本語 → 英語）と `stack.json` を更新する
+4. **段階 2.5 の作業 3**（core に `CsdbSource` インターフェース）。設計は design/agent-platform.md「組み込みに要る広げ方」。core 0.3.0 の公開を待たずに着手できる。
+5. `notes/site-review.md` に `guide/overview.md` と `use-cases/index.md` の照合表（3.10・3.11）を足す（任意）。
 
 ## 作業 10 の記録（公開、D-16。2026-10-26 に完了）
 
