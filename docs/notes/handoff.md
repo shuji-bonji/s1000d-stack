@@ -1,4 +1,4 @@
-# 引き継ぎメモ（2026-10-27 05:30 JST 時点）
+# 引き継ぎメモ（2026-10-27 11:10 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
@@ -32,10 +32,10 @@ flowchart LR
 
 | リポジトリ | 公開 | npm | 状態 |
 |---|---|---|---|
-| [shuji-bonji/s1000d-core](https://github.com/shuji-bonji/s1000d-core) | Public | `@shuji-bonji/s1000d-core` **0.2.0**（2026-10-25、タグ push → `publish.yml`） | 公開は `docs/RELEASE.md` の手順（`npm version` でタグを付けて push）。0.2.0 の後に `a0e9eb6`（`findSchemaDirs` のデータ辞書除外）、vitest 4 への更新、**`f9940dd`（修正提案 `suggestFixes`、段階 2.5 の作業 1）と `5d26288`（NOTATION の照合の修正）** が未公開。新しい API を足したので次は **0.3.0**（`npm version minor`） |
-| [shuji-bonji/s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | Public | `@shuji-bonji/s1000d-brex-mcp` **0.1.1**（2026-10-27 03:37 JST、`publish.yml` 経由。0.1.0 は 10-26 に手動公開） | 5 ツール。core `^0.2.0`。MCP Registry `io.github.shuji-bonji/s1000d-brex-mcp` 0.1.1、claude-plugins `s1000d-brex-mcp` 0.1.1。版を上げるときは `docs/RELEASE.md`（`npm version` → `git push --follow-tags` → `mcp-publisher publish` → claude-plugins の `--write`） |
-| [shuji-bonji/s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | Public | `@shuji-bonji/s1000d-verify-mcp` **0.1.1**（2026-10-27 03:39 JST、同上） | 5 ツール、テスト 13＋5 件。Registry・claude-plugins に 0.1.1。**ローカルに `0c6ef76`（`suggest_fixes`、6 ツール目、テスト 17＋6 件）があり未 push**。core 0.3.0 を使うので、core の公開後に依存を上げてから push する（[Issue #1](https://github.com/shuji-bonji/s1000d-verify-mcp/issues/1)） |
-| [shuji-bonji/s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | Public | `@shuji-bonji/s1000d-reader-mcp` **0.1.1**（2026-10-27 03:37 JST、同上） | 6 ツール、テスト 14＋5 件。Registry・claude-plugins に 0.1.1 |
+| [shuji-bonji/s1000d-core](https://github.com/shuji-bonji/s1000d-core) | Public | `@shuji-bonji/s1000d-core` **0.3.0**（2026-10-27 10:40 JST、タグ push → `publish.yml`） | 公開は `docs/RELEASE.md` の手順（`npm version` でタグを付けて push）。0.3.0 で修正提案 `suggestFixes`（段階 2.5 の作業 1）、`findApplicTables`、NOTATION の照合の修正（`notationPolicy`）、`findSchemaDirs` のデータ辞書除外が入った |
+| [shuji-bonji/s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | Public | `@shuji-bonji/s1000d-brex-mcp` **0.1.1**（2026-10-27 03:37 JST、`publish.yml` 経由。0.1.0 は 10-26 に手動公開） | 5 ツール。core `^0.2.0`。MCP Registry `io.github.shuji-bonji/s1000d-brex-mcp` 0.1.1、claude-plugins `s1000d-brex-mcp` 0.1.1。版を上げるときは `docs/RELEASE.md`（`npm version` → `git push --follow-tags` → `mcp-publisher publish` → claude-plugins の `--write`）。**ローカルに `953b4f6`（core `^0.3.0`、`list_notations` の `effectiveFor` に `mode` / `excluded`、CHANGELOG 0.2.0）があり未署名・未 push**（[Issue #1](https://github.com/shuji-bonji/s1000d-brex-mcp/issues/1)） |
+| [shuji-bonji/s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | Public | `@shuji-bonji/s1000d-verify-mcp` **0.1.1**（2026-10-27 03:39 JST、同上） | 5 ツール、テスト 13＋5 件。Registry・claude-plugins に 0.1.1。**ローカルに `0c6ef76`（`suggest_fixes`、6 ツール目、署名済み）と `e9070db`（core `^0.3.0`、CHANGELOG 0.2.0、未署名）があり未 push**。テスト 17＋6 件が npm の core 0.3.0 で通過（[Issue #1](https://github.com/shuji-bonji/s1000d-verify-mcp/issues/1)） |
+| [shuji-bonji/s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | Public | `@shuji-bonji/s1000d-reader-mcp` **0.1.1**（2026-10-27 03:37 JST、同上） | 6 ツール、テスト 14＋5 件。Registry・claude-plugins に 0.1.1。**ローカルに `0e161d3`（core `^0.3.0`、`findApplicTables` を core に切り替え、CHANGELOG 0.1.2）があり未署名・未 push**（[Issue #1](https://github.com/shuji-bonji/s1000d-reader-mcp/issues/1)） |
 | [shuji-bonji/experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | Public | `@shuji-bonji/experiential-manual-model` **0.1.0**（2026-10-26 16:26 JST、同上） | 型・JSON Schema・`validateManual`・`fromLegacyJson`。`schema/` と `examples/` も配布物に含む |
 | [shuji-bonji/s1000d-stack](https://github.com/shuji-bonji/s1000d-stack)（hub） | Public（2026-10-26） | — | 学習サイトは https://shuji-bonji.github.io/s1000d-stack/ （英語。日本語は `/ja/`）。`deploy.yml` は `main` への push（`site/**` と自身）で配備、`stack-check.yml` は毎日。**git のコミットはチャットから行ってよい**（2026-10-24 に利用者が指示。接続フォルダーの削除の許可を得れば git のロックファイルも消せる）。署名は利用者が後で付け直す |
 | `shuji-bonji/s1000d-writer-mcp` | Private | 未公開 | GitHub に作成済み、中身は空（段階 3） |
@@ -89,13 +89,12 @@ cd site && npm run build && npm run preview
 ## 次にやること
 
 1. **10-4 公開後の確認**（利用者。下のチェックリスト）。加えて、`S1000D_SPEC_DIR` を設定したシェルから Claude Code を起動し、plugin で入れた `s1000d-brex` が `/mcp` で接続済みになり `explain_brex` が動くことを確かめる（plugin の `mcpServers` に `env` を書かない判断、D-23）。動かなければ `plugin.json` に `env` を足す案を検討する。
-2. **core 0.3.0 の公開**（利用者）: `lib/s1000d-core` の未 push のコミット `f9940dd`（修正提案）と `5d26288`（NOTATION の照合の修正）を push し（署名済みは `f9940dd` まで。`5d26288` は 2026-10-27 05:20 頃の追加で未署名）、CHANGELOG の「未リリース（0.3.0 に向けて）」の見出しを `0.3.0 (日付)` に直してから `npm version minor` → `git push --follow-tags`（`docs/RELEASE.md`）。`a0e9eb6`・vitest 4・README の英語化は push 済み・未公開で、これも 0.3.0 に入る。
-3. core 0.3.0 の公開後に、次の Issue を片付ける。どれも手順を Issue に書いてある。
-   - [verify-mcp #1](https://github.com/shuji-bonji/s1000d-verify-mcp/issues/1): 依存を `^0.3.0` に上げ、`0c6ef76`（`suggest_fixes`）と一緒に push して 0.2.0 として公開する（Registry・marketplace も）
-   - [brex-mcp #1](https://github.com/shuji-bonji/s1000d-brex-mcp/issues/1): 依存を上げ、`list_notations` の `effectiveFor` を core の `notationPolicy` に切り替える（除外だけの層で `null` にならないように）
-   - [reader-mcp #1](https://github.com/shuji-bonji/s1000d-reader-mcp/issues/1): `services/context.ts` の `findApplicTables` を core の関数に置き換える
-   - [s1000d-stack #4](https://github.com/shuji-bonji/s1000d-stack/issues/4): verify-mcp 0.2.0 の後に、サイト（`guide/brex.md` の NOTATION の行、`mcp/verify-mcp.md` の `suggest_fixes`、`lib/s1000d-core.md`、日本語 → 英語）と `stack.json` を更新する
-4. **段階 2.5 の作業 3**（core に `CsdbSource` インターフェース）。設計は design/agent-platform.md「組み込みに要る広げ方」。core 0.3.0 の公開を待たずに着手できる。
+2. **MCP 3 本の公開**（利用者）。core 0.3.0 は 2026-10-27 10:40 JST に公開済み。3 本ともチャットで依存を `^0.3.0` に上げてテストを通し、ローカルにコミットしてある（未署名・未 push）。署名 → push → 版上げ → `mcp-publisher publish` → claude-plugins の `node scripts/marketplace-version-check.mjs --write`（各リポジトリの `docs/RELEASE.md` の手順 6）。終わったら各 Issue を閉じる。
+   - [verify-mcp #1](https://github.com/shuji-bonji/s1000d-verify-mcp/issues/1): `npm version minor`（0.2.0。`suggest_fixes` を足した）
+   - [brex-mcp #1](https://github.com/shuji-bonji/s1000d-brex-mcp/issues/1): `npm version minor`（0.2.0。`list_notations` の応答に項目を足した）
+   - [reader-mcp #1](https://github.com/shuji-bonji/s1000d-reader-mcp/issues/1): `npm version patch`（0.1.2。応答は変わらない）
+3. [s1000d-stack #4](https://github.com/shuji-bonji/s1000d-stack/issues/4)（チャット、2 の後）: サイト（`guide/brex.md` の NOTATION の行、`mcp/verify-mcp.md` の `suggest_fixes`、`mcp/brex-mcp.md` の `list_notations`、`lib/s1000d-core.md`。日本語 → 英語）と `stack.json` を更新する。MCP が npm で core 0.2.0 のままの間に直すと、公開済みの動作と食い違うので待つ。
+4. **段階 2.5 の作業 3**（core に `CsdbSource` インターフェース）。設計は design/agent-platform.md「組み込みに要る広げ方」。
 5. `notes/site-review.md` に `guide/overview.md` と `use-cases/index.md` の照合表（3.10・3.11）を足す（任意）。
 
 ## 作業 10 の記録（公開、D-16。2026-10-26 に完了）
