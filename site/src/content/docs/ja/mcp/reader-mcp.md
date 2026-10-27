@@ -105,6 +105,8 @@ flowchart LR
 
 環境変数が無いときは、設定ファイル `~/.config/s1000d-stack/config.json`（`XDG_CONFIG_HOME` があればその下、`S1000D_CONFIG` で場所を変更可）の `specDir` と `csdbDirs` を読みます。Claude Desktop に plugin で入れたときのように、環境変数がサーバーに渡らない場合に使います。書き方は[はじめに](/s1000d-stack/ja/guide/getting-started/)にあります。
 
+既定は stdio です。`--http` を付けると Streamable HTTP（既定 `http://127.0.0.1:3000/mcp`。`--host` / `--port` / `--path` で変更）で起動し、CSDB 製品のサーバーや Web アプリから HTTP で呼べます。loopback に束縛したときは `Host` と `Origin` を localhost 系に限り、それ以外のアドレスでは検査しないので、製品側のリバースプロキシや認証の後ろに置いてください。認証・権限・マルチテナントはサーバーでは持ちません（[組み込み基盤の設計](https://github.com/shuji-bonji/s1000d-stack/blob/main/docs/design/agent-platform.md)の境界）。
+
 ## 応答の例
 
 `read_data_module` の手順 1 件は次の形です（Bike Samples の手順データモジュールを、PCT の製品に `type` を補って読んだもの）。

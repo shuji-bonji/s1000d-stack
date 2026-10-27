@@ -96,6 +96,8 @@ The server decides every candidate. Only values with a clear origin become candi
 
 When the environment variables are not set, the server reads `specDir` and `csdbDirs` from the config file `~/.config/s1000d-stack/config.json` (under `XDG_CONFIG_HOME` if it is set; `S1000D_CONFIG` changes the location). Use it when environment variables do not reach the server, as when it is installed as a plugin in Claude Desktop. See [Getting started](/s1000d-stack/guide/getting-started/) for the format.
 
+The default is stdio. With `--http` the server starts over Streamable HTTP (default `http://127.0.0.1:3000/mcp`; change it with `--host` / `--port` / `--path`), so a CSDB product's server or a web application can call it over HTTP. When bound to a loopback address, `Host` and `Origin` are limited to localhost names; on any other address they are not checked, so put the server behind the product's reverse proxy or authentication. Authentication, authorization and multi-tenancy are not part of the server (the boundary in the [embedding design](https://github.com/shuji-bonji/s1000d-stack/blob/main/docs/design/agent-platform.md)).
+
 ## How XSDs are found
 
 The distribution contains 2 `xml_schema_flat/` folders that include `brex.xsd`: the one in the XML Schema Package, and a copy inside the data dictionary (`data_dictionary_7/Files/`). The copy is not used, because its `xs:import` uses absolute URLs such as `http://www.w3.org/2001/xml.xsd`, and libxml2 tries to go out to the network and fails. The XSDs on the XML Schema Package side import with relative paths such as `xml.xsd`, so registering all the XSDs in the same folder together resolves them.

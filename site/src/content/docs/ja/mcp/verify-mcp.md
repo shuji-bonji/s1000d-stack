@@ -96,6 +96,8 @@ XSD が見つからなかったときは検証が行われていないだけで�
 
 環境変数が無いときは、設定ファイル `~/.config/s1000d-stack/config.json`（`XDG_CONFIG_HOME` があればその下、`S1000D_CONFIG` で場所を変更可）の `specDir` と `csdbDirs` を読みます。Claude Desktop に plugin で入れたときのように、環境変数がサーバーに渡らない場合に使います。書き方は[はじめに](/s1000d-stack/ja/guide/getting-started/)にあります。
 
+既定は stdio です。`--http` を付けると Streamable HTTP（既定 `http://127.0.0.1:3000/mcp`。`--host` / `--port` / `--path` で変更）で起動し、CSDB 製品のサーバーや Web アプリから HTTP で呼べます。loopback に束縛したときは `Host` と `Origin` を localhost 系に限り、それ以外のアドレスでは検査しないので、製品側のリバースプロキシや認証の後ろに置いてください。認証・権限・マルチテナントはサーバーでは持ちません（[組み込み基盤の設計](https://github.com/shuji-bonji/s1000d-stack/blob/main/docs/design/agent-platform.md)の境界）。
+
 ## XSD の探し方
 
 配布物の中には `brex.xsd` を含む `xml_schema_flat/` が 2 つあります。XML Schema Package のものと、データ辞書（`data_dictionary_7/Files/`）の中の写しです。写しの方は `xs:import` が `http://www.w3.org/2001/xml.xsd` のような絶対 URL で、libxml2 がネットワークに出ようとして失敗するため、使いません。XML Schema Package 側の XSD は `xml.xsd` のように相対パスで import しているので、同じフォルダーの XSD をまとめて登録すれば解決します。

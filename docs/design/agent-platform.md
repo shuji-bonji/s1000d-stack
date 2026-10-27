@@ -91,6 +91,8 @@ verify-mcp に `suggest_fixes` を足します。入力は `verify_data_module` 
 
 実装（2026-10-27、core `src/csdb-source.ts`）: `CsdbSource` は `description`・`list(): CsdbObject[]`・`readText(object): string` の 3 つです。既定は `DirectoryCsdbSource`（フォルダー群）、ほかに `MemoryCsdbSource`（ファイル名と XML の組をメモリーに持つ）があります。`CsdbIndex.fromSource(source)` で索引を作り、`index.read(object)` で中身を読みます。core の中で他の DM を読む箇所（`findApplicTables` の ACT・CCT・PCT、`createBrexResolver` の BREX）は `index.read` に切り替えました。**同期にしました。** `resolveReferences`・`suggestFixes`・`findApplicTables` が同期関数で、ここを非同期にするとそれらの API を変えることになるためです。データベースや API から非同期にしか読めない製品は、先に読み込んで `MemoryCsdbSource` に渡すか、同期で読めるキャッシュを `readText` の後ろに置きます。非同期の `CsdbSource` が要ると分かったら、HTTP transport（作業 4）か writer（段階 3）と合わせて考えます。`CsdbObject.path` は置き場所の中での識別子で、応答にそのまま載ります。reader-mcp と verify-mcp の `readFileSync(o.path)` を `index.read(o)` に置き換える作業は、core 0.5.0 の公開後に行います。
 | HTTP transport | 各 MCP を stdio だけでなく Streamable HTTP でも起動できるようにする（MCP SDK v2 の transport の切り替え）。認証・権限・マルチテナントは製品側の責務とし、持ち込まない | 小 |
+
+実装（2026-10-27、各 MCP の `src/http.ts`）: `--http` で起動すると、SDK v2 の `createMcpHandler`（要求ごとにサーバーを 1 つ作る、web 標準の `fetch` 形）を `node:http` に載せて `/mcp` で受けます。`@modelcontextprotocol/node` は使わず、`IncomingMessage` → `Request`、`Response` → `ServerResponse`（SSE は本文をそのまま流す）の変換を自前で書きました。既定は `127.0.0.1:3000`。loopback に束縛したときは SDK の `hostHeaderValidationResponse` / `originValidationResponse` で `Host` と `Origin` を localhost 系に限り（DNS rebinding 対策）、それ以外のアドレスでは検査しません。`GET /healthz` は名前と版を返します。認証・権限・マルチテナントは持たず、製品側のリバースプロキシや認証の後ろに置く前提です。3 本とも同じファイルで、差はパッケージ名だけです（core には置きません。MCP の起動は core の責務ではないため）。
 | DML・DDN の読み取り | データモジュールリスト・納入票を読み、「DML にあるのに CSDB に無い」「版が違う」を照合する（プロジェクト管理の土台）。reader の `include` に `dml` / `ddn` は既にある | 中 |
 | comment DM の生成 | レビュー結果を S1000D の comment データモジュール（`comment.xsd`）として書き出す。CSDB の中でレビューは comment DM で回る | 中。writer（段階 3）の最初の一部 |
 | 翻訳向けの文の抜き出しと差し戻し | `extractSegments`（構造を保ったまま翻訳対象の文だけを取り出す）/ `applySegments`（同じ構造に差し戻す）。言語違いの DM は DMC が同じで `language` だけ違う。訳の品質評価は xcomet-mcp と組み合わせる | 中 |
@@ -151,7 +153,7 @@ S1000D を LLM で扱うときに挙げられる注意点（2026-10-25 に利用
 | 1 | core に `suggestFixes()`（BREX の 4 種、参照、適用性）と `Fix` 型。XSD の候補は XSD の定義を読む部分を含める | lib/s1000d-core（`src/fix/`） |
 | 2 | verify-mcp に `suggest_fixes`。`instructions` に候補の外の値を提案しない旨 | mcp/s1000d-verify-mcp |
 | 3 | core に `CsdbSource` インターフェース（フォルダー実装を既定に）。`CsdbIndex` はその上に載せる。済み（2026-10-27）。MCP 側の置き換えは core 0.5.0 の公開後 | lib/s1000d-core |
-| 4 | 各 MCP に HTTP transport の起動オプション | mcp/* |
+| 4 | 各 MCP に HTTP transport の起動オプション。済み（2026-10-27、`--http`） | mcp/* |
 | 5 | core に DML・DDN の読み取りと照合。verify-mcp `verify_csdb` と reader-mcp `list_data_modules` に反映 | lib/s1000d-core、mcp/* |
 | 6 | サイトに「組み込み基盤」のページ（4 つの要件と境界、LLM 活用時の注意点への対応、近似スキーマとの違い） | s1000d-stack/site |
 | 7 | reader-mcp に概要モード（`section: "outline"`）と節点ごとの文字数。DM 全体と各節の `securityClassification` を応答の先頭に必ず付ける | lib/s1000d-core、mcp/s1000d-reader-mcp |
