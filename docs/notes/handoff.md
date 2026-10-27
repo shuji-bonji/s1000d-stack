@@ -1,4 +1,4 @@
-# 引き継ぎメモ（2026-10-27 14:45 JST 時点）
+# 引き継ぎメモ（2026-10-27 15:25 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
@@ -89,13 +89,8 @@ cd site && npm run build && npm run preview
 ## 次にやること
 
 1. **10-4 公開後の確認**（利用者。下のチェックリスト）。加えて、`S1000D_SPEC_DIR` を設定したシェルから Claude Code を起動し、plugin で入れた `s1000d-brex` が `/mcp` で接続済みになり `explain_brex` が動くことを確かめる（plugin の `mcpServers` に `env` を書かない判断、D-23）。動かなければ `plugin.json` に `env` を足す案を検討する。
-2. **配布物の場所を設定ファイルからも読む変更の公開**（D-25）。core の `1fa516b`（`resolveStackConfig`）と、MCP 3 本の `77df929`（brex）・`4762484`（verify）・`361354b`（reader）をコミット済み（未署名・未 push）。クラウドの作業環境で、core 95 件・brex 13 件・verify 19 件・reader 14 件が通過（配布物のテストは除く）。順番は次のとおり。
-   - core: 署名 → push → CHANGELOG の「未リリース（0.4.0 に向けて）」を `0.4.0 (日付)` に → `npm version minor` → `git push origin main --tags`
-   - MCP 3 本: `npm install @shuji-bonji/s1000d-core@^0.4.0` → テスト → CHANGELOG の「未リリース」を切る → 署名 → `npm version minor`（0.3.0）→ `git push origin main --tags`（**main も push する**。前回はタグだけ push されて marketplace の追随が遅れた）→ `mcp-publisher publish` → claude-plugins の `--write`
-   - 公開したら `~/.config/s1000d-stack/config.json` に `{"specDir": "/Users/bonji/workspace/shuji-bonji/s1000d-stack/specs/s1000d/issue-7"}` を書き、Desktop の plugin 版で `list_schemas` が Issue 7 を見つけることを確かめる
-   - 試して効かなかった LaunchAgent を片付ける: `launchctl unsetenv S1000D_SPEC_DIR`、`rm ~/Library/LaunchAgents/io.github.shuji-bonji.s1000d-env.plist`
-   - **開発版（`-dev`）は core 0.4.0 の公開まで作り直さない**。Mac の `node_modules` の core は 0.3.0 で `resolveStackConfig` が無いので、いまの main を `npm run build` すると起動しなくなる。急ぐときは `npm install ../../lib/s1000d-core --no-save`（core を先に `npm run build`）
-3. 公開のあと（チャット）: サイトの `guide/getting-started.md` と MCP 3 ページ（日英）、claude-plugins の README の「利用上の注意」（いまは「plugin は環境変数を設定せず、起動したシェルから受け取る」と書いてある）に設定ファイルを足す。D-24 の運用（公開版と `-dev` 版）も `guide/getting-started.md` か開発者向けの節に書くか決める
+2. **D-25（設定ファイル）は 2026-10-27 15:10 頃に公開済み**: core 0.4.0、brex-mcp・verify-mcp・reader-mcp 0.3.0（npm と MCP Registry、core `^0.4.0`、main も push 済み）。`~/.config/s1000d-stack/config.json` に `specDir` を書き、Claude Desktop の plugin 版で `list_schemas`（Issue 7 の XSD 33 本）と `explain_brex`（既定 BREX）が動くことを確かめた。LaunchAgent は片付け済み（plist は置かれていなかった）。残りは **claude-plugins のコミットと push**（利用者）: チャットで `--write` を実行し、marketplace.json と README の表を 0.3.0 に、README の「利用上の注意」を設定ファイルの説明に直してある（未コミット。`marketplace-version-check` は 3 件とも OK）。`-dev` 版は core 0.4.0 が出たので、各リポジトリで `npm install && npm run build` すれば作り直せる
+3. サイト（チャット）: `guide/getting-started.md` と MCP 3 ページ（日英）に設定ファイルを足し、`guide/architecture.md` の版と README の表（`generate-stack.mjs --readme`）を core 0.4.0・MCP 0.3.0 に揃える。D-24 の運用（公開版と `-dev` 版）も `guide/getting-started.md` か開発者向けの節に書くか決める
 4. **段階 2.5 の作業 3**（core に `CsdbSource` インターフェース）。設計は design/agent-platform.md「組み込みに要る広げ方」。
 5. `notes/site-review.md` に `guide/overview.md` と `use-cases/index.md` の照合表（3.10・3.11）を足す（任意）。
 
