@@ -103,6 +103,8 @@ flowchart LR
 }
 ```
 
+When the environment variables are not set, the server reads `specDir` and `csdbDirs` from the config file `~/.config/s1000d-stack/config.json` (under `XDG_CONFIG_HOME` if it is set; `S1000D_CONFIG` changes the location). Use it when environment variables do not reach the server, as when it is installed as a plugin in Claude Desktop. See [Getting started](/s1000d-stack/guide/getting-started/) for the format.
+
 ## Example response
 
 One step from `read_data_module` has the following shape (a procedural data module from the Bike Samples, read with `type` added to a PCT product).

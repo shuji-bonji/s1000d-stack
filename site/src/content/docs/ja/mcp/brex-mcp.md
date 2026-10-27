@@ -49,6 +49,8 @@ description: BREX を LLM が読み、データモジュールを BREX に照合
 }
 ```
 
+環境変数が無いときは、設定ファイル `~/.config/s1000d-stack/config.json`（`XDG_CONFIG_HOME` があればその下、`S1000D_CONFIG` で場所を変更可）の `specDir` と `csdbDirs` を読みます。Claude Desktop に plugin で入れたときのように、環境変数がサーバーに渡らない場合に使います。書き方は[はじめに](/s1000d-stack/ja/guide/getting-started/)にあります。
+
 ## 照合の流れ
 
 ```mermaid

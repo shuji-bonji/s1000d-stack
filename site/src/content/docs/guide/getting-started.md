@@ -50,8 +50,24 @@ Once it is registered, try asking for things like these.
 - "What does `01` for `securityClassification` mean in this BREX?" → `lookup_value`
 
 :::tip[In Claude Code, the servers can also be installed as plugins]
-The three MCP servers are listed on the MCP Registry (`io.github.shuji-bonji/s1000d-brex-mcp` and so on) and in the personal marketplace [shuji-bonji/claude-plugins](https://github.com/shuji-bonji/claude-plugins) (category `s1000d`). In Claude Code, run `claude plugin marketplace add shuji-bonji/claude-plugins` and then `claude plugin install s1000d-brex-mcp@shuji-bonji`. The plugin sets no environment variables, so start Claude Code from a shell in which `S1000D_SPEC_DIR` and `S1000D_CSDB_DIR` are set.
+The three MCP servers are listed on the MCP Registry (`io.github.shuji-bonji/s1000d-brex-mcp` and so on) and in the personal marketplace [shuji-bonji/claude-plugins](https://github.com/shuji-bonji/claude-plugins) (category `s1000d`). In Claude Code, run `claude plugin marketplace add shuji-bonji/claude-plugins` and then `claude plugin install s1000d-brex-mcp@shuji-bonji`. The plugin sets no environment variables. In Claude Code, start it from a shell in which `S1000D_SPEC_DIR` and `S1000D_CSDB_DIR` are set, and those values are passed on.
 :::
+
+### When environment variables are not passed (config file)
+
+Claude Desktop does not pass environment variables to servers installed as plugins. In such cases, write the locations of the distribution and the CSDB to the config file `~/.config/s1000d-stack/config.json`. When the environment variables are not set, the three servers read this file (brex, verify and reader, 0.3.0 and later).
+
+```json
+{
+  "specDir": "/path/to/s1000d/issue-7",
+  "csdbDirs": ["/path/to/your/csdb"]
+}
+```
+
+- Environment variables take precedence when they are set.
+- Paths that start with `~/` and paths relative to the folder of the config file are accepted.
+- The location follows `XDG_CONFIG_HOME`, and `S1000D_CONFIG` can point to a different file.
+- The config file is read again on every call, so the server does not need to be restarted after you edit it.
 
 
 ## What to read next

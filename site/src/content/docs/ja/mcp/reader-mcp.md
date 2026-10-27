@@ -103,6 +103,8 @@ flowchart LR
 }
 ```
 
+環境変数が無いときは、設定ファイル `~/.config/s1000d-stack/config.json`（`XDG_CONFIG_HOME` があればその下、`S1000D_CONFIG` で場所を変更可）の `specDir` と `csdbDirs` を読みます。Claude Desktop に plugin で入れたときのように、環境変数がサーバーに渡らない場合に使います。書き方は[はじめに](/s1000d-stack/ja/guide/getting-started/)にあります。
+
 ## 応答の例
 
 `read_data_module` の手順 1 件は次の形です（Bike Samples の手順データモジュールを、PCT の製品に `type` を補って読んだもの）。

@@ -49,6 +49,8 @@ Folders can also be added with the tool argument `csdbDirs`. A BREX can be given
 }
 ```
 
+When the environment variables are not set, the server reads `specDir` and `csdbDirs` from the config file `~/.config/s1000d-stack/config.json` (under `XDG_CONFIG_HOME` if it is set; `S1000D_CONFIG` changes the location). Use it when environment variables do not reach the server, as when it is installed as a plugin in Claude Desktop. See [Getting started](/s1000d-stack/guide/getting-started/) for the format.
+
 ## How a check runs
 
 ```mermaid

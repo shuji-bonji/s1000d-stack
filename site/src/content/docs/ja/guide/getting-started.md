@@ -50,8 +50,24 @@ Claude Desktop の設定ファイル（`claude_desktop_config.json`）に次を�
 - 「`securityClassification` の `01` はこの BREX では何を意味する？」 → `lookup_value`
 
 :::tip[Claude Code では plugin からも入れられます]
-3 つの MCP サーバーは MCP Registry（`io.github.shuji-bonji/s1000d-brex-mcp` など）と、個人の marketplace [shuji-bonji/claude-plugins](https://github.com/shuji-bonji/claude-plugins)（category `s1000d`）に載せています。Claude Code では `claude plugin marketplace add shuji-bonji/claude-plugins` の後に `claude plugin install s1000d-brex-mcp@shuji-bonji` で入ります。plugin は環境変数を設定しないので、`S1000D_SPEC_DIR` と `S1000D_CSDB_DIR` を設定したシェルから Claude Code を起動してください。
+3 つの MCP サーバーは MCP Registry（`io.github.shuji-bonji/s1000d-brex-mcp` など）と、個人の marketplace [shuji-bonji/claude-plugins](https://github.com/shuji-bonji/claude-plugins)（category `s1000d`）に載せています。Claude Code では `claude plugin marketplace add shuji-bonji/claude-plugins` の後に `claude plugin install s1000d-brex-mcp@shuji-bonji` で入ります。plugin は環境変数を設定しません。Claude Code では、`S1000D_SPEC_DIR` と `S1000D_CSDB_DIR` を設定したシェルから起動すれば、その値が渡ります。
 :::
+
+### 環境変数が渡らないとき（設定ファイル）
+
+Claude Desktop は、plugin で入れたサーバーに環境変数を渡しません。このような場合は、設定ファイル `~/.config/s1000d-stack/config.json` に配布物と CSDB の場所を書いてください。環境変数が無いとき、3 つのサーバーはこのファイルを読みます（brex・verify・reader とも 0.3.0 以降）。
+
+```json
+{
+  "specDir": "/path/to/s1000d/issue-7",
+  "csdbDirs": ["/path/to/your/csdb"]
+}
+```
+
+- 環境変数があれば、そちらが優先します。
+- `~/` で始まるパスと、設定ファイルのあるフォルダーからの相対パスも使えます。
+- 場所は `XDG_CONFIG_HOME` に従い、`S1000D_CONFIG` で別のファイルを指せます。
+- 設定ファイルは呼び出しのたびに読み直すので、書き換えたあとにサーバーを再起動する必要はありません。
 
 
 ## 次に読むもの

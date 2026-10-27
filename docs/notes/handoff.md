@@ -1,4 +1,4 @@
-# 引き継ぎメモ（2026-10-27 15:25 JST 時点）
+# 引き継ぎメモ（2026-10-27 15:35 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
@@ -89,8 +89,8 @@ cd site && npm run build && npm run preview
 ## 次にやること
 
 1. **10-4 公開後の確認**（利用者。下のチェックリスト）。加えて、`S1000D_SPEC_DIR` を設定したシェルから Claude Code を起動し、plugin で入れた `s1000d-brex` が `/mcp` で接続済みになり `explain_brex` が動くことを確かめる（plugin の `mcpServers` に `env` を書かない判断、D-23）。動かなければ `plugin.json` に `env` を足す案を検討する。
-2. **D-25（設定ファイル）は 2026-10-27 15:10 頃に公開済み**: core 0.4.0、brex-mcp・verify-mcp・reader-mcp 0.3.0（npm と MCP Registry、core `^0.4.0`、main も push 済み）。`~/.config/s1000d-stack/config.json` に `specDir` を書き、Claude Desktop の plugin 版で `list_schemas`（Issue 7 の XSD 33 本）と `explain_brex`（既定 BREX）が動くことを確かめた。LaunchAgent は片付け済み（plist は置かれていなかった）。残りは **claude-plugins のコミットと push**（利用者）: チャットで `--write` を実行し、marketplace.json と README の表を 0.3.0 に、README の「利用上の注意」を設定ファイルの説明に直してある（未コミット。`marketplace-version-check` は 3 件とも OK）。`-dev` 版は core 0.4.0 が出たので、各リポジトリで `npm install && npm run build` すれば作り直せる
-3. サイト（チャット）: `guide/getting-started.md` と MCP 3 ページ（日英）に設定ファイルを足し、`guide/architecture.md` の版と README の表（`generate-stack.mjs --readme`）を core 0.4.0・MCP 0.3.0 に揃える。D-24 の運用（公開版と `-dev` 版）も `guide/getting-started.md` か開発者向けの節に書くか決める
+2. **D-25（設定ファイル）は 2026-10-27 15:10 頃に公開済み**: core 0.4.0、brex-mcp・verify-mcp・reader-mcp 0.3.0（npm・MCP Registry・claude-plugins。core `^0.4.0`）。Claude Desktop の plugin 版が `~/.config/s1000d-stack/config.json` の `specDir` を読み、`list_schemas`（Issue 7 の XSD 33 本）と `explain_brex`（既定 BREX）が動くことを確かめた。`-dev` 版も core 0.4.0 で作り直し済み。LaunchAgent は片付け済み。
+3. サイトと hub の README は 2026-10-27 15:35 に更新済み（未 push）: `guide/getting-started.md` に「環境変数が渡らないとき（設定ファイル）」の節、MCP 3 ページの「設定」に設定ファイルの一文、`guide/architecture.md` の版（core 0.4.0・MCP 0.3.0）。README は表を `generate-stack.mjs --readme` で揃え、「できること」に段階 2.5 の修正提案と `suggest_fixes`、冒頭の注記に設定ファイルを足した。日本語 → 英語、`check:i18n` ok、29 ページ、内部リンク切れ 0（ビルドはクラウドの作業環境）
 4. **段階 2.5 の作業 3**（core に `CsdbSource` インターフェース）。設計は design/agent-platform.md「組み込みに要る広げ方」。
 5. `notes/site-review.md` に `guide/overview.md` と `use-cases/index.md` の照合表（3.10・3.11）を足す（任意）。
 
