@@ -94,6 +94,8 @@ verify-mcp に `suggest_fixes` を足します。入力は `verify_data_module` 
 
 実装（2026-10-27、各 MCP の `src/http.ts`）: `--http` で起動すると、SDK v2 の `createMcpHandler`（要求ごとにサーバーを 1 つ作る、web 標準の `fetch` 形）を `node:http` に載せて `/mcp` で受けます。`@modelcontextprotocol/node` は使わず、`IncomingMessage` → `Request`、`Response` → `ServerResponse`（SSE は本文をそのまま流す）の変換を自前で書きました。既定は `127.0.0.1:3000`。loopback に束縛したときは SDK の `hostHeaderValidationResponse` / `originValidationResponse` で `Host` と `Origin` を localhost 系に限り（DNS rebinding 対策）、それ以外のアドレスでは検査しません。`GET /healthz` は名前と版を返します。認証・権限・マルチテナントは持たず、製品側のリバースプロキシや認証の後ろに置く前提です。3 本とも同じファイルで、差はパッケージ名だけです（core には置きません。MCP の起動は core の責務ではないため）。
 | DML・DDN の読み取り | データモジュールリスト・納入票を読み、「DML にあるのに CSDB に無い」「版が違う」を照合する（プロジェクト管理の土台）。reader の `include` に `dml` / `ddn` は既にある | 中 |
+
+実装（2026-10-28、core `src/dml/`）: `readDml` / `readDdn` が `dml.xsd` / `ddn.xsd` の構造（`dmlEntry` は `dmRef` / `pmRef` / `infoEntityRef` / `dmlRef` / `commentRef` のどれか 1 つ、`deliveryListItem` は `dispatchFileName` と任意の `issueInfo`）を読み、`reconcileDml` / `reconcileDdn` が CSDB の索引と照合します。判定は `found`（版まで一致）/ `issue-mismatch`（対象はあるが指定の版が無い。CSDB の最新の版を添える）/ `not-found` / `not-checked`（comment への参照）の 4 つと、`notListed`（CSDB にあるのに DML に無い DM・PM。DML に出てくるモデル識別コードだけを対象にし、言語は見ない）です。`dmlType`（c / p / s）・`dmlEntryType`（c / d / n）・`issueType` は解釈せず列挙のまま返します（意味は仕様書の該当章を読んでから付ける）。DDN は `dispatchFileName` で照合し、発行情報（`_NNN-NN`）だけ違う名前を `issue-mismatch` にします。拡張 DMC（`DME-`）のデータモジュールは索引に `kind: 'dme'` で入り、ファイル名で見つかります（DMC の分解は未対応）。MCP への反映は core 0.6.0 の公開後です。
 | comment DM の生成 | レビュー結果を S1000D の comment データモジュール（`comment.xsd`）として書き出す。CSDB の中でレビューは comment DM で回る | 中。writer（段階 3）の最初の一部 |
 | 翻訳向けの文の抜き出しと差し戻し | `extractSegments`（構造を保ったまま翻訳対象の文だけを取り出す）/ `applySegments`（同じ構造に差し戻す）。言語違いの DM は DMC が同じで `language` だけ違う。訳の品質評価は xcomet-mcp と組み合わせる | 中 |
 
@@ -154,7 +156,7 @@ S1000D を LLM で扱うときに挙げられる注意点（2026-10-25 に利用
 | 2 | verify-mcp に `suggest_fixes`。`instructions` に候補の外の値を提案しない旨 | mcp/s1000d-verify-mcp |
 | 3 | core に `CsdbSource` インターフェース（フォルダー実装を既定に）。`CsdbIndex` はその上に載せる。済み（2026-10-27）。MCP 側の置き換えは core 0.5.0 の公開後 | lib/s1000d-core |
 | 4 | 各 MCP に HTTP transport の起動オプション。済み（2026-10-27、`--http`） | mcp/* |
-| 5 | core に DML・DDN の読み取りと照合。verify-mcp `verify_csdb` と reader-mcp `list_data_modules` に反映 | lib/s1000d-core、mcp/* |
+| 5 | core に DML・DDN の読み取りと照合。verify-mcp `verify_csdb` と reader-mcp `list_data_modules` に反映。core 側は済み（2026-10-28）。MCP 側は core 0.6.0 の公開後 | lib/s1000d-core、mcp/* |
 | 6 | サイトに「組み込み基盤」のページ（4 つの要件と境界、LLM 活用時の注意点への対応、近似スキーマとの違い） | s1000d-stack/site |
 | 7 | reader-mcp に概要モード（`section: "outline"`）と節点ごとの文字数。DM 全体と各節の `securityClassification` を応答の先頭に必ず付ける | lib/s1000d-core、mcp/s1000d-reader-mcp |
 | 8 | 版（Issue）が混ざった CSDB での `verify_csdb`（XSD を版ごとに選ぶ）の確認。Issue 4.2 の XSD が無い間は自作の `xml_schema_flat/` で確かめる | mcp/s1000d-verify-mcp |

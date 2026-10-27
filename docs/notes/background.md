@@ -206,6 +206,18 @@ verify-mcp の stdio の実機確認で、`S1000D_SPEC_DIR` の下に `brex.xsd`
 | `referencedApplicGroupRef/applicRef/@applicIdentValue`（`app-00000000AA057A-0001` の形、13 件の DM）が指す適用性リポジトリは、Bike Samples のどの DM にも無い（`00G` の DM の `applic` は `@applicIdentValue` を持たない） | 64 件の要素が「リポジトリに無い」理由で undetermined になる。core の `ApplicEvaluator` はリポジトリを `buildApplicRepository` で外から渡す形にしてあり、利用者が持っていれば解決できる |
 | `evaluate` の入れ子は 82 件。`andOr="or"` の中に `and` が並ぶ形（機種と版の組み合わせ）が典型 | 3 値評価の `and` / `or` で扱える。XPath や数式は出てこない |
 
+### DML・DDN の照合で分かった配布物の性質（2026-10-27）
+
+段階 2.5 の作業 5 で、Bike Samples の DML（`DML-S1000DBIKE-B6865-S-2026-00001_001-00.XML`、108 行）と DDN（`DDN-S1000DBIKE-B6865-B6865-2026-00001.XML`、184 件）を読み、同じフォルダーの CSDB と照合した結果です（core の `spec.test.ts`）。
+
+| 事実 | 影響 |
+|---|---|
+| DML の 108 行は `dmRef` だけで、PM の行は無い。108 行すべてが CSDB にあり、発行情報（`issueInfo`）も一致する | `reconcileDml` の `notListed` に PM 4 件（EPWG1 × 3、LOAP0）が出る。DML は DM の一覧で PM を載せない運用がある、と読める |
+| DDN の 184 件のうち、`IMF-C0419-S1000D0392-002-01_000-01.XML` は CSDB では `_001-00`（版違い） | `reconcileDdn` は発行情報だけ違う名前を `issue-mismatch` にする。DMC・PMC だけでなく IMF・DML でも同じ規則にした |
+| `ICN-C0419-S1000D0NNN-001-01.SVG` と、その IMF 2 件（`_000-01`・`_001-00`）は DDN にあるが配布物に無い | 配布物の不整合。`not-found` 3 件として残る |
+| 拡張 DMC のデータモジュール（`DME-SF518-CE0701-…`、`DME-SF518-MT0701-…` の 2 件）がある | これまで `listCsdbObjects` が拾っておらず、DDN の照合で「無い」と出た。`CsdbObjectKind` に `dme` を足した（`dm` は付けず、DMC では探せない。拡張 DMC の分解は未対応） |
+| DML の `dmlType` は小文字（`s`）、ファイル名では大文字（`S`） | `sameDmlCode` は大文字小文字を区別しない |
+
 ### サイトの生成と検索（2026-10-24）
 
 - Astro 7.4 ＋ Starlight 0.42。Astro 7 は Node 22.23.4 以上を要求する（22.22 では起動しない）。GitHub Pages の deploy は Node 24 で動かす。
