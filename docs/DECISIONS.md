@@ -245,6 +245,22 @@ flowchart LR
 - 版が乗る場所は 5 つ（`package.json`、`plugin.json`、`server.json` の 2 か所、npm、marketplace.json）。`scripts/sync-plugin-version.mjs` を `npm version` の version フックに掛けて前の 3 つを揃え、marketplace.json は claude-plugins 側で `node scripts/marketplace-version-check.mjs --write` で揃えます。
 - **実施済み（2026-10-27 JST）**: 3 本の 0.1.1 を `publish.yml` 経由で npm に公開（03:37〜03:39）、MCP Registry に `active` で登録（03:48〜03:49）、claude-plugins 0.7.0 に収録（`4d8df7b`）。`claude plugin install s1000d-brex-mcp@shuji-bonji` が成功することを確認。
 
+### D-24 MCP は公開版（plugin）と開発版（-dev）の 2 本立てで使う（2026-10-27）
+
+- 普段使うのは claude-plugins で入れた公開版（`s1000d-brex` / `s1000d-verify` / `s1000d-reader`。npm の最新版を `npx` で起動）。開発中の確認には、手元のビルドを起動する開発版（`s1000d-brex-dev` / `s1000d-verify-dev` / `s1000d-reader-dev`）を使う。pdf・houki・rfcxml と同じ運用。
+- 理由は 3 つ。(1) 公開前の変更（core の公開待ちの機能など）を、普段の利用と分けて試せる。(2) 公開版を利用者と同じ形で確かめられる。(3) 結果が変わる変更（NOTATION の照合の修正など）で、同じ DM を両方に通して比べられる。houki が分ける主な理由（DB の共有で公開版が壊れる）は、ファイルを読むだけの s1000d には当たらない。
+- 開発版は Claude Desktop の `claude_desktop_config.json` に登録する（2026-10-27 に利用者が登録）。`command` は `node`、`args` は `/Users/bonji/workspace/shuji-bonji/s1000d-stack/mcp/s1000d-*-mcp/dist/index.js`、`env` に `S1000D_SPEC_DIR` を絶対パスで書く（JSON では `~` が展開されない）。接尾辞は `-dev`（pdf の `-local` には揃えない）。
+- 開発版のビルドは Mac で `npm install && npm run build`。VM の `~/vmrun.sh` は別の場所にコピーして動かすので、Mac の `dist` とはぶつからない。未公開の core を試すときは MCP 側で `npm install ../../lib/s1000d-core --no-save` などで差し替える。
+
+### D-25 配布物と CSDB の場所は、環境変数が無ければ設定ファイルから読む（2026-10-27、D-23 の補足）
+
+- `S1000D_SPEC_DIR` / `S1000D_CSDB_DIR` が無いときは、設定ファイル `~/.config/s1000d-stack/config.json`（`XDG_CONFIG_HOME` に従う。`S1000D_CONFIG` で場所を変えられる）の `specDir` / `csdbDirs` を読む。処理は core の `resolveStackConfig`（D-10・D-17 と同じく MCP 3 本で共有）。
+- 理由: 2026-10-27 に確かめたところ、Claude Desktop は plugin で入れたサーバーに `S1000D_SPEC_DIR` を渡さなかった。`launchctl setenv` で Desktop 自身に値を入れ、起動し直しても届かない（MCP SDK の stdio クライアントは、設定に `env` が無いと `HOME`・`PATH` など決まった変数しか子プロセスに渡さないためと推定）。plugin の `env` に `${VAR}` を書く方法（pdf-spec の形）も、Desktop は置き換えずに文字のまま渡すので使えない（pdf-spec の plugin 版は Desktop で `REGISTRY_ERROR` になることを同日に確認）。設定ファイルなら `HOME` さえ渡れば読める。
+- D-23 の「plugin の `mcpServers` に `env` を書かない」は変えない。`env` に `${VAR}` を書くと、Desktop では文字の `${VAR}` が値として渡り、設定ファイルへ戻る判断がしにくくなるため。念のため、置き換えられずに渡った `${VAR}` / `$VAR` は使わずに設定ファイルへ戻り、応答の `_notes` に理由を書く。
+- 環境変数があればそちらを優先する（開発版の `env`、Claude Code を起動するシェル）。設定ファイルは呼び出しのたびに読み直す。
+- 試して効かなかった `launchctl setenv` の LaunchAgent（`~/Library/LaunchAgents/io.github.shuji-bonji.s1000d-env.plist`）は片付ける（`launchctl unsetenv S1000D_SPEC_DIR` と plist の削除）。
+- 実装: core の `1fa516b`（0.4.0 として未公開）、brex-mcp `77df929`・verify-mcp `4762484`・reader-mcp `361354b`（未 push。core 0.4.0 の公開後に依存を上げる）。
+
 ## 未決事項
 
 | ID | 内容 | 判断の材料 |
