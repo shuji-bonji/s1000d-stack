@@ -1,4 +1,4 @@
-# 引き継ぎメモ（2026-10-27 15:35 JST 時点）
+# 引き継ぎメモ（2026-10-27 16:55 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
@@ -24,7 +24,7 @@ flowchart LR
 
 **段階 1 は 2026-10-24 に、段階 2 は 2026-10-26 に完了しました。** 段階 2 の設計は `docs/design/` の 3 文書（[verify-mcp.md](../design/verify-mcp.md)、[reader-mcp.md](../design/reader-mcp.md)、[manual-model.md](../design/manual-model.md)）、作業の順序と結果は ROADMAP「段階 2 の作業」の表（作業 1〜10）にあります。2026-10-26 に作業 10（公開）を行い、4 パッケージ（experiential-manual-model・brex-mcp・verify-mcp・reader-mcp）の 0.1.0 を npm に公開し、4 リポジトリと hub を Public にし、学習サイトを GitHub Pages に配備しました。経過は下の「作業 10 の記録」にチェックリストのまま残してあります。**2026-10-27 未明に作業 11（D-23）として、MCP 3 本の 0.1.1 を出し、MCP Registry（`io.github.shuji-bonji/*`、`active`）と claude-plugins marketplace（category `s1000d`、0.7.0）に載せました。** 手順は pdf-agent-stack の `docs/specs/30-registry-and-marketplace-release.md` と同じで、各リポジトリの `docs/RELEASE.md` に手順 6 として足してあります。
 
-**次の目標は「CSDB 製品に組み込める基盤」（D-19）で、段階 2.5**（修正提案・`CsdbSource`・HTTP transport・DML/DDN・概要モード・機密区分）です。**2026-10-27 04:30 JST 頃に作業 1〜2（修正提案）を実装しました**（core `suggestFixes()` と verify-mcp `suggest_fixes`。どちらもコミット済み・未 push・未公開。結果は ROADMAP「進捗（段階 2.5）」）。設計は design/agent-platform.md。LLM 活用時の注意点 5 つへの対応と、段階 4 の最初の成果物にする簡易な技術マニュアルの Web システム（基盤の参照実装、技術は U-10）も同じ設計文書に記録してあります。
+**次の目標は「CSDB 製品に組み込める基盤」（D-19）で、段階 2.5**（修正提案・`CsdbSource`・HTTP transport・DML/DDN・概要モード・機密区分）です。作業 1〜2（修正提案）は 2026-10-27 に実装・公開済み（core 0.3.0、verify-mcp 0.2.0）。**2026-10-27 16:30 JST 頃に作業 3（`CsdbSource`）を core に実装しました**（`6f0029e`、コミット済み・未 push・未公開。次は core 0.5.0）。結果と残り（MCP 側の置き換え）は ROADMAP「進捗（段階 2.5）」と design/agent-platform.md「組み込みに要る広げ方」の実装の記録にあります。設計は design/agent-platform.md。LLM 活用時の注意点 5 つへの対応と、段階 4 の最初の成果物にする簡易な技術マニュアルの Web システム（基盤の参照実装、技術は U-10）も同じ設計文書に記録してあります。
 
 2026-10-26 の日中には、サイトの章立てを houki-hub に揃え（D-20）、ロゴを六角形のスタックに決め（D-21）、英語をルートにして日本語を `/ja/` と `README.ja.md` にしました（D-22）。サイト 14 ページ × 2 言語と README 6 本 × 2 言語が揃い、`npm run check:i18n`（`site/scripts/check-i18n.mjs`）で構造の一致を検査できます。`scripts/generate-stack.mjs --readme` は両 README の表を更新します。経過は notes/i18n-trial.md。
 
@@ -32,10 +32,10 @@ flowchart LR
 
 | リポジトリ | 公開 | npm | 状態 |
 |---|---|---|---|
-| [shuji-bonji/s1000d-core](https://github.com/shuji-bonji/s1000d-core) | Public | `@shuji-bonji/s1000d-core` **0.3.0**（2026-10-27 10:40 JST、タグ push → `publish.yml`） | 公開は `docs/RELEASE.md` の手順（`npm version` でタグを付けて push）。0.3.0 で修正提案 `suggestFixes`（段階 2.5 の作業 1）、`findApplicTables`、NOTATION の照合の修正（`notationPolicy`）、`findSchemaDirs` のデータ辞書除外が入った |
-| [shuji-bonji/s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | Public | `@shuji-bonji/s1000d-brex-mcp` **0.2.0**（2026-10-27 11:07〜11:09 JST、`publish.yml` 経由。core `^0.3.0`） | `list_notations` の `effectiveFor` に `mode` / `excluded`。MCP Registry は 0.2.0 が latest。**`release: v0.2.0` のコミットがタグからしか辿れず main に未 push**（npm と Registry はタグの push で公開済み）。claude-plugins はまだ 0.1.1（main の push 待ち）。[Issue #1](https://github.com/shuji-bonji/s1000d-brex-mcp/issues/1) は開いたまま |
-| [shuji-bonji/s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | Public | `@shuji-bonji/s1000d-verify-mcp` **0.2.0**（2026-10-27 11:07〜11:09 JST、`publish.yml` 経由。core `^0.3.0`） | 6 ツール目 `suggest_fixes`。MCP Registry は 0.2.0 が latest。**`release: v0.2.0` のコミットがタグからしか辿れず main に未 push**（npm と Registry はタグの push で公開済み）。claude-plugins はまだ 0.1.1（main の push 待ち）。[Issue #1](https://github.com/shuji-bonji/s1000d-verify-mcp/issues/1) は開いたまま |
-| [shuji-bonji/s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | Public | `@shuji-bonji/s1000d-reader-mcp` **0.2.0**（2026-10-27 11:07〜11:09 JST、`publish.yml` 経由。core `^0.3.0`） | ACT・CCT・PCT の探索を core の `findApplicTables` に切り替え。MCP Registry は 0.2.0 が latest。**`release: v0.2.0` のコミットがタグからしか辿れず main に未 push**（npm と Registry はタグの push で公開済み）。claude-plugins はまだ 0.1.1（main の push 待ち）。[Issue #1](https://github.com/shuji-bonji/s1000d-reader-mcp/issues/1) は開いたまま |
+| [shuji-bonji/s1000d-core](https://github.com/shuji-bonji/s1000d-core) | Public | `@shuji-bonji/s1000d-core` **0.4.0**（2026-10-27 15:10 JST 頃、タグ push → `publish.yml`） | 公開は `docs/RELEASE.md` の手順（`npm version` でタグを付けて push）。0.3.0 で修正提案 `suggestFixes`（段階 2.5 の作業 1）、0.4.0 で設定ファイル `resolveStackConfig`（D-25）。**main に未 push のコミット `6f0029e`（`CsdbSource`、段階 2.5 の作業 3、署名なし）がある。** 次の公開は 0.5.0（`npm version minor`） |
+| [shuji-bonji/s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | Public | `@shuji-bonji/s1000d-brex-mcp` **0.3.0**（2026-10-27 15:10 JST 頃、`publish.yml` 経由。core `^0.4.0`） | 0.2.0 で `list_notations` の `effectiveFor` に `mode` / `excluded`、0.3.0 で設定ファイル（D-25）。npm・MCP Registry・claude-plugins とも 0.3.0。main は origin と一致（2026-10-27 16:10 JST に確認）。[Issue #1](https://github.com/shuji-bonji/s1000d-brex-mcp/issues/1) は開いたまま |
+| [shuji-bonji/s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | Public | `@shuji-bonji/s1000d-verify-mcp` **0.3.0**（同上。core `^0.4.0`） | 0.2.0 で 6 ツール目 `suggest_fixes`、0.3.0 で設定ファイル。main は origin と一致。**core 0.5.0 の公開後に、`verify_csdb` の `readFileSync(o.path)` を `index.read(o)` に置き換える**（段階 2.5 の作業 3 の残り）。[Issue #1](https://github.com/shuji-bonji/s1000d-verify-mcp/issues/1) は開いたまま |
+| [shuji-bonji/s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | Public | `@shuji-bonji/s1000d-reader-mcp` **0.3.0**（同上。core `^0.4.0`） | 0.2.0 で ACT・CCT・PCT の探索を core の `findApplicTables` に切り替え、0.3.0 で設定ファイル。main は origin と一致。**core 0.5.0 の公開後に、`services/context.ts`（`readDmByCode` / `applicRepository` / `loadObject`）と `tools/handlers.ts` の `readFileSync(o.path)` を `index.read(o)` に置き換える**（作業 3 の残り）。[Issue #1](https://github.com/shuji-bonji/s1000d-reader-mcp/issues/1) は開いたまま |
 | [shuji-bonji/experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | Public | `@shuji-bonji/experiential-manual-model` **0.1.0**（2026-10-26 16:26 JST、同上） | 型・JSON Schema・`validateManual`・`fromLegacyJson`。`schema/` と `examples/` も配布物に含む |
 | [shuji-bonji/s1000d-stack](https://github.com/shuji-bonji/s1000d-stack)（hub） | Public（2026-10-26） | — | 学習サイトは https://shuji-bonji.github.io/s1000d-stack/ （英語。日本語は `/ja/`）。`deploy.yml` は `main` への push（`site/**` と自身）で配備、`stack-check.yml` は毎日。**git のコミットはチャットから行ってよい**（2026-10-24 に利用者が指示。接続フォルダーの削除の許可を得れば git のロックファイルも消せる）。署名は利用者が後で付け直す |
 | `shuji-bonji/s1000d-writer-mcp` | Private | 未公開 | GitHub に作成済み、中身は空（段階 3） |
@@ -90,9 +90,13 @@ cd site && npm run build && npm run preview
 
 1. **10-4 公開後の確認**（利用者。下のチェックリスト）。加えて、`S1000D_SPEC_DIR` を設定したシェルから Claude Code を起動し、plugin で入れた `s1000d-brex` が `/mcp` で接続済みになり `explain_brex` が動くことを確かめる（plugin の `mcpServers` に `env` を書かない判断、D-23）。動かなければ `plugin.json` に `env` を足す案を検討する。
 2. **D-25（設定ファイル）は 2026-10-27 15:10 頃に公開済み**: core 0.4.0、brex-mcp・verify-mcp・reader-mcp 0.3.0（npm・MCP Registry・claude-plugins。core `^0.4.0`）。Claude Desktop の plugin 版が `~/.config/s1000d-stack/config.json` の `specDir` を読み、`list_schemas`（Issue 7 の XSD 33 本）と `explain_brex`（既定 BREX）が動くことを確かめた。`-dev` 版も core 0.4.0 で作り直し済み。LaunchAgent は片付け済み。
-3. サイトと hub の README は 2026-10-27 15:35 に更新済み（未 push）: `guide/getting-started.md` に「環境変数が渡らないとき（設定ファイル）」の節、MCP 3 ページの「設定」に設定ファイルの一文、`guide/architecture.md` の版（core 0.4.0・MCP 0.3.0）。README は表を `generate-stack.mjs --readme` で揃え、「できること」に段階 2.5 の修正提案と `suggest_fixes`、冒頭の注記に設定ファイルを足した。日本語 → 英語、`check:i18n` ok、29 ページ、内部リンク切れ 0（ビルドはクラウドの作業環境）
-4. **段階 2.5 の作業 3**（core に `CsdbSource` インターフェース）。設計は design/agent-platform.md「組み込みに要る広げ方」。
-5. `notes/site-review.md` に `guide/overview.md` と `use-cases/index.md` の照合表（3.10・3.11）を足す（任意）。
+3. サイトと hub の README は 2026-10-27 15:35 に更新済み（hub の `9f2c661`、push 済み）: `guide/getting-started.md` に「環境変数が渡らないとき（設定ファイル）」の節、MCP 3 ページの「設定」に設定ファイルの一文、`guide/architecture.md` の版（core 0.4.0・MCP 0.3.0）。
+4. **段階 2.5 の作業 3 は core 側が済み（2026-10-27 16:30 JST 頃、`6f0029e`、未 push・未公開）。** 残りは次の順で行う。
+   1. 利用者: core の `6f0029e` に署名し直して push し、`npm version minor`（0.5.0）→ `git push --follow-tags` で公開する（`docs/RELEASE.md`）。
+   2. チャット: reader-mcp と verify-mcp の依存を core `^0.5.0` に上げ、`readFileSync(o.path)` を `index.read(o)` に置き換える（場所は上の表）。`-dev` 版も作り直す。
+   3. チャット: サイトの `lib/s1000d-core.md`（日英）に `CsdbSource` の一文を足す（core の README の節「CSDB の置き場所を差し替える（CsdbSource）」が元）。
+5. **段階 2.5 の作業 4**（各 MCP に HTTP transport の起動オプション）。設計は design/agent-platform.md「組み込みに要る広げ方」。
+6. `notes/site-review.md` に `guide/overview.md` と `use-cases/index.md` の照合表（3.10・3.11）を足す（任意）。
 
 ## 作業 10 の記録（公開、D-16。2026-10-26 に完了）
 
