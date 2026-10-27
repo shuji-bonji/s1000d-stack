@@ -15,7 +15,7 @@ flowchart TB
     DOCS["docs/ plans and decision records"]
   end
   subgraph Lib["Shared libraries"]
-    CORE["s1000d-core<br/>published (npm 0.4.0)"]
+    CORE["s1000d-core<br/>published (npm 0.5.0)"]
     MODEL["experiential-manual-model<br/>published (npm 0.1.0)"]
   end
   subgraph Mcp["MCP servers"]
@@ -41,7 +41,7 @@ flowchart TB
 
 | Component | Role | Status (2026-10-27) |
 | --- | --- | --- |
-| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | Shared library for DMC, ICN, the identification and status section, BREX (Business Rules Exchange) checks, XSD validation, reference resolution, applicability evaluation, reading the content and deciding fix candidates | Published on [npm 0.4.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-core) |
+| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | Shared library for DMC, ICN, the identification and status section, BREX (Business Rules Exchange) checks, XSD validation, reference resolution, applicability evaluation, reading the content and deciding fix candidates | Published on [npm 0.5.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-core) |
 | [s1000d-brex-mcp](/s1000d-stack/mcp/brex-mcp/) | Explains and checks against BREX (5 tools) | Published on [npm 0.3.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-brex-mcp) |
 | [s1000d-reader-mcp](/s1000d-stack/mcp/reader-mcp/) | Returns the content of a data module as structure, resolves references, evaluates applicability (6 tools) | Published on [npm 0.3.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-reader-mcp) |
 | [s1000d-verify-mcp](/s1000d-stack/mcp/verify-mcp/) | Validation with the official XSD, BREX checks, detection of broken references, fix suggestions (6 tools) | Published on [npm 0.3.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-verify-mcp) |

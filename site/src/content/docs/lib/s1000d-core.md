@@ -31,6 +31,7 @@ npm install @shuji-bonji/s1000d-core
 | Read content (descript / proced / process / fault / pm) into a common shape | `readContent` / `readContentFromXml` |
 | Verification status that combines one data module's checks (well-formedness, XSD, BREX, references) | `verifyDataModule` / `VerificationStatus` |
 | Fix candidates from the verification result and from applicability that cannot be decided | `suggestFixes` / `findUndeterminedApplicability` / `findApplicTables` |
+| Swapping where the CSDB lives (a folder by default) | `CsdbSource` / `DirectoryCsdbSource` / `MemoryCsdbSource` / `CsdbIndex.fromSource` |
 
 ```ts
 import { readFileSync } from 'node:fs';
@@ -64,6 +65,10 @@ XSD validation uses `libxml2-wasm`. Compared with `xmllint-wasm`, it gave the sa
 ### The library decides the fix candidates
 
 Fix suggestion (`suggestFixes`) returns, for each finding, candidates that say what to change, where, and to which value. The candidates are decided deterministically from the BREX rules, the XSD definitions, the CSDB index, the ids in the document and the ACT/CCT/PCT. No score is given; certainty is expressed in three levels, `exact` / `several` / `none`. This keeps the LLM from inventing allowed values or reference targets and limits it to choosing among the candidates and explaining them. As with applicability evaluation and conformance checks, what can be confirmed is done by the library, and only putting it into words is left to the LLM.
+
+### Where the CSDB lives can be swapped
+
+By default the library treats `DMC-….XML` files inside a folder as the CSDB (`CsdbIndex.fromDirs`). A product's CSDB is a database or an API, so listing the CSDB objects (`list()`) and fetching their content (`readText()`) are gathered in the `CsdbSource` interface, which is swapped the same way as `XmlEngine` / `SchemaValidator` (0.5.0). The index is built with `CsdbIndex.fromSource(source)`, and other data modules (ACT/CCT/PCT, the BREX chain, reference targets) are read through the index's `read()`. The interface is synchronous: reference resolution and fix-candidate decisions are synchronous functions, and making them asynchronous would change their API, so a store that can only be read asynchronously is loaded first and passed to `MemoryCsdbSource`. Writing back will be added with the writer in stage 3.
 
 ### No distribution files included; tests use self-made data
 

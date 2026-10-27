@@ -15,7 +15,7 @@ flowchart TB
     DOCS["docs/ 計画と決定の記録"]
   end
   subgraph Lib["共有ライブラリ"]
-    CORE["s1000d-core<br/>公開済み（npm 0.3.0）"]
+    CORE["s1000d-core<br/>公開済み（npm 0.5.0）"]
     MODEL["experiential-manual-model<br/>公開済み（npm 0.1.0）"]
   end
   subgraph Mcp["MCP サーバー"]
@@ -41,7 +41,7 @@ flowchart TB
 
 | 部品 | 役割 | 状態（2026-10-27） |
 | --- | --- | --- |
-| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | DMC・ICN・識別・状態部・BREX 照合・XSD 検証・参照の解決・適用性の評価・本文の読み取り・修正候補の決定の共有ライブラリ | [npm 0.4.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-core) 公開済み |
+| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | DMC・ICN・識別・状態部・BREX 照合・XSD 検証・参照の解決・適用性の評価・本文の読み取り・修正候補の決定の共有ライブラリ | [npm 0.5.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-core) 公開済み |
 | [s1000d-brex-mcp](/s1000d-stack/ja/mcp/brex-mcp/) | BREX の説明と照合（5 ツール） | [npm 0.3.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-brex-mcp) 公開済み |
 | [s1000d-reader-mcp](/s1000d-stack/ja/mcp/reader-mcp/) | データモジュールの本文を構造化して返す、参照の解決、適用性の判定（6 ツール） | [npm 0.3.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-reader-mcp) 公開済み |
 | [s1000d-verify-mcp](/s1000d-stack/ja/mcp/verify-mcp/) | 公式 XSD による検証、BREX 照合、参照切れの検出、修正提案（6 ツール） | [npm 0.3.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-verify-mcp) 公開済み |

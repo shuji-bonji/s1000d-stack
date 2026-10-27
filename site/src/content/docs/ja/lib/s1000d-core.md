@@ -31,6 +31,7 @@ npm install @shuji-bonji/s1000d-core
 | 本文（descript / proced / process / fault / pm）の共通の形への読み取り | `readContent` / `readContentFromXml` |
 | 1 件の検証（整形式・XSD・BREX・参照）をまとめた検証状態 | `verifyDataModule` / `VerificationStatus` |
 | 検証の結果と、判定できない適用性からの修正候補 | `suggestFixes` / `findUndeterminedApplicability` / `findApplicTables` |
+| CSDB の置き場所の差し替え（既定はフォルダー） | `CsdbSource` / `DirectoryCsdbSource` / `MemoryCsdbSource` / `CsdbIndex.fromSource` |
 
 ```ts
 import { readFileSync } from 'node:fs';
@@ -64,6 +65,10 @@ XSD 検証は `libxml2-wasm` で行います。`xmllint-wasm` と比べ、Issue 
 ### 修正の候補はライブラリが決める
 
 修正提案（`suggestFixes`）は、違反ごとに「何を」「どこで」「どの値に」直せばよいかの候補を返します。候補は BREX のルール、XSD の定義、CSDB の索引、文書の中の id、ACT・CCT・PCT から決定論的に決め、点数は付けず、確からしさを `exact` / `several` / `none` の 3 段階で表します。LLM に許可値や参照先を考え出させず、候補の中から選んで説明する役に限るためです。適用性の評価や準拠の判定と同じく、確かめられることはライブラリが行い、文章にすることだけを LLM に任せます。
+
+### CSDB の置き場所は差し替えられる
+
+このライブラリは既定で「フォルダーの中の `DMC-….XML`」を CSDB と見なします（`CsdbIndex.fromDirs`）。製品の CSDB はデータベースや API なので、CSDB オブジェクトの一覧（`list()`）と中身の取得（`readText()`）を `CsdbSource` インターフェースに集め、`XmlEngine` / `SchemaValidator` と同じ形で差し替えられるようにしています（0.5.0）。索引は `CsdbIndex.fromSource(source)` で作り、他のデータモジュール（ACT・CCT・PCT、BREX の連鎖、参照先）は索引の `read()` から読みます。インターフェースは同期です。参照の解決や修正候補の決定が同期関数で、非同期にするとそれらの API を変えることになるためで、非同期にしか読めない置き場所は先に読み込んで `MemoryCsdbSource` に渡します。書き戻しは段階 3 の writer で足します。
 
 ### 配布物は含めない、テストは自作データで
 
