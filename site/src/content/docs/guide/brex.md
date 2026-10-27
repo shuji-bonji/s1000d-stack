@@ -84,7 +84,7 @@ The check logic lives in the shared library `s1000d-core`, and `s1000d-brex-mcp`
 | `allowedObjectFlag="2"` | The value of each node in the result is checked against `objectValue`; a violation if it matches none of them (`value`). No check is made if there is no `objectValue` with `valueAllowed` |
 | `objectPath` that returns a boolean | true is treated as "target present" and false as "target absent", and the same rules are applied |
 | `rulesContext` | The block whose schema file name matches the `xsi:noNamespaceSchemaLocation` of the target data module is applied, together with the common block |
-| `notationRuleList` | A violation if a NOTATION used in `ENTITY … NDATA` in the DOCTYPE is not in the allowed set (the base set plus schema-specific additions and exclusions) (`notation`) |
+| `notationRuleList` | A violation if a NOTATION used in `ENTITY … NDATA` in the DOCTYPE is not in the allowed set (the base set plus schema-specific redefinitions and exclusions) (`notation`). A BREX that has no inclusion (`allowedNotationFlag="1"`) and only exclusions (`"0"`) is treated as forbidding only the excluded formats and not restricting any others. This is because `allowedNotationFlag` is always relative to the base set, and when a BREX does not define the base set, the scope is to be decided by other means |
 | `nonContextRules` | Not evaluated; returned as manual checks |
 | Layers | The chain is followed up to the default BREX and each layer is checked separately. The check passes only when no layer has a violation and no BREX is missing |
 
@@ -94,4 +94,8 @@ BREX rules are written on the assumption that the data module conforms to the sc
 
 ## The official samples also violate the default BREX
 
-Checking the Bike Samples from the distribution (the bicycle example: 105 of its 106 data modules, excluding the bicycle BREX itself) against the two layers "bicycle BREX → default BREX" finds a total of 55 violations of the default BREX. Even the official samples do not satisfy the default BREX in full. Whether this is strictness on the side of the default BREX or defects on the side of the samples has not been investigated, but keeping in mind that "violations of the default BREX are reported" and "the data module is unusable" are two different things makes the results easier to read.
+Checking the Bike Samples from the distribution (the bicycle example: 105 of its 106 data modules, excluding the bicycle BREX itself) against the two layers "bicycle BREX → default BREX" finds 18 violations of the default BREX (all of them `forbidden`: an element that must not be used is present). Even the official samples do not satisfy the default BREX in full. Whether this is strictness on the side of the default BREX or defects on the side of the samples has not been investigated, but keeping in mind that "violations of the default BREX are reported" and "the data module is unusable" are two different things makes the results easier to read.
+
+:::note[Difference from earlier versions]
+This page used to say "a total of 55 violations". Most of them came from an error in this stack's NOTATION check (it read a `notationRuleList` with exclusions only as "forbid everything"), reported in the bicycle BREX layer. It was fixed in `s1000d-core` 0.3.0 (2026-10-27).
+:::

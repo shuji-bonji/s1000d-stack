@@ -34,6 +34,8 @@
 | 品質保証（未検証 / 第 1 検証 / 第 2 検証） | quality assurance (unverified / first verification / second verification) | |
 | ICN | information control number (ICN) | |
 | 図 | illustration | S1000D では figure より illustration が通例 |
+| 基本セット（NOTATION の） | base set | `rulesContext` の無い `notationRule` の許可で作る集合 |
+| 除外（NOTATION の） | exclusion / exclude | `allowedNotationFlag="0"` |
 | IETP / IETM | interactive electronic technical publication (IETP) / interactive electronic technical manual (IETM) | |
 | 仕様書 | the S1000D specification | 「Issue 7」は Issue 7 のまま |
 | 配布物 | the S1000D distribution (downloaded package) | 文脈で the downloaded package |
@@ -58,6 +60,10 @@
 | 違反 | violation | |
 | 手動確認の項目 | manual checks | `manualChecks` |
 | 判定（適用性の） | evaluation | 3 値は applicable / notApplicable / undetermined のまま |
+| 修正提案 | fix suggestion / suggest fixes | `suggest_fixes`、`suggestFixes`。1 件は a fix suggestion |
+| 直し方の候補 | candidate correction / candidate | `candidates` |
+| 確からしさ | certainty | `confidence`（exact / several / none のまま） |
+| 出どころ（候補の） | where the candidates come from / origin | `source` |
 | 構造として読む | read as structure | |
 | 共有ライブラリ | shared library | |
 | 共通データモデル | common data model | |

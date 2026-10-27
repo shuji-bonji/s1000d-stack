@@ -14,7 +14,7 @@ description: BREX を LLM が読み、データモジュールを BREX に照合
 | `explain_brex` | BREX のルールを一覧にします。対象（XPath）、使用可否、許可する値とその意味、重大度、適用されるスキーマを返します。`kind`（structure / notation / nonContext）、`context`（スキーマ名）、`search`（文字列）で絞り、`offset` と `limit` で分けて読めます |
 | `lookup_sns` | DMC またはコードから、システム番号（SNS）が何を指すかを返します。途中までしか一致しないときは `exact: false` |
 | `lookup_value` | 要素・属性の値がプロジェクトで何を意味するか、どの値が許可されているかを返します。`value` を渡すと許可の判定も返します |
-| `list_notations` | 使ってよい図・マルチメディアの形式を、基本セットとスキーマ別の追加・除外に分けて返します |
+| `list_notations` | 使ってよい図・マルチメディアの形式を、基本セット（`baseSet`）、基本セットからの除外（`baseExcluded`）、スキーマ別の再定義と除外（`perContext`）に分けて返します。`context` にスキーマ名を渡すと、そのスキーマでの扱いを `effectiveFor.mode` で返します。`closed` は `allowed` に挙げた形式だけを使える、`open` は `excluded` に挙げた形式だけを禁止する（除外だけの BREX）、`unrestricted` はこの BREX では制限しない、という意味です |
 | `check_against_brex` | データモジュールを BREX に照合し、違反を箇所（XPath と行番号）・実際の値・ルール ID・説明・重大度付きで返します。既定では `brexDmRef` の連鎖をたどり、各層に個別に照合します |
 
 ## できないこと

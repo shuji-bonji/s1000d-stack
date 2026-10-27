@@ -2,7 +2,7 @@
 
 LLM が S1000D の技術文書を正しく読み、プロジェクトの決まり（ビジネスルール）に沿って検査・作成できるようにするための MCP サーバー・共有ライブラリ・Skill と、体験型マニュアルの作成ツール・閲覧ソフトをまとめるプロジェクトです。
 
-- 作成日: 2026-10-23（JST）、更新日: 2026-10-27（JST、core 0.3.0 の公開と MCP 3 本の依存の更新を記録）
+- 作成日: 2026-10-23（JST）、更新日: 2026-10-27（JST、MCP 3 本の 0.2.0 の公開とサイトの更新を記録）
 - 構成の手本: [houki-hub](https://github.com/shuji-bonji/houki-hub)、[pdf-agent-stack](https://github.com/shuji-bonji/pdf-agent-stack)
 - 決定事項: [DECISIONS.md](./DECISIONS.md)
 - 調査メモ: [notes/background.md](./notes/background.md)
@@ -207,8 +207,8 @@ flowchart LR
 |---|---|
 | 設計 | 済み（2026-10-25、design/agent-platform.md、D-19） |
 | 1 | 済み（2026-10-27 04:30 JST 頃、core の `4565bdc`、**core 0.3.0 として 2026-10-27 10:40 JST に公開**）。`src/fix/`（`Fix` 型、`suggestFixes`、`suggestBrexFixes` / `suggestSchemaFixes` / `suggestReferenceFixes` / `suggestApplicabilityFixes` / `findUndeterminedApplicability`、XSD の定義を読む `XsdIndex`、`nearMatches`）と、reader-mcp から移した `findApplicTables`。自作データのテスト 15 件と配布物のテスト 2 件を追加し、自作 88 件・配布物 13 件がすべて通る。Bike Samples 106 件では、BREX 違反・未解決の参照・版の食い違いの 1,136 件すべてに修正提案が付き（0.7 秒）、うち 954 件は仕様書の章への `dmRef`（候補なし・説明だけ）。改変した Bike Samples の DM で、`securityClassification` の違反に公式 XSD の `securityClassificationAttType` の列挙が候補として付くことも確かめた |
-| 2 | 済み（2026-10-27、verify-mcp の `0c6ef76`、未 push・未公開）。ツール `suggest_fixes`（6 本目）と `instructions` の追記。自作データのテスト 4 件と配布物のテスト 1 件を追加し、17＋6 件がすべて通る。stdio の実機確認済み。テストはローカルの core（`npm pack` した 0.3.0 相当）を `--no-save` で入れて実行した。**core 0.3.0 の公開 → verify-mcp の依存を `^0.3.0` に上げる → push の順**（npm の 0.2.0 には `suggestFixes` が無く、CI が落ちるため。verify-mcp Issue #1）。2026-10-27 11:00 頃、core 0.3.0 の公開を受けて依存を `^0.3.0` に上げた（`e9070db`）。残りは署名・push・0.2.0 の公開 |
-| 1 の副産物 | 済み（2026-10-27、core の `8be8a91`、0.3.0 で公開）。BREX の NOTATION の照合で、除外（`allowedNotationFlag="0"`）だけの層を「使ってよい NOTATION が 0 件」と読んでいた誤りを直した。根拠は Issue 7 Chap 4.10.2.2 Para 2.2.2（`allowedNotationFlag` は基本セットに対する相対的な宣言で、基本セットを BREX で決めないときは BREX 以外の手段で範囲を決める）。新しい `notationPolicy`（`closed` / `open`）で判定する。Bike Samples の NOTATION の違反 36 件が 0 件になり、Bike Samples の BREX の違反は禁止要素の 18 件だけになった。brex-mcp の `list_notations` は `effectiveFor` に `mode`（closed / open / unrestricted）と `excluded` を足して切り替えた（brex-mcp の `953b4f6`、Issue #1、未 push・未公開）。reader-mcp も依存を上げ、ACT・CCT・PCT の探索を core の `findApplicTables` に切り替えた（`0e161d3`、Issue #1、未 push・未公開） |
+| 2 | 済み（2026-10-27、verify-mcp の `0c6ef76`、0.2.0 で公開）。ツール `suggest_fixes`（6 本目）と `instructions` の追記。自作データのテスト 4 件と配布物のテスト 1 件を追加し、17＋6 件がすべて通る。stdio の実機確認済み。テストはローカルの core（`npm pack` した 0.3.0 相当）を `--no-save` で入れて実行した。**core 0.3.0 の公開 → verify-mcp の依存を `^0.3.0` に上げる → push の順**（npm の 0.2.0 には `suggestFixes` が無く、CI が落ちるため。verify-mcp Issue #1）。2026-10-27 11:00 頃、core 0.3.0 の公開を受けて依存を `^0.3.0` に上げた（`e9070db`）。2026-10-27 11:07 JST に 0.2.0 を npm と MCP Registry に公開 |
+| 1 の副産物 | 済み（2026-10-27、core の `8be8a91`、0.3.0 で公開）。BREX の NOTATION の照合で、除外（`allowedNotationFlag="0"`）だけの層を「使ってよい NOTATION が 0 件」と読んでいた誤りを直した。根拠は Issue 7 Chap 4.10.2.2 Para 2.2.2（`allowedNotationFlag` は基本セットに対する相対的な宣言で、基本セットを BREX で決めないときは BREX 以外の手段で範囲を決める）。新しい `notationPolicy`（`closed` / `open`）で判定する。Bike Samples の NOTATION の違反 36 件が 0 件になり、Bike Samples の BREX の違反は禁止要素の 18 件だけになった。brex-mcp の `list_notations` は `effectiveFor` に `mode`（closed / open / unrestricted）と `excluded` を足して切り替えた（brex-mcp 0.2.0、Issue #1）。reader-mcp も依存を上げ、ACT・CCT・PCT の探索を core の `findApplicTables` に切り替えた（reader-mcp 0.2.0、Issue #1）。どちらも 2026-10-27 11:07〜11:09 JST に npm と MCP Registry に公開。サイト（`guide/brex.md`・`mcp/verify-mcp.md`・`mcp/brex-mcp.md`・`lib/s1000d-core.md`・`guide/architecture.md`、日英）と README の表も同日に更新（s1000d-stack #4） |
 | 3〜8 | 未 |
 
 ## 対象とする S1000D の版

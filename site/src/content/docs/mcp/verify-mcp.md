@@ -3,7 +3,7 @@ title: s1000d-verify-mcp
 description: The configuration and tools of the MCP server that validates against XSD, checks against BREX, resolves references, and returns the results as a single verification status.
 ---
 
-`s1000d-verify-mcp` is an MCP server that validates a data module against the XML schema (XSD), checks it against the BREX (Business Rules Exchange) chain, confirms that its references (`dmRef`, `pmRef`, ICN, `internalRef` and `applicRefId`) can be resolved, and returns the results as a single **verification status** (`verification`). It has 5 tools. The verification status has the same shape as the one `s1000d-reader-mcp` embeds in its content responses; both are built by the same function in the shared library `s1000d-core`.
+`s1000d-verify-mcp` is an MCP server that validates a data module against the XML schema (XSD), checks it against the BREX (Business Rules Exchange) chain, confirms that its references (`dmRef`, `pmRef`, ICN, `internalRef` and `applicRefId`) can be resolved, and returns the results as a single **verification status** (`verification`). It also suggests fixes (`suggest_fixes`), returning candidate corrections for each finding, for a total of 6 tools. The verification status has the same shape as the one `s1000d-reader-mcp` embeds in its content responses; both are built by the same function in the shared library `s1000d-core`.
 
 [GitHub](https://github.com/shuji-bonji/s1000d-verify-mcp) / [npm](https://www.npmjs.com/package/@shuji-bonji/s1000d-verify-mcp)
 
@@ -15,6 +15,7 @@ description: The configuration and tools of the MCP server that validates agains
 | `validate_schema` | Runs XSD validation only. The XSD to use is chosen by the file name in `xsi:noNamespaceSchemaLocation` and looked up in `xml_schema_flat/` under `S1000D_SPEC_DIR`. The issue is read from `Issue number:` at the top of `brex.xsd` |
 | `check_references` | Collects references of 5 kinds and returns whether each target exists, with a reason (`not-found` / `no-entity-declaration` / `file-not-found` / `no-such-id` / `no-csdb`). A `dmRef` to a chapter of the specification (model identification code `S1000D`) is not a broken reference, so it is reported separately |
 | `verify_csdb` | Verifies the CSDB objects in a folder (DMC and PMC by default) in one run, and returns the verification status of each object and a count summary. Read the results in parts with `offset` and `limit`, and write the details to JSON with `reportPath` |
+| `suggest_fixes` | Runs the same verification as `verify_data_module` and returns candidate corrections for each finding. The server decides the candidates and adds where they come from and how certain they are (`exact` / `several` / `none`). If `product` is given, applicability that cannot be decided because the product lacks a value also gets candidate values. It does not apply any correction to the document |
 | `list_schemas` | Returns the list of `xml_schema_flat/` folders found under `S1000D_SPEC_DIR` (issue, number of XSDs, schema names). Use it to find the cause of `schema-not-found` |
 
 ## Reading the verification status
@@ -42,11 +43,34 @@ flowchart LR
 When the XSD is not found, validation simply did not run; it does not mean the document is correct. Use `list_schemas` to confirm how the distribution is laid out. In a document that violates the XSD, elements may not be where the specification puts them, so BREX violations can be reported wrongly or hidden. When `schema.state` is `invalid`, treat the BREX results as indicative only (the response says so in `_notes` as well).
 :::
 
+## Reading the fix suggestions
+
+The response of `suggest_fixes` contains the verification status (`verification`) and the list of fix suggestions (`fixes`). Each fix suggestion has the following fields.
+
+| Field | Content |
+| --- | --- |
+| `kind` | What the suggestion is about (`schema` / `brex-value` / `brex-forbidden` / `brex-missing` / `brex-notation` / `reference` / `applicability`) |
+| `location` | Where the finding is (XPath and line number) |
+| `problem` | What is wrong (the text of the original result) |
+| `candidates` | Candidate corrections: `action` (`replace` / `remove` / `add` / `retarget` / `provide`), `value`, `target` (what to change) and `description` |
+| `confidence` | `exact` = one candidate with a fixed value, `several` = choose among several candidates, or a value that fits a range or pattern, `none` = no candidate could be decided |
+| `source` | Where the candidates come from (BREX rule ID, name of the XSD definition, CSDB, ids in the document, ACT/CCT/PCT) |
+| `note` | Why no candidate could be decided, or what to watch for when choosing |
+
+The server decides every candidate. Only values with a clear origin become candidates: for a BREX value violation, the rule's allowed values and their descriptions; for an XSD error, the enumerated values, patterns and element names in the libxml2 message or in the XSD definitions; for a broken reference, similar data module codes in the CSDB or files that differ only in the extension. The intended use is that the LLM chooses among the candidates and explains them, and does not invent values outside them. The MCP `instructions` say the same.
+
+- When `confidence` is `none`, ask the user.
+- A candidate whose `valueForm` is `range` or `pattern` is a constraint, not a value. Ask the user for a concrete value that satisfies it.
+- A candidate whose `action` is `provide` is not a change to the document; it is a value for the product used to evaluate applicability.
+- A `dmRef` to a chapter of the specification (model identification code `S1000D`) is not an error, so by default it is not listed; only the count is returned in `omitted.specificationReferences`.
+- After applying a correction, verify the document again.
+
 ## What it does not do
 
 - **It does not judge conformance to S1000D®.** `valid` and `passed` mean only that no errors were found against the XSD and the BREX rules that a machine can check. `nonContextRules` (rules written as prose) are returned as `manualChecks`, and a person makes the judgement. The project's business rules document is not the subject of any tool.
 - It does not return explanations of BREX rules or the meaning of values. That is the job of `explain_brex` / `lookup_value` in [`s1000d-brex-mcp`](/s1000d-stack/mcp/brex-mcp/). Severity codes (`brsl01` to `brsl99`) are returned as they are.
-- It does not evaluate applicability (which product the content applies to). `check_references` only checks whether the target of `applicRefId` exists. Evaluation is done by [`s1000d-reader-mcp`](/s1000d-stack/mcp/reader-mcp/).
+- It does not evaluate applicability (which product the content applies to). `check_references` only checks whether the target of `applicRefId` exists. Evaluation is done by [`s1000d-reader-mcp`](/s1000d-stack/mcp/reader-mcp/). The exception is `suggest_fixes` with `product`, which reports only applicability that cannot be decided because the product lacks a value.
+- It does not apply corrections to the document. `suggest_fixes` only returns candidates.
 
 ## Configuration
 
@@ -78,5 +102,5 @@ XSD validation is done with `libxml2-wasm` (the WebAssembly build of libxml2); e
 
 ## What the official samples show
 
-All 106 DMCs and 4 PMCs of the Bike Samples conform to the Issue 7 XSD. On the other hand, 954 of the 1,843 `dmRef` elements point to DMCs with the model identification code `S1000D`, that is, to chapters of the specification; they are not in the CSDB, so they are unresolved (almost all of them inside the business rules document `…-024A-D`). `check_references` returns these separately as `specificationReferences` and does not count them in `unresolved`. There is also 1 inconsistency where an ICN declared as `.PNG` in the DOCTYPE has an actual file with the extension `.SVG`, which is reported as `file-not-found`. No lenient resolution that tolerates a different extension is included, because a file that is not placed as declared is exactly the kind of fact a delivery inspection should find.
+All 106 DMCs and 4 PMCs of the Bike Samples conform to the Issue 7 XSD. On the other hand, 954 of the 1,843 `dmRef` elements point to DMCs with the model identification code `S1000D`, that is, to chapters of the specification; they are not in the CSDB, so they are unresolved (almost all of them inside the business rules document `…-024A-D`). `check_references` returns these separately as `specificationReferences` and does not count them in `unresolved`. There is also 1 inconsistency where an ICN declared as `.PNG` in the DOCTYPE has an actual file with the extension `.SVG`, which is reported as `file-not-found`. No lenient resolution that tolerates a different extension is included, because a file that is not placed as declared is exactly the kind of fact a delivery inspection should find. Instead, `suggest_fixes` returns "the file with the same name and the extension `.SVG`" as a candidate for this reference, and its description notes that the `NDATA` of the declaration must be changed to match.
 

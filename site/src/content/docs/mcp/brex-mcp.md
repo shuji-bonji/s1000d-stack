@@ -14,7 +14,7 @@ description: Configuration and tools of the MCP server that lets an LLM read a B
 | `explain_brex` | Lists the rules of a BREX. Returns the target (XPath), whether it may be used, the allowed values and their meaning, the severity level and the schemas the rule applies to. Narrow the list with `kind` (structure / notation / nonContext), `context` (schema name) and `search` (a string), and read it in parts with `offset` and `limit` |
 | `lookup_sns` | Returns what a standard numbering system (SNS) code refers to, from a DMC or a code. When only a prefix matches, `exact: false` |
 | `lookup_value` | Returns what an element or attribute value means in the project and which values are allowed. Pass `value` to also get whether that value is allowed |
-| `list_notations` | Returns the illustration and multimedia formats that may be used, split into the base set and the per-schema additions and exclusions |
+| `list_notations` | Returns the illustration and multimedia formats that may be used, split into the base set (`baseSet`), exclusions from the base set (`baseExcluded`) and the per-schema redefinitions and exclusions (`perContext`). Pass a schema name in `context` to get how that schema is restricted in `effectiveFor.mode`: `closed` means only the formats in `allowed` may be used, `open` means only the formats in `excluded` are forbidden (a BREX with exclusions only), and `unrestricted` means this BREX does not restrict formats |
 | `check_against_brex` | Checks a data module against a BREX and returns each violation with its location (XPath and line number), actual value, rule ID, description and severity level. By default it follows the `brexDmRef` chain and checks against each layer separately |
 
 ## What it does not do

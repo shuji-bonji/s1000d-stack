@@ -6,7 +6,7 @@
     "layer = 役割 / form = 配布形態（誰が起動するか）/ status = released・developing・planned・concept。",
     "developing はリポジトリで開発中で npm 未公開。planned / concept はディレクトリも npm も無い。"
   ],
-  "generatedAt": "2026-10-27T02:11:27.963Z",
+  "generatedAt": "2026-10-27T02:16:48.436Z",
   "generatedBy": "scripts/generate-stack.mjs",
   "npmScope": "@shuji-bonji",
   "repos": [
@@ -87,7 +87,7 @@
         "version": "0.2.0",
         "tag": "v0.2.0",
         "dirty": false,
-        "unpushedCommits": 1
+        "unpushedCommits": 2
       },
       "consistency": {
         "status": "match",

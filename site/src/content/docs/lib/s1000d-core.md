@@ -30,6 +30,7 @@ npm install @shuji-bonji/s1000d-core
 | Applicability (read the ACT, CCT and PCT; three-valued evaluation of `assert` / `evaluate`) | `readAct` / `readCct` / `readPct` / `ApplicEvaluator` |
 | Read content (descript / proced / process / fault / pm) into a common shape | `readContent` / `readContentFromXml` |
 | Verification status that combines one data module's checks (well-formedness, XSD, BREX, references) | `verifyDataModule` / `VerificationStatus` |
+| Fix candidates from the verification result and from applicability that cannot be decided | `suggestFixes` / `findUndeterminedApplicability` / `findApplicTables` |
 
 ```ts
 import { readFileSync } from 'node:fs';
@@ -59,6 +60,10 @@ Both `s1000d-brex-mcp` (stage 1) and `s1000d-verify-mcp` (stage 2) check against
 ### XSD validation with libxml2-wasm, implementation in a subpath
 
 XSD validation uses `libxml2-wasm`. Compared with `xmllint-wasm`, it gave the same verdicts on the 33 Issue 7 XSD files and the 106 Bike Samples, and it was about 30 times faster because a compiled validator can be reused. The API used to resolve `xs:import` is marked experimental (`@alpha`), so, like `XmlEngine`, the validator sits behind the `SchemaValidator` interface, and the implementation is loaded from the subpath `@shuji-bonji/s1000d-core/xsd-libxml2`. `libxml2-wasm` is an optional peerDependency, so `s1000d-brex-mcp`, which does not use XSD validation, does not have to install it.
+
+### The library decides the fix candidates
+
+Fix suggestion (`suggestFixes`) returns, for each finding, candidates that say what to change, where, and to which value. The candidates are decided deterministically from the BREX rules, the XSD definitions, the CSDB index, the ids in the document and the ACT/CCT/PCT. No score is given; certainty is expressed in three levels, `exact` / `several` / `none`. This keeps the LLM from inventing allowed values or reference targets and limits it to choosing among the candidates and explaining them. As with applicability evaluation and conformance checks, what can be confirmed is done by the library, and only putting it into words is left to the LLM.
 
 ### No distribution files included; tests use self-made data
 
