@@ -6,7 +6,7 @@
     "layer = 役割 / form = 配布形態（誰が起動するか）/ status = released・developing・planned・concept。",
     "developing はリポジトリで開発中で npm 未公開。planned / concept はディレクトリも npm も無い。"
   ],
-  "generatedAt": "2026-10-28T02:34:57.836Z",
+  "generatedAt": "2026-10-28T08:20:21.967Z",
   "generatedBy": "scripts/generate-stack.mjs",
   "npmScope": "@shuji-bonji",
   "repos": [
@@ -18,17 +18,17 @@
       "form": "library",
       "status": "released",
       "public": true,
-      "note": "DMC・ICN・PMC の分解、識別・状態部の読み取り、BREX の読み取りと照合（連鎖・層別）、XSD 検証（SchemaValidator、実装は libxml2-wasm のサブパス）、参照の解決、適用性の 3 値評価、本文（descript / proced / process / fault / pm）の共通の形への読み取り、検証状態 VerificationStatus。全 MCP が依存",
-      "published": "0.7.0",
+      "note": "DMC・ICN・PMC の分解、識別・状態部の読み取り、BREX の読み取りと照合（連鎖・層別）、XSD 検証（SchemaValidator、実装は libxml2-wasm のサブパス）、参照の解決、適用性の 3 値評価、本文（descript / proced / process / fault / pm）の共通の形への読み取り、検証状態 VerificationStatus、修正候補の決定。0.8.0 で「書く側」（データモジュールの組み立てと採番、修正候補の適用、WritableCsdbSource、comment DM、翻訳向けの文の出し入れ）を追加。全 MCP が依存",
+      "published": "0.8.0",
       "local": {
-        "version": "0.7.0",
-        "tag": "v0.7.0",
+        "version": "0.8.0",
+        "tag": "v0.8.0",
         "dirty": false,
         "unpushedCommits": 0
       },
       "consistency": {
         "status": "match",
-        "detail": "0.7.0"
+        "detail": "0.8.0"
       }
     },
     {
@@ -116,6 +116,27 @@
       }
     },
     {
+      "name": "s1000d-writer-mcp",
+      "dir": "mcp/s1000d-writer-mcp",
+      "npm": "@shuji-bonji/s1000d-writer-mcp",
+      "layer": "mcp",
+      "form": "mcp-server",
+      "status": "released",
+      "public": true,
+      "note": "段階 3。LLM に XML を書かせずにデータモジュールを作る。build_data_module / convert_manual / apply_fixes / create_comment / extract_segments / apply_segments の 6 tools。npm 未公開（0.1.0 を公開する前）。公開したら status を released にし、public を true にする",
+      "published": "0.1.1",
+      "local": {
+        "version": "0.1.1",
+        "tag": "v0.1.1",
+        "dirty": false,
+        "unpushedCommits": 0
+      },
+      "consistency": {
+        "status": "match",
+        "detail": "0.1.1"
+      }
+    },
+    {
       "name": "s1000d-stack",
       "dir": ".",
       "npm": null,
@@ -128,28 +149,12 @@
       "local": {
         "version": null,
         "tag": null,
-        "dirty": false,
-        "unpushedCommits": 2
+        "dirty": true,
+        "unpushedCommits": 0
       },
       "consistency": {
         "status": "developing",
         "detail": "npm 未公開（開発中）。照合対象外"
-      }
-    },
-    {
-      "name": "s1000d-writer-mcp",
-      "dir": "mcp/s1000d-writer-mcp",
-      "npm": "@shuji-bonji/s1000d-writer-mcp",
-      "layer": "mcp",
-      "form": "mcp-server",
-      "status": "planned",
-      "public": false,
-      "note": "段階 3。共通データモデルからデータモジュール・パブリケーションモジュールを生成する。S1000D との変換関数はここに置く",
-      "published": null,
-      "local": null,
-      "consistency": {
-        "status": "not_started",
-        "detail": "planned（未着手のため照合対象外）"
       }
     },
     {
@@ -160,7 +165,7 @@
       "form": "skill",
       "status": "concept",
       "public": false,
-      "note": "段階 3。experience-to-s1000d / s1000d-publish / s1000d-review の 3 つ。リポジトリ名の規則は U-09",
+      "note": "段階 3。experience-to-s1000d / s1000d-publish / s1000d-review / s1000d-translate の 4 つ。リポジトリ名の規則は U-09",
       "published": null,
       "local": null,
       "consistency": {

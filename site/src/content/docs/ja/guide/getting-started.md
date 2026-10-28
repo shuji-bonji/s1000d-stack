@@ -49,6 +49,8 @@ Claude Desktop の設定ファイル（`claude_desktop_config.json`）に次を�
 - 「このデータモジュール（パス）を BREX に照合して、違反を一覧にして」 → `check_against_brex`
 - 「`securityClassification` の `01` はこの BREX では何を意味する？」 → `lookup_value`
 
+`s1000d-verify-mcp`・`s1000d-reader-mcp`・`s1000d-writer-mcp` も、名前と `args` のパッケージ名（`@shuji-bonji/s1000d-verify-mcp` など）を変えるだけで、同じ形で登録できます。`s1000d-writer-mcp` はファイルを書き込めるので、書き込み先にするフォルダーを `S1000D_CSDB_DIR` の先頭に指定してください。詳しくは [s1000d-writer-mcp](/s1000d-stack/ja/mcp/writer-mcp/) のページを参照してください。
+
 :::tip[Claude Code では plugin からも入れられます]
 3 つの MCP サーバーは MCP Registry（`io.github.shuji-bonji/s1000d-brex-mcp` など）と、個人の marketplace [shuji-bonji/claude-plugins](https://github.com/shuji-bonji/claude-plugins)（category `s1000d`）に載せています。Claude Code では `claude plugin marketplace add shuji-bonji/claude-plugins` の後に `claude plugin install s1000d-brex-mcp@shuji-bonji` で入ります。plugin は環境変数を設定しません。Claude Code では、`S1000D_SPEC_DIR` と `S1000D_CSDB_DIR` を設定したシェルから起動すれば、その値が渡ります。
 :::

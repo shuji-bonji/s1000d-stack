@@ -52,7 +52,7 @@ const README_FILE = join(ROOT, 'README.md');
 const REGISTRY = [
   // ── 公開済み ────────────────────────────────────────────────
   { name: 's1000d-core',      dir: 'lib/s1000d-core',      npm: '@shuji-bonji/s1000d-core',      layer: 'core', form: 'library',    status: 'released',   public: true,
-    note: 'DMC・ICN・PMC の分解、識別・状態部の読み取り、BREX の読み取りと照合（連鎖・層別）、XSD 検証（SchemaValidator、実装は libxml2-wasm のサブパス）、参照の解決、適用性の 3 値評価、本文（descript / proced / process / fault / pm）の共通の形への読み取り、検証状態 VerificationStatus。全 MCP が依存' },
+    note: 'DMC・ICN・PMC の分解、識別・状態部の読み取り、BREX の読み取りと照合（連鎖・層別）、XSD 検証（SchemaValidator、実装は libxml2-wasm のサブパス）、参照の解決、適用性の 3 値評価、本文（descript / proced / process / fault / pm）の共通の形への読み取り、検証状態 VerificationStatus、修正候補の決定。0.8.0 で「書く側」（データモジュールの組み立てと採番、修正候補の適用、WritableCsdbSource、comment DM、翻訳向けの文の出し入れ）を追加。全 MCP が依存' },
 
   // ── 公開済み（段階 2 の 3 部品と brex-mcp は 2026-10-26 に 0.1.0 を公開、D-16）────
   { name: 's1000d-brex-mcp',  dir: 'mcp/s1000d-brex-mcp',  npm: '@shuji-bonji/s1000d-brex-mcp',  layer: 'mcp',  form: 'mcp-server', status: 'released',   public: true,
@@ -63,14 +63,14 @@ const REGISTRY = [
     note: '段階 2。データモジュールの本文を構造化して返す、参照の解決、適用性の判定（式は LLM に渡さない）。応答に検証状態を含める。list_data_modules / read_data_module / read_publication_module / resolve_reference / describe_applicability / read_icn_metadata の 6 tools' },
   { name: 'experiential-manual-model', dir: 'lib/experiential-manual-model', npm: '@shuji-bonji/experiential-manual-model', layer: 'model', form: 'library', status: 'released',   public: true,
     note: '段階 2。体験型マニュアルの共通データモデル（型・JSON Schema・検査・2021 年の作品 JSON からの変換）。S1000D に依存しない。名前は U-04 で確定' },
+  { name: 's1000d-writer-mcp', dir: 'mcp/s1000d-writer-mcp', npm: '@shuji-bonji/s1000d-writer-mcp', layer: 'mcp', form: 'mcp-server', status: 'released', public: true,
+    note: '段階 3。LLM に XML を書かせずにデータモジュールを作る。build_data_module / convert_manual / apply_fixes / create_comment / extract_segments / apply_segments の 6 tools。npm 未公開（0.1.0 を公開する前）。公開したら status を released にし、public を true にする' },
   { name: 's1000d-stack',     dir: '.',                    npm: null,                            layer: 'hub',  form: 'site',       status: 'developing', public: true,
     note: '本リポジトリ。site/ に Astro Starlight の学習サイト（GitHub Pages で公開。英語がルート、日本語は /ja/）' },
 
-  // ── 予定・構想（ディレクトリも npm も無い。照合はしない）──────────
-  { name: 's1000d-writer-mcp', dir: 'mcp/s1000d-writer-mcp', npm: '@shuji-bonji/s1000d-writer-mcp', layer: 'mcp', form: 'mcp-server', status: 'planned', public: false,
-    note: '段階 3。共通データモデルからデータモジュール・パブリケーションモジュールを生成する。S1000D との変換関数はここに置く' },
+  // ── 開発中（ディレクトリはあるが npm 未公開。照合しない）・予定・構想 ──────────
   { name: 's1000d-skills',     dir: 'skill/',                npm: null,                             layer: 'procedure', form: 'skill',  status: 'concept', public: false,
-    note: '段階 3。experience-to-s1000d / s1000d-publish / s1000d-review の 3 つ。リポジトリ名の規則は U-09' },
+    note: '段階 3。experience-to-s1000d / s1000d-publish / s1000d-review / s1000d-translate の 4 つ。リポジトリ名の規則は U-09' },
   { name: 'manual-editor',     dir: 'app/manual-editor',     npm: null,                             layer: 'app',  form: 'app',        status: 'concept', public: false,
     note: '段階 3。体験型マニュアルの作成ツール。製品名は未定（U-05）。AI が無くても動く' },
   { name: 'manual-viewer',     dir: 'app/manual-viewer',     npm: null,                             layer: 'app',  form: 'app',        status: 'concept', public: false,

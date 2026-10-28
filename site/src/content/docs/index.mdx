@@ -39,8 +39,13 @@ import { CardGrid, LinkCard } from '@astrojs/starlight/components';
     href="/s1000d-stack/mcp/reader-mcp/"
   />
   <LinkCard
+    title="s1000d-writer-mcp"
+    description="Creates data modules without letting the LLM write XML. It builds the XML from a structured draft, verifies it, and automatically applies only the fixes that have exactly one candidate. It also converts experiential manuals, creates comment data modules, and hands sentences out and back for translation. Not yet on npm."
+    href="/s1000d-stack/mcp/writer-mcp/"
+  />
+  <LinkCard
     title="s1000d-core (library)"
-    description="A library shared by the three MCP servers for splitting DMCs and ICNs, reading the identification and status section, BREX checks, XSD validation, reference resolution and applicability evaluation. Published on npm."
+    description="A library shared by the four MCP servers for splitting DMCs and ICNs, reading the identification and status section, BREX checks, XSD validation, reference resolution, applicability evaluation and building data modules."
     href="/s1000d-stack/lib/s1000d-core/"
   />
 </CardGrid>
@@ -60,7 +65,7 @@ import { CardGrid, LinkCard } from '@astrojs/starlight/components';
   />
   <LinkCard
     title="Architecture and stages"
-    description="The structure of the hub, libraries, MCP servers, Skills and products, with the deliverables and completion criteria of stages 1–4. The place of the future writer, authoring tool and viewer is also described here."
+    description="The structure of the hub, libraries, MCP servers, Skills and products, with the deliverables and completion criteria of stages 1–4. The place of the future authoring tool and viewer is also described here."
     href="/s1000d-stack/guide/architecture/"
   />
   <LinkCard

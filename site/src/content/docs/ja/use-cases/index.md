@@ -50,4 +50,4 @@ S1000D を導入していない現場でも、画面や機器の操作を体験�
 | JSON を 1 か所で管理し使い回す | CSDB からの単一ソース・複数出力 |
 | `index.html` と JavaScript | IETM（閲覧ソフト） |
 
-この対応を、S1000D に依存しない共通データモデル experiential-manual-model として定め、s1000d-writer-mcp がそこからデータモジュールを生成します。生成したデータモジュールは使い方 2 の verify-mcp で検証できるため、出力の正しさを S1000D の側から確かめられます。
+この対応を、S1000D に依存しない共通データモデル experiential-manual-model として定め、[s1000d-writer-mcp](/s1000d-stack/ja/mcp/writer-mcp/) がそこからデータモジュールを生成します。LLM は XML を書かず、writer が下書きから XML を組み立てて検証し、候補が 1 つに決まる修正だけを自動で適用します。生成したデータモジュールは使い方 2 の verify-mcp で検証できるため、出力の正しさを S1000D の側から確かめられます。

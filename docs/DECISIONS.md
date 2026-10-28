@@ -57,7 +57,7 @@ GitHub は s1000d-core を除き Private です（s1000d-core は 2026-10-24 に
 | MCP | 2 | `shuji-bonji/s1000d-reader-mcp` | `@shuji-bonji/s1000d-reader-mcp` | `s1000d-stack/mcp/s1000d-reader-mcp` |
 | MCP | 2 | `shuji-bonji/s1000d-verify-mcp` | `@shuji-bonji/s1000d-verify-mcp` | `s1000d-stack/mcp/s1000d-verify-mcp` |
 | ライブラリ | 2 | `shuji-bonji/experiential-manual-model`（U-04 で 2026-10-24 に確定。ローカルは 2026-10-25 に作成、GitHub は未作成） | `@shuji-bonji/experiential-manual-model`（未公開） | `s1000d-stack/lib/experiential-manual-model` |
-| MCP | 3 | `shuji-bonji/s1000d-writer-mcp` | `@shuji-bonji/s1000d-writer-mcp` | `s1000d-stack/mcp/s1000d-writer-mcp` |
+| MCP | 3 | `shuji-bonji/s1000d-writer-mcp`（2026-10-28 に実装・push。Public 化は要確認） | `@shuji-bonji/s1000d-writer-mcp` **0.1.1 公開済み**（0.1.0・0.1.1 とも 2026-10-28） | `s1000d-stack/mcp/s1000d-writer-mcp` |
 | Skill（未作成） | 3 | 未定（名前の規則は U-09） | — | `s1000d-stack/skill/` |
 | app（未作成） | 3〜4 | 未定（製品名は U-05） | — | `s1000d-stack/app/` |
 
@@ -141,7 +141,7 @@ flowchart LR
 ### D-14 npm への公開は Trusted Publisher で行う（2026-10-24）
 
 - 各パッケージの公開は、`v*` の tag を push したときに GitHub Actions が OIDC で `npm publish --provenance --access public` を実行する方式にします（houki-abbreviations の `publish.yml` と同じ）。`NPM_TOKEN` は Secrets に置きません。
-- Trusted Publisher は既存パッケージにしか設定できないため、各パッケージの **初回だけは手動で** `npm publish --access public` を行い、その後に npm 側で Trusted Publisher（Repository と `publish.yml`）を登録します。s1000d-core は 2026-10-24 に 0.1.0 を手動公開し、Trusted Publisher を登録済み（0.2.0 はタグ push で公開）。残りの 4 パッケージは 2026-10-26 に 0.1.0 を手動公開し、同日に Trusted Publisher を登録済み。
+- Trusted Publisher は既存パッケージにしか設定できないため、各パッケージの **初回だけは手動で** `npm publish --access public` を行い、その後に npm 側で Trusted Publisher（Repository と `publish.yml`）を登録します。s1000d-core は 2026-10-24 に 0.1.0 を手動公開し、Trusted Publisher を登録済み（0.2.0 はタグ push で公開）。残りの 4 パッケージは 2026-10-26 に 0.1.0 を手動公開し、同日に Trusted Publisher を登録済み。s1000d-writer-mcp は 2026-10-28 に 0.1.0 を手動公開し、同日に Trusted Publisher を登録済み。
 - 手順は各リポジトリの `docs/RELEASE.md` に書きます。
 
 ### D-15 XSD 検証は libxml2-wasm で行う（2026-10-24）
@@ -269,6 +269,15 @@ flowchart LR
 - 理由: 照合は「検証（verify）」の仲間（プロジェクト管理の土台、D-19 の最低限の要件の隣）であり、1 つのツールに入力の形（DML か DDN か、省略で全件）をまとめた方が LLM に説明しやすい。reader にも同じ結果を全部返すと 2 本の応答が重複する。
 - `dmlType`（c / p / s）・`dmlEntryType`（c / d / n）・`issueType` の意味は解釈せず、列挙のまま返す。意味を付けるのは仕様書の該当章を読んでから（notes/background.md）。
 - 実装: core `cdc5c25`（0.6.0 で公開）、verify-mcp `c741b4c`、reader-mcp `c9c9aeb`（2026-10-28、未公開）。
+
+### D-27 データモジュールの組み立て（writer の処理）も s1000d-core に置く（2026-10-28）
+
+- 段階 3 の writer の処理（`DraftDataModule` から XML を組み立てる `buildDataModule` / `buildContent`、採番 `allocateDmc` / `allocateIcn` / `allocatePmc`、修正候補の適用 `applyFix`、comment DM の `buildComment`、翻訳向けの `extractSegments` / `applySegments`、書き込める置き場所 `WritableCsdbSource`）は、D-10・D-17 と同じく s1000d-core に置き、s1000d-writer-mcp はそれを呼ぶだけにする。
+- 理由: `buildContent` は reader の `ContentNode` の型（読んで書き戻すと同じ木になることをテストで固定する）と、修正提案の `XsdIndex`・`CsdbIndex` を共有する。別パッケージにすると、これらの型と索引を core から公開し直す手間が先に要る。
+- core が大きくなったら、書く側だけを `@shuji-bonji/s1000d-build`（仮）に分ける（D-10 の末尾と同じ）。分けるときも MCP 側に処理を持たせない。
+- 情報コード（`infoCode`）の既定は持たせない。`Allocation.rules.infoCodeByKind` を必須にし、省略は入力の誤りとして返す。情報コードの意味は仕様書の該当章を読んでから付け、券売機の例の値は Skill `experience-to-s1000d` の設定例に置く。
+- writer は状態を持たない。採番の台帳（`ledger`）は入力で受け取り応答で返し、保管は呼び出す側（Skill・作成ツール・製品）の仕事にする。
+- 設計は [design/writer-mcp.md](./design/writer-mcp.md)。
 
 ## 未決事項
 

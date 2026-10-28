@@ -2,12 +2,13 @@
 
 LLM が S1000D の技術文書を正しく読み、プロジェクトの決まり（ビジネスルール）に沿って検査・作成できるようにするための MCP サーバー・共有ライブラリ・Skill と、体験型マニュアルの作成ツール・閲覧ソフトをまとめるプロジェクトです。
 
-- 作成日: 2026-10-23（JST）、更新日: 2026-10-28（JST、段階 2.5 の完了を記録）
+- 作成日: 2026-10-23（JST）、更新日: 2026-10-28（JST、段階 3 の writer の実装を記録）
 - 構成の手本: [houki-hub](https://github.com/shuji-bonji/houki-hub)、[pdf-agent-stack](https://github.com/shuji-bonji/pdf-agent-stack)
 - 決定事項: [DECISIONS.md](./DECISIONS.md)
 - 調査メモ: [notes/background.md](./notes/background.md)
 - 段階 2 の設計: [design/verify-mcp.md](./design/verify-mcp.md)、[design/reader-mcp.md](./design/reader-mcp.md)、[design/manual-model.md](./design/manual-model.md)
 - 段階 2.5 の設計: [design/agent-platform.md](./design/agent-platform.md)
+- 段階 3 の設計: [design/writer-mcp.md](./design/writer-mcp.md)（writer。Skill と作成ツールは別の文書にする）
 
 ## 目指すもの
 
@@ -60,7 +61,7 @@ experiential-manual-model（文書の中では「manual-model」と略します�
 | 1 | s1000d-stack（サイトの骨組みと用語の説明）、s1000d-core、s1000d-brex-mcp | **自動**: 自作 BREX と自作データモジュールで、BREX の説明と照合のテストが CI で通る（2026-10-23 済み）。**手動**: 既定の BREX（利用者が入手したもの）を `explain_brex` で読み、自作データモジュールを照合して、結果が仕様書の BREX の章の記述と矛盾しないことを確認済み（2026-10-23 済み。券売機の説明 DM は既定 BREX の 243 ルールに違反なし）。**サイト**: BREX・データモジュールの説明を仕様書と照合済み（2026-10-24 に、作業 3 で読んだ Chap 4.10.2〜4.10.3・7.9 と既定 BREX の実測に基づいて執筆。2026-10-24 に利用者が 9 ページを通読し、仕様書との矛盾が無いことを確認済み。確認の根拠は [notes/site-review.md](./notes/site-review.md)）。**段階 1 は 2026-10-24 に完了** |
 | 2 | s1000d-reader-mcp、s1000d-verify-mcp、manual-model | 公式 XSD（利用者が入手したもの）による検証、参照の解決、適用性の判定ができる。reader の応答には対象データモジュールの版（issue）と検証状態を必ず含め、適用性の判定は reader が済ませてから LLM に渡す。**段階 2 は 2026-10-26 に完了**（3 部品と brex-mcp を npm に公開、hub と学習サイトを公開） |
 | 2.5 | 修正提案（verify-mcp `suggest_fixes`）、`CsdbSource` インターフェース、HTTP transport、DML・DDN の読み取り、サイトの「組み込み基盤」のページ | LLM エージェントがスキーマ検証・クロスリファレンスチェック・適用性チェック・修正提案の 4 つをできる。修正提案の候補は core が決め、LLM は候補の外の値を出さない。CSDB をフォルダー以外（製品のデータベース・API）から読める。**段階 2.5 は 2026-10-28 に完了**（core 0.7.0、brex-mcp 0.4.0、verify-mcp 0.6.0、reader-mcp 0.7.0 を公開） |
-| 3 | s1000d-writer-mcp（LLM に XML を書かせず、構造化された入力から組み立てて「生成 → 検証 → 修正」を回す）、Skill（experience-to-s1000d / s1000d-publish / s1000d-review。STE の用語集は利用者のものを参照）、作成ツールの試作、comment DM の生成、翻訳向けの文の抜き出しと差し戻し | 券売機の例を共通データモデル経由で S1000D に出力し、verify を通る |
+| 3 | s1000d-writer-mcp（LLM に XML を書かせず、構造化された入力から組み立てて「生成 → 検証 → 修正」を回す）、Skill（experience-to-s1000d / s1000d-publish / s1000d-review / s1000d-translate。STE の用語集は利用者のものを参照）、作成ツールの試作、comment DM の生成、翻訳向けの文の抜き出しと差し戻し | 券売機の例を共通データモデル経由で S1000D に出力し、verify を通る。**writer の実装は 2026-10-28 に済み、完了条件をテストで満たした**（core 0.8.0・writer-mcp 0.1.0。同日に npm に公開）。Skill と作成ツールの試作は残る |
 | 4 | 閲覧ソフト。最初の成果物は、S1000D の CSDB を直接表示する簡易な技術マニュアルの Web システム（基盤の参照実装。設計は [design/agent-platform.md](./design/agent-platform.md)「参照実装」）。その後に共通データモデルを表示する閲覧ソフト | 簡易 Web マニュアルで、PM の目次から DM をたどり、製品を選ぶと当てはまらない節が消え、参照先へ移れ、各ページに版・検証状態・機密区分が出る。閲覧ソフトは共通データモデルを表示し、WebMCP で AI が操作を案内できる |
 
 ```mermaid
@@ -215,6 +216,35 @@ flowchart LR
 | 7 | 済み（2026-10-28 11:00 JST 頃に実装、**core 0.7.0・reader-mcp 0.7.0 として 11:30 JST 頃に公開**。npm・MCP Registry・claude-plugins とも同じ版）。core `src/content/outline.ts` に `outlineContent`（見出し・手順の番号・最初の 1 文・警告の数。残す種類は section / step / requirements / sequence / if / dialog / entry）、`measureContent`（部分木の節点数・文字数・種類ごとの数・警告の数）、`firstSentence`。`ContentNode` に要素自身の `securityClassification`。reader-mcp は `read_data_module` に `section: "outline"` と `outlineDepth` を足し（本文と参照は返さず `size` と `outline`）、`read_data_module` / `read_publication_module` の応答の先頭に `securityClassification`（`dataModule` と `inContent`。値は解釈しない）を必ず付け、本文に `size` を付けた。`instructions` に「大きな DM は概要から」「機密区分を見てから引用」を追記。core のテスト 6 件（自作 5・配布物 1。136 件すべて通過）、reader のテスト 3 件（30 件すべて通過。公開前の core は `npm pack` で入れて実行） |
 | 8 | 済み（2026-10-28、verify-mcp の `3b6ee8f`、テストのみ）。自作の `xml_schema_flat/` を Issue 7 と 4.2 の形で 2 版分置き、版の違う 3 件の DM を `verify_csdb` に通して、DM ごとに `xsi:noNamespaceSchemaLocation` の版に合う XSD が選ばれること（同じ本文でも 7 では invalid、4.2 では valid）、合う版が無い DM（Issue 5）は他の版で代用せず `schema-not-found`（理由 `issue-mismatch`）になることを固定した。core の `locateXsd` の既存の動作で足り、変更は無い |
 | 6 | 済み（2026-10-28 11:15 JST 頃、hub の `55513b8`）。サイトに `guide/embedding.md`（日英。「CSDB 製品への組み込み」）: 4 つの要件とツール、組み込みに使う部品（`CsdbSource`・HTTP・設定ファイル・検証状態・機密区分）、製品側に残す責務、LLM 活用時の注意点への対応（近似スキーマとの違いを含む）、参照実装。サイドバーの Guide に追加し、`guide/architecture.md` の段階の表に 2.5 の行を足した。31 ページ、`check:i18n` ok、内部リンク切れ 0 |
+
+## 段階 3 の作業
+
+設計は [design/writer-mcp.md](./design/writer-mcp.md)。writer の処理は core に置き（D-27）、writer-mcp はそれを呼ぶだけにします。Skill と作成ツールの試作は別の設計文書にします。
+
+| 順 | 作業 | 置き場所 |
+|---|---|---|
+| 1 | core に `DraftDataModule` / `DraftNode` / `Allocation` の型と JSON Schema、採番、`buildDataModule` と `buildContent`（5 種）、往復のテスト | lib/s1000d-core（`src/write/`） |
+| 2 | core に `applyFix` と `WritableCsdbSource` | lib/s1000d-core |
+| 3 | writer-mcp（`build_data_module` / `apply_fixes`、`instructions`、`--http`、設定ファイル） | mcp/s1000d-writer-mcp |
+| 4 | writer-mcp に `convert_manual`（manual-model → draft の変換）。券売機の例で Issue 7 の XSD・既定 BREX を通す（完了条件） | mcp/s1000d-writer-mcp |
+| 5 | core に `buildComment`、writer-mcp に `create_comment` | lib/s1000d-core、mcp/s1000d-writer-mcp |
+| 6 | core に `extractSegments` / `applySegments`、writer-mcp に `extract_segments` / `apply_segments` | 同上 |
+| 7 | 公開（npm → MCP Registry → claude-plugins）、`-dev` 版、サイト `mcp/writer-mcp.md`（日英）、hub の README・`stack.json`・`guide/architecture.md` | mcp/s1000d-writer-mcp、hub |
+| 8 | Skill 4 つ（`experience-to-s1000d` / `s1000d-publish` / `s1000d-review` / `s1000d-translate`）と作成ツールの試作 | skill/、app/ |
+
+### 進捗（段階 3）
+
+| 作業 | 状態 |
+|---|---|
+| 設計 | 済み（2026-10-28、design/writer-mcp.md、D-27） |
+| 1 | 済み（2026-10-28、core 0.8.0。同日 16:20 JST 頃に公開）。`src/write/`（型・JSON Schema・採番・組み立て 5 種・`DraftInputError`）、`src/__fixtures__/kenbaiki-drafts.ts`。自作 59 件・配布物 10 件（Issue 7 の XSD で 6 件すべて valid、既定 BREX の違反 0）。XSD の要求で決まった組み立て方（`preliminaryRqmts` の埋め方、`qualityAssurance` は `unverified`、`applic` は必須）は design/writer-mcp.md「実装の記録」 |
+| 2 | 済み（2026-10-28、core 0.8.0）。`src/fix/apply.ts`（`applyFix` / `applyFixes`。候補を計算し直して照合し、一致しない選択は `candidate-not-offered`）22 件、`WritableCsdbSource`（Directory / Memory）10 件 |
+| 5（core 側） | 済み（2026-10-28、core 0.8.0、`src/comment/`）。自作 29 件・配布物 2 件。`originator.address` は XSD で必須 |
+| 6（core 側） | 済み（2026-10-28、core 0.8.0、`src/segments/`）。13 件。Bike Samples 106 件で往復しても元と同じで、訳文を入れても XSD に適合 |
+| 副産物 | BREX の連鎖を PM・comment でもたどるようにした（`readBrexDmRefOf`。これまで層が 0 件だった）。core 全体で自作 260 件・配布物込み 293 件が通る |
+| 3・4・5・6（MCP 側） | 済み（2026-10-28、writer-mcp 0.1.0。同日 16:30 JST 頃に公開）。6 ツール、`instructions`、`--http`、設定ファイル、`src/convert/manual-to-draft.ts`、README 日英、CHANGELOG。自作 36 件・配布物 2 件。**完了条件: `kenbaiki.manual.json` → DM 9 件 ＋ PM 1 件が Issue 7 の XSD で valid、既定 BREX の違反 0、未解決の参照 0**。`package-lock.json` も core 0.8.0 |
+| 7 | 済み（2026-10-28）。**core 0.8.0 を 16:20 JST 頃、writer-mcp 0.1.0 を 16:30 JST 頃に npm に公開**（core はタグ push、writer は初回の手動 `npm publish` と Trusted Publisher の登録）。サイト（`mcp/writer-mcp.md` 日英ほか 9 ページ）・README・`stack.json` も更新し、npm 照合は 6 つとも一致。同日 17:20 JST 頃までに MCP Registry と claude-plugins に登録し、`-dev` 版も登録した。0.1.1（入力スキーマの `$ref` を展開して Claude Desktop から呼べるようにした修正）も同日に公開。hub のコミットは残り |
+| 8 | 未着手 |
 
 ## 対象とする S1000D の版
 

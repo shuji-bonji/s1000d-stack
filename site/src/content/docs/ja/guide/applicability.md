@@ -58,7 +58,7 @@ flowchart LR
   EV --> R["ブロックごとに<br/>applicable / notApplicable / undetermined<br/>＋ displayText ＋ 理由"]
 ```
 
-製品の値をどう決めるか（`describe_applicability`）、3 値をどう読むか、適用性リポジトリの解決は [s1000d-reader-mcp](/s1000d-stack/ja/mcp/reader-mcp/#適用性と検証状態) に書いています。判定の論理は共有ライブラリ `s1000d-core` の `ApplicEvaluator` にあり、`s1000d-reader-mcp` と段階 3 の `s1000d-writer-mcp`（出力時に適用性を付ける）が同じものを使います。ACT・CCT・PCT の読み取り（`readAct` / `readCct` / `readPct`）、PCT の 1 行から製品を作る `productFromPct`、評価（`evaluateApplic`）も同じライブラリにあります。
+製品の値をどう決めるか（`describe_applicability`）、3 値をどう読むか、適用性リポジトリの解決は [s1000d-reader-mcp](/s1000d-stack/ja/mcp/reader-mcp/#適用性と検証状態) に書いています。判定の論理は共有ライブラリ `s1000d-core` の `ApplicEvaluator` にあり、`s1000d-reader-mcp` と `s1000d-writer-mcp`（出力時に適用性を付ける）が同じものを使います。ACT・CCT・PCT の読み取り（`readAct` / `readCct` / `readPct`）、PCT の 1 行から製品を作る `productFromPct`、評価（`evaluateApplic`）も同じライブラリにあります。
 
 :::note[公式サンプルで分かったこと]
 Issue 7 の Bike Samples では、ACT が属性 `type` を定義し 110 件の `assert` が使っているのに、PCT の 3 製品はどれも `type` に値を割り当てていません。PCT の製品で判定すると、要素の `applic` 366 件のうち 310〜324 件が「製品に `type` の値が無い」理由で `undetermined` になります。また、PCT の条件値 `Pre` / `Post` は CCT の列挙 `PRE` / `POST-001~POST-999` と大文字小文字も書式も合いません。このスタックは値の比較を完全一致のままにしてあり、配布物側の不整合がそのまま見えます。`applicIdentValue` で指す先の適用性リポジトリも Bike Samples には入っておらず、該当する 64 件は「リポジトリに無い」理由で `undetermined` になります。

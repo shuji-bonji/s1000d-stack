@@ -50,4 +50,4 @@ This use case rests on the fact that the data structure of the 2021 work [experi
 | JSON managed in one place and reused | Single source, multiple outputs from the CSDB |
 | `index.html` and JavaScript | IETM (viewer) |
 
-This correspondence is defined as experiential-manual-model, a common data model that does not depend on S1000D, and s1000d-writer-mcp generates data modules from it. The generated data modules can be validated with verify-mcp from use case 2, so the correctness of the output can be confirmed from the S1000D side.
+This correspondence is defined as experiential-manual-model, a common data model that does not depend on S1000D, and [s1000d-writer-mcp](/s1000d-stack/mcp/writer-mcp/) generates data modules from it. The LLM does not write XML: the writer builds the XML from a draft, verifies it, and automatically applies only the fixes that have exactly one candidate. The generated data modules can be validated with verify-mcp from use case 2, so the correctness of the output can be confirmed from the S1000D side.

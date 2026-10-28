@@ -69,6 +69,7 @@ export default defineConfig({
             { label: 's1000d-brex-mcp', slug: 'mcp/brex-mcp' },
             { label: 's1000d-verify-mcp', slug: 'mcp/verify-mcp' },
             { label: 's1000d-reader-mcp', slug: 'mcp/reader-mcp' },
+            { label: 's1000d-writer-mcp', slug: 'mcp/writer-mcp' },
           ],
         },
         {

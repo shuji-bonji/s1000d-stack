@@ -14,14 +14,15 @@ This repository holds only the stack manifest (`stack.json`), the documentation 
 
 ## What it does
 
-Stage 1 (understanding and checking against BREX) and stage 2 (verification and reading as structure) are complete, and fix suggestions have been added as the first component of stage 2.5 (a foundation that CSDB products can build in). Parts manufacturers and technical publication companies can use an LLM to understand the BREX (Business Rules Exchange) handed over by a customer, to confirm that their own data modules follow the XML schema (XSD) and the BREX, to receive candidate corrections for the violations, and to read data modules as structure rather than as XML.
+Stage 1 (understanding and checking against BREX) and stage 2 (verification and reading as structure) are complete, and fix suggestions have been added as the first component of stage 2.5 (a foundation that CSDB products can build in). In stage 3, s1000d-writer-mcp has been added, which lets an LLM create data modules without writing XML. Parts manufacturers and technical publication companies can use an LLM to understand the BREX (Business Rules Exchange) handed over by a customer, to confirm that their own data modules follow the XML schema (XSD) and the BREX, to receive candidate corrections for the violations, and to read data modules as structure rather than as XML. They can also use an LLM, without letting it write XML, to create data modules from a structured draft such as an experiential manual, verify and repair them, and hand sentences out and back for translation.
 
 | Component | Role |
 | --- | --- |
-| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | Splits DMCs and ICNs, reads the identification and status section, reads and checks against BREX, validates against the XSD, resolves references, evaluates applicability, reads the content section, decides fix candidates, and decides where the distribution and the CSDB are (from environment variables or a config file). The shared library that every MCP depends on (npm: `@shuji-bonji/s1000d-core`) |
+| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | Splits DMCs and ICNs, reads the identification and status section, reads and checks against BREX, validates against the XSD, resolves references, evaluates applicability, reads the content section, decides fix candidates, builds and numbers data modules, applies fix candidates, and decides where the distribution and the CSDB are (from environment variables or a config file). The shared library that every MCP depends on (npm: `@shuji-bonji/s1000d-core`) |
 | [s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | An MCP server that lists BREX rules in a form people can read (`explain_brex`), looks up the meaning of SNS and attribute values (`lookup_sns` / `lookup_value`), returns the illustration formats that may be used (`list_notations`), and checks data modules against the BREX chain (`check_against_brex`) |
 | [s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | An MCP server that validates one data module in the order well-formedness → XSD → BREX chain → references (`verify_data_module`), runs XSD validation only (`validate_schema`), resolves references (`check_references`), validates a whole folder (`verify_csdb`) and lists the XSDs it found (`list_schemas`). The results are returned combined into a single verification status (`verification`). It also returns candidate corrections for each finding (`suggest_fixes`); the server decides the candidates from the BREX rules, the XSD definitions and the CSDB |
 | [s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | An MCP server that reads data modules and publication modules as structure (`read_data_module` / `read_publication_module`), lists a CSDB and resolves references (`list_data_modules` / `resolve_reference`), returns the applicability vocabulary (`describe_applicability`) and reads ICN metadata (`read_icn_metadata`). The server evaluates which product the content applies to, and every response carries the verification status |
+| s1000d-writer-mcp | An MCP server that creates data modules without letting the LLM write XML. It builds the XML from a structured draft and verifies it (`build_data_module`), and automatically applies only the fixes that have exactly one candidate. It also converts experiential manuals (`convert_manual`), applies a fix chosen from the candidates (`apply_fixes`), creates comment data modules (`create_comment`), and takes out and puts back sentences for translation (`extract_segments` / `apply_segments`). It writes nothing by default |
 | [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | The common data model for experiential operation manuals (TypeScript types, JSON Schema, validation and a converter from the 2021 JSON). Independent of S1000D (npm: `@shuji-bonji/experiential-manual-model`) |
 
 The BREX check follows Chap 4.10.2 (BREX data module) and Chap 7.9 (Business rules processing) of S1000D Issue 7, and applies the `brexDmRef` chain (project → organisation → default BREX) to each layer separately. XSD validation uses the XSDs from the S1000D distribution you obtained. Judgement of agreements written as prose (nonContextRules) and judgement of conformance to S1000D are not included in any component.
@@ -36,14 +37,14 @@ flowchart TB
     DOCS["docs/<br/>ROADMAP, DECISIONS, notes"]
   end
   subgraph Lib["lib/"]
-    CORE["s1000d-core<br/>DMC, ICN, identification and status section, BREX check<br/>XSD, references, applicability, content"]
+    CORE["s1000d-core<br/>DMC, ICN, identification and status section, BREX check<br/>XSD, references, applicability, content<br/>building data modules"]
     MODEL["experiential-manual-model<br/>common data model (independent of S1000D)"]
   end
   subgraph Mcp["mcp/"]
     BREX["s1000d-brex-mcp"]
     R["s1000d-reader-mcp"]
     V["s1000d-verify-mcp"]
-    W["s1000d-writer-mcp (planned)"]
+    W["s1000d-writer-mcp"]
   end
   subgraph App["app/"]
     ED["authoring tool (concept)"]
@@ -70,12 +71,12 @@ The expert agents (MCP and Skills) come first; the products (authoring tool and 
 
 | Repository | Layer | Form | Status | Version | npm |
 | --- | --- | --- | --- | --- | --- |
-| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | core | library | released | 0.7.0 | `@shuji-bonji/s1000d-core` |
+| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | core | library | released | 0.8.0 | `@shuji-bonji/s1000d-core` |
 | [s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | mcp | mcp-server | released | 0.4.0 | `@shuji-bonji/s1000d-brex-mcp` |
 | [s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | mcp | mcp-server | released | 0.6.0 | `@shuji-bonji/s1000d-verify-mcp` |
 | [s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | mcp | mcp-server | released | 0.7.0 | `@shuji-bonji/s1000d-reader-mcp` |
 | [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | model | library | released | 0.1.0 | `@shuji-bonji/experiential-manual-model` |
-| s1000d-writer-mcp | mcp | mcp-server | planned | — | — |
+| [s1000d-writer-mcp](https://github.com/shuji-bonji/s1000d-writer-mcp) | mcp | mcp-server | released | 0.1.1 | `@shuji-bonji/s1000d-writer-mcp` |
 | s1000d-skills | procedure | skill | concept | — | — |
 | manual-editor | app | app | concept | — | — |
 | manual-viewer | app | app | concept | — | — |
