@@ -56,6 +56,7 @@ flowchart TB
 | --- | --- | --- |
 | 1 | hub（このサイト）、s1000d-core、s1000d-brex-mcp | 自作 BREX とデータモジュールで照合のテストが通る。既定 BREX を読み、自作データモジュールを照合して仕様書と矛盾しない。サイトの説明を仕様書と照合済み |
 | 2 | s1000d-reader-mcp、s1000d-verify-mcp、experiential-manual-model | 公式 XSD（利用者が入手したもの）による検証、参照の解決、適用性の判定ができる。reader の応答に版と検証状態を含める |
+| 2.5 | 修正提案、`CsdbSource`、HTTP transport、DML・DDN の照合、概要モードと機密区分、[CSDB 製品への組み込み](/s1000d-stack/ja/guide/embedding/)のページ | LLM エージェントがスキーマ検証・クロスリファレンスチェック・適用性チェック・修正提案の 4 つをでき、CSDB をフォルダー以外から読める |
 | 3 | s1000d-writer-mcp、Skill、作成ツールの試作 | 券売機の例を共通データモデル経由で S1000D に出力し、verify を通る |
 | 4 | 閲覧ソフト | 共通データモデルを表示し、WebMCP で AI が操作を案内できる |
 

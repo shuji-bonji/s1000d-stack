@@ -48,6 +48,7 @@ export default defineConfig({
             { label: 'What S1000D Stack is', translations: { ja: 'S1000D Stack とは' }, slug: 'guide/overview' },
             { label: 'Getting started', translations: { ja: '導入手順' }, slug: 'guide/getting-started' },
             { label: 'Architecture and stages', translations: { ja: '全体構成と進み方' }, slug: 'guide/architecture' },
+            { label: 'Embedding in a CSDB product', translations: { ja: 'CSDB 製品への組み込み' }, slug: 'guide/embedding' },
             { label: 'Specification files and trademarks', translations: { ja: '仕様書の扱いと商標' }, slug: 'guide/license' },
           ],
         },

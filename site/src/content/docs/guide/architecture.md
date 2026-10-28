@@ -56,6 +56,7 @@ flowchart TB
 | --- | --- | --- |
 | 1 | hub (this site), s1000d-core, s1000d-brex-mcp | Check tests pass with a self-made BREX and data modules. The default BREX can be read, and checking self-made data modules against it does not contradict the specification. The site's explanations have been checked against the specification |
 | 2 | s1000d-reader-mcp, s1000d-verify-mcp, experiential-manual-model | Validation with the official XSD (obtained by the user), reference resolution and applicability evaluation work. The reader's responses include the issue and the verification status |
+| 2.5 | Fix suggestions, `CsdbSource`, HTTP transport, DML/DDN reconciliation, outline mode and security classification, the [Embedding in a CSDB product](/s1000d-stack/guide/embedding/) page | An LLM agent can do the four things — schema validation, cross-reference check, applicability check, fix suggestion — and the CSDB can be read from somewhere other than a folder |
 | 3 | s1000d-writer-mcp, Skill, a prototype of the authoring tool | The ticket machine example is output to S1000D through the common data model and passes verify |
 | 4 | Viewer | Displays the common data model, and an AI can guide the operation through WebMCP |
 
