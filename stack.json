@@ -6,7 +6,7 @@
     "layer = 役割 / form = 配布形態（誰が起動するか）/ status = released・developing・planned・concept。",
     "developing はリポジトリで開発中で npm 未公開。planned / concept はディレクトリも npm も無い。"
   ],
-  "generatedAt": "2026-10-28T01:13:24.797Z",
+  "generatedAt": "2026-10-28T01:52:10.764Z",
   "generatedBy": "scripts/generate-stack.mjs",
   "npmScope": "@shuji-bonji",
   "repos": [
@@ -61,16 +61,16 @@
       "status": "released",
       "public": true,
       "note": "段階 2。利用者が入手した公式 XSD による検証 ＋ BREX 照合（core を呼ぶ）＋ 参照の解決を 1 つの検証状態にまとめる。verify_data_module / validate_schema / check_references / verify_csdb / list_schemas の 5 tools",
-      "published": "0.5.0",
+      "published": "0.6.0",
       "local": {
-        "version": "0.5.0",
-        "tag": "v0.5.0",
+        "version": "0.6.0",
+        "tag": "v0.6.0",
         "dirty": false,
         "unpushedCommits": 0
       },
       "consistency": {
         "status": "match",
-        "detail": "0.5.0"
+        "detail": "0.6.0"
       }
     },
     {
@@ -82,16 +82,16 @@
       "status": "released",
       "public": true,
       "note": "段階 2。データモジュールの本文を構造化して返す、参照の解決、適用性の判定（式は LLM に渡さない）。応答に検証状態を含める。list_data_modules / read_data_module / read_publication_module / resolve_reference / describe_applicability / read_icn_metadata の 6 tools",
-      "published": "0.5.0",
+      "published": "0.6.0",
       "local": {
-        "version": "0.5.0",
-        "tag": "v0.5.0",
+        "version": "0.6.0",
+        "tag": "v0.6.0",
         "dirty": false,
         "unpushedCommits": 0
       },
       "consistency": {
         "status": "match",
-        "detail": "0.5.0"
+        "detail": "0.6.0"
       }
     },
     {
@@ -129,7 +129,7 @@
         "version": null,
         "tag": null,
         "dirty": true,
-        "unpushedCommits": 0
+        "unpushedCommits": 1
       },
       "consistency": {
         "status": "developing",
