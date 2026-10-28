@@ -19,7 +19,7 @@ LLM が S1000D® の技術文書を正しく読み、プロジェクトの決ま
 段階 3 の Skill 4 つ（experience-to-s1000d・s1000d-publish・s1000d-review・s1000d-translate）と、体験型マニュアルの作成ツールの試作（仮称 manual-editor）は作成済みです。Skill は、MCP サーバーをどの順番で呼び、各段階で利用者に何を聞くかを Claude に伝える手順です。作成ツールは、体験型マニュアルを画面の上で作り、experiential-manual-model の JSON で保存します。
 
 > [!NOTE]
-> Skill 4 つと作成ツールの試作は、まだ公開していません。Skill の claude-plugins への登録は準備中です。
+> Skill 4 つは claude-plugins に登録済みです（`/plugin install s1000d-review@shuji-bonji` など）。作成ツールは試作で、まだ公開していません。
 
 | 部品 | 役割 |
 | --- | --- |
@@ -28,7 +28,7 @@ LLM が S1000D® の技術文書を正しく読み、プロジェクトの決ま
 | [s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | データモジュール 1 件を整形式 → XSD → BREX の連鎖 → 参照の順に検証し（`verify_data_module`）、XSD 検証だけ（`validate_schema`）、参照の解決（`check_references`）、フォルダー全体の検証（`verify_csdb`）、見つかった XSD の一覧（`list_schemas`）を行う MCP サーバー。結果は 1 つの検証状態（`verification`）にまとめて返す。違反ごとの直し方の候補（`suggest_fixes`）も返し、候補はサーバーが BREX のルール・XSD の定義・CSDB から決める |
 | [s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | データモジュールとパブリケーションモジュールを構造として読み（`read_data_module` / `read_publication_module`）、CSDB の一覧と参照の解決（`list_data_modules` / `resolve_reference`）、適用性の語彙（`describe_applicability`）、ICN メタデータ（`read_icn_metadata`）を返す MCP サーバー。どの製品に当てはまるかはサーバーが判定し、すべての応答に検証状態が付く |
 | s1000d-writer-mcp | LLM に XML を書かせずにデータモジュールを作る MCP サーバー。構造化した下書きから XML を組み立てて検証し（`build_data_module`）、候補が 1 つに決まる修正だけを自動で適用する。体験型マニュアルの変換（`convert_manual`）、候補の中から選んだ修正の適用（`apply_fixes`）、コメントデータモジュールの作成（`create_comment`）、翻訳用の文の取り出しと書き戻し（`extract_segments` / `apply_segments`）も行う。既定では何も書き込まない |
-| Skill 4 つ（`skill/`） | experience-to-s1000d（体験型マニュアルを CSDB に変換）、s1000d-publish（下書きからデータモジュールを作成）、s1000d-review（レビューと comment DM）、s1000d-translate（翻訳）。MCP サーバーを呼ぶ順番と、各段階で利用者に聞くことを Claude に伝える手順で、処理は持たない。作成済み・未公開 |
+| Skill 4 つ（`skill/`） | experience-to-s1000d（体験型マニュアルを CSDB に変換）、s1000d-publish（下書きからデータモジュールを作成）、s1000d-review（レビューと comment DM）、s1000d-translate（翻訳）。MCP サーバーを呼ぶ順番と、各段階で利用者に聞くことを Claude に伝える手順で、処理は持たない。公開済み（0.1.0、claude-plugins） |
 | manual-editor（仮称。`app/manual-editor`） | 体験型マニュアルを画面の上で作る Web アプリの試作（SvelteKit ＋ PWA）。manual-model の JSON を読み書きし、検査と体験表示ができる。S1000D への出力は Skill `experience-to-s1000d` に渡して行う。AI が無くても動く |
 | [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | 体験型操作マニュアルの共通データモデル（TypeScript の型・JSON Schema・検査・2021 年の JSON からの変換）。S1000D に依存しない（npm: `@shuji-bonji/experiential-manual-model`） |
 
@@ -78,16 +78,16 @@ flowchart TB
 
 | リポジトリ | 役割 | 配布形態 | 状態 | 版 | npm |
 | --- | --- | --- | --- | --- | --- |
-| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | core | library | 公開済み | 0.8.0 | `@shuji-bonji/s1000d-core` |
+| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | core | library | 公開済み | 0.8.1 | `@shuji-bonji/s1000d-core` |
 | [s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | mcp | mcp-server | 公開済み | 0.4.0 | `@shuji-bonji/s1000d-brex-mcp` |
 | [s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | mcp | mcp-server | 公開済み | 0.6.0 | `@shuji-bonji/s1000d-verify-mcp` |
 | [s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | mcp | mcp-server | 公開済み | 0.7.0 | `@shuji-bonji/s1000d-reader-mcp` |
 | [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | model | library | 公開済み | 0.1.0 | `@shuji-bonji/experiential-manual-model` |
 | [s1000d-writer-mcp](https://github.com/shuji-bonji/s1000d-writer-mcp) | mcp | mcp-server | 公開済み | 0.1.1 | `@shuji-bonji/s1000d-writer-mcp` |
-| experience-to-s1000d-skill | procedure | skill | 開発中 | 0.1.0 | — |
-| s1000d-publish-skill | procedure | skill | 開発中 | 0.1.0 | — |
-| s1000d-review-skill | procedure | skill | 開発中 | 0.1.0 | — |
-| s1000d-translate-skill | procedure | skill | 開発中 | 0.1.0 | — |
+| [experience-to-s1000d-skill](https://github.com/shuji-bonji/experience-to-s1000d-skill) | procedure | skill | 公開済み | 0.1.0 | — |
+| [s1000d-publish-skill](https://github.com/shuji-bonji/s1000d-publish-skill) | procedure | skill | 公開済み | 0.1.0 | — |
+| [s1000d-review-skill](https://github.com/shuji-bonji/s1000d-review-skill) | procedure | skill | 公開済み | 0.1.0 | — |
+| [s1000d-translate-skill](https://github.com/shuji-bonji/s1000d-translate-skill) | procedure | skill | 公開済み | 0.1.0 | — |
 | manual-editor | app | app | 開発中 | 0.1.0 | — |
 | manual-viewer | app | app | 構想 | — | — |
 

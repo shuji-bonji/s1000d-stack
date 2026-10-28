@@ -44,7 +44,7 @@ const README_FILE = join(ROOT, 'README.md');
  *             hub           本リポジトリ（構成表とサイト）
  *   form    配布形態 mcp-server / library / skill / app / site（「誰が起動するか」で決める）
  *   status  進み具合 released / developing / planned / concept
- *             released    = npm に公開済み。npm 照合の対象
+ *             released    = 公開済み。npm のパッケージは npm 照合の対象（Skill は GitHub Release と claude-plugins で配布）
  *             developing  = リポジトリで開発中。npm 未公開なので照合しない（ローカルの状態だけ記録する）
  *             planned     = 着手順が決まっている。ディレクトリも npm も無い
  *             concept     = 構想だけ。名前と束ねる単位を予約している段階
@@ -65,19 +65,19 @@ const REGISTRY = [
     note: '段階 2。体験型マニュアルの共通データモデル（型・JSON Schema・検査・2021 年の作品 JSON からの変換）。S1000D に依存しない。名前は U-04 で確定' },
   { name: 's1000d-writer-mcp', dir: 'mcp/s1000d-writer-mcp', npm: '@shuji-bonji/s1000d-writer-mcp', layer: 'mcp', form: 'mcp-server', status: 'released', public: true,
     note: '段階 3。LLM に XML を書かせずにデータモジュールを作る。build_data_module / convert_manual / apply_fixes / create_comment / extract_segments / apply_segments の 6 tools。2026-10-28 に 0.1.0・0.1.1 を公開' },
+  // Skill は 1 つにリポジトリ 1 つ（D-28）。npm には載せず、GitHub Release の .plugin と claude-plugins で配る（2026-10-28 に 0.1.0）
+  { name: 'experience-to-s1000d-skill', dir: 'skill/experience-to-s1000d-skill', npm: null, layer: 'procedure', form: 'skill', status: 'released',   public: true,
+    note: '段階 3。体験型マニュアルの JSON を CSDB に変換する Skill（writer の convert_manual、verify の verify_csdb）。plugin 名 experience-to-s1000d' },
+  { name: 's1000d-publish-skill', dir: 'skill/s1000d-publish-skill', npm: null, layer: 'procedure', form: 'skill', status: 'released',   public: true,
+    note: '段階 3。構造化した下書きからデータモジュールを 1 件ずつ作り、検証して CSDB に入れる Skill（writer の build_data_module、verify の reconcile_dml）。plugin 名 s1000d-publish' },
+  { name: 's1000d-review-skill', dir: 'skill/s1000d-review-skill', npm: null, layer: 'procedure', form: 'skill', status: 'released',   public: true,
+    note: '段階 3。データモジュールを 3 つの観点でレビューし、指摘を comment DM に残す Skill（reader、verify の suggest_fixes、writer の create_comment）。plugin 名 s1000d-review' },
+  { name: 's1000d-translate-skill', dir: 'skill/s1000d-translate-skill', npm: null, layer: 'procedure', form: 'skill', status: 'released',   public: true,
+    note: '段階 3。データモジュールを別の言語に訳す Skill（writer の extract_segments / apply_segments、xcomet による採点）。plugin 名 s1000d-translate' },
   { name: 's1000d-stack',     dir: '.',                    npm: null,                            layer: 'hub',  form: 'site',       status: 'developing', public: true,
     note: '本リポジトリ。site/ に Astro Starlight の学習サイト（GitHub Pages で公開。英語がルート、日本語は /ja/）' },
 
   // ── 開発中（ディレクトリはあるが npm 未公開。照合しない）・予定・構想 ──────────
-  // Skill は 1 つにリポジトリ 1 つ（D-28）。リポジトリは Private で、npm には載せない（plugin として配る）
-  { name: 'experience-to-s1000d-skill', dir: 'skill/experience-to-s1000d-skill', npm: null, layer: 'procedure', form: 'skill', status: 'developing', public: false,
-    note: '段階 3。体験型マニュアルの JSON を CSDB に変換する Skill（writer の convert_manual、verify の verify_csdb）。plugin 名 experience-to-s1000d' },
-  { name: 's1000d-publish-skill', dir: 'skill/s1000d-publish-skill', npm: null, layer: 'procedure', form: 'skill', status: 'developing', public: false,
-    note: '段階 3。構造化した下書きからデータモジュールを 1 件ずつ作り、検証して CSDB に入れる Skill（writer の build_data_module、verify の reconcile_dml）。plugin 名 s1000d-publish' },
-  { name: 's1000d-review-skill', dir: 'skill/s1000d-review-skill', npm: null, layer: 'procedure', form: 'skill', status: 'developing', public: false,
-    note: '段階 3。データモジュールを 3 つの観点でレビューし、指摘を comment DM に残す Skill（reader、verify の suggest_fixes、writer の create_comment）。plugin 名 s1000d-review' },
-  { name: 's1000d-translate-skill', dir: 'skill/s1000d-translate-skill', npm: null, layer: 'procedure', form: 'skill', status: 'developing', public: false,
-    note: '段階 3。データモジュールを別の言語に訳す Skill（writer の extract_segments / apply_segments、xcomet による採点）。plugin 名 s1000d-translate' },
   { name: 'manual-editor',     dir: 'app/manual-editor',     npm: null,                             layer: 'app',  form: 'app',        status: 'developing', public: false,
     note: '段階 3。体験型マニュアルの作成ツールの試作（SvelteKit ＋ PWA、D-28）。製品名は未定（U-05）で、manual-editor は仮称。AI が無くても動く' },
   { name: 'manual-viewer',     dir: 'app/manual-viewer',     npm: null,                             layer: 'app',  form: 'app',        status: 'concept', public: false,
@@ -131,6 +131,7 @@ function localState(entry) {
 function consistencyOf(entry, npmVer, local) {
   if (entry.status === 'developing') return { status: 'developing', detail: 'npm 未公開（開発中）。照合対象外' };
   if (entry.status !== 'released') return { status: 'not_started', detail: `${entry.status}（未着手のため照合対象外）` };
+  if (!entry.npm && entry.form === 'skill') return { status: 'plugin', detail: 'GitHub Release の .plugin と claude-plugins で配布（npm には載せない）' };
   if (!entry.npm) return { status: 'not_published', detail: 'npm 未公開のため照合対象外' };
   if (npmVer === null) return { status: 'not_measured', detail: 'npm view が応答しなかった' };
   if (!local.present) return { status: 'npm_only', detail: `npm ${npmVer}（ローカル未確認）` };
@@ -175,7 +176,7 @@ function build() {
 }
 
 const LABEL = {
-  match: '一致', drift: '⚠ ずれ', not_measured: '未測定', npm_only: 'npm のみ', not_published: '未公開', not_started: '未着手', developing: '開発中',
+  match: '一致', drift: '⚠ ずれ', not_measured: '未測定', npm_only: 'npm のみ', not_published: '未公開', plugin: 'plugin 配布', not_started: '未着手', developing: '開発中',
 };
 
 function printSummary(stack) {

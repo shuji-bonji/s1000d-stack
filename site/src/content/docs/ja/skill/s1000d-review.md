@@ -5,6 +5,8 @@ description: S1000D のデータモジュールをレビューし、指摘を co
 
 `s1000d-review` は、既存の S1000D® のデータモジュールをレビューし、指摘を comment DM（コメントデータモジュール）として CSDB に残す Skill です。データモジュールは書き換えません。Skill は、どの MCP サーバーをどの順番で呼び、各段階で利用者に何を聞くかを Claude に伝えるもので、判定の処理は持ちません。
 
+[GitHub](https://github.com/shuji-bonji/s1000d-review-skill) / [Release](https://github.com/shuji-bonji/s1000d-review-skill/releases)
+
 ## 何をする Skill か
 
 - **渡すもの**: 対象のデータモジュール（DMC かファイルのパス、またはフォルダー）と、CSDB のフォルダーです。文章の観点でも見るときは、用語集のファイル（2 列の CSV、Markdown の表、DeepL の用語集）を渡します。comment DM にするときは、`commentType` と `commentPriorityCode` の値をプロジェクトの決まりで選んで伝えます。
@@ -71,10 +73,6 @@ Claude Code では、次のコマンドで入れます。
 ```
 
 必須の MCP サーバーは、Skill の `plugin.json` に依存として宣言してあります。MCP サーバーの設定（`S1000D_SPEC_DIR` など）は[導入手順](/s1000d-stack/ja/guide/getting-started/)にあります。
-
-:::note[公開の状況]
-この Skill はまだ公開していません。claude-plugins への登録は準備中なので、登録が済むまでは上のコマンドで入れられません。
-:::
 
 ## 関連ページ
 

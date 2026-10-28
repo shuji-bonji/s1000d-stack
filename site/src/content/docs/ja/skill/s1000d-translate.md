@@ -5,6 +5,8 @@ description: S1000D のデータモジュールを別の言語に訳し、同じ
 
 `s1000d-translate` は、S1000D® のデータモジュールを別の言語に訳し、同じ DMC で言語だけが違うデータモジュールを作る Skill です。writer サーバーは翻訳も採点もせず、文を取り出して戻すだけです。訳すのは LLM で、採点は xcomet が行います。Skill は、どのサーバーをどの順番で呼び、各段階で利用者に何を聞くかを Claude に伝えます。
 
+[GitHub](https://github.com/shuji-bonji/s1000d-translate-skill) / [Release](https://github.com/shuji-bonji/s1000d-translate-skill/releases)
+
 ## 何をする Skill か
 
 - **渡すもの**: 対象のデータモジュール（DMC かファイルのパス）、訳先の言語（例: `en` と `US`）、CSDB のフォルダーです。用語集があれば、2 列の CSV、Markdown の表、DeepL の用語集のいずれかで渡します。
@@ -62,10 +64,6 @@ Claude Code では、次のコマンドで入れます。
 ```
 
 必須の MCP サーバーは、Skill の `plugin.json` に依存として宣言してあります。MCP サーバーの設定（`S1000D_SPEC_DIR` など）は[導入手順](/s1000d-stack/ja/guide/getting-started/)にあります。
-
-:::note[公開の状況]
-この Skill はまだ公開していません。claude-plugins への登録は準備中なので、登録が済むまでは上のコマンドで入れられません。
-:::
 
 ## 関連ページ
 

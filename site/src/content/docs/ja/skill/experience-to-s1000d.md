@@ -5,6 +5,8 @@ description: 体験型マニュアルの JSON を S1000D の CSDB に変換し�
 
 `experience-to-s1000d` は、体験型マニュアル（[experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) の JSON）を S1000D® の CSDB（データモジュール、パブリケーションモジュール、図の原本）に変換する Skill です。Skill は、どの MCP サーバーをどの順番で呼び、各段階で利用者に何を聞くかを Claude に伝える手順で、変換や検証の処理は持ちません。判定はすべて MCP サーバーの応答を根拠にします。
 
+[GitHub](https://github.com/shuji-bonji/experience-to-s1000d-skill) / [Release](https://github.com/shuji-bonji/experience-to-s1000d-skill/releases)
+
 ## 何をする Skill か
 
 - **渡すもの**: マニュアルの JSON のパス、出力先の CSDB のフォルダー、機密区分、採番の規則（モデル識別コード、システム差異コード、SNS、種類ごとの情報コード、CAGE コード）です。作成ツールの試作（仮称 manual-editor）が保存する JSON を渡せます。
@@ -58,10 +60,6 @@ Claude Code では、次のコマンドで入れます。
 ```
 
 必須の MCP サーバーは、Skill の `plugin.json` に依存として宣言してあります。MCP サーバーの設定（`S1000D_SPEC_DIR` など）は[導入手順](/s1000d-stack/ja/guide/getting-started/)にあります。
-
-:::note[公開の状況]
-この Skill はまだ公開していません。claude-plugins への登録は準備中なので、登録が済むまでは上のコマンドで入れられません。
-:::
 
 ## 関連ページ
 

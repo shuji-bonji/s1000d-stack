@@ -5,6 +5,8 @@ description: Explains what you provide to the Skill that converts an experientia
 
 `experience-to-s1000d` is a Skill that converts an experiential manual (a JSON of [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model)) into an S1000D® CSDB (data modules, a publication module and the original illustration files). A Skill is a procedure that tells Claude which MCP servers to call in which order and what to ask the user at each step; it has no conversion or verification processing of its own. Every judgement rests on the responses of the MCP servers.
 
+[GitHub](https://github.com/shuji-bonji/experience-to-s1000d-skill) / [Release](https://github.com/shuji-bonji/experience-to-s1000d-skill/releases)
+
 ## What it does
 
 - **You provide**: the path of the manual JSON, the CSDB folder to write to, the security classification and the numbering rules (model identification code, system difference code, SNS, the information code for each kind, CAGE code). You can pass a JSON saved by the prototype of the authoring tool (provisionally called manual-editor).
@@ -58,10 +60,6 @@ In Claude Code, install it with the following command.
 ```
 
 The required MCP servers are declared as dependencies in the `plugin.json` of the Skill. The settings of the MCP servers (such as `S1000D_SPEC_DIR`) are described in [Getting started](/s1000d-stack/guide/getting-started/).
-
-:::note[Availability]
-This Skill has not been published yet. Registration in claude-plugins is in preparation, so the command above cannot install it until the registration is done.
-:::
 
 ## Related pages
 

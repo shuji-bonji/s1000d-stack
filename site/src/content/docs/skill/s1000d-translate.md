@@ -5,6 +5,8 @@ description: Explains what you provide to the Skill that translates S1000D data 
 
 `s1000d-translate` is a Skill that translates S1000D® data modules into another language and creates data modules with the same DMC and only the language different. The writer server neither translates nor scores; it only takes sentences out and puts them back. The LLM translates, and xcomet scores. A Skill tells Claude which servers to call in which order and what to ask the user at each step.
 
+[GitHub](https://github.com/shuji-bonji/s1000d-translate-skill) / [Release](https://github.com/shuji-bonji/s1000d-translate-skill/releases)
+
 ## What it does
 
 - **You provide**: the data module to translate (a DMC or a file path), the target language (for example `en` and `US`) and the CSDB folder. If you have a glossary, pass it as a two-column CSV, a Markdown table or a DeepL glossary.
@@ -62,10 +64,6 @@ In Claude Code, install it with the following command.
 ```
 
 The required MCP servers are declared as dependencies in the `plugin.json` of the Skill. The settings of the MCP servers (such as `S1000D_SPEC_DIR`) are described in [Getting started](/s1000d-stack/guide/getting-started/).
-
-:::note[Availability]
-This Skill has not been published yet. Registration in claude-plugins is in preparation, so the command above cannot install it until the registration is done.
-:::
 
 ## Related pages
 

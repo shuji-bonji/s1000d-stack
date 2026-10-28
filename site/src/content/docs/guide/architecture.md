@@ -28,7 +28,7 @@ flowchart TB
     ED["Authoring tool (provisional name)<br/>prototype (stage 3)"]
     VW["Viewer<br/>concept (stage 4)"]
   end
-  SK["4 Skills<br/>created, unpublished (stage 3)"]
+  SK["4 Skills<br/>published (0.1.0)"]
   BREX --> CORE
   R --> CORE
   V --> CORE
@@ -47,7 +47,7 @@ flowchart TB
 | [s1000d-verify-mcp](/s1000d-stack/mcp/verify-mcp/) | Validation with the official XSD, BREX checks, detection of broken references, fix suggestions, DML/DDN reconciliation (7 tools) | Published on [npm 0.6.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-verify-mcp) |
 | [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | Common data model for experiential manuals (independent of S1000D®). Types, JSON Schema, checks, and conversion from the 2021 work | Published on [npm 0.1.0](https://www.npmjs.com/package/@shuji-bonji/experiential-manual-model) |
 | [s1000d-writer-mcp](/s1000d-stack/mcp/writer-mcp/) | Creates data modules without letting the LLM write XML. Converts experiential manuals, applies fixes, creates comment data modules, and hands sentences out and back for translation (6 tools) | Published ([npm 0.1.1](https://www.npmjs.com/package/@shuji-bonji/s1000d-writer-mcp)) |
-| Skills (4) | [experience-to-s1000d](/s1000d-stack/skill/experience-to-s1000d/) (converts an experiential manual into a CSDB), [s1000d-publish](/s1000d-stack/skill/s1000d-publish/) (creates data modules from drafts), [s1000d-review](/s1000d-stack/skill/s1000d-review/) (review and comment data modules), [s1000d-translate](/s1000d-stack/skill/s1000d-translate/) (translation) | Created, unpublished (stage 3) |
+| Skills (4) | [experience-to-s1000d](/s1000d-stack/skill/experience-to-s1000d/) (converts an experiential manual into a CSDB), [s1000d-publish](/s1000d-stack/skill/s1000d-publish/) (creates data modules from drafts), [s1000d-review](/s1000d-stack/skill/s1000d-review/) (review and comment data modules), [s1000d-translate](/s1000d-stack/skill/s1000d-translate/) (translation) | Published (0.1.0, claude-plugins) |
 | Authoring tool (provisionally manual-editor) | A product for creating an experiential manual on screen and saving it as a JSON of experiential-manual-model. It works without AI | Prototype (stage 3) |
 | Viewer | A product for people to use. It works without AI | Concept (stage 4) |
 

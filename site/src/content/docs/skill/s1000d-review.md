@@ -5,6 +5,8 @@ description: Explains what you provide to the Skill that reviews S1000D data mod
 
 `s1000d-review` is a Skill that reviews existing S1000D® data modules and leaves the findings in the CSDB as comment data modules (comment DMs). It does not rewrite the data modules. A Skill tells Claude which MCP servers to call in which order and what to ask the user at each step; it has no judgement processing of its own.
 
+[GitHub](https://github.com/shuji-bonji/s1000d-review-skill) / [Release](https://github.com/shuji-bonji/s1000d-review-skill/releases)
+
 ## What it does
 
 - **You provide**: the data modules to review (a DMC, a file path or a folder) and the CSDB folder. When you also want the wording reviewed, you provide a glossary file (a two-column CSV, a Markdown table or a DeepL glossary). To create comment DMs, you choose the values of `commentType` and `commentPriorityCode` by the rules of your project and tell the Skill.
@@ -71,10 +73,6 @@ In Claude Code, install it with the following command.
 ```
 
 The required MCP servers are declared as dependencies in the `plugin.json` of the Skill. The settings of the MCP servers (such as `S1000D_SPEC_DIR`) are described in [Getting started](/s1000d-stack/guide/getting-started/).
-
-:::note[Availability]
-This Skill has not been published yet. Registration in claude-plugins is in preparation, so the command above cannot install it until the registration is done.
-:::
 
 ## Related pages
 

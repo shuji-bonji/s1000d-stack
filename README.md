@@ -19,7 +19,7 @@ Stage 1 (understanding and checking against BREX) and stage 2 (verification and 
 The four Skills of stage 3 (experience-to-s1000d, s1000d-publish, s1000d-review and s1000d-translate) and a prototype of the authoring tool for experiential manuals (provisionally called manual-editor) have been created. A Skill is a procedure that tells Claude which MCP servers to call in which order and what to ask the user at each step. The authoring tool creates an experiential manual on screen and saves it as a JSON of experiential-manual-model.
 
 > [!NOTE]
-> The four Skills and the prototype of the authoring tool have not been published yet. Registration of the Skills in claude-plugins is in preparation.
+> The four Skills are registered in claude-plugins (for example `/plugin install s1000d-review@shuji-bonji`). The authoring tool is a prototype and has not been published yet.
 
 | Component | Role |
 | --- | --- |
@@ -28,7 +28,7 @@ The four Skills of stage 3 (experience-to-s1000d, s1000d-publish, s1000d-review 
 | [s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | An MCP server that validates one data module in the order well-formedness → XSD → BREX chain → references (`verify_data_module`), runs XSD validation only (`validate_schema`), resolves references (`check_references`), validates a whole folder (`verify_csdb`) and lists the XSDs it found (`list_schemas`). The results are returned combined into a single verification status (`verification`). It also returns candidate corrections for each finding (`suggest_fixes`); the server decides the candidates from the BREX rules, the XSD definitions and the CSDB |
 | [s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | An MCP server that reads data modules and publication modules as structure (`read_data_module` / `read_publication_module`), lists a CSDB and resolves references (`list_data_modules` / `resolve_reference`), returns the applicability vocabulary (`describe_applicability`) and reads ICN metadata (`read_icn_metadata`). The server evaluates which product the content applies to, and every response carries the verification status |
 | s1000d-writer-mcp | An MCP server that creates data modules without letting the LLM write XML. It builds the XML from a structured draft and verifies it (`build_data_module`), and automatically applies only the fixes that have exactly one candidate. It also converts experiential manuals (`convert_manual`), applies a fix chosen from the candidates (`apply_fixes`), creates comment data modules (`create_comment`), and takes out and puts back sentences for translation (`extract_segments` / `apply_segments`). It writes nothing by default |
-| Four Skills (`skill/`) | experience-to-s1000d (converts an experiential manual into a CSDB), s1000d-publish (creates data modules from drafts), s1000d-review (review and comment data modules) and s1000d-translate (translation). Procedures that tell Claude the order in which to call the MCP servers and what to ask the user at each step; they have no processing of their own. Created, unpublished |
+| Four Skills (`skill/`) | experience-to-s1000d (converts an experiential manual into a CSDB), s1000d-publish (creates data modules from drafts), s1000d-review (review and comment data modules) and s1000d-translate (translation). Procedures that tell Claude the order in which to call the MCP servers and what to ask the user at each step; they have no processing of their own. Published (0.1.0, claude-plugins) |
 | manual-editor (provisional name; `app/manual-editor`) | A prototype of a web app for creating experiential manuals on screen (SvelteKit and PWA). It reads and writes the JSON of manual-model, and offers validation and a hands-on preview. S1000D output is done by passing the JSON to the Skill `experience-to-s1000d`. It works without AI |
 | [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | The common data model for experiential operation manuals (TypeScript types, JSON Schema, validation and a converter from the 2021 JSON). Independent of S1000D (npm: `@shuji-bonji/experiential-manual-model`) |
 
@@ -78,16 +78,16 @@ The expert agents (MCP and Skills) come first; the products (authoring tool and 
 
 | Repository | Layer | Form | Status | Version | npm |
 | --- | --- | --- | --- | --- | --- |
-| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | core | library | released | 0.8.0 | `@shuji-bonji/s1000d-core` |
+| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | core | library | released | 0.8.1 | `@shuji-bonji/s1000d-core` |
 | [s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | mcp | mcp-server | released | 0.4.0 | `@shuji-bonji/s1000d-brex-mcp` |
 | [s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | mcp | mcp-server | released | 0.6.0 | `@shuji-bonji/s1000d-verify-mcp` |
 | [s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | mcp | mcp-server | released | 0.7.0 | `@shuji-bonji/s1000d-reader-mcp` |
 | [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | model | library | released | 0.1.0 | `@shuji-bonji/experiential-manual-model` |
 | [s1000d-writer-mcp](https://github.com/shuji-bonji/s1000d-writer-mcp) | mcp | mcp-server | released | 0.1.1 | `@shuji-bonji/s1000d-writer-mcp` |
-| experience-to-s1000d-skill | procedure | skill | in development | 0.1.0 | — |
-| s1000d-publish-skill | procedure | skill | in development | 0.1.0 | — |
-| s1000d-review-skill | procedure | skill | in development | 0.1.0 | — |
-| s1000d-translate-skill | procedure | skill | in development | 0.1.0 | — |
+| [experience-to-s1000d-skill](https://github.com/shuji-bonji/experience-to-s1000d-skill) | procedure | skill | released | 0.1.0 | — |
+| [s1000d-publish-skill](https://github.com/shuji-bonji/s1000d-publish-skill) | procedure | skill | released | 0.1.0 | — |
+| [s1000d-review-skill](https://github.com/shuji-bonji/s1000d-review-skill) | procedure | skill | released | 0.1.0 | — |
+| [s1000d-translate-skill](https://github.com/shuji-bonji/s1000d-translate-skill) | procedure | skill | released | 0.1.0 | — |
 | manual-editor | app | app | in development | 0.1.0 | — |
 | manual-viewer | app | app | concept | — | — |
 

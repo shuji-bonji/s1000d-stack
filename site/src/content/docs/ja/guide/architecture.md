@@ -28,7 +28,7 @@ flowchart TB
     ED["作成ツール（仮称）<br/>試作（段階 3）"]
     VW["閲覧ソフト<br/>構想（段階 4）"]
   end
-  SK["Skill 4 つ<br/>作成済み・未公開（段階 3）"]
+  SK["Skill 4 つ<br/>公開済み（0.1.0）"]
   BREX --> CORE
   R --> CORE
   V --> CORE
@@ -47,7 +47,7 @@ flowchart TB
 | [s1000d-verify-mcp](/s1000d-stack/ja/mcp/verify-mcp/) | 公式 XSD による検証、BREX 照合、参照切れの検出、修正提案、DML・DDN の照合（7 ツール） | [npm 0.6.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-verify-mcp) 公開済み |
 | [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | 体験型マニュアルの共通データモデル（S1000D に依存しない）。型・JSON Schema・検査・2021 年の作品からの変換 | [npm 0.1.0](https://www.npmjs.com/package/@shuji-bonji/experiential-manual-model) 公開済み |
 | [s1000d-writer-mcp](/s1000d-stack/ja/mcp/writer-mcp/) | LLM に XML を書かせずにデータモジュールを作る。体験型マニュアルの変換、修正の適用、コメントデータモジュールの作成、翻訳向けの文の出し入れ（6 ツール） | [npm 0.1.1](https://www.npmjs.com/package/@shuji-bonji/s1000d-writer-mcp) 公開済み |
-| Skill（4 つ） | [experience-to-s1000d](/s1000d-stack/ja/skill/experience-to-s1000d/)（体験型マニュアルを CSDB に変換）、[s1000d-publish](/s1000d-stack/ja/skill/s1000d-publish/)（下書きからデータモジュールを作成）、[s1000d-review](/s1000d-stack/ja/skill/s1000d-review/)（レビューと comment DM）、[s1000d-translate](/s1000d-stack/ja/skill/s1000d-translate/)（翻訳） | 作成済み・未公開（段階 3） |
+| Skill（4 つ） | [experience-to-s1000d](/s1000d-stack/ja/skill/experience-to-s1000d/)（体験型マニュアルを CSDB に変換）、[s1000d-publish](/s1000d-stack/ja/skill/s1000d-publish/)（下書きからデータモジュールを作成）、[s1000d-review](/s1000d-stack/ja/skill/s1000d-review/)（レビューと comment DM）、[s1000d-translate](/s1000d-stack/ja/skill/s1000d-translate/)（翻訳） | 公開済み（0.1.0。claude-plugins） |
 | 作成ツール（仮称 manual-editor） | 体験型マニュアルを画面の上で作り、experiential-manual-model の JSON で保存する製品。AI が無くても動く | 試作（段階 3） |
 | 閲覧ソフト | 人が使う製品。AI が無くても動く | 構想（段階 4） |
 

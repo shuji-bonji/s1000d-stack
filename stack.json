@@ -6,7 +6,7 @@
     "layer = 役割 / form = 配布形態（誰が起動するか）/ status = released・developing・planned・concept。",
     "developing はリポジトリで開発中で npm 未公開。planned / concept はディレクトリも npm も無い。"
   ],
-  "generatedAt": "2026-10-28T09:02:56.333Z",
+  "generatedAt": "2026-10-28T12:40:43.969Z",
   "generatedBy": "scripts/generate-stack.mjs",
   "npmScope": "@shuji-bonji",
   "repos": [
@@ -19,16 +19,16 @@
       "status": "released",
       "public": true,
       "note": "DMC・ICN・PMC の分解、識別・状態部の読み取り、BREX の読み取りと照合（連鎖・層別）、XSD 検証（SchemaValidator、実装は libxml2-wasm のサブパス）、参照の解決、適用性の 3 値評価、本文（descript / proced / process / fault / pm）の共通の形への読み取り、検証状態 VerificationStatus、修正候補の決定。0.8.0 で「書く側」（データモジュールの組み立てと採番、修正候補の適用、WritableCsdbSource、comment DM、翻訳向けの文の出し入れ）を追加。全 MCP が依存",
-      "published": "0.8.0",
+      "published": "0.8.1",
       "local": {
         "version": "0.8.1",
-        "tag": "v0.8.0",
-        "dirty": true,
+        "tag": "v0.8.1",
+        "dirty": false,
         "unpushedCommits": 0
       },
       "consistency": {
-        "status": "drift",
-        "detail": "npm 0.8.0 ≠ local 0.8.1"
+        "status": "match",
+        "detail": "0.8.1"
       }
     },
     {
@@ -137,6 +137,90 @@
       }
     },
     {
+      "name": "experience-to-s1000d-skill",
+      "dir": "skill/experience-to-s1000d-skill",
+      "npm": null,
+      "layer": "procedure",
+      "form": "skill",
+      "status": "released",
+      "public": true,
+      "note": "段階 3。体験型マニュアルの JSON を CSDB に変換する Skill（writer の convert_manual、verify の verify_csdb）。plugin 名 experience-to-s1000d",
+      "published": null,
+      "local": {
+        "version": "0.1.0",
+        "tag": "v0.1.0",
+        "dirty": false,
+        "unpushedCommits": 0
+      },
+      "consistency": {
+        "status": "plugin",
+        "detail": "GitHub Release の .plugin と claude-plugins で配布（npm には載せない）"
+      }
+    },
+    {
+      "name": "s1000d-publish-skill",
+      "dir": "skill/s1000d-publish-skill",
+      "npm": null,
+      "layer": "procedure",
+      "form": "skill",
+      "status": "released",
+      "public": true,
+      "note": "段階 3。構造化した下書きからデータモジュールを 1 件ずつ作り、検証して CSDB に入れる Skill（writer の build_data_module、verify の reconcile_dml）。plugin 名 s1000d-publish",
+      "published": null,
+      "local": {
+        "version": "0.1.0",
+        "tag": "v0.1.0",
+        "dirty": false,
+        "unpushedCommits": 0
+      },
+      "consistency": {
+        "status": "plugin",
+        "detail": "GitHub Release の .plugin と claude-plugins で配布（npm には載せない）"
+      }
+    },
+    {
+      "name": "s1000d-review-skill",
+      "dir": "skill/s1000d-review-skill",
+      "npm": null,
+      "layer": "procedure",
+      "form": "skill",
+      "status": "released",
+      "public": true,
+      "note": "段階 3。データモジュールを 3 つの観点でレビューし、指摘を comment DM に残す Skill（reader、verify の suggest_fixes、writer の create_comment）。plugin 名 s1000d-review",
+      "published": null,
+      "local": {
+        "version": "0.1.0",
+        "tag": "v0.1.0",
+        "dirty": false,
+        "unpushedCommits": 0
+      },
+      "consistency": {
+        "status": "plugin",
+        "detail": "GitHub Release の .plugin と claude-plugins で配布（npm には載せない）"
+      }
+    },
+    {
+      "name": "s1000d-translate-skill",
+      "dir": "skill/s1000d-translate-skill",
+      "npm": null,
+      "layer": "procedure",
+      "form": "skill",
+      "status": "released",
+      "public": true,
+      "note": "段階 3。データモジュールを別の言語に訳す Skill（writer の extract_segments / apply_segments、xcomet による採点）。plugin 名 s1000d-translate",
+      "published": null,
+      "local": {
+        "version": "0.1.0",
+        "tag": "v0.1.0",
+        "dirty": false,
+        "unpushedCommits": 0
+      },
+      "consistency": {
+        "status": "plugin",
+        "detail": "GitHub Release の .plugin と claude-plugins で配布（npm には載せない）"
+      }
+    },
+    {
       "name": "s1000d-stack",
       "dir": ".",
       "npm": null,
@@ -148,90 +232,6 @@
       "published": null,
       "local": {
         "version": null,
-        "tag": null,
-        "dirty": true,
-        "unpushedCommits": 0
-      },
-      "consistency": {
-        "status": "developing",
-        "detail": "npm 未公開（開発中）。照合対象外"
-      }
-    },
-    {
-      "name": "experience-to-s1000d-skill",
-      "dir": "skill/experience-to-s1000d-skill",
-      "npm": null,
-      "layer": "procedure",
-      "form": "skill",
-      "status": "developing",
-      "public": false,
-      "note": "段階 3。体験型マニュアルの JSON を CSDB に変換する Skill（writer の convert_manual、verify の verify_csdb）。plugin 名 experience-to-s1000d",
-      "published": null,
-      "local": {
-        "version": "0.1.0",
-        "tag": null,
-        "dirty": true,
-        "unpushedCommits": 0
-      },
-      "consistency": {
-        "status": "developing",
-        "detail": "npm 未公開（開発中）。照合対象外"
-      }
-    },
-    {
-      "name": "s1000d-publish-skill",
-      "dir": "skill/s1000d-publish-skill",
-      "npm": null,
-      "layer": "procedure",
-      "form": "skill",
-      "status": "developing",
-      "public": false,
-      "note": "段階 3。構造化した下書きからデータモジュールを 1 件ずつ作り、検証して CSDB に入れる Skill（writer の build_data_module、verify の reconcile_dml）。plugin 名 s1000d-publish",
-      "published": null,
-      "local": {
-        "version": "0.1.0",
-        "tag": null,
-        "dirty": true,
-        "unpushedCommits": 0
-      },
-      "consistency": {
-        "status": "developing",
-        "detail": "npm 未公開（開発中）。照合対象外"
-      }
-    },
-    {
-      "name": "s1000d-review-skill",
-      "dir": "skill/s1000d-review-skill",
-      "npm": null,
-      "layer": "procedure",
-      "form": "skill",
-      "status": "developing",
-      "public": false,
-      "note": "段階 3。データモジュールを 3 つの観点でレビューし、指摘を comment DM に残す Skill（reader、verify の suggest_fixes、writer の create_comment）。plugin 名 s1000d-review",
-      "published": null,
-      "local": {
-        "version": "0.1.0",
-        "tag": null,
-        "dirty": true,
-        "unpushedCommits": 0
-      },
-      "consistency": {
-        "status": "developing",
-        "detail": "npm 未公開（開発中）。照合対象外"
-      }
-    },
-    {
-      "name": "s1000d-translate-skill",
-      "dir": "skill/s1000d-translate-skill",
-      "npm": null,
-      "layer": "procedure",
-      "form": "skill",
-      "status": "developing",
-      "public": false,
-      "note": "段階 3。データモジュールを別の言語に訳す Skill（writer の extract_segments / apply_segments、xcomet による採点）。plugin 名 s1000d-translate",
-      "published": null,
-      "local": {
-        "version": "0.1.0",
         "tag": null,
         "dirty": true,
         "unpushedCommits": 0

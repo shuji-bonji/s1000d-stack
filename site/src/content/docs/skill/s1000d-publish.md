@@ -5,6 +5,8 @@ description: Explains what you provide to the Skill that builds S1000D data modu
 
 `s1000d-publish` is a Skill that builds S1000D® data modules one by one from a structured draft, verifies them and puts them in a CSDB. It is a procedure for the authors of technical documents, and it does not go through an experiential manual. A Skill tells Claude which MCP servers to call in which order and what to ask the user at each step; it has no building or verification processing of its own.
 
+[GitHub](https://github.com/shuji-bonji/s1000d-publish-skill) / [Release](https://github.com/shuji-bonji/s1000d-publish-skill/releases)
+
 ## What it does
 
 - **You provide**: the material (text, notes or existing data modules), the CSDB folder to write to, the security classification and the numbering rules. You decide the kind of data module (descriptive, procedural, process or fault isolation) together with the Skill.
@@ -61,10 +63,6 @@ In Claude Code, install it with the following command.
 ```
 
 The required MCP servers are declared as dependencies in the `plugin.json` of the Skill. The settings of the MCP servers (such as `S1000D_SPEC_DIR`) are described in [Getting started](/s1000d-stack/guide/getting-started/).
-
-:::note[Availability]
-This Skill has not been published yet. Registration in claude-plugins is in preparation, so the command above cannot install it until the registration is done.
-:::
 
 ## Related pages
 

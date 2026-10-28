@@ -5,6 +5,8 @@ description: 構造化した下書きから S1000D のデータモジュール�
 
 `s1000d-publish` は、構造化した下書きから S1000D® のデータモジュールを 1 件ずつ作り、検証を通して CSDB に入れる Skill です。体験型マニュアルを経由しない、技術文書の書き手のための手順です。Skill は、どの MCP サーバーをどの順番で呼び、各段階で利用者に何を聞くかを Claude に伝えるもので、組み立てや検証の処理は持ちません。
 
+[GitHub](https://github.com/shuji-bonji/s1000d-publish-skill) / [Release](https://github.com/shuji-bonji/s1000d-publish-skill/releases)
+
 ## 何をする Skill か
 
 - **渡すもの**: 材料（文章、メモ、既存のデータモジュール）、出力先の CSDB のフォルダー、機密区分、採番の規則です。データモジュールの種類（説明、手順、プロセス、故障探求）は、利用者と相談して決めます。
@@ -61,10 +63,6 @@ Claude Code では、次のコマンドで入れます。
 ```
 
 必須の MCP サーバーは、Skill の `plugin.json` に依存として宣言してあります。MCP サーバーの設定（`S1000D_SPEC_DIR` など）は[導入手順](/s1000d-stack/ja/guide/getting-started/)にあります。
-
-:::note[公開の状況]
-この Skill はまだ公開していません。claude-plugins への登録は準備中なので、登録が済むまでは上のコマンドで入れられません。
-:::
 
 ## 関連ページ
 

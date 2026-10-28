@@ -1,4 +1,4 @@
-# 引き継ぎメモ（2026-10-28 18:20 JST 時点）
+# 引き継ぎメモ（2026-10-28 21:50 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
@@ -105,8 +105,8 @@ cd site && npm run build && npm run preview
    3. reader-mcp・verify-mcp・brex-mcp の core の依存は `^0.7.0` / `^0.4.0` のままでよい（0.8.0 は追加だけで既存 API を変えていない）。次に各 MCP の minor を上げるときに揃える
    4. ~~`-dev` 版~~ **済み（2026-10-28 17:00 JST 頃、`s1000d-writer-dev`。`env` は `S1000D_SPEC_DIR` だけ）**
    5. hub: `site/`・README・`stack.json`・`docs/` をコミット・push（サイトが配備される）。サイトは 2026-10-28 に `mcp/writer-mcp.md`（日英）を足し 16 ページ × 2 言語、`check:i18n` ok、内部リンク切れ 0。公開を受けて「npm 未公開」の note（architecture・writer-mcp・s1000d-core、日英）と README の記述は 16:50 JST に消し、`generate-stack.mjs` の writer を `released` にして `stack.json` と README の表を再生成した（npm 照合は 6 つとも一致）。ただし VM では Pagefind が `linux-arm64 is not yet a supported architecture` で失敗したため（以前は通っていた。npm のキャッシュを `/var/tmp` に移した影響か未確認）、**`cd site && npm run build` を Mac で一度通してから push する**。`site/scripts/check-i18n.mjs` が ok であることは確認済み
-10. **core 0.8.1（未コミット・未公開）**: CSDB なしの検証で `brexDmRef` が未解決と出ていた食い違いの修正（ROADMAP「進捗（段階 3）」の「修正」）。公開は `lib/s1000d-core` でコミット → `git tag v0.8.1 && git push --follow-tags`（`package.json` は 0.8.1 に上げてある。`npm version` は使わない）。writer-mcp の依存 `^0.8.0` は 0.8.1 を含むので、writer-mcp の再公開は要らない（`npx @latest` で入れ直せば効く）。
-11. **作業 8 はローカルで作成済み（2026-10-28 18:20 JST 頃、未コミット・未公開）**。結果は ROADMAP「進捗（段階 3）」の 8-2〜8-5。利用者の手順:
+10. **core 0.8.1 は 2026-10-28 21:30 JST 頃までに公開済み**（`npm view` で 0.8.1）: CSDB なしの検証で `brexDmRef` が未解決と出ていた食い違いの修正（ROADMAP「進捗（段階 3）」の「修正」）。公開は `lib/s1000d-core` でコミット → `git tag v0.8.1 && git push --follow-tags`（`package.json` は 0.8.1 に上げてある。`npm version` は使わない）。writer-mcp の依存 `^0.8.0` は 0.8.1 を含むので、writer-mcp の再公開は要らない（`npx @latest` で入れ直せば効く）。
+11. **作業 8 は 2026-10-28 に済み**。Skill 4 つは 21:30 JST 頃までに公開（GitHub Public、`v0.1.0` の Release に `.plugin`、claude-plugins 登録、Claude Desktop に追加）。hub も push 済み。公開を受けて、サイトの Skill の 4 ページ（日英）の「公開準備中」の注記を GitHub・Release へのリンクに置き換え、architecture・トップページ・hub の README を「公開済み」にし、`generate-stack.mjs` の Skill 4 行を `released`（`public: true`、照合の欄は「plugin 配布」）にした（21:50 JST、**未コミット**。Mac で `site` の build を通してからコミット・push）。manual-editor は Mac の `npm run dev` で起動済み。以下は公開までに使った手順の記録:
     1. GitHub に Private で 5 つ作る: `experience-to-s1000d-skill`・`s1000d-publish-skill`・`s1000d-review-skill`・`s1000d-translate-skill`・`manual-editor`
     2. 各フォルダー（`skill/<名前>-skill`、`app/manual-editor`）で `git init` → コミット → `git remote add origin …` → push（hub の `.gitignore` で除外されているので、それぞれが独立したリポジトリになる）
     3. manual-editor は Mac で `npm install && npm run dev` を開き目視で確かめる（券売機の例を開く → ホットスポットを描く → 遷移を付ける → 体験表示）。オフラインは `npm run build && npm run preview`。保存した JSON を `experience-to-s1000d` に渡して S1000D にできることも一度確かめる。`app/manual-editor/.svelte-kit/build-preview.tgz` はチャットでの画面確認に使った build の写し（`.gitignore` 済み。消してよい）
