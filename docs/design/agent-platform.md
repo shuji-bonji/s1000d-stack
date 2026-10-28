@@ -118,7 +118,7 @@ S1000D を LLM で扱うときに挙げられる注意点（2026-10-25 に利用
 | **生成時の課題**: LLM に XML を直接出力させると、スキーマ準拠や参照の整合性を保証しにくい | 段階 2.5 の `suggest_fixes` は候補を core が決め、LLM は候補の外の値を出さない | **段階 3 の writer は LLM に XML を書かせない**。LLM は共通データモデル（experiential-manual-model）か、writer の構造化された入力（題名・段落・手順・参照の DMC）を出し、XML は writer が組み立てて、verify に通らなければ `suggest_fixes` の候補で直す「生成 → 検証 → 修正」の繰り返しにする。DMC・ICN の採番、`brexDmRef`、`issueInfo` は writer が付ける |
 | **その他**: 図（CGM など）・マルチメディア、機密区分、専門用語（Simplified Technical English など）への対応が別途要る | 図は ICN として参照を解決し、`hotspot` の `applicationStructureIdent` を返す。使ってよい形式は BREX の `list_notations` で読む。機密区分（`securityClassification`）は識別・状態部にそのまま返す | **図の中身は読まない**（CGM の描画・画像の理解はこのスタックの対象外。製品側が表示用の変換物を持つ。experiential-manual-model の `Asset.display` と同じ考え方）。**機密区分は応答の先頭に出し、エージェントが扱いを決められるようにする**（`verification` と同じく必ず付ける項目にする）。**STE（ASD-STE100）は ASD の仕様で利用条件が要る**ため、辞書を同梱せず、利用者が持つ用語集を Skill から参照する形にする（段階 3 の `s1000d-review` の一部） |
 
-これらのうち、段階 2.5 で行うのは「概要モード」「版が混ざった CSDB の確認」「機密区分を必ず付ける」「近似スキーマとの違いの説明」の 4 つです。writer の方針と STE は段階 3 に入れます。
+これらのうち、段階 2.5 で行うのは「概要モード」「版が混ざった CSDB の確認」「機密区分を必ず付ける」「近似スキーマとの違いの説明」の 4 つです（4 つとも 2026-10-28 に済み。概要モードは reader-mcp `section: "outline"`、機密区分は reader-mcp の応答の先頭、版の確認は verify-mcp のテスト、近似スキーマとの違いはサイトの `guide/embedding.md`）。writer の方針と STE は段階 3 に入れます。
 
 ## 参照実装: 簡易な技術マニュアルの Web システム
 
@@ -157,8 +157,8 @@ S1000D を LLM で扱うときに挙げられる注意点（2026-10-25 に利用
 | 3 | core に `CsdbSource` インターフェース（フォルダー実装を既定に）。`CsdbIndex` はその上に載せる。済み（2026-10-27）。MCP 側の置き換えは core 0.5.0 の公開後 | lib/s1000d-core |
 | 4 | 各 MCP に HTTP transport の起動オプション。済み（2026-10-27、`--http`） | mcp/* |
 | 5 | core に DML・DDN の読み取りと照合。verify-mcp `verify_csdb` と reader-mcp `list_data_modules` に反映。core 側は済み（2026-10-28）。MCP 側は core 0.6.0 の公開後 | lib/s1000d-core、mcp/* |
-| 6 | サイトに「組み込み基盤」のページ（4 つの要件と境界、LLM 活用時の注意点への対応、近似スキーマとの違い） | s1000d-stack/site |
-| 7 | reader-mcp に概要モード（`section: "outline"`）と節点ごとの文字数。DM 全体と各節の `securityClassification` を応答の先頭に必ず付ける | lib/s1000d-core、mcp/s1000d-reader-mcp |
-| 8 | 版（Issue）が混ざった CSDB での `verify_csdb`（XSD を版ごとに選ぶ）の確認。Issue 4.2 の XSD が無い間は自作の `xml_schema_flat/` で確かめる | mcp/s1000d-verify-mcp |
+| 6 | サイトに「組み込み基盤」のページ（4 つの要件と境界、LLM 活用時の注意点への対応、近似スキーマとの違い）。済み（2026-10-28、`guide/embedding.md`、日英） | s1000d-stack/site |
+| 7 | reader-mcp に概要モード（`section: "outline"`）と節点ごとの文字数。DM 全体と各節の `securityClassification` を応答の先頭に必ず付ける。済み（2026-10-28。core 0.7.0 の `outlineContent` / `measureContent`、reader-mcp の `section: "outline"` と先頭の `securityClassification`） | lib/s1000d-core、mcp/s1000d-reader-mcp |
+| 8 | 版（Issue）が混ざった CSDB での `verify_csdb`（XSD を版ごとに選ぶ）の確認。Issue 4.2 の XSD が無い間は自作の `xml_schema_flat/` で確かめる。済み（2026-10-28、verify-mcp のテストに固定） | mcp/s1000d-verify-mcp |
 
 comment DM の生成、翻訳向けの API、「LLM に XML を書かせない」writer の方針、STE の用語集の参照は、段階 3 の writer と Skill の作業に入れます。
