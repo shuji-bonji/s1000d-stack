@@ -6,7 +6,7 @@
     "layer = 役割 / form = 配布形態（誰が起動するか）/ status = released・developing・planned・concept。",
     "developing はリポジトリで開発中で npm 未公開。planned / concept はディレクトリも npm も無い。"
   ],
-  "generatedAt": "2026-10-27T14:42:54.184Z",
+  "generatedAt": "2026-10-28T01:13:24.797Z",
   "generatedBy": "scripts/generate-stack.mjs",
   "npmScope": "@shuji-bonji",
   "repos": [
@@ -19,16 +19,16 @@
       "status": "released",
       "public": true,
       "note": "DMC・ICN・PMC の分解、識別・状態部の読み取り、BREX の読み取りと照合（連鎖・層別）、XSD 検証（SchemaValidator、実装は libxml2-wasm のサブパス）、参照の解決、適用性の 3 値評価、本文（descript / proced / process / fault / pm）の共通の形への読み取り、検証状態 VerificationStatus。全 MCP が依存",
-      "published": "0.5.0",
+      "published": "0.6.0",
       "local": {
-        "version": "0.5.0",
-        "tag": "v0.5.0",
+        "version": "0.6.0",
+        "tag": "v0.6.0",
         "dirty": false,
         "unpushedCommits": 0
       },
       "consistency": {
         "status": "match",
-        "detail": "0.5.0"
+        "detail": "0.6.0"
       }
     },
     {
@@ -128,7 +128,7 @@
       "local": {
         "version": null,
         "tag": null,
-        "dirty": false,
+        "dirty": true,
         "unpushedCommits": 0
       },
       "consistency": {
