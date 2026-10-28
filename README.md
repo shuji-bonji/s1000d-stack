@@ -70,10 +70,10 @@ The expert agents (MCP and Skills) come first; the products (authoring tool and 
 
 | Repository | Layer | Form | Status | Version | npm |
 | --- | --- | --- | --- | --- | --- |
-| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | core | library | released | 0.6.0 | `@shuji-bonji/s1000d-core` |
+| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | core | library | released | 0.7.0 | `@shuji-bonji/s1000d-core` |
 | [s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | mcp | mcp-server | released | 0.4.0 | `@shuji-bonji/s1000d-brex-mcp` |
 | [s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | mcp | mcp-server | released | 0.6.0 | `@shuji-bonji/s1000d-verify-mcp` |
-| [s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | mcp | mcp-server | released | 0.6.0 | `@shuji-bonji/s1000d-reader-mcp` |
+| [s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | mcp | mcp-server | released | 0.7.0 | `@shuji-bonji/s1000d-reader-mcp` |
 | [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | model | library | released | 0.1.0 | `@shuji-bonji/experiential-manual-model` |
 | s1000d-writer-mcp | mcp | mcp-server | planned | — | — |
 | s1000d-skills | procedure | skill | concept | — | — |

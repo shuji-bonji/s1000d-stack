@@ -6,7 +6,7 @@
     "layer = 役割 / form = 配布形態（誰が起動するか）/ status = released・developing・planned・concept。",
     "developing はリポジトリで開発中で npm 未公開。planned / concept はディレクトリも npm も無い。"
   ],
-  "generatedAt": "2026-10-28T01:52:10.764Z",
+  "generatedAt": "2026-10-28T02:34:57.836Z",
   "generatedBy": "scripts/generate-stack.mjs",
   "npmScope": "@shuji-bonji",
   "repos": [
@@ -19,16 +19,16 @@
       "status": "released",
       "public": true,
       "note": "DMC・ICN・PMC の分解、識別・状態部の読み取り、BREX の読み取りと照合（連鎖・層別）、XSD 検証（SchemaValidator、実装は libxml2-wasm のサブパス）、参照の解決、適用性の 3 値評価、本文（descript / proced / process / fault / pm）の共通の形への読み取り、検証状態 VerificationStatus。全 MCP が依存",
-      "published": "0.6.0",
+      "published": "0.7.0",
       "local": {
-        "version": "0.6.0",
-        "tag": "v0.6.0",
+        "version": "0.7.0",
+        "tag": "v0.7.0",
         "dirty": false,
         "unpushedCommits": 0
       },
       "consistency": {
         "status": "match",
-        "detail": "0.6.0"
+        "detail": "0.7.0"
       }
     },
     {
@@ -82,16 +82,16 @@
       "status": "released",
       "public": true,
       "note": "段階 2。データモジュールの本文を構造化して返す、参照の解決、適用性の判定（式は LLM に渡さない）。応答に検証状態を含める。list_data_modules / read_data_module / read_publication_module / resolve_reference / describe_applicability / read_icn_metadata の 6 tools",
-      "published": "0.6.0",
+      "published": "0.7.0",
       "local": {
-        "version": "0.6.0",
-        "tag": "v0.6.0",
+        "version": "0.7.0",
+        "tag": "v0.7.0",
         "dirty": false,
         "unpushedCommits": 0
       },
       "consistency": {
         "status": "match",
-        "detail": "0.6.0"
+        "detail": "0.7.0"
       }
     },
     {
@@ -128,8 +128,8 @@
       "local": {
         "version": null,
         "tag": null,
-        "dirty": true,
-        "unpushedCommits": 1
+        "dirty": false,
+        "unpushedCommits": 2
       },
       "consistency": {
         "status": "developing",
