@@ -261,6 +261,15 @@ flowchart LR
 - 試して効かなかった `launchctl setenv` の LaunchAgent（`~/Library/LaunchAgents/io.github.shuji-bonji.s1000d-env.plist`）は片付ける（`launchctl unsetenv S1000D_SPEC_DIR` と plist の削除）。
 - 実装: core の `1fa516b`（0.4.0 として未公開）、brex-mcp `77df929`・verify-mcp `4762484`・reader-mcp `361354b`（未 push。core 0.4.0 の公開後に依存を上げる）。
 
+### D-26 DML・DDN の照合は verify-mcp の `reconcile_dml` が行い、reader-mcp は集計だけを返す（2026-10-28）
+
+- DML（データモジュールリスト）・DDN（納入票）と CSDB との照合（段階 2.5 の作業 5）は、処理を core（`readDml` / `readDdn` / `reconcileDml` / `reconcileDdn`、0.6.0）に置き、MCP 側は次の分担にする。
+  - **verify-mcp**: 7 本目のツール `reconcile_dml` が、行ごとの結果（`found` / `issue-mismatch` / `not-found` / `not-checked`）と、DML に載っていない DM・PM（`notListed`）を返す。`path` / `xml` を省くと CSDB の DML・DDN をすべて照合する。`verify_csdb` には混ぜない（`verify_csdb` は中身の検証、`reconcile_dml` は識別子と版の照合で、入力も出力の形も違う）。
+  - **reader-mcp**: `list_data_modules` の `include` に `dml` / `ddn` を渡したとき、行にコード・発行日・行数と照合の集計（件数）だけを付ける。行ごとの結果は verify-mcp に任せ、reader は「CSDB に何があるか」を見渡す役に留める。
+- 理由: 照合は「検証（verify）」の仲間（プロジェクト管理の土台、D-19 の最低限の要件の隣）であり、1 つのツールに入力の形（DML か DDN か、省略で全件）をまとめた方が LLM に説明しやすい。reader にも同じ結果を全部返すと 2 本の応答が重複する。
+- `dmlType`（c / p / s）・`dmlEntryType`（c / d / n）・`issueType` の意味は解釈せず、列挙のまま返す。意味を付けるのは仕様書の該当章を読んでから（notes/background.md）。
+- 実装: core `cdc5c25`（0.6.0 で公開）、verify-mcp `c741b4c`、reader-mcp `c9c9aeb`（2026-10-28、未公開）。
+
 ## 未決事項
 
 | ID | 内容 | 判断の材料 |

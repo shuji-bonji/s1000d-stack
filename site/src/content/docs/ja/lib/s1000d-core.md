@@ -32,6 +32,7 @@ npm install @shuji-bonji/s1000d-core
 | 1 件の検証（整形式・XSD・BREX・参照）をまとめた検証状態 | `verifyDataModule` / `VerificationStatus` |
 | 検証の結果と、判定できない適用性からの修正候補 | `suggestFixes` / `findUndeterminedApplicability` / `findApplicTables` |
 | CSDB の置き場所の差し替え（既定はフォルダー） | `CsdbSource` / `DirectoryCsdbSource` / `MemoryCsdbSource` / `CsdbIndex.fromSource` |
+| DML（データモジュールリスト）・DDN（納入票）の読み取りと CSDB との照合 | `readDml` / `readDdn` / `reconcileDml` / `reconcileDdn` |
 
 ```ts
 import { readFileSync } from 'node:fs';

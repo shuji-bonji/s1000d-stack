@@ -11,7 +11,7 @@ description: データモジュールを XML ではなく構造として読み�
 
 | ツール | 内容 |
 | --- | --- |
-| `list_data_modules` | CSDB の中のデータモジュール（指定すれば PM・DML・DDN・IMF・UPF も）を、DMC・題名・版・言語・スキーマ名・適用性の表示文付きで一覧にします。モデル識別コード・システムコード・情報コード・スキーマ名・題名の文字で絞れます |
+| `list_data_modules` | CSDB の中のデータモジュール（指定すれば PM・DML・DDN・IMF・UPF も）を、DMC・題名・版・言語・スキーマ名・適用性の表示文付きで一覧にします。モデル識別コード・システムコード・情報コード・スキーマ名・題名の文字で絞れます。DML・DDN の行には、コードと行数（納入物の件数）、CSDB との照合の集計（`found` / `issue-mismatch` / `not-found` / `not-checked`）が付きます。行ごとの結果は `s1000d-verify-mcp` の `reconcile_dml` が返します |
 | `read_data_module` | データモジュール 1 件を構造で読みます。識別・状態部、本文の木、参照（題名付き）、検証状態。`product` を渡すとブロックごとに `applicable` / `notApplicable` / `undetermined` を付けます |
 | `read_publication_module` | パブリケーションモジュールを目次として読みます。`pmEntry` の木と、各 `dmRef` / `pmRef` の解決先（ファイル・題名・版） |
 | `resolve_reference` | DMC・PMC・ICN を CSDB のファイルに解決します。ICN は参照元の DOCTYPE 宣言（ファイル名と NOTATION）も返します |

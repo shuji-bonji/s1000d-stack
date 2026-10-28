@@ -3,7 +3,7 @@ title: s1000d-verify-mcp
 description: XSD 検証・BREX 照合・参照の解決を行い、結果を 1 つの検証状態にまとめて返す MCP サーバーの設定とツールを説明します。
 ---
 
-`s1000d-verify-mcp` は、データモジュールを XML スキーマ（XSD）で検証し、BREX の連鎖に照合し、参照（`dmRef`・`pmRef`・ICN・`internalRef`・`applicRefId`）が解決できるかを確かめて、結果を 1 つの**検証状態**（`verification`）にまとめて返す MCP サーバーです。違反ごとに直し方の候補を返す修正提案（`suggest_fixes`）も持ち、ツールは 6 つです。検証状態は `s1000d-reader-mcp` が本文の応答に埋め込むものと同じ形で、どちらも共有ライブラリ `s1000d-core` の同じ関数で作ります。
+`s1000d-verify-mcp` は、データモジュールを XML スキーマ（XSD）で検証し、BREX の連鎖に照合し、参照（`dmRef`・`pmRef`・ICN・`internalRef`・`applicRefId`）が解決できるかを確かめて、結果を 1 つの**検証状態**（`verification`）にまとめて返す MCP サーバーです。違反ごとに直し方の候補を返す修正提案（`suggest_fixes`）と、データモジュールリスト・納入票を CSDB と照合する `reconcile_dml` も持ち、ツールは 7 つです。検証状態は `s1000d-reader-mcp` が本文の応答に埋め込むものと同じ形で、どちらも共有ライブラリ `s1000d-core` の同じ関数で作ります。
 
 [GitHub](https://github.com/shuji-bonji/s1000d-verify-mcp) / [npm](https://www.npmjs.com/package/@shuji-bonji/s1000d-verify-mcp)
 
@@ -16,6 +16,7 @@ description: XSD 検証・BREX 照合・参照の解決を行い、結果を 1 �
 | `check_references` | 参照を 5 種類集め、参照先の有無を理由付き（`not-found` / `no-entity-declaration` / `file-not-found` / `no-such-id` / `no-csdb`）で返します。仕様書の章への `dmRef`（モデル識別コード `S1000D`）は参照切れではないので別枠にします |
 | `verify_csdb` | フォルダーの中の CSDB オブジェクト（既定は DMC と PMC）をまとめて検証し、1 件ごとの検証状態と件数の集計を返します。`offset` と `limit` で分けて読み、`reportPath` で詳細を JSON に書き出せます |
 | `suggest_fixes` | `verify_data_module` と同じ検証を行い、違反ごとに直し方の候補を返します。候補はサーバーが決め、候補の出どころと確からしさ（`exact` / `several` / `none`）を付けます。`product` を渡すと、製品の値が足りず判定できない適用性にも、与える値の候補を付けます。修正を文書に当てることはしません |
+| `reconcile_dml` | データモジュールリスト（DML）か納入票（DDN）を CSDB と照合し、行ごとに `found` / `issue-mismatch`（対象はあるが指定の版が無い）/ `not-found` / `not-checked` と、CSDB にあるのに DML に載っていない DM・PM を返します。`path` も `xml` も省くと CSDB の DML・DDN をすべて照合します。`dmlType` などの値は解釈しません |
 | `list_schemas` | `S1000D_SPEC_DIR` の下で見つかった `xml_schema_flat/` の一覧（版、XSD の数、スキーマ名）を返します。`schema-not-found` の原因を調べるのに使います |
 
 ## 検証状態の読み方

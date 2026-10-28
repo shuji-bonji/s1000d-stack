@@ -32,6 +32,7 @@ npm install @shuji-bonji/s1000d-core
 | Verification status that combines one data module's checks (well-formedness, XSD, BREX, references) | `verifyDataModule` / `VerificationStatus` |
 | Fix candidates from the verification result and from applicability that cannot be decided | `suggestFixes` / `findUndeterminedApplicability` / `findApplicTables` |
 | Swapping where the CSDB lives (a folder by default) | `CsdbSource` / `DirectoryCsdbSource` / `MemoryCsdbSource` / `CsdbIndex.fromSource` |
+| Reading a DML (data module list) and a DDN (data dispatch note) and reconciling them with the CSDB | `readDml` / `readDdn` / `reconcileDml` / `reconcileDdn` |
 
 ```ts
 import { readFileSync } from 'node:fs';
