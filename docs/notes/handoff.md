@@ -1,12 +1,12 @@
-# 引き継ぎメモ（2026-10-28 17:20 JST 時点）
+# 引き継ぎメモ（2026-10-28 18:20 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
 > [!IMPORTANT]
 > 作業の前提は次の 3 つです。
-> 1. DECISIONS.md の決定事項（D-01〜D-27）は覆さない。変える必要があると判断したときは、理由を挙げて先に相談する。
+> 1. DECISIONS.md の決定事項（D-01〜D-28）は覆さない。変える必要があると判断したときは、理由を挙げて先に相談する。
 > 2. S1000D の仕様書・XSD・既定 BREX・公式サンプルは、どのリポジトリにも npm パッケージにもコミットしない（D-03）。置き場所は `s1000d-stack/specs/s1000d/`（git 管理外、D-06）。
-> 3. `docs/` の文書（ROADMAP・DECISIONS・notes/ の 6 本・design/ の 5 本）は、ローカル `s1000d-stack/docs/` と claude.ai Project「S1000D Stack」のナレッジの両方に同じ内容を置く。片方だけ直さない。
+> 3. `docs/` の文書（ROADMAP・DECISIONS・notes/ の 6 本・design/ の 6 本）は、ローカル `s1000d-stack/docs/` と claude.ai Project「S1000D Stack」のナレッジの両方に同じ内容を置く。片方だけ直さない。
 > 4. サイトと README は英語がルート、日本語が `/ja/` と `README.ja.md`（D-22）。一次執筆は日本語で、英語は `notes/glossary.md` と `notes/en-writing-guide.md` に従って訳す。ページの完了条件は「日本語と英語の両方が揃うこと」。
 
 ## いまどこにいるか
@@ -101,14 +101,23 @@ cd site && npm run build && npm run preview
 8. **段階 3 の writer は 2026-10-28 に実装済み**（design/writer-mcp.md、ROADMAP「段階 3 の作業」）。core 0.8.0 の追加は core の CHANGELOG、writer-mcp の中身は同リポジトリの README.ja.md。実装で設計と違えた点は design/writer-mcp.md「実装の記録」。
 9. **公開（利用者）。順番を守る**:
    1. ~~core の公開~~ **済み（2026-10-28 16:20 JST 頃、0.8.0）**
-   2. writer-mcp: ~~`npm install` → テスト → 初回コミット・push → 手動 `npm publish` → Trusted Publisher~~ **済み（2026-10-28 16:30 JST 頃、0.1.0）**。**MCP Registry と claude-plugins も済み（2026-10-28 17:20 JST 頃、0.1.1）**。経過: (1) `server.json` の `description` が 118 文字で Registry に 422（上限 100 文字）→ 97 文字に縮めた。(2) plugin 名を他の 3 本に揃えて `s1000d-writer` → `s1000d-writer-mcp` に直した（`mcpServers` のキーは `s1000d-writer` のまま）。(3) claude-plugins の CI（`marketplace-version-check.mjs`）が古い名前を読んで落ちたのは `raw.githubusercontent.com` のキャッシュ（`max-age=300`）のため。**plugin 側を push したら 5 分置いてから claude-plugins を push する**。(4) 0.1.1 で入力スキーマを直した（上の表）。残り: Claude Desktop を再起動して plugin 版・`-dev` 版の `build_data_module` が呼べることを確かめる
+   2. writer-mcp: ~~`npm install` → テスト → 初回コミット・push → 手動 `npm publish` → Trusted Publisher~~ **済み（2026-10-28 16:30 JST 頃、0.1.0）**。**MCP Registry と claude-plugins も済み（2026-10-28 17:20 JST 頃、0.1.1）**。経過: (1) `server.json` の `description` が 118 文字で Registry に 422（上限 100 文字）→ 97 文字に縮めた。(2) plugin 名を他の 3 本に揃えて `s1000d-writer` → `s1000d-writer-mcp` に直した（`mcpServers` のキーは `s1000d-writer` のまま）。(3) claude-plugins の CI（`marketplace-version-check.mjs`）が古い名前を読んで落ちたのは `raw.githubusercontent.com` のキャッシュ（`max-age=300`）のため。**plugin 側を push したら 5 分置いてから claude-plugins を push する**。(4) 0.1.1 で入力スキーマを直した（上の表）。Claude Desktop の再起動後、plugin 版（npm 0.1.1）と `-dev` 版の両方で `build_data_module` を呼び、descript・proced とも Issue 7 の XSD で valid、既定 BREX の違反 0 を確かめた（17:22 JST）。気づいた点: CSDB のフォルダーを渡さないと、BREX の連鎖は `S1000D_SPEC_DIR` の既定 BREX でたどれるのに、参照の工程は `brexDmRef` を「No CSDB folders」で未解決（`confidence: none`）として返す。既定 BREX（モデル識別コード `S1000D`）への参照は仕様書への参照として扱う方が利用者に分かりやすい（core の参照の解決の小さな改善候補）
    3. reader-mcp・verify-mcp・brex-mcp の core の依存は `^0.7.0` / `^0.4.0` のままでよい（0.8.0 は追加だけで既存 API を変えていない）。次に各 MCP の minor を上げるときに揃える
    4. ~~`-dev` 版~~ **済み（2026-10-28 17:00 JST 頃、`s1000d-writer-dev`。`env` は `S1000D_SPEC_DIR` だけ）**
    5. hub: `site/`・README・`stack.json`・`docs/` をコミット・push（サイトが配備される）。サイトは 2026-10-28 に `mcp/writer-mcp.md`（日英）を足し 16 ページ × 2 言語、`check:i18n` ok、内部リンク切れ 0。公開を受けて「npm 未公開」の note（architecture・writer-mcp・s1000d-core、日英）と README の記述は 16:50 JST に消し、`generate-stack.mjs` の writer を `released` にして `stack.json` と README の表を再生成した（npm 照合は 6 つとも一致）。ただし VM では Pagefind が `linux-arm64 is not yet a supported architecture` で失敗したため（以前は通っていた。npm のキャッシュを `/var/tmp` に移した影響か未確認）、**`cd site && npm run build` を Mac で一度通してから push する**。`site/scripts/check-i18n.mjs` が ok であることは確認済み
-10. 作業 8（Skill 4 つと作成ツールの試作）の設計文書を書く。U-09（Skill のリポジトリ名）と、`s1000d-translate` の名前、U-03（自作サンプルデータの共有。出発点は core の `src/__fixtures__/kenbaiki-drafts.ts`）をそのときに決める。
-11. core で確かめきれていないこと: comment DM のファイル名の規則（仕様書のファイル名の章。データ辞書の見本 1 件からの推定）、`applyFix` が開始タグの中の空白を 1 つに揃えること、ICN の DOCTYPE を書き換える候補が未対応なこと。
-12. 片付け: `lib/s1000d-core` と `mcp/s1000d-reader-mcp` 直下の `vitest.config.ts.timestamp-*.mjs`（`.gitignore` 済み）を消す。VM 側は `/sessions` の空きが少なく、`~/vm` を `/var/tmp/vmroot` へのシンボリックリンクにし、npm のキャッシュを `/var/tmp/npm-cache` にしてある（セッションをまたいで残らないことがある）。
-13. `notes/site-review.md` に `guide/overview.md`・`use-cases/index.md`・`guide/embedding.md` の照合表を足す（任意）。
+10. **core 0.8.1（未コミット・未公開）**: CSDB なしの検証で `brexDmRef` が未解決と出ていた食い違いの修正（ROADMAP「進捗（段階 3）」の「修正」）。公開は `lib/s1000d-core` でコミット → `git tag v0.8.1 && git push --follow-tags`（`package.json` は 0.8.1 に上げてある。`npm version` は使わない）。writer-mcp の依存 `^0.8.0` は 0.8.1 を含むので、writer-mcp の再公開は要らない（`npx @latest` で入れ直せば効く）。
+11. **作業 8 はローカルで作成済み（2026-10-28 18:20 JST 頃、未コミット・未公開）**。結果は ROADMAP「進捗（段階 3）」の 8-2〜8-5。利用者の手順:
+    1. GitHub に Private で 5 つ作る: `experience-to-s1000d-skill`・`s1000d-publish-skill`・`s1000d-review-skill`・`s1000d-translate-skill`・`manual-editor`
+    2. 各フォルダー（`skill/<名前>-skill`、`app/manual-editor`）で `git init` → コミット → `git remote add origin …` → push（hub の `.gitignore` で除外されているので、それぞれが独立したリポジトリになる）
+    3. manual-editor は Mac で `npm install && npm run dev` を開き目視で確かめる（券売機の例を開く → ホットスポットを描く → 遷移を付ける → 体験表示）。オフラインは `npm run build && npm run preview`。保存した JSON を `experience-to-s1000d` に渡して S1000D にできることも一度確かめる。`app/manual-editor/.svelte-kit/build-preview.tgz` はチャットでの画面確認に使った build の写し（`.gitignore` 済み。消してよい）
+    4. Skill の公開: 各リポジトリで `CHANGELOG.md` の 0.1.0 に日付を入れ、タグ `v0.1.0` を push（`release.yml` が `.plugin` を作り GitHub Release に置く）。リポジトリを Public にするかは利用者が決める（サイトと README は Private の前提でリンクを付けていない）
+    5. claude-plugins: 台帳（Skill 4 件、marketplace 0.9.0）と README の表・図は用意済み。**Skill のリポジトリを push して 5 分置いてから** `node scripts/marketplace-version-check.mjs` で 31 件一致を確かめ、コミット・push。`/plugin install s1000d-review@shuji-bonji` などで入ることを確かめる
+    6. hub: サイトの Skill の章を含めてコミット・push（Mac で `cd site && npm run build` を通してから）
+    7. 決まりの準備（任意）: s1000d-review の comment DM に使う `commentType`・`commentPriorityCode`・発信者・機密区分のプロジェクトの決まり、s1000d-review / s1000d-translate が読む用語集（2 列の CSV か Markdown の表、または DeepL の用語集）
+    U-03（自作サンプルデータの共有。出発点は core の `src/__fixtures__/kenbaiki-drafts.ts`）は未決。
+12. core で確かめきれていないこと: comment DM のファイル名の規則（仕様書のファイル名の章。データ辞書の見本 1 件からの推定）、`applyFix` が開始タグの中の空白を 1 つに揃えること、ICN の DOCTYPE を書き換える候補が未対応なこと。
+13. 片付け: `lib/s1000d-core` と `mcp/s1000d-reader-mcp` 直下の `vitest.config.ts.timestamp-*.mjs`（`.gitignore` 済み）を消す。VM 側は `/sessions` の空きが少なく、`~/vm` を `/var/tmp/vmroot` へのシンボリックリンクにし、npm のキャッシュを `/var/tmp/npm-cache` にしてある（セッションをまたいで残らないことがある）。
+14. `notes/site-review.md` に `guide/overview.md`・`use-cases/index.md`・`guide/embedding.md` の照合表を足す（任意）。
 
 ## 作業 10 の記録（公開、D-16。2026-10-26 に完了）
 
@@ -162,10 +171,10 @@ brex-mcp・verify-mcp・reader-mcp・experiential-manual-model に、core と同
 ## 新しいチャットの最初に読むもの
 
 1. ROADMAP.md（全体像と進捗。段階 2 の作業の表）
-2. DECISIONS.md（D-01〜D-27 と未決 U-03・U-05・U-07・U-09・U-10）
+2. DECISIONS.md（D-01〜D-28 と未決 U-03・U-05・U-07・U-09・U-10）
 3. notes/background.md（仕様書の読解結果、配布物のファイル構成、設計のヒント）
 4. このメモ
-5. design/ の 5 文書（着手する作業に応じて。段階 3 は writer-mcp.md）
+5. design/ の 6 文書（着手する作業に応じて。段階 3 は writer-mcp.md と skills-and-editor.md）
 6. notes/site-review.md（サイト通読用の照合シート。通読は 2026-10-24 に完了。記述の根拠を探すときに参照）
 7. notes/glossary.md と notes/en-writing-guide.md（英語版を書く・直すときの対訳表と指針）、notes/i18n-trial.md（多言語化の経過と運用）
 

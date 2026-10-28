@@ -73,6 +73,16 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Skills',
+          translations: { ja: 'Skill' },
+          items: [
+            { label: 'experience-to-s1000d', slug: 'skill/experience-to-s1000d' },
+            { label: 's1000d-publish', slug: 'skill/s1000d-publish' },
+            { label: 's1000d-review', slug: 'skill/s1000d-review' },
+            { label: 's1000d-translate', slug: 'skill/s1000d-translate' },
+          ],
+        },
+        {
           label: 'Libraries',
           translations: { ja: 'ライブラリ' },
           items: [{ label: 's1000d-core', slug: 'lib/s1000d-core' }],

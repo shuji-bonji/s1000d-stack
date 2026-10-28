@@ -40,13 +40,18 @@ import { CardGrid, LinkCard } from '@astrojs/starlight/components';
   />
   <LinkCard
     title="s1000d-writer-mcp"
-    description="LLM に XML を書かせずにデータモジュールを作ります。構造化した下書きから XML を組み立てて検証し、候補が 1 つに決まる修正だけを自動で適用します。体験型マニュアルの変換、コメントデータモジュールの作成、翻訳向けの文の出し入れも行います。npm 未公開です。"
+  description="LLM に XML を書かせずにデータモジュールを作ります。構造化した下書きから XML を組み立てて検証し、候補が 1 つに決まる修正だけを自動で適用します。体験型マニュアルの変換、コメントデータモジュールの作成、翻訳向けの文の出し入れも行います。"
     href="/s1000d-stack/ja/mcp/writer-mcp/"
   />
   <LinkCard
     title="s1000d-core（ライブラリ）"
     description="DMC・ICN の分解、識別・状態部の読み取り、BREX 照合、XSD 検証、参照の解決、適用性の評価、データモジュールの組み立てを 4 つの MCP サーバーが共有するライブラリです。"
     href="/s1000d-stack/ja/lib/s1000d-core/"
+  />
+  <LinkCard
+    title="Skill（4 つ）"
+    description="MCP サーバーをどの順番で呼び、各段階で利用者に何を聞くかを Claude に伝える手順です。体験型マニュアルの変換（experience-to-s1000d）、データモジュールの作成（s1000d-publish）、レビュー（s1000d-review）、翻訳（s1000d-translate）の 4 つを作成済みで、まだ公開していません。"
+    href="/s1000d-stack/ja/skill/experience-to-s1000d/"
   />
 </CardGrid>
 

@@ -35,6 +35,8 @@ flowchart LR
 - [s1000d-verify-mcp](/s1000d-stack/ja/mcp/verify-mcp/) が公式 XSD による検証・BREX 照合・参照切れの検出をまとめて行い、検証状態を付けます
 - [s1000d-reader-mcp](/s1000d-stack/ja/mcp/reader-mcp/) がデータモジュールを見出し・手順・警告・図の構造で返し、参照先を解決し、どの製品に当てはまるか（適用性）を判定します。適用性の式は LLM に渡さず、applicable / notApplicable / undetermined と表示文だけを返します
 
+データモジュールのレビューは Skill [s1000d-review](/s1000d-stack/ja/skill/s1000d-review/)、別の言語への翻訳は Skill [s1000d-translate](/s1000d-stack/ja/skill/s1000d-translate/) の手順で行えます。
+
 ## 3. 軽い Web 形式のマニュアルを作り、必要になったら S1000D に出力する
 
 S1000D を導入していない現場でも、画面や機器の操作を体験しながら学べるマニュアルを Web 形式で作り、顧客から S1000D を求められた時点でデータモジュールとして出力する使い方です。この道筋を作るのが段階 2〜4 の目標です（[全体構成と進み方](/s1000d-stack/ja/guide/architecture/)）。作成ツールと閲覧ソフトの操作説明は製品のサイトに置き、ここでは流れだけを書きます。
@@ -51,3 +53,5 @@ S1000D を導入していない現場でも、画面や機器の操作を体験�
 | `index.html` と JavaScript | IETM（閲覧ソフト） |
 
 この対応を、S1000D に依存しない共通データモデル experiential-manual-model として定め、[s1000d-writer-mcp](/s1000d-stack/ja/mcp/writer-mcp/) がそこからデータモジュールを生成します。LLM は XML を書かず、writer が下書きから XML を組み立てて検証し、候補が 1 つに決まる修正だけを自動で適用します。生成したデータモジュールは使い方 2 の verify-mcp で検証できるため、出力の正しさを S1000D の側から確かめられます。
+
+作成ツールは試作の段階で、名前は仮称（manual-editor）です。ツールが保存した JSON を Skill [experience-to-s1000d](/s1000d-stack/ja/skill/experience-to-s1000d/) に渡すと、writer による変換と verify による検証が、利用者への確認を挟みながら進みます。体験型マニュアルを経由せず、文章からデータモジュールを作るときは、Skill [s1000d-publish](/s1000d-stack/ja/skill/s1000d-publish/) を使います。

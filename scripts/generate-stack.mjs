@@ -64,15 +64,22 @@ const REGISTRY = [
   { name: 'experiential-manual-model', dir: 'lib/experiential-manual-model', npm: '@shuji-bonji/experiential-manual-model', layer: 'model', form: 'library', status: 'released',   public: true,
     note: '段階 2。体験型マニュアルの共通データモデル（型・JSON Schema・検査・2021 年の作品 JSON からの変換）。S1000D に依存しない。名前は U-04 で確定' },
   { name: 's1000d-writer-mcp', dir: 'mcp/s1000d-writer-mcp', npm: '@shuji-bonji/s1000d-writer-mcp', layer: 'mcp', form: 'mcp-server', status: 'released', public: true,
-    note: '段階 3。LLM に XML を書かせずにデータモジュールを作る。build_data_module / convert_manual / apply_fixes / create_comment / extract_segments / apply_segments の 6 tools。npm 未公開（0.1.0 を公開する前）。公開したら status を released にし、public を true にする' },
+    note: '段階 3。LLM に XML を書かせずにデータモジュールを作る。build_data_module / convert_manual / apply_fixes / create_comment / extract_segments / apply_segments の 6 tools。2026-10-28 に 0.1.0・0.1.1 を公開' },
   { name: 's1000d-stack',     dir: '.',                    npm: null,                            layer: 'hub',  form: 'site',       status: 'developing', public: true,
     note: '本リポジトリ。site/ に Astro Starlight の学習サイト（GitHub Pages で公開。英語がルート、日本語は /ja/）' },
 
   // ── 開発中（ディレクトリはあるが npm 未公開。照合しない）・予定・構想 ──────────
-  { name: 's1000d-skills',     dir: 'skill/',                npm: null,                             layer: 'procedure', form: 'skill',  status: 'concept', public: false,
-    note: '段階 3。experience-to-s1000d / s1000d-publish / s1000d-review / s1000d-translate の 4 つ。リポジトリ名の規則は U-09' },
-  { name: 'manual-editor',     dir: 'app/manual-editor',     npm: null,                             layer: 'app',  form: 'app',        status: 'concept', public: false,
-    note: '段階 3。体験型マニュアルの作成ツール。製品名は未定（U-05）。AI が無くても動く' },
+  // Skill は 1 つにリポジトリ 1 つ（D-28）。リポジトリは Private で、npm には載せない（plugin として配る）
+  { name: 'experience-to-s1000d-skill', dir: 'skill/experience-to-s1000d-skill', npm: null, layer: 'procedure', form: 'skill', status: 'developing', public: false,
+    note: '段階 3。体験型マニュアルの JSON を CSDB に変換する Skill（writer の convert_manual、verify の verify_csdb）。plugin 名 experience-to-s1000d' },
+  { name: 's1000d-publish-skill', dir: 'skill/s1000d-publish-skill', npm: null, layer: 'procedure', form: 'skill', status: 'developing', public: false,
+    note: '段階 3。構造化した下書きからデータモジュールを 1 件ずつ作り、検証して CSDB に入れる Skill（writer の build_data_module、verify の reconcile_dml）。plugin 名 s1000d-publish' },
+  { name: 's1000d-review-skill', dir: 'skill/s1000d-review-skill', npm: null, layer: 'procedure', form: 'skill', status: 'developing', public: false,
+    note: '段階 3。データモジュールを 3 つの観点でレビューし、指摘を comment DM に残す Skill（reader、verify の suggest_fixes、writer の create_comment）。plugin 名 s1000d-review' },
+  { name: 's1000d-translate-skill', dir: 'skill/s1000d-translate-skill', npm: null, layer: 'procedure', form: 'skill', status: 'developing', public: false,
+    note: '段階 3。データモジュールを別の言語に訳す Skill（writer の extract_segments / apply_segments、xcomet による採点）。plugin 名 s1000d-translate' },
+  { name: 'manual-editor',     dir: 'app/manual-editor',     npm: null,                             layer: 'app',  form: 'app',        status: 'developing', public: false,
+    note: '段階 3。体験型マニュアルの作成ツールの試作（SvelteKit ＋ PWA、D-28）。製品名は未定（U-05）で、manual-editor は仮称。AI が無くても動く' },
   { name: 'manual-viewer',     dir: 'app/manual-viewer',     npm: null,                             layer: 'app',  form: 'app',        status: 'concept', public: false,
     note: '段階 4。閲覧ソフト（WebMCP 対応）。製品名は未定（U-05）' },
 ];

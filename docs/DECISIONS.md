@@ -58,7 +58,7 @@ GitHub は s1000d-core を除き Private です（s1000d-core は 2026-10-24 に
 | MCP | 2 | `shuji-bonji/s1000d-verify-mcp` | `@shuji-bonji/s1000d-verify-mcp` | `s1000d-stack/mcp/s1000d-verify-mcp` |
 | ライブラリ | 2 | `shuji-bonji/experiential-manual-model`（U-04 で 2026-10-24 に確定。ローカルは 2026-10-25 に作成、GitHub は未作成） | `@shuji-bonji/experiential-manual-model`（未公開） | `s1000d-stack/lib/experiential-manual-model` |
 | MCP | 3 | `shuji-bonji/s1000d-writer-mcp`（2026-10-28 に実装・push。Public 化は要確認） | `@shuji-bonji/s1000d-writer-mcp` **0.1.1 公開済み**（0.1.0・0.1.1 とも 2026-10-28） | `s1000d-stack/mcp/s1000d-writer-mcp` |
-| Skill（未作成） | 3 | 未定（名前の規則は U-09） | — | `s1000d-stack/skill/` |
+| Skill（作成中） | 3 | `shuji-bonji/<名前>-skill`（D-28。experience-to-s1000d・s1000d-publish・s1000d-review・s1000d-translate） | — | `s1000d-stack/skill/` |
 | app（未作成） | 3〜4 | 未定（製品名は U-05） | — | `s1000d-stack/app/` |
 
 MCP の 4 つのリポジトリは作成済みですが、中身はまだ空です（2026-10-23 時点）。hub に `.gitignore` を置くまで、hub 側で `git add .` をしないでください。`mcp/` 以下が gitlink として登録されてしまいます。
@@ -279,6 +279,14 @@ flowchart LR
 - writer は状態を持たない。採番の台帳（`ledger`）は入力で受け取り応答で返し、保管は呼び出す側（Skill・作成ツール・製品）の仕事にする。
 - 設計は [design/writer-mcp.md](./design/writer-mcp.md)。
 
+### D-28 Skill は 1 つにリポジトリ 1 つ、作成ツールは SvelteKit ＋ PWA で作る（2026-10-28）
+
+- U-09 の判断。Skill のリポジトリは `shuji-bonji/<名前>-skill`、plugin 名とフォルダー名は `<名前>` にする（pdf-trust-skill・houki-research-skill と同じ）。ローカルは `s1000d-stack/skill/<名前>-skill`。段階 3 の Skill は `experience-to-s1000d`・`s1000d-publish`・`s1000d-review`・`s1000d-translate` の 4 つ。リポジトリの形は pdf-agent-stack の `skill/pdf-trust-skill` に揃える（`skills/<名前>/SKILL.md` ＋ `references/`、`evals/trigger-eval.json`、タグ push で `.plugin` を作る `release.yml`、`plugin.json` の `dependencies`）。
+- U-10 の判断。作成ツールの試作と、段階 4 の簡易 Web マニュアルは SvelteKit ＋ PWA（`adapter-static`、GitHub Pages）で作る。利用者が習得中で、静的に置けてオフラインでも動くため。
+- U-05 は未決のまま。試作の間は仮称 `manual-editor`（リポジトリ `shuji-bonji/manual-editor`、ローカル `s1000d-stack/app/manual-editor`）。
+- GitHub のリポジトリ（Skill 4 つと manual-editor）は利用者が Private で作り、中身はチャットで作る。
+- 設計は [design/skills-and-editor.md](./design/skills-and-editor.md)。
+
 ## 未決事項
 
 | ID | 内容 | 判断の材料 |
@@ -287,13 +295,13 @@ flowchart LR
 | ~~U-02~~ | Issue 7 の利用条件の全文に、再配布や組み込みについての特別な許可があるか | **解決（2026-10-23）**: 無い。「Special usage rights」の対象は 8 区分の団体・企業・機関に限られる。D-03 に反映済み |
 | U-03 | 自作サンプルデータを共有パッケージに切り出す時期 | 2 つ目の MCP がテストで使い始めた時点を目安にする |
 | ~~U-04~~ | 共通データモデルのパッケージ名 | **解決（2026-10-24）**: `@shuji-bonji/experiential-manual-model`（GitHub は `shuji-bonji/experiential-manual-model`、ローカルは `s1000d-stack/lib/experiential-manual-model`）。`manual-model` だけでは IETM や S1000D 一般のマニュアルのモデルと受け取られるため、「体験型」を表す `experiential` を入れる。npm で `experiential-manual-model` / `experiential-manual` / `experience-manual-model` / `xp-manual-model` が空いていることを 2026-10-24 に確認した。文書の中では引き続き「manual-model」と略して書くことがある |
-| U-05 | 作成ツール・閲覧ソフトの製品名 | 一般の利用者向けの名前にする |
-| U-10 | 簡易 Web マニュアル（段階 4 の参照実装）の技術の選定 | SvelteKit・PWA が候補。段階 3 の作成ツールの試作と合わせて決める |
+| U-05 | 作成ツール・閲覧ソフトの製品名 | 一般の利用者向けの名前にする。試作の間は仮称 `manual-editor`（D-28） |
+| ~~U-10~~ | 簡易 Web マニュアル（段階 4 の参照実装）の技術の選定 | **解決（2026-10-28）**: SvelteKit ＋ PWA（D-28）。作成ツールの試作も同じ |
 | ~~U-06~~ | Starlight の日本語検索の精度 | **解決（2026-10-24）**: 生成された Pagefind の索引を Node から検索して確認。単語（照合・券売機・適用性・識別・商標）は期待どおり。Pagefind は日本語を単語に分けて索引するため、「データモジュール」のような複合語をそのまま入れると同じつながりで現れたページ（1 件）だけが返り、「データ モジュール」と空けると 9 件になる。サイトの見出しに主要な複合語をそのまま書くことで補う |
 | U-07 | Issue 4.2 に対応する時期 | 段階 2 で reader を作るときに判断する。Issue 4.2 以降の ICN メタデータファイル（IMF）を reader の対象に含めるかも一緒に判断する |
 | ~~U-08~~ | XSD 検証の方式（段階 2）。XML の読み取りと XPath は D-12 で決定済み | **解決（2026-10-24）**: `libxml2-wasm` に確定（D-15）。根拠は下記「U-08 の判断材料」と「U-08 の比較結果（2026-10-24）」 |
 | ~~U-10~~ | s1000d-core の npm 公開の時期 | **解決（2026-10-24）**: brex-mcp の CI が `file:` 依存を解決できず落ちたため、core を先に `0.1.0` として npm に公開し、GitHub も Public にした。brex-mcp の依存は `^0.1.0`。hub と brex-mcp の公開（U-01）は従来どおり段階 1 が揃った時点で判断する |
-| U-09 | Skill のリポジトリ名の規則 | houki-hub に倣うなら `s1000d-<名前>-skill`（例: `s1000d-review-skill`）。段階 3 で Skill を作るときに決める |
+| ~~U-09~~ | Skill のリポジトリ名の規則 | **解決（2026-10-28）**: `shuji-bonji/<名前>-skill`、plugin 名は `<名前>`（D-28） |
 
 ### U-08 の判断材料
 

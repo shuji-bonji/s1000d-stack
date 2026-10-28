@@ -8,7 +8,7 @@ LLM が S1000D の技術文書を正しく読み、プロジェクトの決ま�
 - 調査メモ: [notes/background.md](./notes/background.md)
 - 段階 2 の設計: [design/verify-mcp.md](./design/verify-mcp.md)、[design/reader-mcp.md](./design/reader-mcp.md)、[design/manual-model.md](./design/manual-model.md)
 - 段階 2.5 の設計: [design/agent-platform.md](./design/agent-platform.md)
-- 段階 3 の設計: [design/writer-mcp.md](./design/writer-mcp.md)（writer。Skill と作成ツールは別の文書にする）
+- 段階 3 の設計: [design/writer-mcp.md](./design/writer-mcp.md)（writer）、[design/skills-and-editor.md](./design/skills-and-editor.md)（Skill 4 つと作成ツールの試作）
 
 ## 目指すもの
 
@@ -244,7 +244,11 @@ flowchart LR
 | 副産物 | BREX の連鎖を PM・comment でもたどるようにした（`readBrexDmRefOf`。これまで層が 0 件だった）。core 全体で自作 260 件・配布物込み 293 件が通る |
 | 3・4・5・6（MCP 側） | 済み（2026-10-28、writer-mcp 0.1.0。同日 16:30 JST 頃に公開）。6 ツール、`instructions`、`--http`、設定ファイル、`src/convert/manual-to-draft.ts`、README 日英、CHANGELOG。自作 36 件・配布物 2 件。**完了条件: `kenbaiki.manual.json` → DM 9 件 ＋ PM 1 件が Issue 7 の XSD で valid、既定 BREX の違反 0、未解決の参照 0**。`package-lock.json` も core 0.8.0 |
 | 7 | 済み（2026-10-28）。**core 0.8.0 を 16:20 JST 頃、writer-mcp 0.1.0 を 16:30 JST 頃に npm に公開**（core はタグ push、writer は初回の手動 `npm publish` と Trusted Publisher の登録）。サイト（`mcp/writer-mcp.md` 日英ほか 9 ページ）・README・`stack.json` も更新し、npm 照合は 6 つとも一致。同日 17:20 JST 頃までに MCP Registry と claude-plugins に登録し、`-dev` 版も登録した。0.1.1（入力スキーマの `$ref` を展開して Claude Desktop から呼べるようにした修正）も同日に公開。hub のコミットは残り |
-| 8 | 未着手 |
+| 修正 | core 0.8.1（2026-10-28、**未コミット・未公開**）。CSDB を渡さずに検証すると、BREX の工程は既定 BREX をたどれるのに参照の工程が `brexDmRef` を `no-csdb` で未解決にしていた食い違いを直した（`ResolveOptions.knownObjects`。BREX の工程でたどれた層を参照の工程に渡す）。仕様書の章への `dmRef` は `no-csdb` より先に「仕様書への参照」と判定する。9 件を追加し、core 全体で配布物込み 302 件 |
+| 8 | ローカルで作成済み（2026-10-28、**未コミット・未公開**）。設計は design/skills-and-editor.md、名前と技術は D-28。実装は Sonnet のサブエージェントに分担させ、検収はチャットで行った |
+| 8-2・8-3 | Skill 4 つ（`skill/experience-to-s1000d-skill`・`s1000d-publish-skill`・`s1000d-review-skill`・`s1000d-translate-skill`、各 0.1.0）。`SKILL.md` は 155〜192 行、`references/` 3 本ずつ、`evals/trigger-eval.json` は 20 件ずつ（発火する 10・しない 10）、`release.yml`、README 日英。作成の途中で `-dev` 版の MCP を実際に呼び、手順と応答の項目名を照合した: 券売機の例の `convert_manual` は DM 9 件 ＋ PM 1 件がすべて valid・BREX passed、Bike Samples の DM で `read_data_module`（outline）・`suggest_fixes`・`check_against_brex`・`create_comment`・`extract_segments`・`apply_segments`・xcomet の採点・DeepL を通した。未確認: `apply_fixes`、DML がある CSDB での `reconcile_dml`、`write: true` での comment・訳文の書き込み、実機の `skeleton-mismatch` |
+| 8-4 | サイトの Skill の章（`skill/*.md`、日英 4 ページずつ。20 × 2 言語、`check:i18n` ok、内部リンク切れ 0）、`architecture`・`use-cases`・`index` の更新、`generate-stack.mjs` に Skill 4 行と manual-editor（`developing`）。claude-plugins の台帳に Skill 4 件（marketplace 0.9.0）と README の表を用意した（未コミット。Skill のリポジトリを push してからコミットする） |
+| 8-5 | manual-editor の試作（`app/manual-editor`、SvelteKit 2 ＋ Svelte 5 ＋ `adapter-static` ＋ `@vite-pwa/sveltekit`。実行時の依存は experiential-manual-model だけ）。Topic 一覧、画面エディター（ドラッグで矩形・円のホットスポット）、手順・注意・適用範囲、検査（`validateManual`）、体験表示。svelte-check 0 件、Vitest 32 件、build 392 KB。クラウド側の Chromium で build を開き、券売機の例の読み込み・ホットスポットの作図・体験表示での遷移（STEP1 → STEP2 → 戻る）を確かめた（ページのエラー 0）。見送り: 説明の Block の編集、故障探求の行き先の編集、多角形、ホットスポットの移動・変形、英語の文言、Playwright のテスト（VM に Playwright が無い）。manual-model で足りなかった点: `Asset` に画像の元の大きさが無い、`AssetFile.path` がファイル名と data URL の両方を担う |
 
 ## 対象とする S1000D の版
 

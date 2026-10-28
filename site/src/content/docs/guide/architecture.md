@@ -25,10 +25,10 @@ flowchart TB
     W["s1000d-writer-mcp<br/>published (npm 0.1.1)"]
   end
   subgraph App["Products"]
-    ED["Authoring tool<br/>concept (stage 3)"]
+    ED["Authoring tool (provisional name)<br/>prototype (stage 3)"]
     VW["Viewer<br/>concept (stage 4)"]
   end
-  SK["Skill<br/>concept (stage 3)"]
+  SK["4 Skills<br/>created, unpublished (stage 3)"]
   BREX --> CORE
   R --> CORE
   V --> CORE
@@ -47,8 +47,9 @@ flowchart TB
 | [s1000d-verify-mcp](/s1000d-stack/mcp/verify-mcp/) | Validation with the official XSD, BREX checks, detection of broken references, fix suggestions, DML/DDN reconciliation (7 tools) | Published on [npm 0.6.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-verify-mcp) |
 | [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | Common data model for experiential manuals (independent of S1000D®). Types, JSON Schema, checks, and conversion from the 2021 work | Published on [npm 0.1.0](https://www.npmjs.com/package/@shuji-bonji/experiential-manual-model) |
 | [s1000d-writer-mcp](/s1000d-stack/mcp/writer-mcp/) | Creates data modules without letting the LLM write XML. Converts experiential manuals, applies fixes, creates comment data modules, and hands sentences out and back for translation (6 tools) | Published ([npm 0.1.1](https://www.npmjs.com/package/@shuji-bonji/s1000d-writer-mcp)) |
-| Skill | experience-to-s1000d / s1000d-publish / s1000d-review | Concept (stage 3) |
-| Authoring tool and viewer | Products for people to use. They work without AI | Concept (stages 3–4) |
+| Skills (4) | [experience-to-s1000d](/s1000d-stack/skill/experience-to-s1000d/) (converts an experiential manual into a CSDB), [s1000d-publish](/s1000d-stack/skill/s1000d-publish/) (creates data modules from drafts), [s1000d-review](/s1000d-stack/skill/s1000d-review/) (review and comment data modules), [s1000d-translate](/s1000d-stack/skill/s1000d-translate/) (translation) | Created, unpublished (stage 3) |
+| Authoring tool (provisionally manual-editor) | A product for creating an experiential manual on screen and saving it as a JSON of experiential-manual-model. It works without AI | Prototype (stage 3) |
+| Viewer | A product for people to use. It works without AI | Concept (stage 4) |
 
 ## Stages
 
@@ -57,7 +58,7 @@ flowchart TB
 | 1 | hub (this site), s1000d-core, s1000d-brex-mcp | Check tests pass with a self-made BREX and data modules. The default BREX can be read, and checking self-made data modules against it does not contradict the specification. The site's explanations have been checked against the specification |
 | 2 | s1000d-reader-mcp, s1000d-verify-mcp, experiential-manual-model | Validation with the official XSD (obtained by the user), reference resolution and applicability evaluation work. The reader's responses include the issue and the verification status |
 | 2.5 | Fix suggestions, `CsdbSource`, HTTP transport, DML/DDN reconciliation, outline mode and security classification, the [Embedding in a CSDB product](/s1000d-stack/guide/embedding/) page | An LLM agent can do the four things — schema validation, cross-reference check, applicability check, fix suggestion — and the CSDB can be read from somewhere other than a folder |
-| 3 | s1000d-writer-mcp (done), Skill and a prototype of the authoring tool (next) | The ticket machine example is output to S1000D through the common data model and passes verify |
+| 3 | s1000d-writer-mcp, 4 Skills, a prototype of the authoring tool (all in place) | The ticket machine example is output to S1000D through the common data model and passes verify |
 | 4 | Viewer | Displays the common data model, and an AI can guide the operation through WebMCP |
 
 ## Decisions

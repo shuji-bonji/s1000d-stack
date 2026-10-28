@@ -25,10 +25,10 @@ flowchart TB
     W["s1000d-writer-mcp<br/>公開済み（npm 0.1.1）"]
   end
   subgraph App["製品"]
-    ED["作成ツール<br/>構想（段階 3）"]
+    ED["作成ツール（仮称）<br/>試作（段階 3）"]
     VW["閲覧ソフト<br/>構想（段階 4）"]
   end
-  SK["Skill<br/>構想（段階 3）"]
+  SK["Skill 4 つ<br/>作成済み・未公開（段階 3）"]
   BREX --> CORE
   R --> CORE
   V --> CORE
@@ -47,8 +47,9 @@ flowchart TB
 | [s1000d-verify-mcp](/s1000d-stack/ja/mcp/verify-mcp/) | 公式 XSD による検証、BREX 照合、参照切れの検出、修正提案、DML・DDN の照合（7 ツール） | [npm 0.6.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-verify-mcp) 公開済み |
 | [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | 体験型マニュアルの共通データモデル（S1000D に依存しない）。型・JSON Schema・検査・2021 年の作品からの変換 | [npm 0.1.0](https://www.npmjs.com/package/@shuji-bonji/experiential-manual-model) 公開済み |
 | [s1000d-writer-mcp](/s1000d-stack/ja/mcp/writer-mcp/) | LLM に XML を書かせずにデータモジュールを作る。体験型マニュアルの変換、修正の適用、コメントデータモジュールの作成、翻訳向けの文の出し入れ（6 ツール） | [npm 0.1.1](https://www.npmjs.com/package/@shuji-bonji/s1000d-writer-mcp) 公開済み |
-| Skill | experience-to-s1000d / s1000d-publish / s1000d-review | 構想（段階 3） |
-| 作成ツール・閲覧ソフト | 人が使う製品。AI が無くても動く | 構想（段階 3〜4） |
+| Skill（4 つ） | [experience-to-s1000d](/s1000d-stack/ja/skill/experience-to-s1000d/)（体験型マニュアルを CSDB に変換）、[s1000d-publish](/s1000d-stack/ja/skill/s1000d-publish/)（下書きからデータモジュールを作成）、[s1000d-review](/s1000d-stack/ja/skill/s1000d-review/)（レビューと comment DM）、[s1000d-translate](/s1000d-stack/ja/skill/s1000d-translate/)（翻訳） | 作成済み・未公開（段階 3） |
+| 作成ツール（仮称 manual-editor） | 体験型マニュアルを画面の上で作り、experiential-manual-model の JSON で保存する製品。AI が無くても動く | 試作（段階 3） |
+| 閲覧ソフト | 人が使う製品。AI が無くても動く | 構想（段階 4） |
 
 ## 段階
 
@@ -57,7 +58,7 @@ flowchart TB
 | 1 | hub（このサイト）、s1000d-core、s1000d-brex-mcp | 自作 BREX とデータモジュールで照合のテストが通る。既定 BREX を読み、自作データモジュールを照合して仕様書と矛盾しない。サイトの説明を仕様書と照合済み |
 | 2 | s1000d-reader-mcp、s1000d-verify-mcp、experiential-manual-model | 公式 XSD（利用者が入手したもの）による検証、参照の解決、適用性の判定ができる。reader の応答に版と検証状態を含める |
 | 2.5 | 修正提案、`CsdbSource`、HTTP transport、DML・DDN の照合、概要モードと機密区分、[CSDB 製品への組み込み](/s1000d-stack/ja/guide/embedding/)のページ | LLM エージェントがスキーマ検証・クロスリファレンスチェック・適用性チェック・修正提案の 4 つをでき、CSDB をフォルダー以外から読める |
-| 3 | s1000d-writer-mcp（済み）、Skill と作成ツールの試作（次） | 券売機の例を共通データモデル経由で S1000D に出力し、verify を通る |
+| 3 | s1000d-writer-mcp、Skill 4 つ、作成ツールの試作（いずれも揃った） | 券売機の例を共通データモデル経由で S1000D に出力し、verify を通る |
 | 4 | 閲覧ソフト | 共通データモデルを表示し、WebMCP で AI が操作を案内できる |
 
 ## 決めていること

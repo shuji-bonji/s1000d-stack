@@ -35,6 +35,8 @@ This use case targets an existing CSDB (a folder holding `DMC-….XML` files) an
 - [s1000d-verify-mcp](/s1000d-stack/mcp/verify-mcp/) performs validation against the official XSD, the BREX check and broken reference detection together, and attaches a verification status
 - [s1000d-reader-mcp](/s1000d-stack/mcp/reader-mcp/) returns the data module as a structure of headings, steps, warnings and illustrations, resolves reference targets and evaluates which product it applies to (applicability). It does not pass applicability expressions to the LLM; it returns only applicable / notApplicable / undetermined and the display text
 
+Reviewing data modules is done with the Skill [s1000d-review](/s1000d-stack/skill/s1000d-review/), and translating them into another language with the Skill [s1000d-translate](/s1000d-stack/skill/s1000d-translate/).
+
 ## 3. Author in a lightweight web format, then output S1000D when needed
 
 In this use case, a workplace that has not adopted S1000D creates a manual in a web format that teaches screen and equipment operation through hands-on experience, and outputs it as data modules at the point when a customer asks for S1000D. Building this path is the goal of stages 2–4 ([Architecture and stages](/s1000d-stack/guide/architecture/)). Instructions for the authoring tool and the viewer live on the product site; this page describes only the flow.
@@ -51,3 +53,5 @@ This use case rests on the fact that the data structure of the 2021 work [experi
 | `index.html` and JavaScript | IETM (viewer) |
 
 This correspondence is defined as experiential-manual-model, a common data model that does not depend on S1000D, and [s1000d-writer-mcp](/s1000d-stack/mcp/writer-mcp/) generates data modules from it. The LLM does not write XML: the writer builds the XML from a draft, verifies it, and automatically applies only the fixes that have exactly one candidate. The generated data modules can be validated with verify-mcp from use case 2, so the correctness of the output can be confirmed from the S1000D side.
+
+The authoring tool is at the prototype stage, and its name (manual-editor) is provisional. When you pass a JSON saved by the tool to the Skill [experience-to-s1000d](/s1000d-stack/skill/experience-to-s1000d/), the conversion by the writer and the verification by verify proceed with your confirmation at each step. To create data modules from text without going through an experiential manual, use the Skill [s1000d-publish](/s1000d-stack/skill/s1000d-publish/).

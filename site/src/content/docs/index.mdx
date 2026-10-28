@@ -40,13 +40,18 @@ import { CardGrid, LinkCard } from '@astrojs/starlight/components';
   />
   <LinkCard
     title="s1000d-writer-mcp"
-    description="Creates data modules without letting the LLM write XML. It builds the XML from a structured draft, verifies it, and automatically applies only the fixes that have exactly one candidate. It also converts experiential manuals, creates comment data modules, and hands sentences out and back for translation. Not yet on npm."
+    description="Creates data modules without letting the LLM write XML. It builds the XML from a structured draft, verifies it, and automatically applies only the fixes that have exactly one candidate. It also converts experiential manuals, creates comment data modules, and hands sentences out and back for translation."
     href="/s1000d-stack/mcp/writer-mcp/"
   />
   <LinkCard
     title="s1000d-core (library)"
     description="A library shared by the four MCP servers for splitting DMCs and ICNs, reading the identification and status section, BREX checks, XSD validation, reference resolution, applicability evaluation and building data modules."
     href="/s1000d-stack/lib/s1000d-core/"
+  />
+  <LinkCard
+    title="Skills (4)"
+    description="Procedures that tell Claude which MCP servers to call in which order and what to ask the user at each step. Four have been created and are not yet published: converting an experiential manual (experience-to-s1000d), creating data modules (s1000d-publish), review (s1000d-review) and translation (s1000d-translate)."
+    href="/s1000d-stack/skill/experience-to-s1000d/"
   />
 </CardGrid>
 
