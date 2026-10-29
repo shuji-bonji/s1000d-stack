@@ -1,4 +1,4 @@
-# 引き継ぎメモ（2026-10-28 21:50 JST 時点）
+# 引き継ぎメモ（2026-10-29 23:45 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
@@ -115,9 +115,11 @@ cd site && npm run build && npm run preview
     6. hub: サイトの Skill の章を含めてコミット・push（Mac で `cd site && npm run build` を通してから）
     7. 決まりの準備（任意）: s1000d-review の comment DM に使う `commentType`・`commentPriorityCode`・発信者・機密区分のプロジェクトの決まり、s1000d-review / s1000d-translate が読む用語集（2 列の CSV か Markdown の表、または DeepL の用語集）
     U-03（自作サンプルデータの共有。出発点は core の `src/__fixtures__/kenbaiki-drafts.ts`）は未決。
-12. core で確かめきれていないこと: comment DM のファイル名の規則（仕様書のファイル名の章。データ辞書の見本 1 件からの推定）、`applyFix` が開始タグの中の空白を 1 つに揃えること、ICN の DOCTYPE を書き換える候補が未対応なこと。
-13. 片付け: `lib/s1000d-core` と `mcp/s1000d-reader-mcp` 直下の `vitest.config.ts.timestamp-*.mjs`（`.gitignore` 済み）を消す。VM 側は `/sessions` の空きが少なく、`~/vm` を `/var/tmp/vmroot` へのシンボリックリンクにし、npm のキャッシュを `/var/tmp/npm-cache` にしてある（セッションをまたいで残らないことがある）。
-14. `notes/site-review.md` に `guide/overview.md`・`use-cases/index.md`・`guide/embedding.md` の照合表を足す（任意）。
+12. **E2E と不具合の修正は 2026-10-29 23:30 JST 頃までに公開済み**（手順の (1)〜(5) は利用者が実施。(6) の `e2e/package.json` の依存の更新・lock・README の書き直しはチャットで 23:45 JST に行い、npm の版で 42 件通過を確かめた。**未コミット**: `e2e/package.json`・`package-lock.json`・`README*.md` と `docs/`。`_to_delete/` も消す）。結果は ROADMAP「進捗（段階 3）」の「E2E」。使った公開の順番: (1) core 0.8.2 をコミットして `git tag v0.8.2 && git push --follow-tags`（版は上げてある。`npm version` は使わない）→ (2) verify 0.6.1・reader 0.7.1・writer 0.1.2 で `npm install`（lock を core 0.8.2 に。core の公開前は `npm ci` が通らない）→ テスト → コミット → タグ push → (3) 3 本とも `mcp-publisher publish` → (4) claude-plugins で `marketplace-version-check.mjs --write` と README の表 → (5) Skill 4 つをコミットして `v0.1.1` のタグ → claude-plugins をもう一度 → (6) hub: `e2e/package.json` の devDependencies を新しい版に上げて `npm install`、`e2e/README` の「落ちているテスト」の節を消し、`E2E_TARGET=npm` で 42 件通ることを確かめてから `e2e/`・`.github/workflows/e2e.yml`・`docs/` をコミット。`_to_delete/`（E2E の作業中にできた空ファイル）は消す。brex-mcp は変更なし。
+13. **pdf-agent-stack への確認の依頼**: 同じ種類の不具合（書いた直後のファイルを別のサーバーが古い内容で読む）が pdf ファミリーで起きないかの確認と、「書いてから読む」の E2E を持つかの判断を、pdf-agent-stack の `docs/reviews/2026-10-29-state-freshness-check.md` に書いた。別のチャットで行い、改善点は Issue にする（利用者）。結果によっては、「利用者のデータから作った結果をプロセスの中に覚えるときは、指紋で鮮度を確かめる」を Skill `shuji-mcp-patterns` に足す。
+14. core で確かめきれていないこと: comment DM のファイル名の規則（仕様書のファイル名の章。データ辞書の見本 1 件からの推定）、`applyFix` が開始タグの中の空白を 1 つに揃えること、ICN の DOCTYPE を書き換える候補が未対応なこと。
+15. 片付け: `lib/s1000d-core` と `mcp/s1000d-reader-mcp` 直下の `vitest.config.ts.timestamp-*.mjs`（`.gitignore` 済み）を消す。VM 側は `/sessions` の空きが少なく、`~/vm` を `/var/tmp/vmroot` へのシンボリックリンクにし、npm のキャッシュを `/var/tmp/npm-cache` にしてある（セッションをまたいで残らないことがある）。
+16. `notes/site-review.md` に `guide/overview.md`・`use-cases/index.md`・`guide/embedding.md` の照合表を足す（任意）。
 
 ## 作業 10 の記録（公開、D-16。2026-10-26 に完了）
 

@@ -15,7 +15,7 @@ npm run test:spec   # S1000D_SPEC_TESTS=1: the real Issue 7 XSD and default BREX
 npm run test:local  # E2E_TARGET=local: ../mcp/<name>/dist/index.js (build each repo first)
 ```
 
-- `E2E_TARGET=npm` (default) starts the bins in `node_modules/@shuji-bonji/` (brex ^0.4.0, verify ^0.6.0, reader ^0.7.0, writer ^0.1.1). `local` starts `../mcp/<name>/dist/index.js`.
+- `E2E_TARGET=npm` (default) starts the bins in `node_modules/@shuji-bonji/` (brex ^0.4.0, verify ^0.6.1, reader ^0.7.1, writer ^0.1.2). `local` starts `../mcp/<name>/dist/index.js`.
 - Default mode uses only the self-made minimal XSDs in `fixtures/spec/xml_schema_flat/` and the two-layer self-made BREX in `fixtures/csdb-base/` (KBWORKS organisation layer, KENBAIKI project layer). `S1000D_SPEC_TESTS=1` reads `S1000D_SPEC_DIR` (default `../specs/s1000d/issue-7`); scenario 2 and the tests that depend on the self-made BREX rules are skipped there.
 - Each test file creates its CSDB under `os.tmpdir()` and removes it afterwards (`E2E_KEEP_TMP=1` keeps it). The servers never read your `~/.config/s1000d-stack/config.json` or `S1000D_CSDB_DIR`.
 
@@ -29,9 +29,11 @@ npm run test:local  # E2E_TARGET=local: ../mcp/<name>/dist/index.js (build each 
 | `04-translate` | s1000d-translate | `extract_segments`, `apply_segments` (en-US, `write: true`), same DMC with `_EN-US.XML`, `placeholder-mismatch` / `unknown-id`, `skeleton-mismatch` |
 | `05-consistency` | (cross-cutting) | brex and verify agree on BREX violations; writer's `verification` equals verify's result for the written file; whether a running verify/reader sees files that writer wrote later; omitting `allocation.brexDmRef` |
 
-## Known failures
+## Current results
 
-Four tests in `05-consistency` fail on purpose: they keep suspected server defects as plain failing tests (not `it.fails` / `it.todo`). Three show that verify and reader build their CSDB index once per folder set and never see files written afterwards; one shows `brex.state: "passed"` with `layers: 0` when a data module has no `brexDmRef`. Details are in the test bodies and in `README.ja.md`.
+As of 2026-10-29, `npm test` (default mode, npm versions) passes 42 of 43 tests (1 is skipped because it is for spec mode only). With `S1000D_SPEC_TESTS=1`, 27 pass and 16 are skipped because they assume the project's own BREX.
+
+The two defects found by these tests have been fixed: verify and reader did not see files written after their CSDB index was built (fixed in core 0.8.2, verify 0.6.1 and reader 0.7.1), and `brex.state` was `"passed"` with `layers: 0` when no BREX was checked (fixed in core 0.8.2 and writer 0.1.2). When a test reveals a suspected server defect, keep it as a plain failing test; do not relax the expectation or mark it `it.fails` / `it.todo`.
 
 ## CI
 

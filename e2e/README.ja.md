@@ -27,7 +27,7 @@ Node.js 22 以上が要ります。テストは `os.tmpdir()` の下に CSDB を
 
 | 値 | 起動するもの |
 |---|---|
-| `npm`（既定） | `node_modules/@shuji-bonji/s1000d-*-mcp` の bin。`devDependencies` の版（brex ^0.4.0 / verify ^0.6.0 / reader ^0.7.0 / writer ^0.1.1）。CI はこちら |
+| `npm`（既定） | `node_modules/@shuji-bonji/s1000d-*-mcp` の bin。`devDependencies` の版（brex ^0.4.0 / verify ^0.6.1 / reader ^0.7.1 / writer ^0.1.2）。CI はこちら |
 | `local` | `../mcp/<名前>/dist/index.js`。先に各リポジトリで `npm run build` する |
 
 起動時に、使った対象・モード・各サーバーの版を stderr に 1 行出します（`tests/01-…` の「起動」）。
@@ -62,18 +62,18 @@ spec モードでは、DM の `brexDmRef` が既定 BREX（`S1000D-J-04-10-0301-
 | `tests/04-translate.test.ts` | s1000d-translate | `extract_segments` → `[EN] ` を付けた訳で **`apply_segments`**（en-US、`write: true`）→ `_EN-US.XML`・DMC は同じ・reader で訳文 → `write-conflict` と `overwrite` → `placeholder-mismatch`・`unknown-id` → 構造を変えた DM に古い `skeletonHash` で **`skeleton-mismatch`**（書かない）→ 取り出し直せば適用できる |
 | `tests/05-consistency.test.ts` | （横断） | brex `check_against_brex` と verify `verify_data_module` の違反（件数・規則 ID・層）が一致 / writer の `verification` と、書いたファイルを verify に通した結果が一致（`build_data_module`・`convert_manual` の全 10 件・`create_comment`）/ **writer が後から書いたものを、動いている verify と reader が見られるか**（索引の鮮度）/ `allocation.brexDmRef` を省いたとき |
 
-## 今の結果と、落ちているテスト
+## 今の結果
 
-`npm test`（既定・npm）は 43 件中 38 件が通り、4 件が**意図して落ちたまま**です。サーバーの不具合と思われる挙動を、期待値を緩めず、`it.fails` や `it.todo` にもせずに残しています。サーバーが直ったら通ります。
+2026-10-29 の時点で、`npm test`（既定・npm の版）は 43 件中 42 件が通ります（1 件は spec モード専用でスキップ）。`S1000D_SPEC_TESTS=1` では 27 件が通り、16 件は自作の BREX を前提にするためスキップします。
 
-| テスト | 疑い |
-|---|---|
-| 05「reader list_data_modules は、先に一覧を取った後に writer が書いた DM を返す」 | verify と reader が CSDB の索引をフォルダーの組み合わせごとに 1 回だけ作って持ち続け、あとから増えたファイルが見えない |
-| 05「verify verify_csdb は、先に一度検証した後に writer が書いた DM も数える」 | 同上 |
-| 05「verify check_references は、先に索引を作った後に writer が書いた DM への dmRef を解決する」 | 同上 |
-| 05「既定 BREX も無いとき、brexDmRef は書かれず、BREX を 1 層も評価していないのに brex.state: passed とは言わない」 | `brexDmRef` が無く BREX を 1 層も評価していないのに `brex.state: "passed"`（`layers: 0`） |
+このテストで見つけた不具合は 2 件で、どちらも直しました。
 
-詳しい再現手順は、これらのテストの本体に書いてあります。
+| 見つけたテスト | 不具合 | 直した版 |
+|---|---|---|
+| 05「索引の鮮度」の 3 件 | verify と reader が CSDB の索引をフォルダーの組み合わせごとに 1 回だけ作って持ち続け、あとから書いたファイルが見えなかった | core 0.8.2（`fingerprintDirs`）、verify 0.6.1、reader 0.7.1 |
+| 05「既定 BREX も無いとき …」 | `brexDmRef` が無く BREX を 1 層も照合していないのに `brex.state: "passed"`（`layers: 0`）を返した | core 0.8.2（`not-run` と理由）、writer 0.1.2（`_notes`） |
+
+サーバーの不具合と思われる挙動を見つけたときは、期待値を緩めず、`it.fails` や `it.todo` にもせず、落ちるテストのまま残します。
 
 ## 構成
 
