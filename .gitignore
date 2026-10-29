@@ -15,5 +15,8 @@ node_modules/
 site/dist/
 site/.astro/
 
+# 削除の許可が無いときに Claude が消す予定のファイルを移す場所（中身は利用者が消す）
+/_to_delete/
+
 # macOS
 .DS_Store
