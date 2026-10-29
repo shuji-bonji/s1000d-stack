@@ -1,0 +1,26 @@
+{
+  "name": "s1000d-stack-e2e",
+  "version": "0.0.0",
+  "private": true,
+  "description": "S1000D Stack の MCP サーバー 4 本（brex・verify・reader・writer）を実際にプロセスとして起動し、Skill の手順をなぞって連携を確かめる E2E テスト",
+  "type": "module",
+  "scripts": {
+    "test": "vitest --run",
+    "test:spec": "S1000D_SPEC_TESTS=1 vitest --run",
+    "test:local": "E2E_TARGET=local vitest --run",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "^2.0.0",
+    "@shuji-bonji/s1000d-brex-mcp": "^0.4.0",
+    "@shuji-bonji/s1000d-reader-mcp": "^0.7.0",
+    "@shuji-bonji/s1000d-verify-mcp": "^0.6.0",
+    "@shuji-bonji/s1000d-writer-mcp": "^0.1.1",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.12"
+  }
+}

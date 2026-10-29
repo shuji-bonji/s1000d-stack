@@ -1,0 +1,34 @@
+name: E2E (MCP 4 本の連携)
+
+# brex・verify・reader・writer の MCP サーバーを npm の公開版で実際に起動し、Skill の手順をなぞって連携を確かめる。
+# 詳しくは e2e/README.ja.md。自作の XSD・BREX だけを使うので、S1000D の仕様書・XSD は要らない。
+# 公開版は npm install 時点の最新（package.json の範囲内）。週 1 回と手動で回し、公開版どうしの組み合わせが壊れていないかを見る。
+# 手元の作業コピーに対する実行（E2E_TARGET=local）と、本物の Issue 7 の XSD・既定 BREX に対する実行（S1000D_SPEC_TESTS=1）は
+# 配布物と未公開のビルドが要るので、CI では回さない。
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 21 * * 0' # 毎週月曜 06:17 JST
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: e2e
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: e2e/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm test
+        env:
+          E2E_TARGET: npm
