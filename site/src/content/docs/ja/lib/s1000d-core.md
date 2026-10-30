@@ -32,7 +32,7 @@ npm install @shuji-bonji/s1000d-core
 | 1 件の検証（整形式・XSD・BREX・参照）をまとめた検証状態 | `verifyDataModule` / `VerificationStatus` |
 | 検証の結果と、判定できない適用性からの修正候補 | `suggestFixes` / `findUndeterminedApplicability` / `findApplicTables` |
 | CSDB の置き場所の差し替え（既定はフォルダー） | `CsdbSource` / `DirectoryCsdbSource` / `MemoryCsdbSource` / `CsdbIndex.fromSource` |
-| DML（データモジュールリスト）・DDN（納入票）の読み取りと CSDB との照合 | `readDml` / `readDdn` / `reconcileDml` / `reconcileDdn` |
+| DML（データ管理リスト）・DDN（納入票）の読み取りと CSDB との照合 | `readDml` / `readDdn` / `reconcileDml` / `reconcileDdn` |
 | 下書き（`DraftDataModule`）からのデータモジュールの組み立てと、DMC・ICN・PMC の採番 | `buildDataModule` / `buildContent` / `allocateDmc` / `allocateIcn` / `allocatePmc` |
 | 修正候補の文書への適用（候補と一致する選択だけ） | `applyFix` / `applyFixes` |
 | 書き込める CSDB の置き場所 | `WritableCsdbSource` / `isWritableCsdbSource` |
@@ -111,7 +111,7 @@ BREX の `objectPath` は XPath で書かれ、既定 BREX には `descendant-or
 
 ### 照合処理はライブラリに置く
 
-BREX の照合は `s1000d-brex-mcp`（段階 1）と `s1000d-verify-mcp`（段階 2）の両方が使います。同じ処理を 2 つの MCP に別々に書くと結果が食い違うので、照合処理はこのライブラリに置き、MCP は呼ぶだけにしています。
+BREX の照合は `s1000d-brex-mcp` と `s1000d-verify-mcp` の両方が使います。同じ処理を 2 つの MCP に別々に書くと結果が食い違うので、照合処理はこのライブラリに置き、MCP は呼ぶだけにしています。
 
 ### XSD 検証は libxml2-wasm、実装はサブパスに
 

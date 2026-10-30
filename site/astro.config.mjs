@@ -9,6 +9,11 @@ import starlightThemeRapide from 'starlight-theme-rapide';
 export default defineConfig({
   site: 'https://shuji-bonji.github.io',
   base: '/s1000d-stack',
+  // 「CSDB 製品への組み込み」はガイドからユースケースへ移した（2026-10-30）。古いリンクを新しい場所へ送る
+  redirects: {
+    '/guide/embedding/': '/s1000d-stack/use-cases/embedding/',
+    '/ja/guide/embedding/': '/s1000d-stack/ja/use-cases/embedding/',
+  },
   integrations: [
     // astro-mermaid は starlight より前に置く（README の指示）
     mermaid({ theme: 'neutral', autoTheme: true }),
@@ -23,6 +28,8 @@ export default defineConfig({
         alt: 'S1000D Stack',
       },
       favicon: '/favicon.svg',
+      // Mermaid の図をクリックで拡大ポップアップ表示する（Issue #1）。図は <svg> なので starlight-image-zoom は効かない
+      head: [{ tag: 'script', attrs: { src: '/s1000d-stack/mermaid-zoom.js', defer: true } }],
       description:
         'LLM が S1000D® の技術文書を読み、BREX（ビジネスルール）に沿って検査・作成するための MCP サーバー・ライブラリ・Skill と、体験型マニュアルの作成ツール・閲覧ソフトの学習サイト',
       // D-22: ルートは英語、日本語は /ja/。一次執筆は日本語（ja/ 配下）で、英語は翻訳。
@@ -47,8 +54,8 @@ export default defineConfig({
           items: [
             { label: 'What S1000D Stack is', translations: { ja: 'S1000D Stack とは' }, slug: 'guide/overview' },
             { label: 'Getting started', translations: { ja: '導入手順' }, slug: 'guide/getting-started' },
-            { label: 'Architecture and stages', translations: { ja: '全体構成と進み方' }, slug: 'guide/architecture' },
-            { label: 'Embedding in a CSDB product', translations: { ja: 'CSDB 製品への組み込み' }, slug: 'guide/embedding' },
+            { label: 'Architecture', translations: { ja: '全体構成' }, slug: 'guide/architecture' },
+            { label: 'Design principles', translations: { ja: '設計方針' }, slug: 'guide/design-principles' },
             { label: 'Specification files and trademarks', translations: { ja: '仕様書の扱いと商標' }, slug: 'guide/license' },
           ],
         },
@@ -58,6 +65,7 @@ export default defineConfig({
           items: [
             { label: 'IETM and S1000D', translations: { ja: 'IETM と S1000D' }, slug: 'guide/ietm-and-s1000d' },
             { label: 'Data modules and the DMC', translations: { ja: 'データモジュールと DMC' }, slug: 'guide/data-module-and-dmc' },
+            { label: 'CSDB (Common Source DataBase)', translations: { ja: 'CSDB（共通ソースデータベース）' }, slug: 'guide/csdb' },
             { label: 'BREX (Business Rules Exchange)', translations: { ja: 'BREX（ビジネスルール交換）' }, slug: 'guide/brex' },
             { label: 'Applicability', translations: { ja: '適用性（どの製品に当てはまるか）' }, slug: 'guide/applicability' },
           ],
@@ -90,7 +98,10 @@ export default defineConfig({
         {
           label: 'Use cases',
           translations: { ja: 'ユースケース' },
-          items: [{ label: 'Three ways to use it', translations: { ja: '3 つの使い方（見取り図）' }, slug: 'use-cases' }],
+          items: [
+            { label: 'Three ways to use it', translations: { ja: '3 つの使い方（見取り図）' }, slug: 'use-cases' },
+            { label: 'Embedding in a CSDB product', translations: { ja: 'CSDB 製品に組み込む' }, slug: 'use-cases/embedding' },
+          ],
         },
       ],
       customCss: ['./src/styles/custom.css'],

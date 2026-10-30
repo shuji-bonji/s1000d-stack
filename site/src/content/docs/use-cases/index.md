@@ -39,7 +39,7 @@ Reviewing data modules is done with the Skill [s1000d-review](/s1000d-stack/skil
 
 ## 3. Author in a lightweight web format, then output S1000D when needed
 
-In this use case, a workplace that has not adopted S1000D creates a manual in a web format that teaches screen and equipment operation through hands-on experience, and outputs it as data modules at the point when a customer asks for S1000D. Building this path is the goal of stages 2–4 ([Architecture and stages](/s1000d-stack/guide/architecture/)). Instructions for the authoring tool and the viewer live on the product site; this page describes only the flow.
+In this use case, a workplace that has not adopted S1000D creates a manual in a web format that teaches screen and equipment operation through hands-on experience, and outputs it as data modules at the point when a customer asks for S1000D. The components used are described in [Architecture](/s1000d-stack/guide/architecture/). Instructions for the authoring tool and the viewer live on the product site; this page describes only the flow.
 
 This use case rests on the fact that the data structure of the 2021 work [experience_based_operation_explanation](https://github.com/shuji-bonji/experience_based_operation_explanation) (operating instructions for a reserved-seat ticket machine) corresponds to the ideas of S1000D as follows.
 
@@ -55,3 +55,7 @@ This use case rests on the fact that the data structure of the 2021 work [experi
 This correspondence is defined as experiential-manual-model, a common data model that does not depend on S1000D, and [s1000d-writer-mcp](/s1000d-stack/mcp/writer-mcp/) generates data modules from it. The LLM does not write XML: the writer builds the XML from a draft, verifies it, and automatically applies only the fixes that have exactly one candidate. The generated data modules can be validated with verify-mcp from use case 2, so the correctness of the output can be confirmed from the S1000D side.
 
 The authoring tool is at the prototype stage, and its name (manual-editor) is provisional. When you pass a JSON saved by the tool to the Skill [experience-to-s1000d](/s1000d-stack/skill/experience-to-s1000d/), the conversion by the writer and the verification by verify proceed with your confirmation at each step. To create data modules from text without going through an experiential manual, use the Skill [s1000d-publish](/s1000d-stack/skill/s1000d-publish/).
+
+:::tip[Embedding in a product]
+How vendors of CSDB products use the MCP servers to embed AI agents in their product is explained in [Embedding in a CSDB product](/s1000d-stack/use-cases/embedding/).
+:::

@@ -32,7 +32,7 @@ npm install @shuji-bonji/s1000d-core
 | Verification status that combines one data module's checks (well-formedness, XSD, BREX, references) | `verifyDataModule` / `VerificationStatus` |
 | Fix candidates from the verification result and from applicability that cannot be decided | `suggestFixes` / `findUndeterminedApplicability` / `findApplicTables` |
 | Swapping where the CSDB lives (a folder by default) | `CsdbSource` / `DirectoryCsdbSource` / `MemoryCsdbSource` / `CsdbIndex.fromSource` |
-| Reading a DML (data module list) and a DDN (data dispatch note) and reconciling them with the CSDB | `readDml` / `readDdn` / `reconcileDml` / `reconcileDdn` |
+| Reading a DML (data management list) and a DDN (data dispatch note) and reconciling them with the CSDB | `readDml` / `readDdn` / `reconcileDml` / `reconcileDdn` |
 | Building a data module from a draft (`DraftDataModule`) and numbering DMCs, ICNs and PMCs | `buildDataModule` / `buildContent` / `allocateDmc` / `allocateIcn` / `allocatePmc` |
 | Applying fix candidates to a document (only a selection that matches a candidate) | `applyFix` / `applyFixes` |
 | A CSDB place that can be written to | `WritableCsdbSource` / `isWritableCsdbSource` |
@@ -111,7 +111,7 @@ Two points hit during implementation are worth recording. `fontoxpath` returns s
 
 ### The check logic lives in the library
 
-Both `s1000d-brex-mcp` (stage 1) and `s1000d-verify-mcp` (stage 2) check against BREX. Writing the same logic separately in two MCP servers would let the results diverge, so the check logic lives in this library and the MCP servers only call it.
+Both `s1000d-brex-mcp` and `s1000d-verify-mcp` check against BREX. Writing the same logic separately in two MCP servers would let the results diverge, so the check logic lives in this library and the MCP servers only call it.
 
 ### XSD validation with libxml2-wasm, implementation in a subpath
 

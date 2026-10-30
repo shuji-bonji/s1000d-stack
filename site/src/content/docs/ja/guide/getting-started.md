@@ -9,14 +9,22 @@ description: s1000d-stack を使い始めるために用意するものと、MCP
 
 ```mermaid
 flowchart LR
-  A["s1000d.org で配布物を入手<br/>（利用条件に同意）"] --> B["フォルダーに展開<br/>内側の zip も展開する"]
+  A["s1000d.org で配布物を入手<br/>（利用条件に同意）"] --> B["フォルダーに展開<br/>内側の Default BREX と<br/>XML Schema Package の zip も展開する"]
   B --> C["S1000D_SPEC_DIR にそのフォルダーを指定"]
   D["自分のデータモジュールと BREX<br/>（CSDB のフォルダー）"] --> E["S1000D_CSDB_DIR に指定"]
   C --> F["s1000d-brex-mcp を MCP クライアントに登録"]
   E --> F
 ```
 
-1. **S1000D の配布物**。[s1000d.org](https://s1000d.org/) のダウンロードページから、対象の版（最初の対象は Issue 7）の zip を入手し、展開します。配布物の中に既定 BREX（`DMC-S1000D-*-04-10-0301-00A-022A-D_*.XML`）と XML スキーマが入っています。
+1. **S1000D の配布物**。[s1000d.org](https://s1000d.org/) のダウンロードページから、対象の版（最初の対象は Issue 7）の zip（`S1000D Issue 7.zip`）を入手し、1 つのフォルダーに展開します。展開すると、仕様書の PDF と、内側の zip が 10 本出てきます。MCP サーバーが読むのは、そのうち次の 2 本の中身です。
+
+   | 内側の zip | 中身 | 展開 |
+   | --- | --- | --- |
+   | `S1000D Issue 7 Default BREX.zip` | 既定 BREX（`DMC-S1000D-*-04-10-0301-00A-022A-D_*.XML`） | 必要 |
+   | `S1000D Issue 7 XML Schema Package.zip` | XML スキーマ（`xml_schema_flat/` の XSD） | 必要 |
+   | `S1000D Issue 7 Bike Samples.zip` | 自転車のサンプル CSDB | 試しに読むときだけ |
+
+   ほかの 7 本（Data Dictionary、Example SNS など）は、MCP サーバーは読みません。展開しなくてもかまいません。内側の zip は展開後も元の zip ファイルが残りますが、MCP サーバーは zip を開かないので、残したままで問題ありません。展開先のフォルダー名は自由です（サーバーは `S1000D_SPEC_DIR` の下を探して、既定 BREX のファイル名と `brex.xsd` のある `xml_schema_flat/` を見つけます）。
 2. **Node.js 22 以上**。MCP サーバーは `npx` で起動できます。
 3. **MCP クライアント**。Claude Desktop や Claude Code など、MCP サーバーを登録できるものです。
 
@@ -52,12 +60,12 @@ Claude Desktop の設定ファイル（`claude_desktop_config.json`）に次を�
 `s1000d-verify-mcp`・`s1000d-reader-mcp`・`s1000d-writer-mcp` も、名前と `args` のパッケージ名（`@shuji-bonji/s1000d-verify-mcp` など）を変えるだけで、同じ形で登録できます。`s1000d-writer-mcp` はファイルを書き込めるので、書き込み先にするフォルダーを `S1000D_CSDB_DIR` の先頭に指定してください。詳しくは [s1000d-writer-mcp](/s1000d-stack/ja/mcp/writer-mcp/) のページを参照してください。
 
 :::tip[Claude Code では plugin からも入れられます]
-3 つの MCP サーバーは MCP Registry（`io.github.shuji-bonji/s1000d-brex-mcp` など）と、個人の marketplace [shuji-bonji/claude-plugins](https://github.com/shuji-bonji/claude-plugins)（category `s1000d`）に載せています。Claude Code では `claude plugin marketplace add shuji-bonji/claude-plugins` の後に `claude plugin install s1000d-brex-mcp@shuji-bonji` で入ります。plugin は環境変数を設定しません。Claude Code では、`S1000D_SPEC_DIR` と `S1000D_CSDB_DIR` を設定したシェルから起動すれば、その値が渡ります。
+4 つの MCP サーバーは MCP Registry（`io.github.shuji-bonji/s1000d-brex-mcp` など）と、個人の marketplace [shuji-bonji/claude-plugins](https://github.com/shuji-bonji/claude-plugins)（category `s1000d`）に載せています。Claude Code では `claude plugin marketplace add shuji-bonji/claude-plugins` の後に `claude plugin install s1000d-brex-mcp@shuji-bonji` で入ります。plugin は環境変数を設定しません。Claude Code では、`S1000D_SPEC_DIR` と `S1000D_CSDB_DIR` を設定したシェルから起動すれば、その値が渡ります。
 :::
 
 ### 環境変数が渡らないとき（設定ファイル）
 
-Claude Desktop は、plugin で入れたサーバーに環境変数を渡しません。このような場合は、設定ファイル `~/.config/s1000d-stack/config.json` に配布物と CSDB の場所を書いてください。環境変数が無いとき、3 つのサーバーはこのファイルを読みます（brex・verify・reader とも 0.3.0 以降）。
+Claude Desktop は、plugin で入れたサーバーに環境変数を渡しません。このような場合は、設定ファイル `~/.config/s1000d-stack/config.json` に配布物と CSDB の場所を書いてください。環境変数が無いとき、4 つのサーバーはこのファイルを読みます（brex・verify・reader は 0.3.0 以降、writer は最初の版から）。
 
 ```json
 {

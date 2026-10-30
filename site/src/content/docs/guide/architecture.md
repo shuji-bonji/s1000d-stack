@@ -1,80 +1,82 @@
 ---
-title: Architecture and stages
-description: The repositories that make up s1000d-stack, and how the work proceeds stage by stage.
+title: Architecture
+description: The shared libraries, MCP servers, Skills and products that make up s1000d-stack, and what each one is used for.
 ---
 
-s1000d-stack consists of a hub repository that holds only the stack manifest and the documentation site, and independent component repositories. The expert agents (MCP and Skill) come first; they are then used as development tools to build the products (the authoring tool and the viewer).
-
-## Components
+s1000d-stack consists of four kinds of component: shared libraries, MCP servers, Skills and products. The shared libraries hold the S1000D® processing (reading, validation, assembly); the MCP servers turn that processing into tools an LLM can call; the Skills tell the LLM in which order to call the tools and what to confirm with the user. The products (the authoring tool and the viewer) are software for people that works without AI.
 
 ```mermaid
 flowchart TB
-  subgraph Hub["s1000d-stack (hub)"]
-    SITE["site/ documentation site"]
-    STACK["stack.json stack manifest"]
-    DOCS["docs/ plans and decision records"]
+  U(["User"]) -->|request| LLM(["LLM (Claude, etc.)"])
+  SK["Skills<br/>experience-to-s1000d, s1000d-publish<br/>s1000d-review, s1000d-translate"] -. provide the procedure .-> LLM
+  LLM -->|calls tools| Mcp
+  subgraph Mcp["MCP servers"]
+    BREX["s1000d-brex-mcp"]
+    V["s1000d-verify-mcp"]
+    R["s1000d-reader-mcp"]
+    W["s1000d-writer-mcp"]
   end
   subgraph Lib["Shared libraries"]
-    CORE["s1000d-core<br/>published (npm 0.8.0)"]
-    MODEL["experiential-manual-model<br/>published (npm 0.1.0)"]
+    CORE["s1000d-core"]
+    MODEL["experiential-manual-model"]
   end
-  subgraph Mcp["MCP servers"]
-    BREX["s1000d-brex-mcp<br/>published (npm 0.4.0)"]
-    R["s1000d-reader-mcp<br/>published (npm 0.7.0)"]
-    V["s1000d-verify-mcp<br/>published (npm 0.6.0)"]
-    W["s1000d-writer-mcp<br/>published (npm 0.1.1)"]
+  subgraph App["Products (work without AI)"]
+    ED["Authoring tool<br/>(provisionally manual-editor)"]
+    VW["Viewer"]
   end
-  subgraph App["Products"]
-    ED["Authoring tool (provisional name)<br/>prototype (stage 3)"]
-    VW["Viewer<br/>concept (stage 4)"]
-  end
-  SK["4 Skills<br/>published (0.1.0)"]
   BREX --> CORE
-  R --> CORE
   V --> CORE
+  R --> CORE
   W --> CORE
   W --> MODEL
   ED --> MODEL
   VW --> MODEL
-  SK -.-> Mcp
 ```
 
-| Component | Role | Status (2026-10-28) |
+Each component is published as an independent repository. The hub repository [s1000d-stack](https://github.com/shuji-bonji/s1000d-stack), which holds this site, contains only the documentation site (`site/`), the stack manifest recording the published version of each component (`stack.json`), and the plans and decision records (`docs/`).
+
+## Shared libraries
+
+| Library | What it is used for | Published |
 | --- | --- | --- |
-| [s1000d-core](/s1000d-stack/lib/s1000d-core/) | Shared library for DMC, ICN, the identification and status section, BREX (Business Rules Exchange) checks, XSD validation, reference resolution, applicability evaluation, reading the content, deciding fix candidates, building data modules and applying fixes | Published ([npm 0.8.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-core)) |
-| [s1000d-brex-mcp](/s1000d-stack/mcp/brex-mcp/) | Explains and checks against BREX (5 tools) | Published on [npm 0.4.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-brex-mcp) |
-| [s1000d-reader-mcp](/s1000d-stack/mcp/reader-mcp/) | Returns the content of a data module as structure, resolves references, evaluates applicability (6 tools) | Published on [npm 0.7.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-reader-mcp) |
-| [s1000d-verify-mcp](/s1000d-stack/mcp/verify-mcp/) | Validation with the official XSD, BREX checks, detection of broken references, fix suggestions, DML/DDN reconciliation (7 tools) | Published on [npm 0.6.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-verify-mcp) |
-| [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | Common data model for experiential manuals (independent of S1000D®). Types, JSON Schema, checks, and conversion from the 2021 work | Published on [npm 0.1.0](https://www.npmjs.com/package/@shuji-bonji/experiential-manual-model) |
-| [s1000d-writer-mcp](/s1000d-stack/mcp/writer-mcp/) | Creates data modules without letting the LLM write XML. Converts experiential manuals, applies fixes, creates comment data modules, and hands sentences out and back for translation (6 tools) | Published ([npm 0.1.1](https://www.npmjs.com/package/@shuji-bonji/s1000d-writer-mcp)) |
-| Skills (4) | [experience-to-s1000d](/s1000d-stack/skill/experience-to-s1000d/) (converts an experiential manual into a CSDB), [s1000d-publish](/s1000d-stack/skill/s1000d-publish/) (creates data modules from drafts), [s1000d-review](/s1000d-stack/skill/s1000d-review/) (review and comment data modules), [s1000d-translate](/s1000d-stack/skill/s1000d-translate/) (translation) | Published (0.1.0, claude-plugins) |
-| Authoring tool (provisionally manual-editor) | A product for creating an experiential manual on screen and saving it as a JSON of experiential-manual-model. It works without AI | Prototype (stage 3) |
-| Viewer | A product for people to use. It works without AI | Concept (stage 4) |
+| [s1000d-core](/s1000d-stack/lib/s1000d-core/) | The shared library used by the MCP servers. It provides functions such as splitting DMCs and ICNs, reading the identification and status section, BREX (Business Rules Exchange) checks, XSD validation, reference resolution, applicability evaluation, reading the content, deciding fix candidates, building data modules and applying fixes | [npm 0.8.1](https://www.npmjs.com/package/@shuji-bonji/s1000d-core) |
+| [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | The common data model for experiential manuals (manuals in which you learn an operation by trying it while looking at the screen). It provides types and a JSON Schema, content checks, and conversion from the 2021 work. It does not depend on S1000D | [npm 0.1.0](https://www.npmjs.com/package/@shuji-bonji/experiential-manual-model) |
 
-## Stages
+## MCP servers
 
-| Stage | Deliverables | Completion criteria |
+An MCP server is a program that provides tools an LLM can call. None of the four passes the XML of a data module or applicability expressions to the LLM; they return only the results of their decisions.
+
+| MCP server | What it is used for | Tools | Published |
+| --- | --- | --- | --- |
+| [s1000d-brex-mcp](/s1000d-stack/mcp/brex-mcp/) | Reads the BREX (the rules for how data modules are written) handed over by a customer or project, and confirms whether a data module follows those rules | 5 | [npm 0.4.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-brex-mcp) |
+| [s1000d-verify-mcp](/s1000d-stack/mcp/verify-mcp/) | Confirms that a data module is written correctly against the official XML schema (XSD), BREX and the existence of reference targets together, and proposes candidate corrections. It also reconciles the CSDB with the data management list (DML, the list of data modules to be produced) | 7 | [npm 0.6.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-verify-mcp) |
+| [s1000d-reader-mcp](/s1000d-stack/mcp/reader-mcp/) | Passes the content of a data module to the LLM as a structure of headings, steps, warnings and illustrations. It follows references and evaluates which product the content applies to (applicability) | 6 | [npm 0.7.0](https://www.npmjs.com/package/@shuji-bonji/s1000d-reader-mcp) |
+| [s1000d-writer-mcp](/s1000d-stack/mcp/writer-mcp/) | Creates data modules. From a draft passed by the LLM, the server assembles the XML and validates it. It also converts experiential manuals, applies fixes, creates comment data modules, and hands sentences out and back for translation | 6 | [npm 0.1.1](https://www.npmjs.com/package/@shuji-bonji/s1000d-writer-mcp) |
+
+## Skills
+
+A Skill is a written procedure that tells the LLM (Claude) which MCP servers to call in which order, and what to confirm with the user along the way. A Skill has no assembly or validation logic of its own; every decision is based on the responses of the MCP servers. All four are published as 0.1.0 in the personal marketplace [shuji-bonji/claude-plugins](https://github.com/shuji-bonji/claude-plugins).
+
+| Skill | What it is used for | Required MCP servers |
 | --- | --- | --- |
-| 1 | hub (this site), s1000d-core, s1000d-brex-mcp | Check tests pass with a self-made BREX and data modules. The default BREX can be read, and checking self-made data modules against it does not contradict the specification. The site's explanations have been checked against the specification |
-| 2 | s1000d-reader-mcp, s1000d-verify-mcp, experiential-manual-model | Validation with the official XSD (obtained by the user), reference resolution and applicability evaluation work. The reader's responses include the issue and the verification status |
-| 2.5 | Fix suggestions, `CsdbSource`, HTTP transport, DML/DDN reconciliation, outline mode and security classification, the [Embedding in a CSDB product](/s1000d-stack/guide/embedding/) page | An LLM agent can do the four things — schema validation, cross-reference check, applicability check, fix suggestion — and the CSDB can be read from somewhere other than a folder |
-| 3 | s1000d-writer-mcp, 4 Skills, a prototype of the authoring tool (all in place) | The ticket machine example is output to S1000D through the common data model and passes verify |
-| 4 | Viewer | Displays the common data model, and an AI can guide the operation through WebMCP |
+| [experience-to-s1000d](/s1000d-stack/skill/experience-to-s1000d/) | Converts the JSON of an experiential manual into an S1000D CSDB (data modules, publication modules, illustrations) and validates the whole CSDB | writer, verify |
+| [s1000d-publish](/s1000d-stack/skill/s1000d-publish/) | Creates data modules one at a time from a structured draft (title, paragraphs, steps, warnings, tables), validates them and puts them into the CSDB. It also confirms that they are listed in the DML | writer, verify |
+| [s1000d-review](/s1000d-stack/skill/s1000d-review/) | Reviews a data module from three points of view — verification results, the manual checks of the BREX, and the text (glossary and writing style) — and keeps the findings you choose as comment data modules | reader, verify |
+| [s1000d-translate](/s1000d-stack/skill/s1000d-translate/) | Takes the sentences out of a data module, has the LLM translate them, scores them with xcomet, and puts them back into a data module with the same DMC that differs only in language | writer |
 
-## Decisions
+## Products
 
-- **Names follow S1000D.** The MCP servers and libraries start with `s1000d-`. Products for general users do not carry the S1000D name.
-- **The specification, schemas and official samples are not included.** Users point `S1000D_SPEC_DIR` at the files they obtained themselves.
-- **The structure follows houki-hub.** The hub holds only the stack manifest and the site; each component is an independent repository.
-- **BREX check processing lives in s1000d-core.** brex-mcp and verify-mcp only call it.
-- **XML uses @xmldom/xmldom, XPath uses fontoxpath.** The default BREX contains XPath 2.0 expressions.
-- **XSD validation uses libxml2-wasm.** Each XSD is compiled once and reused, and the 106 official samples are validated in 0.5 seconds or less. The interface and the implementation live in s1000d-core, and verify-mcp and reader-mcp use the same one.
-- **The writer does not let the LLM write XML.** The LLM passes a structured draft, s1000d-core builds the XML and assigns the numbers, and the XML it builds is always verified. A fix is applied only when the selection matches a candidate that the server computed.
-- **The reader does not pass applicability expressions to the LLM.** The server performs the evaluation and returns only applicable / notApplicable / undetermined and the display text.
-- **Publishing to npm uses Trusted Publisher.** Pushing a tag makes GitHub Actions publish through OIDC.
+| Product | What it is used for | Status |
+| --- | --- | --- |
+| Authoring tool (provisionally manual-editor) | Creates an experiential manual on screen and saves it as JSON of experiential-manual-model. The saved JSON can be converted to S1000D with the experience-to-s1000d Skill | Prototype |
+| Viewer | Displays an experiential manual so that people can learn an operation by trying it. WebMCP is planned so that AI can guide the operation | Concept |
 
-The background of each decision and the open items are recorded with numbers in `docs/DECISIONS.md` in the hub repository.
+Instructions for the products will be placed on the product site.
 
-## Target issues
+## Target issue
 
-The first target is Issue 7. Issue 4.2 is planned next, because many real examples in Japan and abroad are in the Issue 4 series. `s1000d-core` is structured so that it can read each issue separately.
+The first target is Issue 7. Issue 4.2 is planned next, because most real-world examples, in Japan and elsewhere, use the Issue 4 series. `s1000d-core` is structured so that it can read each issue separately.
+
+:::note[Design decisions]
+Why decisions are left to the server, and decisions such as not letting the LLM write XML, are summarised in [Design principles](/s1000d-stack/guide/design-principles/). The history of decisions and the open questions are recorded with numbers in [docs/DECISIONS.md](https://github.com/shuji-bonji/s1000d-stack/blob/main/docs/DECISIONS.md) in the hub repository.
+:::

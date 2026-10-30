@@ -7,3 +7,73 @@
   display: block;
   overflow-x: auto;
 }
+
+/* Mermaid の図の拡大ポップアップ（public/mermaid-zoom.js、Issue #1）。動きは starlight-image-zoom に合わせている */
+:root {
+  --mermaid-zoom-duration: 300ms;
+}
+.mermaid-zoomable {
+  cursor: zoom-in;
+}
+.mermaid-zoomable:focus-visible {
+  outline: 2px solid var(--sl-color-accent);
+  outline-offset: 4px;
+}
+.mermaid-zoom__source {
+  visibility: hidden;
+}
+.mermaid-zoom {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  width: 100dvw;
+  height: 100vh;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: transparent;
+  cursor: zoom-out;
+}
+/* 図はテーマに合わせた色で描かれているので、背景は黒ではなくページの背景色にする */
+.mermaid-zoom::backdrop {
+  background: var(--sl-color-bg);
+  opacity: 0;
+}
+.mermaid-zoom-opened .mermaid-zoom::backdrop {
+  opacity: 0.97;
+}
+.mermaid-zoom__image {
+  cursor: zoom-out;
+}
+.mermaid-zoom__close {
+  position: absolute;
+  inset: 20px 20px auto auto;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 10px;
+  border: 2px solid var(--sl-color-gray-2);
+  border-radius: 50%;
+  background-color: var(--sl-color-bg-nav);
+  color: var(--sl-color-text);
+  cursor: zoom-out;
+  opacity: 0;
+}
+.mermaid-zoom-opened .mermaid-zoom__close {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mermaid-zoom__image {
+    transition: transform var(--mermaid-zoom-duration) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .mermaid-zoom::backdrop,
+  .mermaid-zoom__close {
+    transition: opacity var(--mermaid-zoom-duration);
+  }
+}
