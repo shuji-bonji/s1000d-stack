@@ -58,7 +58,9 @@ S1000D has been revised many times, and several issues are in use side by side. 
 
 ## The S-Series
 
-S1000D is one of a family of specifications for product support (ILS, integrated logistics support) maintained by ASD and AIA, known as the S-Series. It includes S2000M for material management and S3000L for logistics support analysis, and they are designed to be used together. The whole family is described at [s-series.org](https://www.s-series.org/).
+S1000D is one of the S-Series, a family of specifications that covers support across the whole life cycle of a product. The S-Series is called the IPS (Integrated Product Support) specifications. It includes S2000M for material management, S3000L for logistics support analysis, S4000P for developing preventive maintenance, S5000F for in-service data feedback, S6000T for training analysis and design, and SX000i, which explains how to use the family. They are designed to be used together.
+
+The family used to be called the ILS (Integrated Logistics Support) specifications. Because its scope reaches beyond logistics to the whole life cycle of a product, the term IPS was introduced in 2019. Older material may still say ILS. The whole family is described at [s-series.org](https://www.s-series.org/). In this stack, only S1000D from the S-Series is handled.
 
 ## In this stack
 
