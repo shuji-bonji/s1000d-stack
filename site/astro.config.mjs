@@ -63,6 +63,7 @@ export default defineConfig({
           label: 'Understanding S1000D',
           translations: { ja: 'S1000D を知る' },
           items: [
+            { label: 'What S1000D is', translations: { ja: 'S1000D とは' }, slug: 'guide/what-is-s1000d' },
             { label: 'IETM and S1000D', translations: { ja: 'IETM と S1000D' }, slug: 'guide/ietm-and-s1000d' },
             { label: 'Data modules and the DMC', translations: { ja: 'データモジュールと DMC' }, slug: 'guide/data-module-and-dmc' },
             { label: 'CSDB (Common Source DataBase)', translations: { ja: 'CSDB（共通ソースデータベース）' }, slug: 'guide/csdb' },
