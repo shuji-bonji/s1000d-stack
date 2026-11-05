@@ -65,6 +65,7 @@ Grok Build（1.0.70）で、S1000D Stack の MCP 4 本（brex 0.5.0・verify 0.6
 ## 6. 次にすること
 
 1. F-01〜F-05・F-07 は、2026-11-05 に各リポジトリの Issue にした（上の表のリンク）。F-06 は出どころを確かめてから Issue にする。
+   - **2026-11-06 に 8 件とも修正した（コミット済み・未公開）。** core 0.8.3（F-04）、verify-mcp 0.7.0（F-01・F-02・F-03）、reader-mcp 0.8.0（F-02・F-03）、writer-mcp 0.2.0（F-03・F-05・F-07）。決めたこと: `csdbDirs` は引数で渡したら設定を置き換える（writer も同じ）、直せる誤りは writer と同じ `{"error": {"code", "path", "detail"}}` で返す（`file-not-found`・`no-csdb`・`not-found`・`input-error`）、`applic` の無い下書きは `input-error`（`path` は `/applic`）。公開すると Issue は各コミットの `Closes` で閉じる
 2. F-08〜F-14 は、ソースで確かめてから Issue にする。
 3. D-01〜D-06 は、次の版で説明文を直すときにまとめて入れる。
 4. S-01・S-02 は Skill の次の版で直す。

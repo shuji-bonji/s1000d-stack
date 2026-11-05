@@ -130,7 +130,7 @@ What the conversion cannot express (the coordinates of hotspots, part of `scopeR
 - **It does not translate.** It only takes sentences out and puts them back.
 - **It does not create figures or judge controlled language (STE).** For a figure it only assigns an ICN and inserts the reference, and no STE dictionary is bundled.
 - **Inline elements inside a paragraph (emphasis and the like) cannot be expressed in a draft.**
-- It does not create an ACT, CCT or PCT. Applicability relies on the `applic` of the draft and on an existing applicability repository.
+- It does not create an ACT, CCT or PCT. Applicability relies on the `applic` of the draft and on an existing applicability repository. It does not decide applicability either, so when a draft given to `build_data_module` has no `applic`, it is not built and `input-error` (`path` is `/applic`) is returned.
 
 ## Configuration
 
@@ -154,7 +154,7 @@ What the conversion cannot express (the coordinates of hotspots, part of `scopeR
 }
 ```
 
-Folders can also be added with the tool argument `csdbDirs` (the first one is where files are written). When the environment variables are not set, the server reads `specDir` and `csdbDirs` from the config file `~/.config/s1000d-stack/config.json` (under `XDG_CONFIG_HOME` if it is set; `S1000D_CONFIG` changes the location). See [Getting started](/s1000d-stack/guide/getting-started/) for the format.
+Folders can also be given with the tool argument `csdbDirs` (the first one is where files are written). When it is given, only those folders are used; `S1000D_CSDB_DIR` and `csdbDirs` in the config file are not used (they are not added together). Folders that do not exist are skipped and listed in `_notes` of the response (the first folder may not exist yet; it is created with `write: true`). When the environment variables are not set, the server reads `specDir` and `csdbDirs` from the config file `~/.config/s1000d-stack/config.json` (under `XDG_CONFIG_HOME` if it is set; `S1000D_CONFIG` changes the location). See [Getting started](/s1000d-stack/guide/getting-started/) for the format.
 
 The default is stdio. With `--http` the server starts over Streamable HTTP (default `http://127.0.0.1:3000/mcp`; change it with `--host` / `--port` / `--path`), so a CSDB product's server or a web application can call it over HTTP. When bound to a loopback address, `Host` and `Origin` are limited to localhost names; on any other address they are not checked. This server can write files, so do not expose it without authentication: put it behind the product's reverse proxy or authentication. Authentication, authorization and multi-tenancy are not part of the server (see "What stays with the product" in [Embedding in a CSDB product](/s1000d-stack/use-cases/embedding/)).
 

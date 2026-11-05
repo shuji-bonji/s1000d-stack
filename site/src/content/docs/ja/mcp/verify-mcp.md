@@ -97,6 +97,10 @@ XSD が見つからなかったときは検証が行われていないだけで�
 
 環境変数が無いときは、設定ファイル `~/.config/s1000d-stack/config.json`（`XDG_CONFIG_HOME` があればその下、`S1000D_CONFIG` で場所を変更可）の `specDir` と `csdbDirs` を読みます。Claude Desktop に plugin で入れたときのように、環境変数がサーバーに渡らない場合に使います。書き方は[はじめに](/s1000d-stack/ja/guide/getting-started/)にあります。
 
+ツールの引数 `csdbDirs` を渡したときは、そのフォルダーだけを使い、`S1000D_CSDB_DIR` と設定ファイルの `csdbDirs` は使いません（足し合わせません）。存在しないフォルダーは使わず、応答の `_notes` に書きます。
+
+引数を直せば済む誤りは、ツールの失敗（`isError`）ではなく、s1000d-writer-mcp と同じ `error: { code, path, detail }` で返します。`code` は `file-not-found`（ファイルが無い）・`no-csdb`（CSDB のフォルダーが無い）・`input-error`（引数の形が違う、必要な引数が無い） のどれかで、`path` は直す引数（`/path`、`/csdbDirs` など）です。
+
 既定は stdio です。`--http` を付けると Streamable HTTP（既定 `http://127.0.0.1:3000/mcp`。`--host` / `--port` / `--path` で変更）で起動し、CSDB 製品のサーバーや Web アプリから HTTP で呼べます。loopback に束縛したときは `Host` と `Origin` を localhost 系に限り、それ以外のアドレスでは検査しないので、製品側のリバースプロキシや認証の後ろに置いてください。認証・権限・マルチテナントはサーバーでは持ちません（[組み込み基盤の設計](https://github.com/shuji-bonji/s1000d-stack/blob/main/docs/design/agent-platform.md)の境界）。
 
 ## XSD の探し方

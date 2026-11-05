@@ -58,7 +58,7 @@ const REGISTRY = [
   { name: 's1000d-brex-mcp',  dir: 'mcp/s1000d-brex-mcp',  npm: '@shuji-bonji/s1000d-brex-mcp',  layer: 'mcp',  form: 'mcp-server', status: 'released',   public: true,
     note: 'BREX を LLM が読み、データモジュールを BREX に照合する。explain_brex / lookup_sns / lookup_value / list_notations / check_against_brex の 5 tools。段階 1 の成果物' },
   { name: 's1000d-verify-mcp', dir: 'mcp/s1000d-verify-mcp', npm: '@shuji-bonji/s1000d-verify-mcp', layer: 'mcp', form: 'mcp-server', status: 'released',   public: true,
-    note: '段階 2。利用者が入手した公式 XSD による検証 ＋ BREX 照合（core を呼ぶ）＋ 参照の解決を 1 つの検証状態にまとめる。verify_data_module / validate_schema / check_references / verify_csdb / list_schemas の 5 tools' },
+    note: '段階 2。利用者が入手した公式 XSD による検証 ＋ BREX 照合（core を呼ぶ）＋ 参照の解決を 1 つの検証状態にまとめる。verify_data_module / validate_schema / check_references / verify_csdb / suggest_fixes / reconcile_dml / list_schemas の 7 tools' },
   { name: 's1000d-reader-mcp', dir: 'mcp/s1000d-reader-mcp', npm: '@shuji-bonji/s1000d-reader-mcp', layer: 'mcp', form: 'mcp-server', status: 'released',   public: true,
     note: '段階 2。データモジュールの本文を構造化して返す、参照の解決、適用性の判定（式は LLM に渡さない）。応答に検証状態を含める。list_data_modules / read_data_module / read_publication_module / resolve_reference / describe_applicability / read_icn_metadata の 6 tools' },
   { name: 'experiential-manual-model', dir: 'lib/experiential-manual-model', npm: '@shuji-bonji/experiential-manual-model', layer: 'model', form: 'library', status: 'released',   public: true,

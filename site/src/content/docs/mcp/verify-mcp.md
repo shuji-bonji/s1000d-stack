@@ -97,6 +97,10 @@ The server decides every candidate. Only values with a clear origin become candi
 
 When the environment variables are not set, the server reads `specDir` and `csdbDirs` from the config file `~/.config/s1000d-stack/config.json` (under `XDG_CONFIG_HOME` if it is set; `S1000D_CONFIG` changes the location). Use it when environment variables do not reach the server, as when it is installed as a plugin in Claude Desktop. See [Getting started](/s1000d-stack/guide/getting-started/) for the format.
 
+When the tool argument `csdbDirs` is given, only those folders are used; `S1000D_CSDB_DIR` and `csdbDirs` in the config file are not used (they are not added together). Folders that do not exist are skipped and listed in `_notes` of the response.
+
+A mistake that the caller can fix by changing an argument is returned not as a tool failure (`isError`) but as `error: { code, path, detail }`, the same shape as s1000d-writer-mcp. `code` is one of `file-not-found` (no such file), `no-csdb` (no CSDB folder) and `input-error` (an argument is malformed or missing), and `path` names the argument to fix (`/path`, `/csdbDirs` and so on).
+
 The default is stdio. With `--http` the server starts over Streamable HTTP (default `http://127.0.0.1:3000/mcp`; change it with `--host` / `--port` / `--path`), so a CSDB product's server or a web application can call it over HTTP. When bound to a loopback address, `Host` and `Origin` are limited to localhost names; on any other address they are not checked, so put the server behind the product's reverse proxy or authentication. Authentication, authorization and multi-tenancy are not part of the server (the boundary in the [embedding design](https://github.com/shuji-bonji/s1000d-stack/blob/main/docs/design/agent-platform.md)).
 
 ## How XSDs are found

@@ -130,7 +130,7 @@ XSD・BREX・参照の各工程の状態です。形と意味は [s1000d-verify-
 - **翻訳はしません。** 文を取り出して戻すだけです。
 - **図の作成や、制限言語（STE）の判定はしません。** 図は ICN を採番して参照を入れるだけで、STE の辞書は同梱しません。
 - **段落の中のインライン要素（強調など）は、下書きでは表せません。**
-- ACT・CCT・PCT は作りません。適用性は、下書きの `applic` と、既存の適用性リポジトリを前提にします。
+- ACT・CCT・PCT は作りません。適用性は、下書きの `applic` と、既存の適用性リポジトリを前提にします。適用範囲も決めないので、`build_data_module` の下書きに `applic` が無いときは、組み立てずに `input-error`（`path` は `/applic`）を返します。
 
 ## 設定
 
@@ -154,7 +154,7 @@ XSD・BREX・参照の各工程の状態です。形と意味は [s1000d-verify-
 }
 ```
 
-ツールの引数 `csdbDirs` でフォルダーを追加することもできます（先頭が書き込み先）。環境変数が無いときは、設定ファイル `~/.config/s1000d-stack/config.json`（`XDG_CONFIG_HOME` があればその下、`S1000D_CONFIG` で場所を変更可）の `specDir` と `csdbDirs` を読みます。書き方は[導入手順](/s1000d-stack/ja/guide/getting-started/)にあります。
+ツールの引数 `csdbDirs` でフォルダーを指定することもできます（先頭が書き込み先）。渡したときは、そのフォルダーだけを使い、`S1000D_CSDB_DIR` と設定ファイルの `csdbDirs` は使いません（足し合わせません）。存在しないフォルダーは使わず、応答の `_notes` に書きます（先頭のフォルダーはまだ無くてもよく、`write: true` のときに作ります）。環境変数が無いときは、設定ファイル `~/.config/s1000d-stack/config.json`（`XDG_CONFIG_HOME` があればその下、`S1000D_CONFIG` で場所を変更可）の `specDir` と `csdbDirs` を読みます。書き方は[導入手順](/s1000d-stack/ja/guide/getting-started/)にあります。
 
 既定は stdio です。`--http` を付けると Streamable HTTP（既定 `http://127.0.0.1:3000/mcp`。`--host` / `--port` / `--path` で変更）で起動し、CSDB 製品のサーバーや Web アプリから HTTP で呼べます。loopback に束縛したときは `Host` と `Origin` を localhost 系に限り、それ以外のアドレスでは検査しません。このサーバーはファイルを書き込めるので、認証の無い公開は避け、製品側のリバースプロキシや認証の後ろに置いてください。認証・権限・マルチテナントはサーバーでは持ちません（[CSDB 製品に組み込む](/s1000d-stack/ja/use-cases/embedding/)の「製品側に残す責務」）。
 

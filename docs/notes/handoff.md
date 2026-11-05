@@ -1,4 +1,4 @@
-# 引き継ぎメモ（2026-10-29 23:45 JST 時点）
+# 引き継ぎメモ（2026-11-06 JST 更新。本文の大半は 2026-10-29 23:45 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
@@ -90,6 +90,14 @@ cd site && npm run build && npm run preview
 > VM の npm は 10.9.9 で、Mac の npm 12 が書いた lock を読めず `Cannot read properties of null (reading 'edgesOut')` で失敗することがあるので、npm は `npx -y npm@12` で呼ぶ。
 
 ## 次にやること
+
+0. **Grok Build の所見（F-01〜F-05・F-07）の 8 Issue は 2026-11-06 にコミットまで済み、未公開**（チャットで実装。各リポジトリ main が origin より 1 つ先）。所見と決めたことは `eval/hosts/grok-build/reports/2026-11/FINDINGS.md` の「6. 次にすること」。公開（利用者）は次の順番:
+   1. core 0.8.3: `cd lib/s1000d-core && git push && git tag v0.8.3 && git push --tags`（`package.json` は 0.8.3。`npm version` は使わない）。`fix/schema.ts` が「前に足す」`add` 候補（`position: "before"`）を作り、`applyFix` がそれを適用する
+   2. verify-mcp 0.7.0・reader-mcp 0.8.0・writer-mcp 0.2.0: 各リポジトリで push → タグ `v0.7.0` / `v0.8.0` / `v0.2.0` を push → `mcp-publisher publish`。依存は `^0.8.2` のままで、core 0.8.3 は新しく入れたときに入る（lock を 0.8.3 に上げるなら core の公開後に `npm install`）。**動きが変わるのでマイナーで上げた**: ツール引数の `csdbDirs` は設定を置き換える（3 本とも。存在しないフォルダーは `_notes`）、verify・reader の直せる誤りは `isError` ではなく `{"error": {"code", "path", "detail"}}`、writer の `build_data_module` は `applic` の無い下書きを `input-error`（`/applic`）にする
+   3. claude-plugins: plugin 側を push して 5 分置いてから `marketplace-version-check.mjs --write` と README の表
+   4. Skill s1000d-publish: `applic` の説明を直したコミット（CHANGELOG「未リリース」）。次の Skill の版でタグを付ける
+   5. hub: `node scripts/generate-stack.mjs --readme` で `stack.json` と README の表を作り直す（verify の note は 7 tools に直してある。公開前に作るとローカルの版が `drift` と記録されるので、公開後に行う）。`e2e/package.json` の devDependencies を新しい版に上げて `npm install`、`npm test`（`E2E_TARGET=npm`）。手元のビルドでは `E2E_TARGET=local` で 42 件、spec モードで 27 件が通ることを確かめた（2026-11-06）
+   6. s1000d-brex-mcp の `csdbDirs` も「追加」のまま（README・サイトの記述も）。同じ置き換えにするかは次の brex-mcp の版で決める
 
 1. **10-4 公開後の確認**（利用者。下のチェックリスト）。加えて、`S1000D_SPEC_DIR` を設定したシェルから Claude Code を起動し、plugin で入れた `s1000d-brex` が `/mcp` で接続済みになり `explain_brex` が動くことを確かめる（plugin の `mcpServers` に `env` を書かない判断、D-23）。動かなければ `plugin.json` に `env` を足す案を検討する。
 2. **D-25（設定ファイル）は 2026-10-27 15:10 頃に公開済み**: core 0.4.0、brex-mcp・verify-mcp・reader-mcp 0.3.0（npm・MCP Registry・claude-plugins。core `^0.4.0`）。Claude Desktop の plugin 版が `~/.config/s1000d-stack/config.json` の `specDir` を読み、`list_schemas`（Issue 7 の XSD 33 本）と `explain_brex`（既定 BREX）が動くことを確かめた。`-dev` 版も core 0.4.0 で作り直し済み。LaunchAgent は片付け済み。
