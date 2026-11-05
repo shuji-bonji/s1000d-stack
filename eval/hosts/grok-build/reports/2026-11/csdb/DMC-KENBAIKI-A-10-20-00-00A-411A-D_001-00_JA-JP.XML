@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dmodule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_7/xml_schema_flat/fault.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="KENBAIKI" systemDiffCode="A" systemCode="10" subSystemCode="2" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="411" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="ja" countryIsoCode="JP"/>
+        <issueInfo issueNumber="001" inWork="00"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2026" month="10" day="25"/>
+        <dmTitle>
+          <techName>指定席券売機 操作マニュアル（例）</techName>
+          <infoName>きっぷが出てこない</infoName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus>
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany enterpriseCode="K0002"/>
+      <originator enterpriseCode="K0002"/>
+      <applic>
+        <displayText>
+          <simplePara>すべて</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="KENBAIKI" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <faultIsolation>
+      <faultIsolationProcedure>
+        <isolationProcedure>
+          <preliminaryRqmts>
+            <reqCondGroup>
+              <noConds/>
+            </reqCondGroup>
+            <reqSupportEquips>
+              <noSupportEquips/>
+            </reqSupportEquips>
+            <reqSupplies>
+              <noSupplies/>
+            </reqSupplies>
+            <reqSpares>
+              <noSpares/>
+            </reqSpares>
+            <reqSafety>
+              <noSafety/>
+            </reqSafety>
+          </preliminaryRqmts>
+          <isolationMainProcedure>
+            <isolationStep id="ts-1">
+              <action>用紙の残量を見る。</action>
+              <isolationStepQuestion>用紙はありますか。</isolationStepQuestion>
+              <isolationStepAnswer>
+                <listOfChoices>
+                  <choice nextActionRefId="ts-2">ある</choice>
+                  <choice nextActionRefId="ts-3">ない</choice>
+                </listOfChoices>
+              </isolationStepAnswer>
+            </isolationStep>
+            <isolationProcedureEnd id="ts-2">
+              <action>印字部を清掃する。</action>
+            </isolationProcedureEnd>
+            <isolationProcedureEnd id="ts-3">
+              <action>用紙を補充する。</action>
+            </isolationProcedureEnd>
+          </isolationMainProcedure>
+          <closeRqmts>
+            <reqCondGroup>
+              <noConds/>
+            </reqCondGroup>
+          </closeRqmts>
+        </isolationProcedure>
+      </faultIsolationProcedure>
+    </faultIsolation>
+  </content>
+</dmodule>

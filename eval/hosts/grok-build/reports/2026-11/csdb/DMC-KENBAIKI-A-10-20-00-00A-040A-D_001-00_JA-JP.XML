@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule [
+<!ENTITY ICN-K0001-00001-001-01 SYSTEM "ICN-K0001-00001-001-01.PNG" NDATA png>
+<!NOTATION png PUBLIC "-//W3C//NOTATION Portable Network Graphics//EN">
+]>
+<dmodule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_7/xml_schema_flat/descript.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="KENBAIKI" systemDiffCode="A" systemCode="10" subSystemCode="2" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="040" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="ja" countryIsoCode="JP"/>
+        <issueInfo issueNumber="001" inWork="00"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2026" month="10" day="25"/>
+        <dmTitle>
+          <techName>指定席券売機 操作マニュアル（例）</techName>
+          <infoName>券売機の概要</infoName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus>
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany enterpriseCode="K0002"/>
+      <originator enterpriseCode="K0002"/>
+      <applic>
+        <displayText>
+          <simplePara>すべて</simplePara>
+        </displayText>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="KENBAIKI" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <description>
+      <para>何ができる機械か、画面の見方。</para>
+      <levelledPara id="sec-what">
+        <title>できること</title>
+        <para>乗換案内から列車を選んできっぷを買う、きっぷを払い戻す、定期券を更新する、の 3 つができます。</para>
+        <para><randomList>
+            <listItem>
+              <para>乗換案内からの購入</para>
+            </listItem>
+            <listItem>
+              <para>払い戻し</para>
+            </listItem>
+            <listItem>
+              <para>定期券の更新</para>
+            </listItem>
+          </randomList></para>
+      </levelledPara>
+      <levelledPara id="sec-screen">
+        <title>画面の見方</title>
+        <figure>
+          <title>トップ画面</title>
+          <graphic infoEntityIdent="ICN-K0001-00001-001-01"/>
+        </figure>
+        <table>
+          <tgroup cols="2">
+            <thead>
+              <row>
+                <entry>
+                  <para>場所</para>
+                </entry>
+                <entry>
+                  <para>内容</para>
+                </entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry>
+                  <para>上</para>
+                </entry>
+                <entry>
+                  <para>現在時刻と出発駅</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>中央</para>
+                </entry>
+                <entry>
+                  <para>操作のボタン</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>下</para>
+                </entry>
+                <entry>
+                  <para>取り消し・前の画面</para>
+                </entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+        <note>
+          <notePara>画面はしばらく触れないとトップ画面に戻ります。</notePara>
+        </note>
+      </levelledPara>
+    </description>
+  </content>
+</dmodule>

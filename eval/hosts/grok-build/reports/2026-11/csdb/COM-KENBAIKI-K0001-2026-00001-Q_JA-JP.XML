@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<comment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_7/xml_schema_flat/comment.xsd">
+  <identAndStatusSection>
+    <commentAddress>
+      <commentIdent>
+        <commentCode modelIdentCode="KENBAIKI" senderIdent="K0001" yearOfDataIssue="2026" seqNumber="00001" commentType="q"/>
+        <language languageIsoCode="ja" countryIsoCode="JP"/>
+      </commentIdent>
+      <commentAddressItems>
+        <commentTitle>レビューの指摘 3 件</commentTitle>
+        <issueDate year="2026" month="11" day="05"/>
+        <commentOriginator>
+          <dispatchAddress>
+            <enterprise>
+              <enterpriseName>KBWORKS</enterpriseName>
+            </enterprise>
+            <dispatchPerson>
+              <lastName>評価</lastName>
+              <firstName>太郎</firstName>
+            </dispatchPerson>
+            <address>
+              <city>東京</city>
+              <country>JP</country>
+            </address>
+          </dispatchAddress>
+        </commentOriginator>
+      </commentAddressItems>
+    </commentAddress>
+    <commentStatus>
+      <security securityClassification="01"/>
+      <commentPriority commentPriorityCode="cp01"/>
+      <commentRefs>
+        <dmRefGroup>
+          <dmRef>
+            <dmRefIdent>
+              <dmCode modelIdentCode="KENBAIKI" systemDiffCode="A" systemCode="10" subSystemCode="2" subSubSystemCode="0" assyCode="00" disassyCode="04" disassyCodeVariant="A" infoCode="520" infoCodeVariant="A" itemLocationCode="D"/>
+              <issueInfo issueNumber="001" inWork="00"/>
+              <language languageIsoCode="ja" countryIsoCode="JP"/>
+            </dmRefIdent>
+          </dmRef>
+        </dmRefGroup>
+      </commentRefs>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="KENBAIKI" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+    </commentStatus>
+  </identAndStatusSection>
+  <commentContent>
+    <simplePara>R-1 [機械] 手順 1 の図「前面扉の取っ手」（graphic、行 73）: File ICN-K0001-00005-001-01.PNG declared for ICN-K0001-00005-001-01 is not in the CSDB。kind は reference、source は CsdbIndex and DOCTYPE、confidence は none、candidates は空。候補が無いので値は選んでいない。</simplePara>
+    <simplePara>R-2 [機械] 手順 1 の multimedia「前面扉の 3D モデル」（行 77）: File ICN-K0001-00006-001-01.JT declared for ICN-K0001-00006-001-01 is not in the CSDB。kind は reference、source は CsdbIndex and DOCTYPE、confidence は none、candidates は空。候補が無いので値は選んでいない。</simplePara>
+    <simplePara>R-3 [BREX手動] KB-00100: 手順 3（id stp-open-3）「作業が終わったら扉を閉めて鍵をかける。」は、扉を閉める操作と鍵をかける操作の 2 つが 1 つのステップに読める。確認してください。</simplePara>
+  </commentContent>
+</comment>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dmodule [
+<!ENTITY ICN-K0001-00005-001-01 SYSTEM "ICN-K0001-00005-001-01.PNG" NDATA png>
+<!ENTITY ICN-K0001-00006-001-01 SYSTEM "ICN-K0001-00006-001-01.JT" NDATA jt>
+<!NOTATION png PUBLIC "-//W3C//NOTATION Portable Network Graphics//EN">
+<!NOTATION jt PUBLIC "-//s1000d-writer-mcp//NOTATION jt//EN">
+]>
+<dmodule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_7/xml_schema_flat/proced.xsd">
+  <identAndStatusSection>
+    <dmAddress>
+      <dmIdent>
+        <dmCode modelIdentCode="KENBAIKI" systemDiffCode="A" systemCode="10" subSystemCode="2" subSubSystemCode="0" assyCode="00" disassyCode="04" disassyCodeVariant="A" infoCode="520" infoCodeVariant="A" itemLocationCode="D"/>
+        <language languageIsoCode="ja" countryIsoCode="JP"/>
+        <issueInfo issueNumber="001" inWork="00"/>
+      </dmIdent>
+      <dmAddressItems>
+        <issueDate year="2026" month="10" day="25"/>
+        <dmTitle>
+          <techName>指定席券売機 操作マニュアル（例）</techName>
+          <infoName>前面扉を開ける（係員）</infoName>
+        </dmTitle>
+      </dmAddressItems>
+    </dmAddress>
+    <dmStatus>
+      <security securityClassification="01"/>
+      <responsiblePartnerCompany enterpriseCode="K0002"/>
+      <originator enterpriseCode="K0002"/>
+      <applic>
+        <displayText>
+          <simplePara>MV-50、MV-60</simplePara>
+        </displayText>
+        <assert applicPropertyIdent="model" applicPropertyType="prodattr" applicPropertyValues="MV-50|MV-60"/>
+      </applic>
+      <brexDmRef>
+        <dmRef>
+          <dmRefIdent>
+            <dmCode modelIdentCode="KENBAIKI" systemDiffCode="A" systemCode="00" subSystemCode="0" subSubSystemCode="0" assyCode="00" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D"/>
+          </dmRefIdent>
+        </dmRef>
+      </brexDmRef>
+      <qualityAssurance>
+        <unverified/>
+      </qualityAssurance>
+    </dmStatus>
+  </identAndStatusSection>
+  <content>
+    <procedure>
+      <preliminaryRqmts>
+        <reqCondGroup>
+          <noConds/>
+        </reqCondGroup>
+        <reqSupportEquips>
+          <noSupportEquips/>
+        </reqSupportEquips>
+        <reqSupplies>
+          <noSupplies/>
+        </reqSupplies>
+        <reqSpares>
+          <noSpares/>
+        </reqSpares>
+        <reqSafety>
+          <noSafety/>
+        </reqSafety>
+      </preliminaryRqmts>
+      <mainProcedure>
+        <proceduralStep id="stp-open-1">
+          <caution>
+            <warningAndCautionPara>扉は重いので、両手で支える。</warningAndCautionPara>
+          </caution>
+          <para>保守鍵で前面扉の鍵を開ける。</para>
+          <figure>
+            <title>前面扉の取っ手</title>
+            <graphic infoEntityIdent="ICN-K0001-00005-001-01"/>
+          </figure>
+          <multimedia>
+            <title>前面扉の 3D モデル</title>
+            <multimediaObject multimediaType="3D" infoEntityIdent="ICN-K0001-00006-001-01"/>
+          </multimedia>
+          <proceduralStep id="stp-open-1-1">
+            <para>鍵を右に回す。カチッと音がして鍵が外れる。</para>
+          </proceduralStep>
+          <proceduralStep id="stp-open-1-2">
+            <para>取っ手を引く。</para>
+          </proceduralStep>
+          <proceduralStep id="stp-open-1-3">
+            <para>雨よけのカバーを先に外す。</para>
+          </proceduralStep>
+        </proceduralStep>
+        <proceduralStep id="stp-open-2">
+          <para>保守モードに入る。</para>
+        </proceduralStep>
+        <proceduralStep id="stp-open-3">
+          <para>作業が終わったら扉を閉めて鍵をかける。</para>
+        </proceduralStep>
+      </mainProcedure>
+      <closeRqmts>
+        <reqCondGroup>
+          <noConds/>
+        </reqCondGroup>
+      </closeRqmts>
+    </procedure>
+  </content>
+</dmodule>
