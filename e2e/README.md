@@ -15,7 +15,7 @@ npm run test:spec   # S1000D_SPEC_TESTS=1: the real Issue 7 XSD and default BREX
 npm run test:local  # E2E_TARGET=local: ../mcp/<name>/dist/index.js (build each repo first)
 ```
 
-- `E2E_TARGET=npm` (default) starts the bins in `node_modules/@shuji-bonji/` (brex ^0.5.0, verify ^0.7.0, reader ^0.8.0, writer ^0.2.0). `local` starts `../mcp/<name>/dist/index.js`.
+- `E2E_TARGET=npm` (default) starts the bins in `node_modules/@shuji-bonji/` (brex ^0.6.0, verify ^0.7.0, reader ^0.8.0, writer ^0.2.0). `local` starts `../mcp/<name>/dist/index.js`.
 - Default mode uses only the self-made minimal XSDs in `fixtures/spec/xml_schema_flat/` and the two-layer self-made BREX in `fixtures/csdb-base/` (KBWORKS organisation layer, KENBAIKI project layer). `S1000D_SPEC_TESTS=1` reads `S1000D_SPEC_DIR` (default `../specs/s1000d/issue-7`); scenario 2 and the tests that depend on the self-made BREX rules are skipped there.
 - Each test file creates its CSDB under `os.tmpdir()` and removes it afterwards (`E2E_KEEP_TMP=1` keeps it). The servers never read your `~/.config/s1000d-stack/config.json` or `S1000D_CSDB_DIR`.
 
