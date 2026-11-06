@@ -27,7 +27,7 @@ Node.js 22 以上が要ります。テストは `os.tmpdir()` の下に CSDB を
 
 | 値 | 起動するもの |
 |---|---|
-| `npm`（既定） | `node_modules/@shuji-bonji/s1000d-*-mcp` の bin。`devDependencies` の版（brex ^0.4.0 / verify ^0.6.1 / reader ^0.7.1 / writer ^0.1.2）。CI はこちら |
+| `npm`（既定） | `node_modules/@shuji-bonji/s1000d-*-mcp` の bin。`devDependencies` の版（brex ^0.5.0 / verify ^0.7.0 / reader ^0.8.0 / writer ^0.2.0）。CI はこちら |
 | `local` | `../mcp/<名前>/dist/index.js`。先に各リポジトリで `npm run build` する |
 
 起動時に、使った対象・モード・各サーバーの版を stderr に 1 行出します（`tests/01-…` の「起動」）。
