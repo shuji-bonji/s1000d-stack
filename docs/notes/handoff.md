@@ -91,7 +91,7 @@ cd site && npm run build && npm run preview
 
 ## 次にやること
 
-0. **Grok Build の所見（F-01〜F-05・F-07）の 8 Issue は 2026-11-06 にコミットまで済み、未公開**（チャットで実装。各リポジトリ main が origin より 1 つ先）。所見と決めたことは `eval/hosts/grok-build/reports/2026-11/FINDINGS.md` の「6. 次にすること」。公開（利用者）は次の順番:
+0. **Grok Build の所見（F-01〜F-05・F-07）の 8 Issue は 2026-11-06 に公開まで済み**（チャットで実装、17:10 JST 頃までに利用者が公開。npm は core 0.8.3・verify 0.7.0・reader 0.8.0・writer 0.2.0、MCP Registry・claude-plugins も同じ版、Issue 8 件はクローズ、`stack.json` は 6 パッケージとも `match`。E2E の依存も新しい版に上げ、`E2E_TARGET=npm` で 42 件、spec モードで 27 件が通ることを確かめた）。残りは下の 4（Skill のタグ）と 6（brex-mcp の判断）。所見と決めたことは `eval/hosts/grok-build/reports/2026-11/FINDINGS.md` の「6. 次にすること」。公開（利用者）は次の順番:
    1. core 0.8.3: `cd lib/s1000d-core && git push && git tag v0.8.3 && git push --tags`（`package.json` は 0.8.3。`npm version` は使わない）。`fix/schema.ts` が「前に足す」`add` 候補（`position: "before"`）を作り、`applyFix` がそれを適用する
    2. verify-mcp 0.7.0・reader-mcp 0.8.0・writer-mcp 0.2.0: 各リポジトリで push → タグ `v0.7.0` / `v0.8.0` / `v0.2.0` を push → `mcp-publisher publish`。依存は `^0.8.2` のままで、core 0.8.3 は新しく入れたときに入る（lock を 0.8.3 に上げるなら core の公開後に `npm install`）。**動きが変わるのでマイナーで上げた**: ツール引数の `csdbDirs` は設定を置き換える（3 本とも。存在しないフォルダーは `_notes`）、verify・reader の直せる誤りは `isError` ではなく `{"error": {"code", "path", "detail"}}`、writer の `build_data_module` は `applic` の無い下書きを `input-error`（`/applic`）にする
    3. claude-plugins: plugin 側を push して 5 分置いてから `marketplace-version-check.mjs --write` と README の表
