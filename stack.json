@@ -6,7 +6,7 @@
     "layer = 役割 / form = 配布形態（誰が起動するか）/ status = released・developing・planned・concept。",
     "developing はリポジトリで開発中で npm 未公開。planned / concept はディレクトリも npm も無い。"
   ],
-  "generatedAt": "2026-10-30T14:06:34.503Z",
+  "generatedAt": "2026-11-06T08:11:45.836Z",
   "generatedBy": "scripts/generate-stack.mjs",
   "npmScope": "@shuji-bonji",
   "repos": [
@@ -19,16 +19,16 @@
       "status": "released",
       "public": true,
       "note": "DMC・ICN・PMC の分解、識別・状態部の読み取り、BREX の読み取りと照合（連鎖・層別）、XSD 検証（SchemaValidator、実装は libxml2-wasm のサブパス）、参照の解決、適用性の 3 値評価、本文（descript / proced / process / fault / pm）の共通の形への読み取り、検証状態 VerificationStatus、修正候補の決定。0.8.0 で「書く側」（データモジュールの組み立てと採番、修正候補の適用、WritableCsdbSource、comment DM、翻訳向けの文の出し入れ）を追加。全 MCP が依存",
-      "published": "0.8.2",
+      "published": "0.8.3",
       "local": {
-        "version": "0.8.2",
-        "tag": "v0.8.2",
+        "version": "0.8.3",
+        "tag": "v0.8.3",
         "dirty": false,
         "unpushedCommits": 0
       },
       "consistency": {
         "status": "match",
-        "detail": "0.8.2"
+        "detail": "0.8.3"
       }
     },
     {
@@ -60,17 +60,17 @@
       "form": "mcp-server",
       "status": "released",
       "public": true,
-      "note": "段階 2。利用者が入手した公式 XSD による検証 ＋ BREX 照合（core を呼ぶ）＋ 参照の解決を 1 つの検証状態にまとめる。verify_data_module / validate_schema / check_references / verify_csdb / list_schemas の 5 tools",
-      "published": "0.6.1",
+      "note": "段階 2。利用者が入手した公式 XSD による検証 ＋ BREX 照合（core を呼ぶ）＋ 参照の解決を 1 つの検証状態にまとめる。verify_data_module / validate_schema / check_references / verify_csdb / suggest_fixes / reconcile_dml / list_schemas の 7 tools",
+      "published": "0.7.0",
       "local": {
-        "version": "0.6.1",
-        "tag": "v0.6.1",
+        "version": "0.7.0",
+        "tag": "v0.7.0",
         "dirty": false,
         "unpushedCommits": 0
       },
       "consistency": {
         "status": "match",
-        "detail": "0.6.1"
+        "detail": "0.7.0"
       }
     },
     {
@@ -82,16 +82,16 @@
       "status": "released",
       "public": true,
       "note": "段階 2。データモジュールの本文を構造化して返す、参照の解決、適用性の判定（式は LLM に渡さない）。応答に検証状態を含める。list_data_modules / read_data_module / read_publication_module / resolve_reference / describe_applicability / read_icn_metadata の 6 tools",
-      "published": "0.7.1",
+      "published": "0.8.0",
       "local": {
-        "version": "0.7.1",
-        "tag": "v0.7.1",
+        "version": "0.8.0",
+        "tag": "v0.8.0",
         "dirty": false,
         "unpushedCommits": 0
       },
       "consistency": {
         "status": "match",
-        "detail": "0.7.1"
+        "detail": "0.8.0"
       }
     },
     {
@@ -124,16 +124,16 @@
       "status": "released",
       "public": true,
       "note": "段階 3。LLM に XML を書かせずにデータモジュールを作る。build_data_module / convert_manual / apply_fixes / create_comment / extract_segments / apply_segments の 6 tools。2026-10-28 に 0.1.0・0.1.1 を公開",
-      "published": "0.1.2",
+      "published": "0.2.0",
       "local": {
-        "version": "0.1.2",
-        "tag": "v0.1.2",
+        "version": "0.2.0",
+        "tag": "v0.2.0",
         "dirty": false,
         "unpushedCommits": 0
       },
       "consistency": {
         "status": "match",
-        "detail": "0.1.2"
+        "detail": "0.2.0"
       }
     },
     {
@@ -171,7 +171,7 @@
         "version": "0.1.1",
         "tag": "v0.1.1",
         "dirty": false,
-        "unpushedCommits": 0
+        "unpushedCommits": 1
       },
       "consistency": {
         "status": "plugin",
@@ -233,8 +233,8 @@
       "local": {
         "version": null,
         "tag": null,
-        "dirty": true,
-        "unpushedCommits": 0
+        "dirty": false,
+        "unpushedCommits": 1
       },
       "consistency": {
         "status": "developing",
@@ -254,8 +254,8 @@
       "local": {
         "version": "0.1.0",
         "tag": null,
-        "dirty": true,
-        "unpushedCommits": 0
+        "dirty": false,
+        "unpushedCommits": 1
       },
       "consistency": {
         "status": "developing",
