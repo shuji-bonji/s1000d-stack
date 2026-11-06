@@ -6,7 +6,7 @@
     "layer = 役割 / form = 配布形態（誰が起動するか）/ status = released・developing・planned・concept。",
     "developing はリポジトリで開発中で npm 未公開。planned / concept はディレクトリも npm も無い。"
   ],
-  "generatedAt": "2026-11-06T08:11:45.836Z",
+  "generatedAt": "2026-11-06T08:27:56.498Z",
   "generatedBy": "scripts/generate-stack.mjs",
   "npmScope": "@shuji-bonji",
   "repos": [
@@ -168,10 +168,10 @@
       "note": "段階 3。構造化した下書きからデータモジュールを 1 件ずつ作り、検証して CSDB に入れる Skill（writer の build_data_module、verify の reconcile_dml）。plugin 名 s1000d-publish",
       "published": null,
       "local": {
-        "version": "0.1.1",
-        "tag": "v0.1.1",
+        "version": "0.1.2",
+        "tag": "v0.1.2",
         "dirty": false,
-        "unpushedCommits": 1
+        "unpushedCommits": 0
       },
       "consistency": {
         "status": "plugin",
@@ -234,7 +234,7 @@
         "version": null,
         "tag": null,
         "dirty": false,
-        "unpushedCommits": 1
+        "unpushedCommits": 0
       },
       "consistency": {
         "status": "developing",
@@ -255,7 +255,7 @@
         "version": "0.1.0",
         "tag": null,
         "dirty": false,
-        "unpushedCommits": 1
+        "unpushedCommits": 0
       },
       "consistency": {
         "status": "developing",
