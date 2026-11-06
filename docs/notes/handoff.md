@@ -97,7 +97,7 @@ cd site && npm run build && npm run preview
    3. claude-plugins: plugin 側を push して 5 分置いてから `marketplace-version-check.mjs --write` と README の表
    4. Skill s1000d-publish: `applic` の説明を直したコミット（CHANGELOG「未リリース」）。次の Skill の版でタグを付ける
    5. hub: `node scripts/generate-stack.mjs --readme` で `stack.json` と README の表を作り直す（verify の note は 7 tools に直してある。公開前に作るとローカルの版が `drift` と記録されるので、公開後に行う）。`e2e/package.json` の devDependencies を新しい版に上げて `npm install`、`npm test`（`E2E_TARGET=npm`）。手元のビルドでは `E2E_TARGET=local` で 42 件、spec モードで 27 件が通ることを確かめた（2026-11-06）
-   6. s1000d-brex-mcp の `csdbDirs` も「追加」のまま（README・サイトの記述も）。同じ置き換えにするかは次の brex-mcp の版で決める
+   6. s1000d-brex-mcp も同じ直しにした（2026-11-06 17:50 JST 頃、0.6.0 としてコミット。未公開）。`csdbDirs` は設定の置き換え（既定 BREX は `S1000D_SPEC_DIR` から探す）、存在しないフォルダーは `_notes`、直せる誤りは `{"error": {"code", "path", "detail"}}`（`file-not-found`・`not-found`・`input-error`）。テスト 26 件（配布物を含む）、手元のビルドで E2E 42 件・spec 27 件が通過。公開は他の 3 本と同じ手順（push → タグ `v0.6.0` → `mcp-publisher publish` → claude-plugins）。公開後に hub の `generate-stack.mjs --readme` と `e2e/package.json` の brex を `^0.6.0` に
 
 1. **10-4 公開後の確認**（利用者。下のチェックリスト）。加えて、`S1000D_SPEC_DIR` を設定したシェルから Claude Code を起動し、plugin で入れた `s1000d-brex` が `/mcp` で接続済みになり `explain_brex` が動くことを確かめる（plugin の `mcpServers` に `env` を書かない判断、D-23）。動かなければ `plugin.json` に `env` を足す案を検討する。
 2. **D-25（設定ファイル）は 2026-10-27 15:10 頃に公開済み**: core 0.4.0、brex-mcp・verify-mcp・reader-mcp 0.3.0（npm・MCP Registry・claude-plugins。core `^0.4.0`）。Claude Desktop の plugin 版が `~/.config/s1000d-stack/config.json` の `specDir` を読み、`list_schemas`（Issue 7 の XSD 33 本）と `explain_brex`（既定 BREX）が動くことを確かめた。`-dev` 版も core 0.4.0 で作り直し済み。LaunchAgent は片付け済み。

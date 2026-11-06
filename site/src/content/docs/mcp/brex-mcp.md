@@ -32,7 +32,9 @@ These points are also written in the MCP `instructions` (the description placed 
 | `S1000D_SPEC_DIR` | The folder where the S1000D distribution is extracted. The default BREX is searched for under it. Extract the inner zip files as well |
 | `S1000D_CSDB_DIR` | The folder that holds the project's data modules. Several folders can be given, separated by `:` (`;` on Windows) |
 
-Folders can also be added with the tool argument `csdbDirs`. A BREX can be given as a file path, as a DMC (the `DMC-` prefix is optional), or omitted (the default BREX).
+Folders can also be given with the tool argument `csdbDirs`. When the argument is given, only those folders are used; `S1000D_CSDB_DIR` and `csdbDirs` in the config file are not used (they are not added together). The default BREX is still looked up under `S1000D_SPEC_DIR`. Folders that do not exist are skipped and listed in `_notes` of the response. A BREX can be given as a file path, as a DMC (the `DMC-` prefix is optional), or omitted (the default BREX).
+
+A mistake that the caller can fix by changing an argument is returned not as a tool failure (`isError`) but as `error: { code, path, detail }`, the same shape as the other S1000D Stack servers. `code` is one of `file-not-found` (no such file), `not-found` (the BREX given by DMC, or the default BREX, was not found) and `input-error` (an argument is malformed or missing), and `path` names the argument to fix (`/brex`, `/path` and so on).
 
 ```json
 {
