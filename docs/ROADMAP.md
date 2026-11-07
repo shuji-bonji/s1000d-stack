@@ -9,14 +9,18 @@ LLM が S1000D の技術文書を正しく読み、プロジェクトの決ま�
 - 段階 2 の設計: [design/verify-mcp.md](./design/verify-mcp.md)、[design/reader-mcp.md](./design/reader-mcp.md)、[design/manual-model.md](./design/manual-model.md)
 - 段階 2.5 の設計: [design/agent-platform.md](./design/agent-platform.md)
 - 段階 3 の設計: [design/writer-mcp.md](./design/writer-mcp.md)（writer）、[design/skills-and-editor.md](./design/skills-and-editor.md)（Skill 4 つと作成ツールの試作）
+- 製品の分離（2026-11-07、D-29）: [notes/editor-and-viewer-study.md](./notes/editor-and-viewer-study.md)（検討）、[design/player-and-editor.md](./design/player-and-editor.md)（体験型マニュアルの画面設計の草案）、[notes/ietp-kickoff.md](./notes/ietp-kickoff.md)（IETM / IETP の最初の文書の下書き）
 
 ## 目指すもの
 
-1. **一般向け**: 画面や機器の操作を体験しながら学べるマニュアルを、軽い Web 形式で作れるようにします（2021 年の作品 [experience_based_operation_explanation](https://github.com/shuji-bonji/experience_based_operation_explanation) の再構築）。
-2. **産業向け**: 同じデータを S1000D のデータモジュールとして出力・検査できるようにし、部品メーカーや技術マニュアル制作会社の作業を支援します。
-3. **組み込み基盤**（2026-10-25 に追加、D-19）: CSDB 製品にオーサリング支援・レビュー・翻訳・プロジェクト管理の AI エージェントを組み込めるようにする基盤を目指します。最低限の要件は、LLM エージェントが**スキーマ検証・クロスリファレンスチェック・適用性チェック・修正提案**をできることです。決定論的に確かめられることは core が行い、LLM は文章の生成と説明に限ります。設計は [design/agent-platform.md](./design/agent-platform.md)。
+> [!IMPORTANT]
+> 2026-11-07（D-29）に、製品（作成ツール・閲覧ソフト）を 2 つの別プロジェクトに分けました。s1000d-stack は 3 の**基盤**に専念し、1 と 2 はこの基盤を使う製品として別のプロジェクトで進めます。
 
-専門家エージェント（MCP と Skill）を先に作り、それを開発の道具として使いながら製品（作成ツール・閲覧ソフト）を作ります。
+1. **一般向け**（別プロジェクト「体験型マニュアル」。名前は U-05）: 画面や機器の操作を体験しながら学べるマニュアルを、軽い Web 形式で作れるようにします（2021 年の作品 [experience_based_operation_explanation](https://github.com/shuji-bonji/experience_based_operation_explanation) の再構築）。データモデル `experiential-manual-model` は基盤側に残し、player・editor・cli を製品側で作ります。検討は [notes/editor-and-viewer-study.md](./notes/editor-and-viewer-study.md)、画面設計は [design/player-and-editor.md](./design/player-and-editor.md)。
+2. **産業向け**（別プロジェクト「IETM / IETP」）: S1000D の CSDB を Web で表示する閲覧ソフト（IETP の最小形）から始め、作成・公開まで広げます。輸出先から S1000D を求められる日本の中小企業の作業を支援することを目指します。最初の文書の下書きは [notes/ietp-kickoff.md](./notes/ietp-kickoff.md)。
+3. **組み込み基盤**（2026-10-25 に追加、D-19。**このプロジェクトの主題**）: CSDB 製品にオーサリング支援・レビュー・翻訳・プロジェクト管理の AI エージェントを組み込めるようにする基盤を目指します。最低限の要件は、LLM エージェントが**スキーマ検証・クロスリファレンスチェック・適用性チェック・修正提案**をできることです。決定論的に確かめられることは core が行い、LLM は文章の生成と説明に限ります。設計は [design/agent-platform.md](./design/agent-platform.md)。
+
+専門家エージェント（MCP と Skill）を先に作り、2 つの製品プロジェクトがそれを開発の道具として使います。製品側で足りなかったものは core・MCP に戻します（D-19）。
 
 ## 全体像
 
@@ -37,22 +41,24 @@ flowchart TB
     V["s1000d-verify-mcp"]
     W["s1000d-writer-mcp"]
   end
-  subgraph App["app/"]
-    ED["作成ツール"]
-    VW["閲覧ソフト（WebMCP 対応）"]
-  end
   SK["skill/<br/>変換・作成・受入検査の手順"]
+  subgraph Products["別プロジェクト（D-29）"]
+    XM["体験型マニュアル<br/>player / editor / cli"]
+    IETP["IETM / IETP<br/>CSDB の閲覧ソフト → 作成・公開"]
+  end
   BREX --> CORE
   R --> CORE
   V --> CORE
   W --> CORE
   W --> MODEL
-  ED --> MODEL
-  VW --> MODEL
   SK -.呼び出す.-> Mcp
+  XM --> MODEL
+  XM -. to-s1000d .-> CORE
+  IETP --> CORE & Mcp
+  IETP -. 図＋ホットスポットの表示部品 .-> XM
 ```
 
-experiential-manual-model（文書の中では「manual-model」と略します。U-04）は s1000d-core に依存させません。一般向けの製品が S1000D の概念を抱え込まないようにするためです（D-01、D-09）。S1000D との変換関数は writer 側に置きます。
+experiential-manual-model（文書の中では「manual-model」と略します。U-04）は s1000d-core に依存させません。一般向けの製品が S1000D の概念を抱え込まないようにするためです（D-01、D-09）。S1000D との変換関数は writer 側に置きます。製品 2 つは別プロジェクトで、この図では基盤との依存だけを示します（D-29）。
 
 ## 段階
 
@@ -62,16 +68,16 @@ experiential-manual-model（文書の中では「manual-model」と略します�
 | 2 | s1000d-reader-mcp、s1000d-verify-mcp、manual-model | 公式 XSD（利用者が入手したもの）による検証、参照の解決、適用性の判定ができる。reader の応答には対象データモジュールの版（issue）と検証状態を必ず含め、適用性の判定は reader が済ませてから LLM に渡す。**段階 2 は 2026-10-26 に完了**（3 部品と brex-mcp を npm に公開、hub と学習サイトを公開） |
 | 2.5 | 修正提案（verify-mcp `suggest_fixes`）、`CsdbSource` インターフェース、HTTP transport、DML・DDN の読み取り、サイトの「組み込み基盤」のページ | LLM エージェントがスキーマ検証・クロスリファレンスチェック・適用性チェック・修正提案の 4 つをできる。修正提案の候補は core が決め、LLM は候補の外の値を出さない。CSDB をフォルダー以外（製品のデータベース・API）から読める。**段階 2.5 は 2026-10-28 に完了**（core 0.7.0、brex-mcp 0.4.0、verify-mcp 0.6.0、reader-mcp 0.7.0 を公開） |
 | 3 | s1000d-writer-mcp（LLM に XML を書かせず、構造化された入力から組み立てて「生成 → 検証 → 修正」を回す）、Skill（experience-to-s1000d / s1000d-publish / s1000d-review / s1000d-translate。STE の用語集は利用者のものを参照）、作成ツールの試作、comment DM の生成、翻訳向けの文の抜き出しと差し戻し | 券売機の例を共通データモデル経由で S1000D に出力し、verify を通る。**writer の実装は 2026-10-28 に済み、完了条件をテストで満たした**（core 0.8.0・writer-mcp 0.1.0。同日に npm に公開）。Skill と作成ツールの試作は残る |
-| 4 | 閲覧ソフト。最初の成果物は、S1000D の CSDB を直接表示する簡易な技術マニュアルの Web システム（基盤の参照実装。設計は [design/agent-platform.md](./design/agent-platform.md)「参照実装」）。その後に共通データモデルを表示する閲覧ソフト | 簡易 Web マニュアルで、PM の目次から DM をたどり、製品を選ぶと当てはまらない節が消え、参照先へ移れ、各ページに版・検証状態・機密区分が出る。閲覧ソフトは共通データモデルを表示し、WebMCP で AI が操作を案内できる |
+| 4 | ~~閲覧ソフト~~ → **別プロジェクトへ移管（2026-11-07、D-29）**。S1000D の CSDB を直接表示する簡易な技術マニュアルの Web システム（[design/agent-platform.md](./design/agent-platform.md)「参照実装」）は IETM / IETP プロジェクトの最初の成果物に、共通データモデルを表示する閲覧ソフトは体験型マニュアルプロジェクトの player になる | 基盤側に残る仕事は、2 つの製品から戻ってくる core・MCP への要望（API の不足、`CsdbSource` の実装、WebMCP 向けの読み取り）に応えること。完了の条件は製品側の文書に書く |
 
 ```mermaid
 flowchart LR
   S1["段階 1<br/>hub ＋ core ＋ brex"] --> S2["段階 2<br/>reader ＋ verify ＋ model"]
   S2 --> S25["段階 2.5<br/>修正提案 ＋ 組み込みの土台"]
-  S25 --> S3["段階 3<br/>writer ＋ Skill ＋ 作成ツール"]
-  S2 --> S3b["段階 3（並行）<br/>作成ツールの試作"]
-  S3 --> S4["段階 4<br/>閲覧ソフト"]
-  S3b --> S4
+  S25 --> S3["段階 3<br/>writer ＋ Skill ＋ 作成ツールの試作"]
+  S3 --> XM["別プロジェクト<br/>体験型マニュアル"]
+  S3 --> IETP["別プロジェクト<br/>IETM / IETP"]
+  XM & IETP -. 要望を戻す .-> S1
 ```
 
 ## 段階 1 の作業（完了）

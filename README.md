@@ -74,7 +74,7 @@ The expert agents (MCP and Skills) come first; the products (authoring tool and 
 
 <!-- stack:begin — scripts/generate-stack.mjs が生成。手で編集しない -->
 
-> Versions are measured (`npm view` as of 2026-11-06).
+> Versions are measured (`npm view` as of 2026-11-07).
 
 | Repository | Layer | Form | Status | Version | npm |
 | --- | --- | --- | --- | --- | --- |
@@ -88,8 +88,6 @@ The expert agents (MCP and Skills) come first; the products (authoring tool and 
 | [s1000d-publish-skill](https://github.com/shuji-bonji/s1000d-publish-skill) | procedure | skill | released | 0.1.2 | — |
 | [s1000d-review-skill](https://github.com/shuji-bonji/s1000d-review-skill) | procedure | skill | released | 0.1.1 | — |
 | [s1000d-translate-skill](https://github.com/shuji-bonji/s1000d-translate-skill) | procedure | skill | released | 0.1.1 | — |
-| manual-editor | app | app | in development | 0.1.0 | — |
-| manual-viewer | app | app | concept | — | — |
 
 <!-- stack:end -->
 

@@ -74,7 +74,7 @@ flowchart TB
 
 <!-- stack:begin — scripts/generate-stack.mjs が生成。手で編集しない -->
 
-> 版は実測（2026-11-06 時点の `npm view`）。
+> 版は実測（2026-11-07 時点の `npm view`）。
 
 | リポジトリ | 役割 | 配布形態 | 状態 | 版 | npm |
 | --- | --- | --- | --- | --- | --- |
@@ -88,8 +88,6 @@ flowchart TB
 | [s1000d-publish-skill](https://github.com/shuji-bonji/s1000d-publish-skill) | procedure | skill | 公開済み | 0.1.2 | — |
 | [s1000d-review-skill](https://github.com/shuji-bonji/s1000d-review-skill) | procedure | skill | 公開済み | 0.1.1 | — |
 | [s1000d-translate-skill](https://github.com/shuji-bonji/s1000d-translate-skill) | procedure | skill | 公開済み | 0.1.1 | — |
-| manual-editor | app | app | 開発中 | 0.1.0 | — |
-| manual-viewer | app | app | 構想 | — | — |
 
 <!-- stack:end -->
 

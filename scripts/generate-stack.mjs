@@ -76,16 +76,12 @@ const REGISTRY = [
     note: '段階 3。データモジュールを別の言語に訳す Skill（writer の extract_segments / apply_segments、xcomet による採点）。plugin 名 s1000d-translate' },
   { name: 's1000d-stack',     dir: '.',                    npm: null,                            layer: 'hub',  form: 'site',       status: 'developing', public: true,
     note: '本リポジトリ。site/ に Astro Starlight の学習サイト（GitHub Pages で公開。英語がルート、日本語は /ja/）' },
-
-  // ── 開発中（ディレクトリはあるが npm 未公開。照合しない）・予定・構想 ──────────
-  { name: 'manual-editor',     dir: 'app/manual-editor',     npm: null,                             layer: 'app',  form: 'app',        status: 'developing', public: false,
-    note: '段階 3。体験型マニュアルの作成ツールの試作（SvelteKit ＋ PWA、D-28）。製品名は未定（U-05）で、manual-editor は仮称。AI が無くても動く' },
-  { name: 'manual-viewer',     dir: 'app/manual-viewer',     npm: null,                             layer: 'app',  form: 'app',        status: 'concept', public: false,
-    note: '段階 4。閲覧ソフト（WebMCP 対応）。製品名は未定（U-05）' },
 ];
 
 /** 外部にあり、この束ねの配下に置かないもの（参照だけ残す） */
 const EXTERNAL = [
+  { name: '体験型マニュアル（別プロジェクト。製品名は U-05）', layer: 'app', form: 'app', public: false, note: 'D-29 で分離。experiential-manual-model を読み書きする player（Web Components）・editor・cli。試作 manual-editor はここへ移す。この基盤を使う製品' },
+  { name: 'IETM / IETP（別プロジェクト）', layer: 'app', form: 'app', public: false, note: 'D-29 で分離。S1000D の CSDB を表示する Web の閲覧ソフトから始め、作成・公開まで広げる。段階 4 の参照実装はここへ移す。この基盤を使う製品' },
   { name: 'S1000D 配布物（s1000d.org）', layer: 'source', form: 'data', public: false, note: '仕様書 PDF・XSD・既定 BREX・公式サンプル。利用条件により再配布できないため、利用者が入手して S1000D_SPEC_DIR で指定する' },
   { name: 'i2oss/s1000d-mcp', layer: 'mcp', form: 'mcp-server', public: true, note: 'Python の S1000D MCP（自作サブセット XSD、参照・適用性）。依存しない。参照・適用性の実装の参考' },
   { name: 'Zenn Book「IETM入門 — 概念から S1000D まで」', layer: 'learning', form: 'book', public: true, note: '概念の入門はこちら。サイトはこのスタックの利用者向けの説明に絞る' },

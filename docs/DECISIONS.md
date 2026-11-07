@@ -287,6 +287,17 @@ flowchart LR
 - GitHub のリポジトリ（Skill 4 つと manual-editor）は利用者が Private で作り、中身はチャットで作る。
 - 設計は [design/skills-and-editor.md](./design/skills-and-editor.md)。
 
+### D-29 製品は 2 つの別プロジェクトに分け、s1000d-stack は基盤に専念する（2026-11-07）
+
+- 作成ツール・閲覧ソフト（段階 3 の試作と段階 4）を s1000d-stack から切り離し、次の 2 つの別プロジェクトにする。s1000d-stack は core・MCP・Skill・experiential-manual-model の**基盤**だけを持ち、製品を持たない。
+  - **体験型マニュアル**（一般向けの製品。名前は U-05）: `experiential-manual-model` を読み書きする player（Svelte の部品 ＋ Web Components `<experiential-manual>`）、editor、cli（`validate` / `build` / `to-s1000d`）。速く作り、実例（e-shiwake のヘルプ）で直す。
+  - **IETM / IETP**（産業向けの製品）: S1000D の CSDB を表示する Web の閲覧ソフト（IETP の最小形）から始め、作成・公開まで広げる。仕様書を読みながらじっくり進める。段階 4 の「簡易な技術マニュアルの Web システム」（[design/agent-platform.md](./design/agent-platform.md)「参照実装」）はここへ移す。
+- 理由は 3 つ。(1) 進め方の速さが違う。同じ ROADMAP に置くと、片方の判断がもう片方を止める。(2) 体験型マニュアルは「画面の操作」を題材にした一般向けの製品で、S1000D の名前を付けない（D-01）。IETM / IETP は S1000D の CSDB を扱う産業向けの製品で、利用者も題材も違う。(3) D-19 の「製品は基盤の最初の利用者」は、製品が別のプロジェクトにあっても成り立つ。製品側で足りなかったものを core・MCP に戻す流れは変えない。
+- 共有する部品の置き場所。`experiential-manual-model` は基盤（s1000d-stack の `lib/`）に残す（writer の `convert_manual` が使う）。図＋ホットスポットの表示部品（player の Stage）は体験型マニュアル側に置き、IETM / IETP 側は npm で取る。S1000D の語を持たない部品に IETP 側が依存するのは問題ない。逆（player が core に依存する）は作らない。
+- IETM / IETP 側の CSDB の仕組み（版・状態・履歴・DML/DDN・権限）は、最初はフォルダー ＋ Git で代える。DB の CSDB は自分では作らず、製品ベンダーには `CsdbSource` の差し替え（D-19）で対応する。
+- hub の整理。`stack.json` と README の表から `manual-editor` / `manual-viewer` の行を外し、`generate-stack.mjs` の EXTERNAL に 2 つのプロジェクトへの参照を置く。ROADMAP の「目指すもの」は 3（組み込み基盤）を主にし、1・2 は「この基盤を使う製品」として参照する。段階 4 の行は IETM / IETP プロジェクトへの参照に置き換える。`app/manual-editor` の作業コピーは、体験型マニュアルのプロジェクトのフォルダーへ移す（hub の `.gitignore` の `/app/` は残してよい）。
+- 検討の経過は [notes/editor-and-viewer-study.md](./notes/editor-and-viewer-study.md)、画面設計の草案は [design/player-and-editor.md](./design/player-and-editor.md)。どちらも体験型マニュアルのプロジェクトへ移す対象だが、決定の根拠として hub にも残す。IETM / IETP の最初の文書の下書きは [notes/ietp-kickoff.md](./notes/ietp-kickoff.md)。
+
 ## 未決事項
 
 | ID | 内容 | 判断の材料 |
@@ -295,7 +306,7 @@ flowchart LR
 | ~~U-02~~ | Issue 7 の利用条件の全文に、再配布や組み込みについての特別な許可があるか | **解決（2026-10-23）**: 無い。「Special usage rights」の対象は 8 区分の団体・企業・機関に限られる。D-03 に反映済み |
 | U-03 | 自作サンプルデータを共有パッケージに切り出す時期 | 2 つ目の MCP がテストで使い始めた時点を目安にする |
 | ~~U-04~~ | 共通データモデルのパッケージ名 | **解決（2026-10-24）**: `@shuji-bonji/experiential-manual-model`（GitHub は `shuji-bonji/experiential-manual-model`、ローカルは `s1000d-stack/lib/experiential-manual-model`）。`manual-model` だけでは IETM や S1000D 一般のマニュアルのモデルと受け取られるため、「体験型」を表す `experiential` を入れる。npm で `experiential-manual-model` / `experiential-manual` / `experience-manual-model` / `xp-manual-model` が空いていることを 2026-10-24 に確認した。文書の中では引き続き「manual-model」と略して書くことがある |
-| U-05 | 作成ツール・閲覧ソフトの製品名 | 一般の利用者向けの名前にする。試作の間は仮称 `manual-editor`（D-28） |
+| U-05 | 体験型マニュアルの製品名 | 一般の利用者向けの名前にする。試作の間は仮称 `manual-editor`（D-28）。D-29 で製品は別プロジェクトになったので、名前はそのプロジェクトで決め、決まったら player / editor / cli に同じ語を頭に付ける。IETM / IETP のプロジェクト名も別に決める |
 | ~~U-10~~ | 簡易 Web マニュアル（段階 4 の参照実装）の技術の選定 | **解決（2026-10-28）**: SvelteKit ＋ PWA（D-28）。作成ツールの試作も同じ |
 | ~~U-06~~ | Starlight の日本語検索の精度 | **解決（2026-10-24）**: 生成された Pagefind の索引を Node から検索して確認。単語（照合・券売機・適用性・識別・商標）は期待どおり。Pagefind は日本語を単語に分けて索引するため、「データモジュール」のような複合語をそのまま入れると同じつながりで現れたページ（1 件）だけが返り、「データ モジュール」と空けると 9 件になる。サイトの見出しに主要な複合語をそのまま書くことで補う |
 | U-07 | Issue 4.2 に対応する時期 | 段階 2 で reader を作るときに判断する。Issue 4.2 以降の ICN メタデータファイル（IMF）を reader の対象に含めるかも一緒に判断する |

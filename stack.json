@@ -6,7 +6,7 @@
     "layer = 役割 / form = 配布形態（誰が起動するか）/ status = released・developing・planned・concept。",
     "developing はリポジトリで開発中で npm 未公開。planned / concept はディレクトリも npm も無い。"
   ],
-  "generatedAt": "2026-11-06T08:47:52.365Z",
+  "generatedAt": "2026-11-07T13:13:07.674Z",
   "generatedBy": "scripts/generate-stack.mjs",
   "npmScope": "@shuji-bonji",
   "repos": [
@@ -234,52 +234,29 @@
         "version": null,
         "tag": null,
         "dirty": true,
-        "unpushedCommits": 0
+        "unpushedCommits": 1
       },
       "consistency": {
         "status": "developing",
         "detail": "npm 未公開（開発中）。照合対象外"
-      }
-    },
-    {
-      "name": "manual-editor",
-      "dir": "app/manual-editor",
-      "npm": null,
-      "layer": "app",
-      "form": "app",
-      "status": "developing",
-      "public": false,
-      "note": "段階 3。体験型マニュアルの作成ツールの試作（SvelteKit ＋ PWA、D-28）。製品名は未定（U-05）で、manual-editor は仮称。AI が無くても動く",
-      "published": null,
-      "local": {
-        "version": "0.1.0",
-        "tag": null,
-        "dirty": true,
-        "unpushedCommits": 0
-      },
-      "consistency": {
-        "status": "developing",
-        "detail": "npm 未公開（開発中）。照合対象外"
-      }
-    },
-    {
-      "name": "manual-viewer",
-      "dir": "app/manual-viewer",
-      "npm": null,
-      "layer": "app",
-      "form": "app",
-      "status": "concept",
-      "public": false,
-      "note": "段階 4。閲覧ソフト（WebMCP 対応）。製品名は未定（U-05）",
-      "published": null,
-      "local": null,
-      "consistency": {
-        "status": "not_started",
-        "detail": "concept（未着手のため照合対象外）"
       }
     }
   ],
   "external": [
+    {
+      "name": "体験型マニュアル（別プロジェクト。製品名は U-05）",
+      "layer": "app",
+      "form": "app",
+      "public": false,
+      "note": "D-29 で分離。experiential-manual-model を読み書きする player（Web Components）・editor・cli。試作 manual-editor はここへ移す。この基盤を使う製品"
+    },
+    {
+      "name": "IETM / IETP（別プロジェクト）",
+      "layer": "app",
+      "form": "app",
+      "public": false,
+      "note": "D-29 で分離。S1000D の CSDB を表示する Web の閲覧ソフトから始め、作成・公開まで広げる。段階 4 の参照実装はここへ移す。この基盤を使う製品"
+    },
     {
       "name": "S1000D 配布物（s1000d.org）",
       "layer": "source",
