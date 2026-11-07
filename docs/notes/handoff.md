@@ -1,4 +1,4 @@
-# 引き継ぎメモ（2026-11-06 JST 更新。本文の大半は 2026-10-29 23:45 JST 時点）
+# 引き継ぎメモ（2026-11-08 JST 更新。「いまどこにいるか」以降の本文の大半は 2026-10-29 23:45 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
@@ -8,6 +8,38 @@
 > 2. S1000D の仕様書・XSD・既定 BREX・公式サンプルは、どのリポジトリにも npm パッケージにもコミットしない（D-03）。置き場所は `s1000d-stack/specs/s1000d/`（git 管理外、D-06）。
 > 3. `docs/` の文書（ROADMAP・DECISIONS・notes/ の 6 本・design/ の 6 本）は、ローカル `s1000d-stack/docs/` と claude.ai Project「S1000D Stack」のナレッジの両方に同じ内容を置く。片方だけ直さない。
 > 4. サイトと README は英語がルート、日本語が `/ja/` と `README.ja.md`（D-22）。一次執筆は日本語で、英語は `notes/glossary.md` と `notes/en-writing-guide.md` に従って訳す。ページの完了条件は「日本語と英語の両方が揃うこと」。
+
+## 2026-11-08 の状態と、次のチャットで最初にやること
+
+> [!IMPORTANT]
+> 2026-11-07 に **D-29** で製品を 2 つの別プロジェクトに分けました。s1000d-stack はこれから **基盤（core・MCP・Skill・experiential-manual-model）だけ**を持ちます。ROADMAP の「目指すもの」「全体像」「段階 4」、`stack.json`、README（日英）、サイトの `guide/architecture` ほかは分離後の形に直し、コミット済みです（`77d604c`・`b75a947`。`b75a947` は Mac で `cd site && npm run build` を通してから push する）。
+
+| 何が | どこに | 状態 |
+|---|---|---|
+| 作成ツール・閲覧ソフトの検討メモ | [notes/editor-and-viewer-study.md](./editor-and-viewer-study.md) | 済み。候補のツール、構成案、題材の選定（8 節・8-2 節）、決めること |
+| 体験型マニュアルの画面設計の草案 | [design/player-and-editor.md](../design/player-and-editor.md) | 済み。player を先に作り、editor を編集モードとして重ねる。作る順序は同文書 6 節 |
+| IETM / IETP プロジェクトの最初の文書 | [notes/ietp-kickoff.md](./ietp-kickoff.md) | 下書き。新しいリポジトリと Claude プロジェクトを作ったら、そこへ移して ROADMAP の元にする（利用者） |
+| 作成ツールの試作 manual-editor | `/Users/bonji/workspace/shuji-bonji/webapps/manual-editor`（hub の `app/` から移した）。GitHub `shuji-bonji/manual-editor`（Private）に初回コミット `23c1e88` を push 済み、CI（Vitest 32 件）緑 | 上の 2 文書の写しを `docs/` に置き、hub への相対リンクは GitHub の URL に直してある。体験型マニュアルの製品プロジェクトの中心のリポジトリ |
+
+### 次にやること（この順）
+
+1. **experiential-manual-model 0.2.0**（基盤側。**このプロジェクトで行う**）。設計は player-and-editor.md 6 節の作業 1 と editor-and-viewer-study.md 6 節。
+   - `AssetFile` に `width` / `height`（任意）。`AssetFile.path`（ファイル名または URL）と、data URL を入れる `data`（任意）を分ける。`validateManual` は `path` と `data` の両方が無いときだけ誤りにする
+   - `Screen.capture`（任意）: `{ url, viewport: { width, height }, capturedAt }`。`Hotspot.capture`（任意）: `{ selector }`
+   - `Admonition.title`（任意）
+   - `Screen` の JSDoc と README に「画像はスクリーンショットに限らない（操作パネルの写真・分解図でもよい）」と書く
+   - JSON Schema・`types.ts`・テスト（Schema と型の一致、券売機の例、2021 年の JSON）を更新し、CHANGELOG 0.2.0。既存の JSON はそのまま読める（追加だけ。破壊的な変更は無い）
+   - 公開は利用者（`docs/RELEASE.md`。タグ push）。manual-editor 側の依存を `^0.2.0` に上げるのは製品側の作業
+2. **player の切り出し**（製品側。manual-editor のプロジェクトで行う。新しい Claude プロジェクトを作るか、既存の「S1000D Stack」に `webapps/manual-editor` を足すかは利用者が決める）。設計は player-and-editor.md 1〜2 節・6 節の作業 2〜4
+3. **editor の組み直し**（製品側）。同 3 節・7 節（試作から残すもの・捨てるもの）
+4. **IETM / IETP プロジェクトの立ち上げ**（利用者）。ietp-kickoff.md 5 節の段階 0
+5. 基盤側の残り: 製品側から戻ってくる要望（`issueInfo` を上げる操作、DML・DDN を書く処理、`ContentNode` の書き出し）は、要望が来てから ROADMAP に足す
+
+### 作業の進め方で決まっていること
+
+- hub の `docs/` は、ローカルと claude.ai Project「S1000D Stack」のナレッジの両方に同じ内容を置く（従来どおり）。manual-editor の `docs/` は manual-editor のリポジトリが正本。
+- git のコミットはチャットから行ってよい。接続フォルダー（`/Users/bonji/workspace/shuji-bonji`）の削除の許可を得ると、git のロックファイルも消せる。push は Mac のキーチェーンが要るので利用者が行う。
+- チャットの Linux VM では Mac の `node_modules` を使わない（下の TIP）。サイトの build は Mac で確かめる。
 
 ## いまどこにいるか
 
@@ -184,7 +216,7 @@ brex-mcp・verify-mcp・reader-mcp・experiential-manual-model に、core と同
 2. DECISIONS.md（D-01〜D-28 と未決 U-03・U-05・U-07・U-09・U-10）
 3. notes/background.md（仕様書の読解結果、配布物のファイル構成、設計のヒント）
 4. このメモ
-5. design/ の 6 文書（着手する作業に応じて。段階 3 は writer-mcp.md と skills-and-editor.md）
+5. design/ の 7 文書（着手する作業に応じて。段階 3 は writer-mcp.md と skills-and-editor.md。製品の分離の後は player-and-editor.md）と、notes/editor-and-viewer-study.md・notes/ietp-kickoff.md（2026-11-07〜08 の検討。上の「2026-11-08 の状態」から読む）
 6. notes/site-review.md（サイト通読用の照合シート。通読は 2026-10-24 に完了。記述の根拠を探すときに参照）
 7. notes/glossary.md と notes/en-writing-guide.md（英語版を書く・直すときの対訳表と指針）、notes/i18n-trial.md（多言語化の経過と運用）
 
