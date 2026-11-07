@@ -1,4 +1,4 @@
-# 引き継ぎメモ（2026-11-08 JST 更新。「いまどこにいるか」以降の本文の大半は 2026-10-29 23:45 JST 時点）
+# 引き継ぎメモ（2026-11-08 04:10 JST 更新。「いまどこにいるか」以降の本文の大半は 2026-10-29 23:45 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
@@ -23,13 +23,9 @@
 
 ### 次にやること（この順）
 
-1. **experiential-manual-model 0.2.0**（基盤側。**このプロジェクトで行う**）。設計は player-and-editor.md 6 節の作業 1 と editor-and-viewer-study.md 6 節。
-   - `AssetFile` に `width` / `height`（任意）。`AssetFile.path`（ファイル名または URL）と、data URL を入れる `data`（任意）を分ける。`validateManual` は `path` と `data` の両方が無いときだけ誤りにする
-   - `Screen.capture`（任意）: `{ url, viewport: { width, height }, capturedAt }`。`Hotspot.capture`（任意）: `{ selector }`
-   - `Admonition.title`（任意）
-   - `Screen` の JSDoc と README に「画像はスクリーンショットに限らない（操作パネルの写真・分解図でもよい）」と書く
-   - JSON Schema・`types.ts`・テスト（Schema と型の一致、券売機の例、2021 年の JSON）を更新し、CHANGELOG 0.2.0。既存の JSON はそのまま読める（追加だけ。破壊的な変更は無い）
-   - 公開は利用者（`docs/RELEASE.md`。タグ push）。manual-editor 側の依存を `^0.2.0` に上げるのは製品側の作業
+1. **experiential-manual-model 0.2.0 は 2026-11-08 04:00 JST 頃に実装・コミット済み**（`lib/experiential-manual-model` の `3f49e56`。テスト 13 件、`tsc`・`eslint`・`prettier --check` とも通過。結果は ROADMAP「進捗（段階 3）」の「model 0.2.0」の行）。**残りは公開（利用者）**: `cd lib/experiential-manual-model && git push && git tag v0.2.0 && git push --tags`（`package.json` は 0.2.0 に上げてあるので `npm version` は使わない。`publish.yml` が package.json の版とタグの一致を確かめてから公開する）。
+   - 入れたもの: `AssetFile.path`（ファイル名または URL）と `data`（data URL）を分け、どちらか一方を必須に。`width` / `height`（任意、1 以上の整数）。`Screen.capture`（任意、`{ url, viewport?: { width, height }, capturedAt? }`）。`Hotspot.capture`（任意、`{ selector }`）。`Admonition.title`（任意）。`Screen` の JSDoc と README（日英）に「画像はスクリーンショットに限らない」。`fromLegacyJson` は `imageUrl` が data URL なら `source.data` に入れる。券売機の例に新しい項目を足した（`img-top` ほか 4 枚に 1280×1024、`scr-top` に `capture`、手順の caution に `title`）
+   - 製品側（manual-editor）の依存を `^0.2.0` に上げるのは製品側の作業。**writer-mcp も `^0.2.0` に上げるときは** `src/convert/manual-to-draft.ts` の `extname(asset.source.path)` が `path` の任意化で型エラーになるので、`data`（data URL）のときの扱い（`mediaType` から拡張子を決める、または `assetFormats` を要求する）を足す。`^0.1.0` のままなら 0.2.0 は入らないので、いまは壊れない
 2. **player の切り出し**（製品側。manual-editor のプロジェクトで行う。新しい Claude プロジェクトを作るか、既存の「S1000D Stack」に `webapps/manual-editor` を足すかは利用者が決める）。設計は player-and-editor.md 1〜2 節・6 節の作業 2〜4
 3. **editor の組み直し**（製品側）。同 3 節・7 節（試作から残すもの・捨てるもの）
 4. **IETM / IETP プロジェクトの立ち上げ**（利用者）。ietp-kickoff.md 5 節の段階 0
@@ -71,7 +67,7 @@ flowchart LR
 | [shuji-bonji/s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | Public | `@shuji-bonji/s1000d-brex-mcp` **0.4.0**（2026-10-27 夜、`publish.yml` 経由。core `^0.4.0`） | 0.2.0 で `list_notations` の `effectiveFor` に `mode` / `excluded`、0.3.0 で設定ファイル（D-25）。npm・MCP Registry・claude-plugins とも 0.3.0。0.4.0 で `--http`（作業 4）。npm・MCP Registry・claude-plugins とも 0.4.0。core の依存は `^0.4.0` のまま（`CsdbSource` を使わないため。次に core の minor を上げるときに揃える）。main は origin と一致。[Issue #1](https://github.com/shuji-bonji/s1000d-brex-mcp/issues/1) は開いたまま |
 | [shuji-bonji/s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | Public | `@shuji-bonji/s1000d-verify-mcp` **0.6.0**（2026-10-28 10:50 JST 頃、`publish.yml` 経由。core `^0.6.0`） | 0.2.0 で 6 ツール目 `suggest_fixes`、0.3.0 で設定ファイル、0.4.0 で `verify_csdb` を `index.read(o)` に（作業 3）、0.5.0 で `--http`（作業 4）。npm・MCP Registry・claude-plugins とも 0.5.0。0.6.0 で 7 本目のツール `reconcile_dml`（作業 5、core `^0.6.0`）。npm・MCP Registry・claude-plugins とも 0.6.0（作業 8 はテストだけなので公開していない）。main は origin と一致。[Issue #1](https://github.com/shuji-bonji/s1000d-verify-mcp/issues/1) は開いたまま |
 | [shuji-bonji/s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | Public | `@shuji-bonji/s1000d-reader-mcp` **0.7.0**（2026-10-28 11:30 JST 頃、`publish.yml` 経由。core `^0.7.0`） | 0.2.0 で ACT・CCT・PCT の探索を core の `findApplicTables` に切り替え、0.3.0 で設定ファイル、0.4.0 で CSDB の中身を `index.read(o)` で読む（作業 3）、0.5.0 で `--http`（作業 4）。npm・MCP Registry・claude-plugins とも 0.5.0。0.6.0 で `list_data_modules` の DML・DDN の行に照合の集計（作業 5、core `^0.6.0`）。0.7.0 で `section: "outline"`、先頭の `securityClassification`、本文の `size`（作業 7、core `^0.7.0`）。npm・MCP Registry・claude-plugins とも 0.7.0。main は origin と一致。[Issue #1](https://github.com/shuji-bonji/s1000d-reader-mcp/issues/1) は開いたまま |
-| [shuji-bonji/experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | Public | `@shuji-bonji/experiential-manual-model` **0.1.0**（2026-10-26 16:26 JST、同上） | 型・JSON Schema・`validateManual`・`fromLegacyJson`。`schema/` と `examples/` も配布物に含む |
+| [shuji-bonji/experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | Public | `@shuji-bonji/experiential-manual-model` **0.1.0**（2026-10-26 16:26 JST、同上）。**0.2.0 はローカルの `3f49e56` でコミット済み、未 push・未公開**（タグ `v0.2.0` の push で `publish.yml` が公開する） | 型・JSON Schema・`validateManual`・`fromLegacyJson`。`schema/` と `examples/` も配布物に含む。0.2.0 で `AssetFile.path` / `data` の分離と `width` / `height`、`Screen.capture`・`Hotspot.capture`・`Admonition.title` |
 | [shuji-bonji/s1000d-stack](https://github.com/shuji-bonji/s1000d-stack)（hub） | Public（2026-10-26） | — | 学習サイトは https://shuji-bonji.github.io/s1000d-stack/ （英語。日本語は `/ja/`）。`deploy.yml` は `main` への push（`site/**` と自身）で配備、`stack-check.yml` は毎日。**git のコミットはチャットから行ってよい**（2026-10-24 に利用者が指示。接続フォルダーの削除の許可を得れば git のロックファイルも消せる）。署名は利用者が後で付け直す |
 | [shuji-bonji/s1000d-writer-mcp](https://github.com/shuji-bonji/s1000d-writer-mcp) | push 済み（Public かは要確認） | `@shuji-bonji/s1000d-writer-mcp` **0.1.1**（0.1.0 は 2026-10-28 16:30 JST 頃に初回の手動 `npm publish`。0.1.1 は 17:10 JST 頃にタグ push → `publish.yml`。npm・MCP Registry・claude-plugins とも 0.1.1） | 2026-10-28 にローカルで実装（6 ツール `build_data_module` / `convert_manual` / `apply_fixes` / `create_comment` / `extract_segments` / `apply_segments`、`--http`、設定ファイル、plugin.json / server.json、CI / publish、README 日英、CHANGELOG「未リリース」）。コミット・push 済み（main は origin と一致）。core の依存は `^0.8.0`（lock も 0.8.0）。テストは自作 36 件・配布物 2 件。MCP Registry（`io.github.shuji-bonji/s1000d-writer-mcp`、0.1.1）と claude-plugins（plugin 名 `s1000d-writer-mcp`、marketplace 0.8.0）に登録済み。0.1.1 は入力スキーマの修正: `draft`・`allocation` を `$ref` だけで書いていたため、`$ref` を解決しない Claude Desktop がオブジェクトを文字列として渡し `data/draft must be object` で拒否された。`$defs` の定義を引数の位置に展開して直した |
 
@@ -120,6 +116,8 @@ cd site && npm run build && npm run preview
 > ```
 >
 > VM の npm は 10.9.9 で、Mac の npm 12 が書いた lock を読めず `Cannot read properties of null (reading 'edgesOut')` で失敗することがあるので、npm は `npx -y npm@12` で呼ぶ。
+>
+> 2026-11-08 に分かったこと: VM のユーザー ID はセッションごとに変わる（この日は uid 1527）。前のセッションが作った `/var/tmp/vmroot` と `/var/tmp/npm-cache` は所有者が `nobody` になっていて書けず、`~/vm` のシンボリックリンク先に使うと rsync が `Permission denied` で止まる。`/sessions`（ホーム）は空きが 100 MB 台しか無い。`mkdir /var/tmp/vmroot-$(id -u)` を作って `~/vm` をそこへ向け、`~/vmrun.sh` の先頭に `export npm_config_cache=/var/tmp/npm-cache-$(id -u)` を足すと動く（上のスクリプトにはこの 1 行が無いので、作り直すときに足す）。
 
 ## 次にやること
 
