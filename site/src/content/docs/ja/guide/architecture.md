@@ -1,9 +1,9 @@
 ---
 title: 全体構成
-description: s1000d-stack を構成する共有ライブラリ・MCP サーバー・Skill・製品と、それぞれを何に使うかを説明します。
+description: s1000d-stack を構成する共有ライブラリ・MCP サーバー・Skill と、それぞれを何に使うか、そしてこの基盤を使う製品との関係を説明します。
 ---
 
-s1000d-stack は、共有ライブラリ・MCP サーバー・Skill・製品の 4 種類の部品からなります。共有ライブラリが S1000D の処理（読み取り・検証・組み立て）を持ち、MCP サーバーがその処理を LLM から呼べるツールにし、Skill がツールを呼ぶ順番と利用者に確かめることを LLM に伝えます。製品（作成ツール・閲覧ソフト）は、AI が無くても動く、人が使うソフトです。
+s1000d-stack は、共有ライブラリ・MCP サーバー・Skill の 3 種類の部品からなります。共有ライブラリが S1000D の処理（読み取り・検証・組み立て）を持ち、MCP サーバーがその処理を LLM から呼べるツールにし、Skill がツールを呼ぶ順番と利用者に確かめることを LLM に伝えます。人が使う製品（体験型マニュアルの作成ツール・閲覧部品と、CSDB を表示する IETM / IETP の閲覧ソフト）は、この基盤を使う別のプロジェクトで作ります。製品は AI が無くても動きます。
 
 ```mermaid
 flowchart TB
@@ -20,17 +20,17 @@ flowchart TB
     CORE["s1000d-core"]
     MODEL["experiential-manual-model"]
   end
-  subgraph App["製品（AI が無くても動く）"]
-    ED["作成ツール<br/>（仮称 manual-editor）"]
-    VW["閲覧ソフト"]
+  subgraph Products["製品（別プロジェクト。AI が無くても動く）"]
+    XM["体験型マニュアル<br/>作成ツール・閲覧部品"]
+    IETP["IETM / IETP<br/>CSDB の閲覧ソフト"]
   end
   BREX --> CORE
   V --> CORE
   R --> CORE
   W --> CORE
   W --> MODEL
-  ED --> MODEL
-  VW --> MODEL
+  XM --> MODEL
+  IETP --> CORE
 ```
 
 各部品は独立したリポジトリで公開しています。このサイトを持つ hub リポジトリ [s1000d-stack](https://github.com/shuji-bonji/s1000d-stack) は、学習サイト（`site/`）、各部品の公開版を記録した構成表（`stack.json`）、計画と決定の記録（`docs/`）だけを持ちます。
@@ -68,10 +68,10 @@ Skill は、どの MCP サーバーをどの順番で呼び、途中で利用者
 
 | 製品 | 何に使うか | 状態 |
 | --- | --- | --- |
-| 作成ツール（仮称 manual-editor） | 体験型マニュアルを画面の上で作り、experiential-manual-model の JSON で保存します。保存した JSON は Skill experience-to-s1000d で S1000D に変換できます | 試作 |
-| 閲覧ソフト | 体験型マニュアルを表示し、利用者が操作を体験しながら学べるようにします。WebMCP を使って、AI が操作を案内できるようにする予定です | 構想 |
+| 体験型マニュアル | 画面や機器の操作を体験しながら学べるマニュアルを、画面の上で作る作成ツールと、他のサイトにも埋め込める閲覧部品（Web Components）。experiential-manual-model の JSON を読み書きし、保存した JSON は Skill experience-to-s1000d で S1000D に変換できます | 別プロジェクトで開発中（作成ツールは試作済み） |
+| IETM / IETP | S1000D の CSDB を Web で表示する閲覧ソフト。パブリケーションモジュールの目次からデータモジュールをたどり、製品を選ぶと当てはまらない節が消え、各ページに版・検証状態・機密区分が出ます。この基盤の reader・verify・適用性の処理をそのまま使います | 別プロジェクトで計画中 |
 
-製品の操作説明は、製品のサイトに置く予定です。
+2 つの製品は 2026-11-07 に s1000d-stack から分け、別のプロジェクトとして進めています。製品の操作説明は、それぞれの製品のサイトに置きます。製品側で足りなかった処理は、この基盤（s1000d-core と MCP サーバー）に戻します。
 
 ## 対象とする版
 

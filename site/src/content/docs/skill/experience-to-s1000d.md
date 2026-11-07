@@ -9,7 +9,7 @@ description: Explains what you provide to the Skill that converts an experientia
 
 ## What it does
 
-- **You provide**: the path of the manual JSON, the CSDB folder to write to, the security classification and the numbering rules (model identification code, system difference code, SNS, the information code for each kind, CAGE code). You can pass a JSON saved by the prototype of the authoring tool (provisionally called manual-editor).
+- **You provide**: the path of the manual JSON, the CSDB folder to write to, the security classification and the numbering rules (model identification code, system difference code, SNS, the information code for each kind, CAGE code). You can pass a JSON saved by the authoring tool for experiential manuals (a separate project; its prototype is provisionally called manual-editor).
 - **You receive**: one data module per Topic and one publication module, the original illustration files, and a Conversion Report that summarises the result of the conversion (verification status, fixes applied automatically, what could not be expressed, and the files written). The files are written after you confirm.
 
 ## Required MCP servers

@@ -39,7 +39,7 @@ flowchart LR
 
 ## 3. 軽い Web 形式のマニュアルを作り、必要になったら S1000D に出力する
 
-S1000D を導入していない現場でも、画面や機器の操作を体験しながら学べるマニュアルを Web 形式で作り、顧客から S1000D を求められた時点でデータモジュールとして出力する使い方です。使う部品の構成は [全体構成](/s1000d-stack/ja/guide/architecture/) にあります。作成ツールと閲覧ソフトの操作説明は製品のサイトに置き、ここでは流れだけを書きます。
+S1000D を導入していない現場でも、画面や機器の操作を体験しながら学べるマニュアルを Web 形式で作り、顧客から S1000D を求められた時点でデータモジュールとして出力する使い方です。使う部品の構成は [全体構成](/s1000d-stack/ja/guide/architecture/) にあります。作成ツールと閲覧部品は別のプロジェクト（体験型マニュアル）で作り、操作説明はその製品のサイトに置きます。ここでは流れだけを書きます。
 
 この使い方が成り立つ根拠は、2021 年の作品 [experience_based_operation_explanation](https://github.com/shuji-bonji/experience_based_operation_explanation)（指定席券売機の操作説明）のデータ構造が、S1000D の考え方と次のように対応することです。
 
@@ -50,11 +50,11 @@ S1000D を導入していない現場でも、画面や機器の操作を体験�
 | ボタンと遷移先 | プロセスデータモジュール（提示順の制御） |
 | 購入方法ごとのまとまり | パブリケーションモジュール |
 | JSON を 1 か所で管理し使い回す | CSDB からの単一ソース・複数出力 |
-| `index.html` と JavaScript | IETM（閲覧ソフト） |
+| `index.html` と JavaScript | IETP（閲覧ソフト） |
 
 この対応を、S1000D に依存しない共通データモデル experiential-manual-model として定め、[s1000d-writer-mcp](/s1000d-stack/ja/mcp/writer-mcp/) がそこからデータモジュールを生成します。LLM は XML を書かず、writer が下書きから XML を組み立てて検証し、候補が 1 つに決まる修正だけを自動で適用します。生成したデータモジュールは使い方 2 の verify-mcp で検証できるため、出力の正しさを S1000D の側から確かめられます。
 
-作成ツールは試作の段階で、名前は仮称（manual-editor）です。ツールが保存した JSON を Skill [experience-to-s1000d](/s1000d-stack/ja/skill/experience-to-s1000d/) に渡すと、writer による変換と verify による検証が、利用者への確認を挟みながら進みます。体験型マニュアルを経由せず、文章からデータモジュールを作るときは、Skill [s1000d-publish](/s1000d-stack/ja/skill/s1000d-publish/) を使います。
+作成ツールは別プロジェクトで開発中で、試作の名前は仮称（manual-editor）です。ツールが保存した JSON を Skill [experience-to-s1000d](/s1000d-stack/ja/skill/experience-to-s1000d/) に渡すと、writer による変換と verify による検証が、利用者への確認を挟みながら進みます。体験型マニュアルを経由せず、文章からデータモジュールを作るときは、Skill [s1000d-publish](/s1000d-stack/ja/skill/s1000d-publish/) を使います。
 
 :::tip[製品に組み込む使い方]
 CSDB 製品のベンダーが、製品に AI エージェントを組み込むために MCP サーバーを使う方法は [CSDB 製品に組み込む](/s1000d-stack/ja/use-cases/embedding/) で説明しています。

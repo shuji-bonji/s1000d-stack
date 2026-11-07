@@ -4,7 +4,7 @@
 
 **English** | [日本語](./README.ja.md)
 
-s1000d-stack is a project that brings together the MCP servers, shared libraries and Skills that let an LLM read technical documents written in S1000D® correctly and check and create them according to the rules agreed for a project (business rules), together with an authoring tool and a viewer for manuals that teach through hands-on operation of screens and equipment.
+s1000d-stack is a project that brings together the MCP servers, shared libraries and Skills that let an LLM read technical documents written in S1000D® correctly and check and create them according to the rules agreed for a project (business rules). The products that use this foundation — an authoring tool and a player for manuals that teach through hands-on operation of screens and equipment (experiential manuals), and a web viewer that displays an S1000D CSDB (IETM / IETP) — are developed in separate projects.
 
 This repository holds only the stack manifest (`stack.json`), the documentation site (`site/`) and the record of plans and decisions (`docs/`). Each component is an independent repository.
 
@@ -16,10 +16,10 @@ This repository holds only the stack manifest (`stack.json`), the documentation 
 
 Stage 1 (understanding and checking against BREX) and stage 2 (verification and reading as structure) are complete, and fix suggestions have been added as the first component of stage 2.5 (a foundation that CSDB products can build in). In stage 3, s1000d-writer-mcp has been added, which lets an LLM create data modules without writing XML. Parts manufacturers and technical publication companies can use an LLM to understand the BREX (Business Rules Exchange) handed over by a customer, to confirm that their own data modules follow the XML schema (XSD) and the BREX, to receive candidate corrections for the violations, and to read data modules as structure rather than as XML. They can also use an LLM, without letting it write XML, to create data modules from a structured draft such as an experiential manual, verify and repair them, and hand sentences out and back for translation.
 
-The four Skills of stage 3 (experience-to-s1000d, s1000d-publish, s1000d-review and s1000d-translate) and a prototype of the authoring tool for experiential manuals (provisionally called manual-editor) have been created. A Skill is a procedure that tells Claude which MCP servers to call in which order and what to ask the user at each step. The authoring tool creates an experiential manual on screen and saves it as a JSON of experiential-manual-model.
+The four Skills of stage 3 (experience-to-s1000d, s1000d-publish, s1000d-review and s1000d-translate) have been created. A Skill is a procedure that tells Claude which MCP servers to call in which order and what to ask the user at each step. The prototype of the authoring tool for experiential manuals (provisionally called manual-editor) was moved to a separate product project on 2026-11-07.
 
 > [!NOTE]
-> The four Skills are registered in claude-plugins (for example `/plugin install s1000d-review@shuji-bonji`). The authoring tool is a prototype and has not been published yet.
+> The four Skills are registered in claude-plugins (for example `/plugin install s1000d-review@shuji-bonji`).
 
 | Component | Role |
 | --- | --- |
@@ -29,7 +29,6 @@ The four Skills of stage 3 (experience-to-s1000d, s1000d-publish, s1000d-review 
 | [s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | An MCP server that reads data modules and publication modules as structure (`read_data_module` / `read_publication_module`), lists a CSDB and resolves references (`list_data_modules` / `resolve_reference`), returns the applicability vocabulary (`describe_applicability`) and reads ICN metadata (`read_icn_metadata`). The server evaluates which product the content applies to, and every response carries the verification status |
 | s1000d-writer-mcp | An MCP server that creates data modules without letting the LLM write XML. It builds the XML from a structured draft and verifies it (`build_data_module`), and automatically applies only the fixes that have exactly one candidate. It also converts experiential manuals (`convert_manual`), applies a fix chosen from the candidates (`apply_fixes`), creates comment data modules (`create_comment`), and takes out and puts back sentences for translation (`extract_segments` / `apply_segments`). It writes nothing by default |
 | Four Skills (`skill/`) | experience-to-s1000d (converts an experiential manual into a CSDB), s1000d-publish (creates data modules from drafts), s1000d-review (review and comment data modules) and s1000d-translate (translation). Procedures that tell Claude the order in which to call the MCP servers and what to ask the user at each step; they have no processing of their own. Published (0.1.0, claude-plugins) |
-| manual-editor (provisional name; `app/manual-editor`) | A prototype of a web app for creating experiential manuals on screen (SvelteKit and PWA). It reads and writes the JSON of manual-model, and offers validation and a hands-on preview. S1000D output is done by passing the JSON to the Skill `experience-to-s1000d`. It works without AI |
 | [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | The common data model for experiential operation manuals (TypeScript types, JSON Schema, validation and a converter from the 2021 JSON). Independent of S1000D (npm: `@shuji-bonji/experiential-manual-model`) |
 
 The BREX check follows Chap 4.10.2 (BREX data module) and Chap 7.9 (Business rules processing) of S1000D Issue 7, and applies the `brexDmRef` chain (project → organisation → default BREX) to each layer separately. XSD validation uses the XSDs from the S1000D distribution you obtained. Judgement of agreements written as prose (nonContextRules) and judgement of conformance to S1000D are not included in any component.
@@ -53,9 +52,9 @@ flowchart TB
     V["s1000d-verify-mcp"]
     W["s1000d-writer-mcp"]
   end
-  subgraph App["app/"]
-    ED["authoring tool (prototype)"]
-    VW["viewer (concept)"]
+  subgraph Products["separate projects (products that use this foundation)"]
+    XM["experiential manuals<br/>authoring tool and player"]
+    IETP["IETM / IETP<br/>viewer for a CSDB"]
   end
   SK["skill/<br/>procedures for conversion, authoring, review and translation (4 Skills)"]
   BREX --> CORE
@@ -63,12 +62,12 @@ flowchart TB
   V --> CORE
   W --> CORE
   W --> MODEL
-  ED --> MODEL
-  VW --> MODEL
+  XM --> MODEL
+  IETP --> CORE
   SK -.calls.-> Mcp
 ```
 
-The expert agents (MCP and Skills) come first; the products (authoring tool and viewer) are built while using those agents as development tools. The mapping to S1000D is gathered into the common data model and its conversion functions, so that the agents and the products do not interpret it separately. The products stay usable without AI.
+The expert agents (MCP and Skills) come first; the two product projects (experiential manuals, and IETM / IETP) use those agents as development tools. The mapping to S1000D is gathered into the common data model and its conversion functions, so that the agents and the products do not interpret it separately. The products stay usable without AI. Whatever the products find missing is returned to this foundation (core and MCP).
 
 ## Stack manifest
 

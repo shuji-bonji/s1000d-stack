@@ -3,7 +3,7 @@ title: Architecture
 description: The shared libraries, MCP servers, Skills and products that make up s1000d-stack, and what each one is used for.
 ---
 
-s1000d-stack consists of four kinds of component: shared libraries, MCP servers, Skills and products. The shared libraries hold the S1000D® processing (reading, validation, assembly); the MCP servers turn that processing into tools an LLM can call; the Skills tell the LLM in which order to call the tools and what to confirm with the user. The products (the authoring tool and the viewer) are software for people that works without AI.
+s1000d-stack consists of three kinds of component: shared libraries, MCP servers and Skills. The shared libraries hold the S1000D® processing (reading, validation, assembly); the MCP servers turn that processing into tools an LLM can call; the Skills tell the LLM in which order to call the tools and what to confirm with the user. The products for people (the authoring tool and player for experiential manuals, and the IETM / IETP viewer that displays a CSDB) are built in separate projects that use this foundation. The products work without AI.
 
 ```mermaid
 flowchart TB
@@ -20,17 +20,17 @@ flowchart TB
     CORE["s1000d-core"]
     MODEL["experiential-manual-model"]
   end
-  subgraph App["Products (work without AI)"]
-    ED["Authoring tool<br/>(provisionally manual-editor)"]
-    VW["Viewer"]
+  subgraph Products["Products (separate projects; work without AI)"]
+    XM["Experiential manuals<br/>authoring tool and player"]
+    IETP["IETM / IETP<br/>viewer for a CSDB"]
   end
   BREX --> CORE
   V --> CORE
   R --> CORE
   W --> CORE
   W --> MODEL
-  ED --> MODEL
-  VW --> MODEL
+  XM --> MODEL
+  IETP --> CORE
 ```
 
 Each component is published as an independent repository. The hub repository [s1000d-stack](https://github.com/shuji-bonji/s1000d-stack), which holds this site, contains only the documentation site (`site/`), the stack manifest recording the published version of each component (`stack.json`), and the plans and decision records (`docs/`).
@@ -68,10 +68,10 @@ A Skill is a written procedure that tells the LLM (Claude) which MCP servers to 
 
 | Product | What it is used for | Status |
 | --- | --- | --- |
-| Authoring tool (provisionally manual-editor) | Creates an experiential manual on screen and saves it as JSON of experiential-manual-model. The saved JSON can be converted to S1000D with the experience-to-s1000d Skill | Prototype |
-| Viewer | Displays an experiential manual so that people can learn an operation by trying it. WebMCP is planned so that AI can guide the operation | Concept |
+| Experiential manuals | An authoring tool that creates, on screen, manuals that teach screen and equipment operation through hands-on experience, and a player (Web Components) that can be embedded in other sites. They read and write the JSON of experiential-manual-model, and the saved JSON can be converted to S1000D with the experience-to-s1000d Skill | In development in a separate project (the authoring tool exists as a prototype) |
+| IETM / IETP | A web viewer that displays an S1000D CSDB. It follows the table of contents of a publication module to the data modules, hides the sections that do not apply when a product is selected, and shows the issue, the verification status and the security classification on every page. It uses the reader, verify and applicability processing of this foundation as it is | Planned in a separate project |
 
-Instructions for the products will be placed on the product site.
+The two products were separated from s1000d-stack on 2026-11-07 and are developed as separate projects. Instructions for each product are placed on that product's own site. Processing that the products find missing is returned to this foundation (s1000d-core and the MCP servers).
 
 ## Target issue
 

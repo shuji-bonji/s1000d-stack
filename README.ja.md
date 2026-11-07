@@ -4,7 +4,7 @@
 
 [English](./README.md) | **日本語**
 
-LLM が S1000D® の技術文書を正しく読み、プロジェクトの決まり（ビジネスルール）に沿って検査・作成できるようにするための MCP サーバー・共有ライブラリ・Skill と、画面や機器の操作を体験しながら学べるマニュアルの作成ツール・閲覧ソフトをまとめるプロジェクトです。
+LLM が S1000D® の技術文書を正しく読み、プロジェクトの決まり（ビジネスルール）に沿って検査・作成できるようにするための MCP サーバー・共有ライブラリ・Skill をまとめるプロジェクトです。画面や機器の操作を体験しながら学べるマニュアルの作成ツール・閲覧部品（体験型マニュアル）と、S1000D の CSDB を Web で表示する閲覧ソフト（IETM / IETP）は、この基盤を使う製品として別のプロジェクトで進めます。
 
 このリポジトリは構成表（`stack.json`）と学習サイト（`site/`）、計画と決定の記録（`docs/`）だけを持ちます。各部品は独立したリポジトリです。
 
@@ -16,10 +16,10 @@ LLM が S1000D® の技術文書を正しく読み、プロジェクトの決ま
 
 段階 1（BREX の理解と照合）と段階 2（検証と構造での読み取り）が揃い、段階 2.5（CSDB 製品に組み込める基盤）の最初の部品として修正提案を足しました。段階 3 では、LLM が XML を書かずにデータモジュールを作る s1000d-writer-mcp を足しました。部品メーカーや技術マニュアル制作会社が、顧客から渡された BREX（Business Rules Exchange）を理解し、自分たちのデータモジュールが XML スキーマ（XSD）と BREX に従っているかを確かめ、違反の直し方の候補を受け取り、データモジュールを XML ではなく構造として読む作業を、LLM から行えるようにします。さらに、体験型マニュアルなどの構造化した下書きからデータモジュールを作り、検証して直し、翻訳用に文を出し入れする作業も、LLM に XML を書かせずに行えるようにします。
 
-段階 3 の Skill 4 つ（experience-to-s1000d・s1000d-publish・s1000d-review・s1000d-translate）と、体験型マニュアルの作成ツールの試作（仮称 manual-editor）は作成済みです。Skill は、MCP サーバーをどの順番で呼び、各段階で利用者に何を聞くかを Claude に伝える手順です。作成ツールは、体験型マニュアルを画面の上で作り、experiential-manual-model の JSON で保存します。
+段階 3 の Skill 4 つ（experience-to-s1000d・s1000d-publish・s1000d-review・s1000d-translate）は作成済みです。Skill は、MCP サーバーをどの順番で呼び、各段階で利用者に何を聞くかを Claude に伝える手順です。体験型マニュアルの作成ツールの試作（仮称 manual-editor）は、2026-11-07 に別の製品プロジェクトへ移しました。
 
 > [!NOTE]
-> Skill 4 つは claude-plugins に登録済みです（`/plugin install s1000d-review@shuji-bonji` など）。作成ツールは試作で、まだ公開していません。
+> Skill 4 つは claude-plugins に登録済みです（`/plugin install s1000d-review@shuji-bonji` など）。
 
 | 部品 | 役割 |
 | --- | --- |
@@ -29,7 +29,6 @@ LLM が S1000D® の技術文書を正しく読み、プロジェクトの決ま
 | [s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | データモジュールとパブリケーションモジュールを構造として読み（`read_data_module` / `read_publication_module`）、CSDB の一覧と参照の解決（`list_data_modules` / `resolve_reference`）、適用性の語彙（`describe_applicability`）、ICN メタデータ（`read_icn_metadata`）を返す MCP サーバー。どの製品に当てはまるかはサーバーが判定し、すべての応答に検証状態が付く |
 | s1000d-writer-mcp | LLM に XML を書かせずにデータモジュールを作る MCP サーバー。構造化した下書きから XML を組み立てて検証し（`build_data_module`）、候補が 1 つに決まる修正だけを自動で適用する。体験型マニュアルの変換（`convert_manual`）、候補の中から選んだ修正の適用（`apply_fixes`）、コメントデータモジュールの作成（`create_comment`）、翻訳用の文の取り出しと書き戻し（`extract_segments` / `apply_segments`）も行う。既定では何も書き込まない |
 | Skill 4 つ（`skill/`） | experience-to-s1000d（体験型マニュアルを CSDB に変換）、s1000d-publish（下書きからデータモジュールを作成）、s1000d-review（レビューと comment DM）、s1000d-translate（翻訳）。MCP サーバーを呼ぶ順番と、各段階で利用者に聞くことを Claude に伝える手順で、処理は持たない。公開済み（0.1.0、claude-plugins） |
-| manual-editor（仮称。`app/manual-editor`） | 体験型マニュアルを画面の上で作る Web アプリの試作（SvelteKit ＋ PWA）。manual-model の JSON を読み書きし、検査と体験表示ができる。S1000D への出力は Skill `experience-to-s1000d` に渡して行う。AI が無くても動く |
 | [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | 体験型操作マニュアルの共通データモデル（TypeScript の型・JSON Schema・検査・2021 年の JSON からの変換）。S1000D に依存しない（npm: `@shuji-bonji/experiential-manual-model`） |
 
 BREX への照合は S1000D Issue 7 の Chap 4.10.2（BREX data module）と Chap 7.9（Business rules processing）に沿い、`brexDmRef` の連鎖（プロジェクト → 組織 → 既定 BREX）を各層に個別に当てます。XSD 検証は、利用者が入手した配布物の XSD で行います。文章で書かれた取り決め（nonContextRules）の判断と、S1000D への準拠の判定は、どの部品にも含みません。
@@ -53,9 +52,9 @@ flowchart TB
     V["s1000d-verify-mcp"]
     W["s1000d-writer-mcp"]
   end
-  subgraph App["app/"]
-    ED["作成ツール（試作）"]
-    VW["閲覧ソフト（構想）"]
+  subgraph Products["別プロジェクト（この基盤を使う製品）"]
+    XM["体験型マニュアル<br/>作成ツール・閲覧部品"]
+    IETP["IETM / IETP<br/>CSDB の閲覧ソフト"]
   end
   SK["skill/<br/>変換・作成・レビュー・翻訳の手順（4 つ）"]
   BREX --> CORE
@@ -63,12 +62,12 @@ flowchart TB
   V --> CORE
   W --> CORE
   W --> MODEL
-  ED --> MODEL
-  VW --> MODEL
+  XM --> MODEL
+  IETP --> CORE
   SK -.呼び出す.-> Mcp
 ```
 
-専門家エージェント（MCP と Skill）を先に作り、それを開発の道具として使いながら製品（作成ツール・閲覧ソフト）を作ります。S1000D との対応関係は共通データモデルとその変換関数に集め、エージェントと製品が別々に解釈しないようにします。製品は AI が無くても動く状態を保ちます。
+専門家エージェント（MCP と Skill）を先に作り、2 つの製品プロジェクト（体験型マニュアル、IETM / IETP）がそれを開発の道具として使います。S1000D との対応関係は共通データモデルとその変換関数に集め、エージェントと製品が別々に解釈しないようにします。製品は AI が無くても動く状態を保ちます。製品側で足りなかったものは、この基盤（core・MCP）に戻します。
 
 ## 構成表
 
