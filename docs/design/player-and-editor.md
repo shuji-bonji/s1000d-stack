@@ -4,7 +4,7 @@
 
 - 作成日: 2026-11-07（JST）
 - 前提: [notes/editor-and-viewer-study.md](../notes/editor-and-viewer-study.md)（候補のツールと構成案）、[design/manual-model.md](./manual-model.md)、D-01・D-09・D-28
-- 対象: player（`lib/experiential-manual-player`、仮称）と editor（`app/manual-editor`、仮称）。CLI と取り込み拡張はこの文書の対象外
+- 対象: player（`manual-editor/packages/player`、仮称。置き場所は 8 節）と editor（`manual-editor`、仮称）。CLI と取り込み拡張はこの文書の対象外
 
 ## 1. player を先に作り、editor を編集モードとして重ねる
 
@@ -331,7 +331,7 @@ player の `runtime` は `Manual` を読むだけで書き換えません。編�
 
 | 項目 | 提案 |
 |---|---|
-| player のリポジトリ | `shuji-bonji/experiential-manual-player`（仮称。U-05 の製品名が決まったら改名）。ローカルは `s1000d-stack/lib/experiential-manual-player` |
+| player の置き場所 | **決定（2026-11-08）**: 別リポジトリにせず、`manual-editor` の `packages/player`（npm workspaces）に置く。D-29 で製品を s1000d-stack の外に出したので、`s1000d-stack/lib/` には置かない。npm に出すのは `packages/player` だけ（名前は U-05 の製品名が決まってから。それまで `private: true`）。製品名が決まったらリポジトリ名を変える（GitHub のリポジトリ名は転送されるので変えてよい） |
 | editor の作り直し方 | 同じリポジトリ `manual-editor` で、`src/lib/components` を空にして組み直す（`ops` / `io` / `i18n` は残す）。履歴を切らない |
 | Web Components のビルド | Svelte 5 の `customElement` で `<experiential-manual>` を出す。スタイルは Shadow DOM の中に閉じ、色は CSS カスタムプロパティで外から変えられるようにする |
 | 遷移の地図の配置計算 | 自前の簡単な階層配置から始め、足りなければ `elkjs` などを検討する。Mermaid は実行時の依存が大きいので使わない |

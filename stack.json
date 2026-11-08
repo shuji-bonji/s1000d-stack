@@ -6,7 +6,7 @@
     "layer = 役割 / form = 配布形態（誰が起動するか）/ status = released・developing・planned・concept。",
     "developing はリポジトリで開発中で npm 未公開。planned / concept はディレクトリも npm も無い。"
   ],
-  "generatedAt": "2026-11-07T13:13:07.674Z",
+  "generatedAt": "2026-11-08T02:23:59.096Z",
   "generatedBy": "scripts/generate-stack.mjs",
   "npmScope": "@shuji-bonji",
   "repos": [
@@ -103,16 +103,16 @@
       "status": "released",
       "public": true,
       "note": "段階 2。体験型マニュアルの共通データモデル（型・JSON Schema・検査・2021 年の作品 JSON からの変換）。S1000D に依存しない。名前は U-04 で確定",
-      "published": "0.1.0",
+      "published": "0.2.0",
       "local": {
-        "version": "0.1.0",
-        "tag": null,
+        "version": "0.2.0",
+        "tag": "v0.2.0",
         "dirty": false,
         "unpushedCommits": 0
       },
       "consistency": {
         "status": "match",
-        "detail": "0.1.0"
+        "detail": "0.2.0"
       }
     },
     {
