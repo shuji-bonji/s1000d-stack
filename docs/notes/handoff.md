@@ -1,4 +1,4 @@
-# 引き継ぎメモ（2026-11-08 04:10 JST 更新。「いまどこにいるか」以降の本文の大半は 2026-10-29 23:45 JST 時点）
+# 引き継ぎメモ（2026-11-08 21:30 JST 更新。「いまどこにいるか」以降の本文の大半は 2026-10-29 23:45 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
@@ -19,15 +19,15 @@
 | 作成ツール・閲覧ソフトの検討メモ | [notes/editor-and-viewer-study.md](./editor-and-viewer-study.md) | 済み。候補のツール、構成案、題材の選定（8 節・8-2 節）、決めること |
 | 体験型マニュアルの画面設計の草案 | [design/player-and-editor.md](../design/player-and-editor.md) | 済み。player を先に作り、editor を編集モードとして重ねる。作る順序は同文書 6 節 |
 | IETM / IETP プロジェクトの最初の文書 | [notes/ietp-kickoff.md](./ietp-kickoff.md) | 下書き。新しいリポジトリと Claude プロジェクトを作ったら、そこへ移して ROADMAP の元にする（利用者） |
-| 作成ツールの試作 manual-editor | `/Users/bonji/workspace/shuji-bonji/webapps/manual-editor`（hub の `app/` から移した）。GitHub `shuji-bonji/manual-editor`（Private）に初回コミット `23c1e88` を push 済み、CI（Vitest 32 件）緑 | 上の 2 文書の写しを `docs/` に置き、hub への相対リンクは GitHub の URL に直してある。体験型マニュアルの製品プロジェクトの中心のリポジトリ |
+| 作成ツールの試作 manual-editor | `/Users/bonji/workspace/shuji-bonji/webapps/manual-editor`（hub の `app/` から移した）。GitHub `shuji-bonji/manual-editor`（Private）。初回コミット `23c1e88` のあと、2026-11-08 に設計書 6 節の手順 2〜6 まで進んだ（player の runtime・部品・Web Components、editor の E-0 / E-1、E-5 遷移の地図・E-6 素材・E-7 検査。最新は `e454cbf`、Vitest 52 件、未 push） | 製品側の正本は manual-editor の `docs/`（`notes/handoff.md` と `design/player-and-editor.md` 9 節「実装の記録」）。hub にある写しは 2026-11-07 時点のもの。体験型マニュアルの製品プロジェクトの中心のリポジトリ |
 
 ### 次にやること（この順）
 
 1. **experiential-manual-model 0.2.0 は 2026-11-08 04:00 JST 頃に実装・コミット済み**（`lib/experiential-manual-model` の `3f49e56`。テスト 13 件、`tsc`・`eslint`・`prettier --check` とも通過。結果は ROADMAP「進捗（段階 3）」の「model 0.2.0」の行）。**残りは公開（利用者）**: `cd lib/experiential-manual-model && git push && git tag v0.2.0 && git push --tags`（`package.json` は 0.2.0 に上げてあるので `npm version` は使わない。`publish.yml` が package.json の版とタグの一致を確かめてから公開する）。
    - 入れたもの: `AssetFile.path`（ファイル名または URL）と `data`（data URL）を分け、どちらか一方を必須に。`width` / `height`（任意、1 以上の整数）。`Screen.capture`（任意、`{ url, viewport?: { width, height }, capturedAt? }`）。`Hotspot.capture`（任意、`{ selector }`）。`Admonition.title`（任意）。`Screen` の JSDoc と README（日英）に「画像はスクリーンショットに限らない」。`fromLegacyJson` は `imageUrl` が data URL なら `source.data` に入れる。券売機の例に新しい項目を足した（`img-top` ほか 4 枚に 1280×1024、`scr-top` に `capture`、手順の caution に `title`）
    - 製品側（manual-editor）の依存を `^0.2.0` に上げるのは製品側の作業。**writer-mcp も `^0.2.0` に上げるときは** `src/convert/manual-to-draft.ts` の `extname(asset.source.path)` が `path` の任意化で型エラーになるので、`data`（data URL）のときの扱い（`mediaType` から拡張子を決める、または `assetFormats` を要求する）を足す。`^0.1.0` のままなら 0.2.0 は入らないので、いまは壊れない
-2. **player の切り出し**（製品側。manual-editor のプロジェクトで行う。新しい Claude プロジェクトを作るか、既存の「S1000D Stack」に `webapps/manual-editor` を足すかは利用者が決める）。設計は player-and-editor.md 1〜2 節・6 節の作業 2〜4
-3. **editor の組み直し**（製品側）。同 3 節・7 節（試作から残すもの・捨てるもの）
+2. ~~**player の切り出し**~~ **済み（2026-11-08、製品側）**。`manual-editor/packages/player`（npm workspaces）。設計書 6 節の作業 2〜4
+3. **editor の組み直し**（製品側）。手順 5（E-0 / E-1）と手順 6（E-5 / E-6 / E-7）は 2026-11-08 に済み。残りは手順 7（E-2 / E-3 / E-4）と手順 8（Playwright 1 本を CI に）。詳細は manual-editor の `docs/notes/handoff.md`
 4. **IETM / IETP プロジェクトの立ち上げ**（利用者）。ietp-kickoff.md 5 節の段階 0
 5. 基盤側の残り: 製品側から戻ってくる要望（`issueInfo` を上げる操作、DML・DDN を書く処理、`ContentNode` の書き出し）は、要望が来てから ROADMAP に足す
 
