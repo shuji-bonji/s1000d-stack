@@ -107,6 +107,8 @@ export default defineConfig({
       ],
       customCss: ['./src/styles/custom.css'],
       lastUpdated: true,
+      // og:image・twitter:image を言語ごとに出し分ける（pdf-agent-stack と同じ構成）
+      routeMiddleware: './src/routeData.ts',
       pagination: true,
       plugins: [starlightThemeRapide()],
     }),
