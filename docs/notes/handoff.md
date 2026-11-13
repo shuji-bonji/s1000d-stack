@@ -1,4 +1,4 @@
-# 引き継ぎメモ（2026-11-08 22:50 JST 更新。「いまどこにいるか」以降の本文の大半は 2026-10-29 23:45 JST 時点）
+# 引き継ぎメモ（2026-11-14 09:10 JST 更新。「いまどこにいるか」以降の本文の大半は 2026-10-29 23:45 JST 時点）
 
 新しいチャットで s1000d-stack の作業を続けるための要約です。経緯の詳細は [ROADMAP.md](../ROADMAP.md)・[DECISIONS.md](../DECISIONS.md)・[background.md](./background.md) にあり、このメモはそれらへの入口です。
 
@@ -27,7 +27,7 @@
    - 入れたもの: `AssetFile.path`（ファイル名または URL）と `data`（data URL）を分け、どちらか一方を必須に。`width` / `height`（任意、1 以上の整数）。`Screen.capture`（任意、`{ url, viewport?: { width, height }, capturedAt? }`）。`Hotspot.capture`（任意、`{ selector }`）。`Admonition.title`（任意）。`Screen` の JSDoc と README（日英）に「画像はスクリーンショットに限らない」。`fromLegacyJson` は `imageUrl` が data URL なら `source.data` に入れる。券売機の例に新しい項目を足した（`img-top` ほか 4 枚に 1280×1024、`scr-top` に `capture`、手順の caution に `title`）
    - 製品側（manual-editor）の依存を `^0.2.0` に上げるのは製品側の作業。**writer-mcp も `^0.2.0` に上げるときは** `src/convert/manual-to-draft.ts` の `extname(asset.source.path)` が `path` の任意化で型エラーになるので、`data`（data URL）のときの扱い（`mediaType` から拡張子を決める、または `assetFormats` を要求する）を足す。`^0.1.0` のままなら 0.2.0 は入らないので、いまは壊れない
 2. ~~**player の切り出し**~~ **済み（2026-11-08、製品側）**。`manual-editor/packages/player`（npm workspaces）。設計書 6 節の作業 2〜4
-3. ~~**editor の組み直し**~~ **済み（2026-11-08、製品側）**。手順 5〜8（E-0〜E-7、Playwright の E2E と CI）まで済み。次の候補（製品名の決定と player の npm 公開、学習サイトへの埋め込み、後の版に回したもの）は manual-editor の `docs/notes/handoff.md` の「次の候補」。基盤への要望の候補: 手順の図（`Step.assetRefs`）で `Screen` を指せるようにすること（設計 E-2。いまは素材 id だけ）。詳細は manual-editor の `docs/notes/handoff.md`
+3. ~~**editor の組み直し**~~ **済み（2026-11-08、製品側）**。手順 5〜8（E-0〜E-7、Playwright の E2E と CI）まで済み。2026-11-14 に、editor の使い方（ヘルプ）を editor 自身で作った体験型マニュアルを実例の 1 冊目にした（`scripts/make-help.mjs` が Playwright で画面を撮り、`data-testid` の位置をホットスポットにする。`b04a9ef`）。この JSON を `experience-to-s1000d` に渡す実演が、学習サイトの実例の候補。次の候補（製品名の決定と player の npm 公開、学習サイトへの埋め込み、後の版に回したもの）は manual-editor の `docs/notes/handoff.md` の「次の候補」。基盤への要望の候補: 手順の図（`Step.assetRefs`）で `Screen` を指せるようにすること（設計 E-2。いまは素材 id だけ）。詳細は manual-editor の `docs/notes/handoff.md`
 4. **IETM / IETP プロジェクトの立ち上げ**（利用者）。ietp-kickoff.md 5 節の段階 0
 5. 基盤側の残り: 製品側から戻ってくる要望（`issueInfo` を上げる操作、DML・DDN を書く処理、`ContentNode` の書き出し）は、要望が来てから ROADMAP に足す
 
