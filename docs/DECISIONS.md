@@ -307,6 +307,17 @@ flowchart LR
 - 同名の製品・商標の有無は、この時点では調べていない。npm は `@shuji-bonji` のスコープの下なので、名前の衝突は起きない。
 - 残る作業は製品側（manual-editor の `docs/notes/handoff.md`）: README と画面の題名から「仮称」を外す、player の npm 名を `@shuji-bonji/experiential-manual-player` で確定する、GitHub のリポジトリ名 `manual-editor` を変えるかを決める。IETM / IETP のプロジェクト名は別に決める。
 
+### D-31 s1000d-core は S1000D の構造を出発点にし、experiential-manual-model の都合で形を決めない（2026-11-15）
+
+- s1000d-core と experiential-manual-model は目的が違う。experiential-manual-model は一般向けの体験型マニュアルのデータモデルで、S1000D に準じる厳密さを求めない。s1000d-core は IETM / IETP の作成ツール・閲覧ソフトでも使うので、S1000D に準じる厳密さを重視する。s1000d-stack（core・MCP・Skill）は、体験型マニュアルと IETM / IETP のどちらの作成ツールからも独立している（D-29 の補足）。
+- core の読み書きの形（`ContentNode`・`DraftNode`）を足す・変えるときは、XSD の構造と配布物（Bike Samples）の実測から決め、core の設計文書に書く。experiential-manual-model との対応は、writer-mcp の変換関数（D-09）と、model の側の設計文書に置く。model で表したいことが core で書けないときは、model の形に合わせて core を狭く作らず、S1000D の構造として足りないものを core に足す。
+- 読む側（`readContent`）は落とさない。構造として返せないものは、`unknown`・`attrs`・`notes` であることを知らせる。
+- 新しく作る側（`DraftNode` → `buildContent`）は S1000D の部分集合でよい。書けない構造を設計文書に明記し、渡されたら入力の誤りにする。検証を通すために値を補わない。
+- **案（未確定）**: 既にある DM を直すときは、元の XML を保ったまま、その場所だけを直す（`applyFix`・`applySegments` と同じやり方）。読んだ木を下書きに写して作り直す経路は、既にある DM の編集に使わない。
+- どこまで扱えているかは、配布物のテストで数えて固定し、減らす方向にだけ動かす（最初は `preliminaryRqmts`。2026-11-15 の実測は、Bike Samples の 41 件で要素・属性 2,527 個のうち 898 個が往復で失われる）。
+- きっかけ: 2026-11-15 に、実在の技術マニュアルを使った確認の要望（W-1）として、core の下書きの `requirements` に人員・文書・品目を足した。その形を experiential-manual-model の 7 つの区分から決め、model の設計文書の中で決めていた。利用者の指摘で見直した。
+- 設計は [design/core-preliminary-rqmts.md](./design/core-preliminary-rqmts.md)。上の案（読む・新しく作る・既にある DM を直す、の 3 つの経路を分ける方針）と、公開の前に変える範囲は、同じ文書の「決めてもらうこと」で確定する。
+
 ## 未決事項
 
 | ID | 内容 | 判断の材料 |
