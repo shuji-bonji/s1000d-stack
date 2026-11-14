@@ -313,10 +313,10 @@ flowchart LR
 - core の読み書きの形（`ContentNode`・`DraftNode`）を足す・変えるときは、XSD の構造と配布物（Bike Samples）の実測から決め、core の設計文書に書く。experiential-manual-model との対応は、writer-mcp の変換関数（D-09）と、model の側の設計文書に置く。model で表したいことが core で書けないときは、model の形に合わせて core を狭く作らず、S1000D の構造として足りないものを core に足す。
 - 読む側（`readContent`）は落とさない。構造として返せないものは、`unknown`・`attrs`・`notes` であることを知らせる。
 - 新しく作る側（`DraftNode` → `buildContent`）は S1000D の部分集合でよい。書けない構造を設計文書に明記し、渡されたら入力の誤りにする。検証を通すために値を補わない。
-- **案（未確定）**: 既にある DM を直すときは、元の XML を保ったまま、その場所だけを直す（`applyFix`・`applySegments` と同じやり方）。読んだ木を下書きに写して作り直す経路は、既にある DM の編集に使わない。
-- どこまで扱えているかは、配布物のテストで数えて固定し、減らす方向にだけ動かす（最初は `preliminaryRqmts`。2026-11-15 の実測は、Bike Samples の 41 件で要素・属性 2,527 個のうち 898 個が往復で失われる）。
+- 既にある DM を直すときは、元の XML を保ったまま、その場所だけを直す（`applyFix`・`applySegments` と同じやり方）。読んだ木を下書きに写して作り直す経路は、既にある DM の編集に使わない（2026-11-15 08:26 JST に利用者が採用）。
+- どこまで扱えているかは、配布物のテストで数えて固定し、減らす方向にだけ動かす（最初は `preliminaryRqmts`。2026-11-15 の実測は、Bike Samples の 41 件で要素・属性 2,527 個のうち、最初は 898 個、人員・文書・条件の形を直した後は 631 個が往復で失われる。reader が読まずに知らせてもいない要素は 0 種類）。
 - きっかけ: 2026-11-15 に、実在の技術マニュアルを使った確認の要望（W-1）として、core の下書きの `requirements` に人員・文書・品目を足した。その形を experiential-manual-model の 7 つの区分から決め、model の設計文書の中で決めていた。利用者の指摘で見直した。
-- 設計は [design/core-preliminary-rqmts.md](./design/core-preliminary-rqmts.md)。上の案（読む・新しく作る・既にある DM を直す、の 3 つの経路を分ける方針）と、公開の前に変える範囲は、同じ文書の「決めてもらうこと」で確定する。
+- 設計は [design/core-preliminary-rqmts.md](./design/core-preliminary-rqmts.md)。読む・新しく作る・既にある DM を直す、の 3 つの経路を分ける方針と、公開の前に変える範囲は、同じ文書の「決まったこと」にある。
 
 ## 未決事項
 

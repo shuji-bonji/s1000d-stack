@@ -3,7 +3,7 @@
 s1000d-core が、手順・故障探求のデータモジュールの `preliminaryRqmts` を読む・書くときに、S1000D のどの構造を扱い、どの構造を扱わないかを決める文書です。出発点は Issue 7 の XSD と Bike Samples の実測で、experiential-manual-model の形ではありません（D-31）。
 
 - 作成日: 2026-11-15（JST）
-- 段階: 実測と方針の案。「決めてもらうこと」の 2 点が決まってから、下書きの形を変えます
+- 段階: **決定済み（2026-11-15 08:26 JST、利用者が 2 点とも案を採用）**。公開の前に変える範囲（下の 1〜4 と、読んでいない要素を知らせること）は実装済み（core `db0fd31`、未公開）
 - 前提の決定: D-03（XSD を同梱しない）、D-19（決定論的に確かめられることは core が行う）、D-27（書く処理も core に置く）、D-31（core は S1000D の構造を出発点にする）
 - 関連: [writer-mcp.md](./writer-mcp.md)「入力の形: DraftDataModule」、[reader-mcp.md](./reader-mcp.md)「本文の構造の返し方」。experiential-manual-model との対応は [manual-model-0.3.0.md](./manual-model-0.3.0.md)「S1000D との対応」にあり、この文書では扱いません
 
@@ -40,40 +40,53 @@ preliminaryRqmts
 
 `@warningRefs` / `@cautionRefs`（IDREFS）は、同じ DM の `warningsAndCautions` の `warning` / `caution`、または `warningsAndCautionsRef` の `warningRef` / `cautionRef`（別の DM への `dmRef` と識別番号）を指します。`proceduralStep` などにも同じ属性があります。
 
-## いまの対応（2026-11-15、core `8bdea98`）
+## いまの対応（2026-11-15、core `db0fd31`）
+
+「知らせる」は、中身は読まないが、あることを `DataModuleContent.notReadElements`・`notes`・節点の `attrs.notRead` で返す、という意味です。
 
 | 構造 | 読む（`readContent`） | 下書きで表す・書く（`buildContent`） |
 |---|---|---|
 | `reqCondNoRef` | 子の `para` と要約の文 | 書ける（`requirements` の `text` と子の `para`） |
-| `reqCondDm`・`reqCondPm`・`reqCondExternalPub` | 子の `para`、参照は `refs` | **書けない**（条件の `para` は `refs` を受け取らない） |
-| `reqCondCircuitBreaker` | 文と参照だけ。遮断器の一覧は読まず、`attrs.notRead` に書く | 書けない |
-| `personnel` | `person` の節点（`count`、`text` が `trade`） | 書ける。ただし中身の無い `personnel` は受け取らない |
-| `person`（`@man`） | `person` の節点（`attrs.man`） | **書けない**（`personnel` として書くので `@man` が落ちる） |
-| `personCategory`・`personSkill`・`estimatedTime` | `attrs` に入れる | **書けない** |
-| `reqTechInfo` | `document` の節点（参照は `refs`、外部の文書は題名と番号） | 書ける。`@reqTechInfoCategory` と、外部の文書の発行情報は**書けない** |
+| `reqCondDm`・`reqCondPm` | 子の `para`、参照は `refs` | 書ける（`para` の `refs` に `dmRef` か `pmRef` を 1 つ） |
+| `reqCondExternalPub` | 子の `para`、参照は `refs` | 書けない（下書きの参照に外部の文書の種類が無い） |
+| `reqCondCircuitBreaker` | 文と参照だけ。遮断器の一覧は知らせる | 書けない |
+| `personnel` | `person` の節点（`count`、`text` が `trade`） | 書ける。中身の無い `personnel` も書ける |
+| `person`（`@man`） | `person` の節点（`man`） | 書ける（`man` があれば `person` 要素） |
+| `personCategory`・`personSkill`・`estimatedTime` | `personCategoryCode`・`skillLevelCode`・`estimatedTime`・`estimatedTimeUnit` | 書ける |
+| `reqPersons` が複数あるとき、その `@applicRefId` | **読まない**（人員を 1 つの並びにまとめる） | 書けない |
+| `reqTechInfo` | `document` の節点（参照は `refs`、外部の文書は題名と番号、`reqTechInfoCategory`） | 書ける。外部の文書の発行情報は書けない |
 | 品目（`identNumber` を持つもの） | `equipment`・`supply`・`spare` の節点 | 書ける（名前、製造者コード、部品番号、数量、単位、補足） |
-| 品目のほかの識別子（`toolRef`・`partRef`・`supplyRef`・`supplyRqmtRef`・`catalogSeqNumberRef`・`natoStockNumber`・`materialSetRef`） | あることを `attrs.otherIdentifiers` に要素名で返す。中身は読まない | **書けない** |
-| `shortName`・`@materialUsage`・`@supplyCategory`・`hazards`・`embedded…Descr`・`footnote` | **読まない** | 書けない |
+| 品目のほかの識別子（`toolRef`・`partRef`・`supplyRef`・`supplyRqmtRef`・`catalogSeqNumberRef`・`natoStockNumber`・`materialSetRef`） | 知らせる（`attrs.otherIdentifiers` に要素名） | 書けない |
+| `shortName`・`@materialUsage`・`@supplyCategory` | `attrs` に読む | 書けない |
+| `hazards`・`embedded…Descr`・脚注 | 知らせる | 書けない |
 | `safetyRqmts` の `warning`・`caution`・`note` | 子の `admonition` | 書ける |
-| `safetyRqmts` の `@warningRefs`・`@cautionRefs` | 参照先を `admonition` として返す（`attrs.referencedId`。見つからなければ `attrs.unresolved`） | **書けない** |
-| `productionMaintData` | **読まない** | 書けない |
-| 各要素の `@applicRefId`・`@id` | 節点の `applicRefId`・`id`（品目・人員・警告） | 品目・警告は書ける。`reqPersons`・`dmRef` の分は書けない |
+| `safetyRqmts` の `@warningRefs`・`@cautionRefs` | 参照先を `admonition` として返す（`attrs.referencedId`。見つからなければ `attrs.unresolved`） | 書けない |
+| `productionMaintData` | 知らせる | 書けない |
+| 参照（`dmRef` など）の版（`issueInfo`）・言語・`@applicRefId` | **読まない**（行き先と題名だけを返す） | 書けない |
 
-`@warningRefs` / `@cautionRefs` と、条件の参照は、2026-11-15 の `8bdea98` で読めるようにしました。それまでは、`safetyRqmts` が参照だけを持つ DM で、reader が安全の要件を何も返していませんでした。
+経過:
+
+- `8bdea98`: `@warningRefs` / `@cautionRefs` と条件の参照を読めるようにしました。それまでは、`safetyRqmts` が参照だけを持つ DM で、reader が安全の要件を何も返していませんでした。
+- `db0fd31`: 人員の `man`・区分・技能・見積もり時間、文書の区分、条件の参照を、読む側と書く側の両方に足しました。読んでいない要素を知らせるようにしました。
 
 ## 実測: Bike Samples を読んで書き、失われるものを数える
 
 core の配布物のテスト（`src/content/requirements.spec.test.ts`、`S1000D_SPEC_TESTS=1`）で数えます。reader が返した `requirements` の節点を下書きに写して組み立て直し、元の `preliminaryRqmts` と要素・属性の数を比べます。値（文の中身）は比べません。
 
-| 項目 | 2026-11-15 の実測 |
-|---|---|
-| `preliminaryRqmts` を持つ DM | 44 件 |
-| reader が `requirements` として返した DM | 41 件（残りは checklist 2 件と schedul 1 件。この種類の本文は構造化していない） |
-| 要素と属性の数（41 件の合計） | 2,527 個（要素 1,660、属性 867） |
-| 往復で失われた数 | **898 個**（要素 382、属性 516）。全体の 36 % |
-| 何も失わずに往復できた DM | 3 件 |
+| 項目 | 最初の実測（`8bdea98`） | 形を直した後（`db0fd31`） |
+|---|---|---|
+| `preliminaryRqmts` を持つ DM | 44 件 | 44 件 |
+| reader が `requirements` として返した DM | 41 件（残りは checklist 2 件と schedul 1 件。この種類の本文は構造化していない） | 41 件 |
+| 要素と属性の数（41 件の合計） | 2,527 個（要素 1,660、属性 867） | 同じ |
+| 往復で失われた数 | 898 個（要素 382、属性 516）。全体の 36 % | **631 個**（要素 256、属性 375）。全体の 25 % |
+| 何も失わずに往復できた DM | 3 件 | **26 件** |
+| reader が読まず、知らせてもいない要素 | 数えていない | **0 種類**（要素の単位。属性は数えていない） |
 
-失われた 898 個の内訳です。
+形を直した後は、人員（`person`・`personnel`・`personCategory`・`personSkill`・`trade`・`estimatedTime`）と文書の区分が、すべて往復できます。残りの 631 個は、品目（識別子の無い品目 12 件、入れ子の品目、`materialSetRef` など）、参照の中身（`dmRef` の版、文の中の `internalRef`）、`productionMaintData`、参照で書く安全の要件です。
+
+reader が知らせた「読んでいない要素」は、41 件の合計で `materialSetRef` 9、`embeddedSpareDescr` 9、`productionMaintData` 5、`embeddedSupportEquipDescr` 4、`catalogSeqNumberRef` 3、`toolRef` 2、`hazards`・`supplyRef`・`supplyRqmtRef`・脚注が各 1 でした。
+
+最初の実測で失われた 898 個の内訳です。
 
 | まとまり | 個数 | 主なもの |
 |---|---|---|
@@ -85,12 +98,12 @@ core の配布物のテスト（`src/content/requirements.spec.test.ts`、`S1000
 | 安全の要件の参照 | 6 | `safetyRqmts` 2 と `@warningRefs`・`@cautionRefs` |
 | 警告・注意の `@applicRefId` | 5 | |
 
-このテストは 898 個を上限として固定しています。数が減ったら上限を下げ、増える変更は通しません。
+このテストは、いまの数（631 個）を上限として固定しています。数が減ったら上限を下げ、増える変更は通しません。同じテストで、reader が読まずに知らせてもいない要素が 0 種類であることも確かめます。
 
 > [!NOTE]
-> この数は「読めない」「下書きで表せない」「書けない」を区別していません。たとえば `person/@man` は読めていますが、下書きに項目が無いので失われます。読む側だけの取りこぼし（`productionMaintData`、`shortName`、`hazards` など）を分けて数えることは、まだしていません。
+> 往復の数は「下書きで表せない」「書けない」を合わせた数です。読む側の取りこぼしは、要素の単位では別のテストで 0 と確かめていますが、属性の単位（`reqPersons/@applicRefId`、参照の `issueInfo` など）は数えていません。
 
-## 方針の案: 3 つの経路を分ける
+## 方針: 3 つの経路を分ける（決定）
 
 ```mermaid
 flowchart TB
@@ -109,34 +122,43 @@ flowchart TB
 
 | 経路 | 求める厳密さ | いまの状態 |
 |---|---|---|
-| 読む | 落とさない。構造として返せないものは、あることを知らせる | `productionMaintData`・`shortName`・`hazards`・`embedded…Descr`・脚注を、知らせずに落としている |
+| 読む | 落とさない。構造として返せないものは、あることを知らせる | `preliminaryRqmts` の要素は、読むか知らせるかのどちらかになった（`db0fd31`）。属性の取りこぼしと、ほかの要素（手順の本文など）は未確認 |
 | 新しく作る | 部分集合でよい。書けないものを明記し、渡されたら入力の誤りにする。値を補わない | 守られている（識別子や数量の無い品目は `DraftInputError`） |
 | 既にある DM を直す | 触っていない部分を 1 文字も変えない | core にあるのは修正候補の適用（`applyFix`）と訳文の差し戻し（`applySegments`）の 2 つ。どちらも元の XML を保つ |
 
 点線の経路（読んだ木を下書きに写して作り直す）は、既にある DM の編集には使いません。上の実測のとおり 36 % が失われるからです。IETM / IETP の作成ツールで既にある DM を直すときは、3 つ目の経路を広げます（「この手順の文を変える」「この品目を足す」を、元の XML への操作として行う）。下書きの経路は、新しく作るときと、体験型マニュアルからの変換に使います。
 
-この分け方にすると、実測の 898 個は「新しく作るときに書けない構造の数」を表す指標になり、0 にすることは目標にしません。目標にするのは、読む側の取りこぼしを 0 にすることです。
+この分け方にすると、往復で失われる数は「新しく作るときに書けない構造の数」を表す指標になり、0 にすることは目標にしません。目標にするのは、読む側の取りこぼしを 0 にすることです。
 
-## 公開の前に変える下書きの形の案
+## 下書きの形の変更
 
-core は未公開（`origin/main` より 4 コミット先）なので、`f7104ce` で足した形を今なら変えられます。XSD から見て、足りない順に並べます。
+`f7104ce` で足した形を、公開の前に XSD から見て直しました。1〜4 は `db0fd31` で済み、5 と 6 は次の版です。
 
-| # | 変更 | 対応する XSD | 減る見込み |
+| # | 変更 | 対応する XSD | 状態 |
 |---|---|---|---|
-| 1 | `person` に `man` を足す（あれば `person`、無ければ `personnel` として書く）。中身の無い `personnel` も受け取る | `person/@man`、`personnel` | 人員の 224 個のうち、要素の種類の違いと中身の無いもの |
-| 2 | `person` に `personCategoryCode`・`skillLevelCode`・`estimatedTime`・`estimatedTimeUnit` を足す | `personCategory`、`personSkill`、`estimatedTime` | 人員の残り |
-| 3 | `document` に `reqTechInfoCategory` を足す | `reqTechInfo/@reqTechInfoCategory` | 21 個 |
-| 4 | 条件の `para` が `refs`（`dmRef`・`pmRef` を 1 つ）を受け取る | `reqCondDm`、`reqCondPm` | 参照の 219 個の一部 |
-| 5 | 品目の識別子を増やす（`toolRef`、`partRef`、`supplyRef`、`natoStockNumber` など） | 識別子の選択肢 | 品目の一部。形を決める必要がある（下の 2） |
-| 6 | 安全の要件を参照で書く（`@warningRefs` / `@cautionRefs` と `warningsAndCautionsRef`） | 共通の警告・注意 | 6 個。DM の先頭に別の要素を足す必要があり、範囲が広い |
+| 1 | `person` に `man` を足す（あれば `person`、無ければ `personnel` として書く）。中身の無い `personnel` も受け取る。`man` と `count` は一緒に使えない | `person/@man`、`personnel` | 済み |
+| 2 | `person` に `personCategoryCode`・`skillLevelCode`・`estimatedTime`・`estimatedTimeUnit` を足す | `personCategory`、`personSkill`、`estimatedTime` | 済み |
+| 3 | `document` に `reqTechInfoCategory` を足す | `reqTechInfo/@reqTechInfoCategory` | 済み |
+| 4 | 条件の `para` が `refs`（`dmRef`・`pmRef` を 1 つ）を受け取る。`closeRqmts` でも同じ | `reqCondDm`、`reqCondPm` | 済み |
+| 5 | 品目の識別子を増やす（`toolRef`、`partRef`、`supplyRef`、`natoStockNumber` など） | 識別子の選択肢 | 次の版。形を決める必要がある |
+| 6 | 安全の要件を参照で書く（`@warningRefs` / `@cautionRefs` と `warningsAndCautionsRef`） | 共通の警告・注意 | 次の版。DM の先頭に別の要素を足す必要があり、範囲が広い |
+
+1〜4 をすべて入れた手順 DM と故障探求 DM を組み立て、Issue 7 の XSD で valid、既定 BREX で違反 0 件を確かめました（2026-11-15）。
 
 項目の名前は、S1000D の属性の値をそのまま渡すもの（列挙や、プロジェクトが決めるコード）には、S1000D の属性名を使います（`personCategoryCode`、`skillLevelCode`、`reqTechInfoCategory`）。値の意味を core が解釈しないことを、名前でも示すためです。
 
-読む側は、形を変えずに次を足します: `productionMaintData`・`shortName`・`hazards`・`embedded…Descr`・脚注があることを、節点か `notes` で返す。読む側だけの取りこぼしを数えるテストを足す。
+## 決まったこと（2026-11-15 08:26 JST）
 
-## 決めてもらうこと
-
-| # | 項目 | 案 |
+| # | 項目 | 決定 |
 |---|---|---|
-| 1 | 3 つの経路を分ける方針 | 上のとおり。読む側は落とさない、新しく作る側は明記した部分集合、既にある DM は元の XML を保って直す。下書きに写して作り直す経路を、既にある DM の編集に使わない |
-| 2 | 公開の前に変える範囲 | 1〜4 を行い、読む側の取りこぼしを知らせるようにしてから公開する。5（識別子の種類）と 6（参照で書く安全の要件）は、形の検討が要るので次の版にする |
+| 1 | 3 つの経路を分ける方針 | 読む側は落とさない、新しく作る側は明記した部分集合、既にある DM は元の XML を保って直す。下書きに写して作り直す経路を、既にある DM の編集に使わない（D-31） |
+| 2 | 公開の前に変える範囲 | 1〜4 を行い、読む側の取りこぼしを知らせるようにしてから公開する。5（識別子の種類）と 6（参照で書く安全の要件）は次の版にする |
+
+## 残っている点
+
+| 項目 | 内容 |
+|---|---|
+| 属性の取りこぼし | reader は、`reqPersons` が複数あるときの `@applicRefId`（Bike Samples に 4 か所）と、参照の版（`issueInfo`）・言語を返していない。属性の単位で「読むか、知らせるか」を確かめるテストは無い |
+| `preliminaryRqmts` 以外 | 同じ測り方（往復で数える、黙って落としていないかを確かめる）を、手順の本文・説明・故障探求・プロセスにはまだ当てていない |
+| 既にある DM を直す経路 | 方針は決まったが、操作の種類（文を変える、品目を足す、手順を入れ替える、など）と API は未設計。IETM / IETP の作成ツールの設計のときに決める |
+| checklist・schedul | `preliminaryRqmts` を持つが、この種類の本文を reader が構造化していない（Bike Samples に 3 件） |
