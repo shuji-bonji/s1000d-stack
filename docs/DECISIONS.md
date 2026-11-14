@@ -298,6 +298,15 @@ flowchart LR
 - hub の整理。`stack.json` と README の表から `manual-editor` / `manual-viewer` の行を外し、`generate-stack.mjs` の EXTERNAL に 2 つのプロジェクトへの参照を置く。ROADMAP の「目指すもの」は 3（組み込み基盤）を主にし、1・2 は「この基盤を使う製品」として参照する。段階 4 の行は IETM / IETP プロジェクトへの参照に置き換える。`app/manual-editor` の作業コピーは、体験型マニュアルのプロジェクトのフォルダーへ移す（hub の `.gitignore` の `/app/` は残してよい）。
 - 検討の経過は [notes/editor-and-viewer-study.md](./notes/editor-and-viewer-study.md)、画面設計の草案は [design/player-and-editor.md](./design/player-and-editor.md)。どちらも体験型マニュアルのプロジェクトへ移す対象だが、決定の根拠として hub にも残す。IETM / IETP の最初の文書の下書きは [notes/ietp-kickoff.md](./notes/ietp-kickoff.md)。
 
+### D-30 体験型マニュアルの製品名は Experiential Manual にする（2026-11-14）
+
+- U-05 の判断。製品の共通の語を **Experiential Manual** とし、作成ツールを **Experiential Manual Editor**、閲覧部品を Experiential Manual Player、CLI を Experiential Manual CLI と呼ぶ。
+- 理由は 3 つ。(1) 公開済みの `@shuji-bonji/experiential-manual-model`、仮称で作ってきた `@shuji-bonji/experiential-manual-player`、Web Components の `<experiential-manual>` と同じ語になり、既存の名前を変えずに済む。(2) "Manual Editor" だけでは、英語で「手動のエディター」とも読める。前に "Experiential" が付くと manual は名詞としか読めない。(3) "Operation" は付けない。Topic には説明（`description`）と困ったとき（`troubleshooting`）もあり、`Screen` の画像は操作パネルの写真や分解図でもよいので、「操作」に限ると名前が中身より狭くなる。
+- 比べた案は Manual Editor、Operation Manual Editor、Experiential Operation Manual Editor。
+- "experiential" は一般の利用者になじみの薄い語なので、説明文の 1 行目で「押して進める操作マニュアル」のように言い換えて補う。
+- 同名の製品・商標の有無は、この時点では調べていない。npm は `@shuji-bonji` のスコープの下なので、名前の衝突は起きない。
+- 残る作業は製品側（manual-editor の `docs/notes/handoff.md`）: README と画面の題名から「仮称」を外す、player の npm 名を `@shuji-bonji/experiential-manual-player` で確定する、GitHub のリポジトリ名 `manual-editor` を変えるかを決める。IETM / IETP のプロジェクト名は別に決める。
+
 ## 未決事項
 
 | ID | 内容 | 判断の材料 |
@@ -306,7 +315,7 @@ flowchart LR
 | ~~U-02~~ | Issue 7 の利用条件の全文に、再配布や組み込みについての特別な許可があるか | **解決（2026-10-23）**: 無い。「Special usage rights」の対象は 8 区分の団体・企業・機関に限られる。D-03 に反映済み |
 | U-03 | 自作サンプルデータを共有パッケージに切り出す時期 | 2 つ目の MCP がテストで使い始めた時点を目安にする |
 | ~~U-04~~ | 共通データモデルのパッケージ名 | **解決（2026-10-24）**: `@shuji-bonji/experiential-manual-model`（GitHub は `shuji-bonji/experiential-manual-model`、ローカルは `s1000d-stack/lib/experiential-manual-model`）。`manual-model` だけでは IETM や S1000D 一般のマニュアルのモデルと受け取られるため、「体験型」を表す `experiential` を入れる。npm で `experiential-manual-model` / `experiential-manual` / `experience-manual-model` / `xp-manual-model` が空いていることを 2026-10-24 に確認した。文書の中では引き続き「manual-model」と略して書くことがある |
-| U-05 | 体験型マニュアルの製品名 | 一般の利用者向けの名前にする。試作の間は仮称 `manual-editor`（D-28）。D-29 で製品は別プロジェクトになったので、名前はそのプロジェクトで決め、決まったら player / editor / cli に同じ語を頭に付ける。IETM / IETP のプロジェクト名も別に決める |
+| ~~U-05~~ | 体験型マニュアルの製品名 | **解決（2026-11-14）**: Experiential Manual（作成ツールは Experiential Manual Editor、D-30）。以下は経過。一般の利用者向けの名前にする。試作の間は仮称 `manual-editor`（D-28）。D-29 で製品は別プロジェクトになったので、名前はそのプロジェクトで決め、決まったら player / editor / cli に同じ語を頭に付ける。IETM / IETP のプロジェクト名も別に決める |
 | ~~U-10~~ | 簡易 Web マニュアル（段階 4 の参照実装）の技術の選定 | **解決（2026-10-28）**: SvelteKit ＋ PWA（D-28）。作成ツールの試作も同じ |
 | ~~U-06~~ | Starlight の日本語検索の精度 | **解決（2026-10-24）**: 生成された Pagefind の索引を Node から検索して確認。単語（照合・券売機・適用性・識別・商標）は期待どおり。Pagefind は日本語を単語に分けて索引するため、「データモジュール」のような複合語をそのまま入れると同じつながりで現れたページ（1 件）だけが返り、「データ モジュール」と空けると 9 件になる。サイトの見出しに主要な複合語をそのまま書くことで補う |
 | U-07 | Issue 4.2 に対応する時期 | 段階 2 で reader を作るときに判断する。Issue 4.2 以降の ICN メタデータファイル（IMF）を reader の対象に含めるかも一緒に判断する |
