@@ -2,7 +2,7 @@
 
 [tm-eval-requests.md](./tm-eval-requests.md) の「進める順」に沿って行った作業の記録です。要望の ID（RD-1、W-3 など）は同じ文書のものです。
 
-- 作成日: 2026-11-15（JST）、更新: 同日 13:20 JST 頃（順 4 と W-10 まで。core 0.9.0 と model 0.3.0 の公開、見本の書き直し、MCP 3 本の依存の更新）
+- 作成日: 2026-11-15（JST）、更新: 同日 13:45 JST 頃（順 4、W-10、RD-3 まで。core 0.9.0 と model 0.3.0 の公開、見本の書き直し、MCP 3 本の依存の更新、読み取りの抜けの修正）
 - 評価フォルダー: `/Users/bonji/s1000d-stack-eval/tm-9-6115-749-10/`
 
 ## 済んだ作業
@@ -23,6 +23,7 @@
 | 4 | 見本を model 0.3.0 の形に書き直し、変換し直す | 評価フォルダー（リポジトリには入れない） | — |
 | 4 の後 | W-10（識別子か数量の無い品目がある Topic の DM を作らない） | s1000d-writer-mcp | `601e53e` |
 | 4 の後 | 依存を core `^0.9.0` に上げる。reader-mcp は `content.notReadElements` を返す | s1000d-reader-mcp / s1000d-verify-mcp / s1000d-brex-mcp | `2154c17` / `4c4c14a` / `656cf5f` |
+| RD-3 | 段落の中のリストと、プロセスの節点が指す DM を読む。本文の文字が読み取りの結果に残っているかを数えるテスト | s1000d-core | `9328bbf` |
 
 設計と決定は次の文書にあります。
 
@@ -37,7 +38,7 @@
 >
 > | リポジトリ | `origin/main` との差 | `package.json` の版 | npm の最新 |
 > |---|---|---|---|
-> | s1000d-core | 一致 | 0.9.0 | 0.9.0 |
+> | s1000d-core | 1 コミット先（`9328bbf`。読み取りの修正） | 0.9.0（上げていない。CHANGELOG は「未リリース」の節） | 0.9.0 |
 > | experiential-manual-model | 一致 | 0.3.0 | 0.3.0 |
 > | s1000d-writer-mcp | 1 コミット先（`601e53e`） | 0.2.0（上げていない。CHANGELOG は「未リリース」の節） | 0.2.0 |
 > | s1000d-reader-mcp | 1 コミット先 | 0.8.0（上げていない。CHANGELOG は「未リリース」の節） | 0.8.0 |
@@ -107,6 +108,32 @@ W-10 について、Issue 7 の `proced.xsd` で確かめたこと:
 
 MCP 3 本の依存を core `^0.9.0` に上げました（決定は同じとき）。reader-mcp は、core が返す `notReadElements` を `content.notReadElements` として応答に入れるようにしました。テストは reader 27 件、verify 34 件、brex 23 件が通りました（配布物を使う分はスキップ）。
 
+## RD-3: 残りの DM と PM を読んだ結果（2026-11-15 13:45 JST まで）
+
+`csdb-0.3/` の DM 23 件を core 0.9.0 の `readContentFromXml` で読み（Mac 側の VM で、reader-mcp の `node_modules` の core を使ったスクリプト）、PM と手順 DM 1 件は `s1000d-reader-dev` で読みました。`unknownElements` と `notReadElements` は 23 件とも空でした。
+
+それでも、読み取りの結果に入っていない文がありました。
+
+| 見つかったこと | 原因 | 扱い |
+|---|---|---|
+| 説明 DM の箇条書きが、文の無い段落になる。用語の DM は、文の無い段落 1 つだけになる | core の reader は、`para` の中のブロック要素（`randomList`・`definitionList` など）を、文にも子にも入れていなかった。`unknownElements` にも `notReadElements` にも数えていなかった。core の writer はリストを `para` の中に書く（S1000D の普通の書き方） | 直した（core `9328bbf`） |
+| プロセス DM の `dmNode` が、題名だけで返る。その画面の手順 DM への `dmRef` が返らない | reader が `dmNode` の直下の参照を読んでいなかった（テストにも「reader は読まない」と書いてあった） | 直した（同上） |
+| 参照の題名が、どれもマニュアルの題名（`techName`）になる。「次に進む: [→ …-12A-520A-D AMMPS 5 kW 発電機 操作の手引き…]」のように、行き先の作業の名前が出ない | writer が `dmRef` の `dmTitle` に `infoName` を書いていない（作業前の要件の `reqTechInfo` の参照には書いている） | 未着手（R11） |
+
+D-31 の「読む側は落とさない」を、`preliminaryRqmts` 以外でも数で確かめるために、本文のテキスト節点が読み取りの結果に残っているかを数えるテストを core に足しました（`src/content/coverage.spec.test.ts`）。
+
+| 対象 | テキスト節点 | 読み取りの結果に無い（0.9.0） | 直した後 |
+|---|---|---|---|
+| 評価フォルダーの `csdb-0.3/`（23 件） | 509 個 | 36 個（7 件の DM） | 0 個 |
+| Bike Samples（本文を構造化して読む 59 件） | 1,587 個 | 193 個（31 件の DM） | 66 個（20 件の DM） |
+
+Bike Samples で残っている 66 個は、プロセス DM の `displayText`（15）、品目の `partNumber`（7）、故障の `faultDescr`（6）、定義リストの一部（5）、`hazard`（4）、`prompt`（4）、文書の版（7）などです。文字列が含まれるかどうかだけを見る測り方なので、少なめに数えています。
+
+PM は、`pmEntry` 13 件・DM への参照 23 件がすべて解決していて、問題は見つかりませんでした。
+
+> [!IMPORTANT]
+> 読み取りの修正は core の未公開のコミットです。reader-mcp の応答に反映するには、core の公開（0.9.1）と、reader-mcp の依存の更新が要ります。それまで、`s1000d-reader-dev` は箇条書きと用語集を空の段落として返します。
+
 ## 作業中に分かったこと
 
 | 項目 | 内容 | 扱い |
@@ -115,7 +142,7 @@ MCP 3 本の依存を core `^0.9.0` に上げました（決定は同じとき�
 | 品目の識別子 | 品目は識別子が 1 つ以上と `reqQuantity` が要る。Bike Samples の 118 件は、110 件が `identNumber`、8 件が `toolRef` などだけを持つ。core が書けるのは `identNumber` だけ | 識別子の種類を増やすのは次の版（core の設計の 5） |
 | 参照で書く安全の要件 | `@warningRefs` / `@cautionRefs` は読めるが、書けない | 次の版（core の設計の 6） |
 | 要約の文と子の節点の重なり | reader は、条件・品目・安全の要件を `requirements` の `text`（要約）と子の節点の両方に返す。文字数（`chars`）には両方が入る | そのまま。要約の文を使っている Skill を変えないため |
-| ほかの要素への広げ方 | 往復で数える・黙って落としていないかを確かめる、という測り方を、手順の本文・説明・故障探求・プロセスにはまだ当てていない | 未着手 |
+| ほかの要素への広げ方 | 往復で数える・黙って落としていないかを確かめる、という測り方を、`preliminaryRqmts` 以外には当てていなかった | 読む側は、本文のテキスト節点で数えるテストを足した（`9328bbf`）。往復（読んで書く）の測り方は未着手 |
 | `userEntry` の `variableRef` | reader は変数名を `dialog` の `attrs.variableName` に読んでいるのに、`variableRef` を `unknown` にも数える | 未着手 |
 | `dmThenSeq` と `dmElseSeq` | reader はどちらも中身をそのまま並べるので、区別が付かない | W-6 と一緒に扱う |
 | 条件の文の言い回し | writer-mcp は「〈条件〉、次に進む: 」と書く。見本の条件には「とき」で終わらないものがある | 未着手（第 3 回の書き直しでは触っていない） |
@@ -130,7 +157,8 @@ MCP 3 本の依存を core `^0.9.0` に上げました（決定は同じとき�
 | 順 | 作業 | 待つもの |
 |---|---|---|
 | 4 の後 | 見本の材料 4 品目の書き方を決める（数量を文で書く、識別子を `supplyRqmtRef` などにする） | core が書ける識別子は `identNumber` だけ（core の設計の 5）。仕様書で `supplyRqmtRef` の使い方を確かめる |
-| 4 の後 | RD-3（残りの DM と PM を reader で読む） | Mac で reader-mcp の `npm install`・`npm run build` と、Claude Desktop の再起動 |
+| RD-3 の後 | core 0.9.1 の公開と、reader-mcp の依存の更新 | 利用者の公開 |
+| RD-3 の後 | R11（`dmRef` の `dmTitle` に `infoName` を書く）。Bike Samples で残っている 66 個を減らす | 無し |
 | 5 | W-4 → W-5 → RD-2 | core に足す形は、XSD の `hotspot` と配布物の実測から決める（D-31） |
 | 6 | 仕様書のプロセス DM の章を読んでから W-6 | — |
 | 7 | M-4〜M-7 と W-9、その後に優先 3 | — |
