@@ -2,7 +2,7 @@
 
 [tm-eval-requests.md](./tm-eval-requests.md) の「進める順」に沿って行った作業の記録です。要望の ID（RD-1、W-3 など）は同じ文書のものです。
 
-- 作成日: 2026-11-15（JST）、更新: 同日 11:55 JST 頃（順 4 まで。core 0.9.0 と model 0.3.0 の公開、見本の書き直し）
+- 作成日: 2026-11-15（JST）、更新: 同日 13:20 JST 頃（順 4 と W-10 まで。core 0.9.0 と model 0.3.0 の公開、見本の書き直し、MCP 3 本の依存の更新）
 - 評価フォルダー: `/Users/bonji/s1000d-stack-eval/tm-9-6115-749-10/`
 
 ## 済んだ作業
@@ -21,6 +21,8 @@
 | 3 | model の CHANGELOG の見出しを日付にする | experiential-manual-model | `cb254e1` |
 | 4 | W-1 の変換関数の分、W-2、`Step.next` の `fragment`、`Admonition.title`、依存を core `^0.9.0`・model `^0.3.0` に上げる | s1000d-writer-mcp | `1a3027c` |
 | 4 | 見本を model 0.3.0 の形に書き直し、変換し直す | 評価フォルダー（リポジトリには入れない） | — |
+| 4 の後 | W-10（識別子か数量の無い品目がある Topic の DM を作らない） | s1000d-writer-mcp | `601e53e` |
+| 4 の後 | 依存を core `^0.9.0` に上げる。reader-mcp は `content.notReadElements` を返す | s1000d-reader-mcp / s1000d-verify-mcp / s1000d-brex-mcp | `2154c17` / `4c4c14a` / `656cf5f` |
 
 設計と決定は次の文書にあります。
 
@@ -31,16 +33,17 @@
 | [DECISIONS.md](../DECISIONS.md) の D-31 | core は S1000D の構造を出発点にし、model の都合で形を決めない |
 
 > [!IMPORTANT]
-> core と model は公開済みです（2026-11-15）。writer-mcp と hub は push していません。
+> core と model は公開済みです（2026-11-15）。writer-mcp は `bb13797` まで push 済みです（公開はしていません）。それより後のコミットと hub は push していません。
 >
 > | リポジトリ | `origin/main` との差 | `package.json` の版 | npm の最新 |
 > |---|---|---|---|
 > | s1000d-core | 一致 | 0.9.0 | 0.9.0 |
 > | experiential-manual-model | 一致 | 0.3.0 | 0.3.0 |
-> | s1000d-writer-mcp | 2 コミット先 | 0.2.0（上げていない。CHANGELOG は「未リリース」の節） | 0.2.0 |
+> | s1000d-writer-mcp | 1 コミット先（`601e53e`） | 0.2.0（上げていない。CHANGELOG は「未リリース」の節） | 0.2.0 |
+> | s1000d-reader-mcp | 1 コミット先 | 0.8.0（上げていない。CHANGELOG は「未リリース」の節） | 0.8.0 |
+> | s1000d-verify-mcp | 1 コミット先 | 0.7.0（同上） | 0.7.0 |
+> | s1000d-brex-mcp | 1 コミット先 | 0.6.0（同上） | 0.6.0 |
 > | s1000d-stack（hub） | 文書のコミットの分だけ先 | — | — |
->
-> reader-mcp・verify-mcp・brex-mcp の依存は、core 0.9.0 に上げていません。
 
 ## 順 1〜3 の要点
 
@@ -86,7 +89,23 @@ writer-mcp（`1a3027c`）:
 - 3 つの説明 Topic に置いていた INITIAL SETUP の表と注意書きを、手順 4 件と故障探求 1 件の `prerequisites` に移しました。Hotspot 76 か所の `label` を、名前・説明（66 か所）・番号（52 か所）に分けました。Topic は 14 → 12 です。
 - `convert_manual` で `csdb-0.3/` に書きました。DM 23 件 ＋ PM 1 件が XSD で valid、BREX で passed、参照は解決です。`notRepresented` は 119 件です（書き直す前の 107 件に、識別子か数量の無い品目の 12 件が加わりました）。
 - **R1 と R2 は消えました**。画面の手順は「[Exit]を押す。メイン画面に戻る。「メイン画面」に進む。」、始動の手順 DM の `preliminaryRqmts` は条件 1・人員 2・参照 6・材料 1・警告 4 になりました。
-- 新しく見つかったこと（R8）: 冷却系統の 3 つの手順 DM の `reqSupplies` が `noSupplies` になります。元の文書は材料を「消耗品の一覧の品目番号」で示していて、部品番号と数量がありません。writer は値を補わずに品目を落としますが、落とした品目があるのに `noSupplies` と書くので、DM は「材料は要らない」と読めます。要望の一覧に W-10 として足しました。
+- 新しく見つかったこと（R8）: 冷却系統の 3 つの手順 DM の `reqSupplies` が `noSupplies` になります。元の文書は材料を「消耗品の一覧の品目番号」で示していて、部品番号と数量がありません。writer は値を補わずに品目を落とし、その区分を `noSupplies` と書くので、DM は「材料は要らない」と読めます。要望の一覧に W-10 として足しました。
+
+## W-10 と、MCP 3 本の依存の更新（2026-11-15 13:20 JST まで）
+
+W-10 について、Issue 7 の `proced.xsd` で確かめたこと:
+
+- `reqSupplies` に書けるのは、`noSupplies` か、`supplyDescr` を 1 件以上持つ `supplyDescrGroup` のどちらかです。品目をすべて落とした区分は、XSD の形の上で `noSupplies` と書くしかありません。
+- `supplyDescr` には、識別子（`catalogSeqNumberRef`・`natoStockNumber`・`identNumber`・`supplyRef`・`supplyRqmtRef`・`materialSetRef` のどれか 1 つ以上）と `reqQuantity` が要ります。
+- `reqQuantity` は文も書けます。展開してある仕様パッケージの XML（`specs/s1000d/` の下）には、「As required」が 27 件、「See SB」が 6 件あります。
+- `supplyRqmtRef` は `supplyRqmtNumber`（必須）で一覧の品目を指す形です。元の文書の「消耗品の一覧の品目番号」に近い形ですが、使い方は仕様書で確かめていません。
+
+決定（利用者、2026-11-15 12:50 JST 頃）: 識別子か数量の無い品目がある Topic の DM は作らない。`convert_manual` は、`dataModules[]` のその行に `error`（`input-error`、`path` は品目の場所）を返し、ほかの DM は作ります（writer-mcp `601e53e`。テスト 49 件が通り、配布物を使う 2 件はスキップ）。テストの券売機の例からは、識別子の無い品目（ウエス）を外しました。
+
+> [!NOTE]
+> 評価フォルダーの見本は、このままだと冷却系統の 3 つの手順 DM が作られなくなります。`csdb-0.3/` は W-10 の前に書いたもので、3 件の `reqSupplies` は `noSupplies` のままです。
+
+MCP 3 本の依存を core `^0.9.0` に上げました（決定は同じとき）。reader-mcp は、core が返す `notReadElements` を `content.notReadElements` として応答に入れるようにしました。テストは reader 27 件、verify 34 件、brex 23 件が通りました（配布物を使う分はスキップ）。
 
 ## 作業中に分かったこと
 
@@ -110,8 +129,8 @@ writer-mcp（`1a3027c`）:
 
 | 順 | 作業 | 待つもの |
 |---|---|---|
-| 4 の後 | W-10（落とした品目があるときに `noSupplies` などを書かない） | 無し。品目番号だけの材料をどう書くかは、XSD と仕様書で確かめてから |
-| 4 の後 | RD-3（残りの DM と PM を reader で読む） | reader-mcp の依存を core 0.9.0 に上げる |
+| 4 の後 | 見本の材料 4 品目の書き方を決める（数量を文で書く、識別子を `supplyRqmtRef` などにする） | core が書ける識別子は `identNumber` だけ（core の設計の 5）。仕様書で `supplyRqmtRef` の使い方を確かめる |
+| 4 の後 | RD-3（残りの DM と PM を reader で読む） | Mac で reader-mcp の `npm install`・`npm run build` と、Claude Desktop の再起動 |
 | 5 | W-4 → W-5 → RD-2 | core に足す形は、XSD の `hotspot` と配布物の実測から決める（D-31） |
 | 6 | 仕様書のプロセス DM の章を読んでから W-6 | — |
 | 7 | M-4〜M-7 と W-9、その後に優先 3 | — |
