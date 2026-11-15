@@ -10,14 +10,16 @@ TM 9-6115-749-10 を体験型マニュアルに写し、S1000D に変換して�
 > [!NOTE]
 > この一覧は自分たちの観察だけを書いています。題材の本文・図は含みません。
 
-## その後に変わった点（2026-11-15 09:10 JST 頃まで）
+## その後に変わった点（2026-11-15 11:55 JST 頃まで）
 
 | 要望 | 変わった点 |
 |---|---|
 | RD-1、W-3 | 済み（core `d69a6f8`、writer-mcp `4ad1e08`） |
 | M-1・M-2・M-3 | 済み（model `e0ca740`）。M-2 は `Topic.admonitions` を足さず、`prerequisites.safety` の 1 か所にした（[design/manual-model-0.3.0.md](../design/manual-model-0.3.0.md) の決定 1） |
 | W-1 の core の分 | 済み（core `118fd99`〜`830de9f`）。形は model の区分からではなく XSD から決め直した（D-31、[design/core-preliminary-rqmts.md](../design/core-preliminary-rqmts.md)） |
-| W-3 の補足 | 「`dmRef` は DM の中の手順を指せない」としていたが、`dmRef/@referredFragment` で指せる。core は読み書きできるようになった（`830de9f`）。writer-mcp の変換関数はまだ使っていない |
+| W-3 の補足 | 「`dmRef` は DM の中の手順を指せない」としていたが、`dmRef/@referredFragment` で指せる。core は読み書きできるようになり（`830de9f`）、writer-mcp の変換関数も使うようになった（`1a3027c`） |
+| W-1 の変換関数の分、W-2 | 済み（writer-mcp `1a3027c`）。見本を model 0.3.0 の形に書き直して変換し直し、R1 と R2 が消えたことを XML で確かめた |
+| W-10（新規） | 見本の書き直しで見つかった。下の「core / writer への要望」に足した |
 | 全体の方針 | s1000d-core は S1000D の構造を出発点にし、experiential-manual-model の都合で形を決めない（D-31）。下の「core / writer への要望」のうち core に足すものは、XSD と配布物の実測から形を決める |
 
 ## 材料と振り分け先
@@ -90,6 +92,7 @@ R5 と R7 は NOTES.md で「問題なし」としているので、要望には
 | W-5 | 2 | `Step.targetRef` を、W-4 で書いた hotspot への `internalRef` にする | `Step.targetRef` 11 件 | 変換関数 | W-4 |
 | W-9 | 2 | 参照を文の中の位置に置く | `#4` | core（`DraftNode` のインライン要素） | M-4。いまの `DraftRef` は `text` の後ろに並ぶ。インライン要素は writer-mcp.md「確定が要ること」で未実装 |
 | W-6 | 保留 | プロセス DM で、枝分かれ、通った画面へ戻る遷移、別の Topic の画面への遷移を表す | R4、`a transition back to a screen already in the flow` 6 件、`transition to something that is not a screen of this topic` 2 件 | core、変換関数 | 仕様書のプロセス DM の章を読み、`dmElseSeq`・`dmLoop`・`dmNodeAlts` のどれを使うかを決める |
+| W-10 | 1 | 識別子か数量が無くて品目を落としたときに、その区分を `noSupplies`・`noSupportEquips`・`noSpares` と書かない（DM が「要らない」と読めてしまう）。品目番号だけで示された材料の書き方を決める | `prerequisites item without manufacturerCode or quantity` 12 件（R8） | 変換関数。書き方によっては core | XSD と仕様書で、識別子・数量の無い品目の書き方を確かめる |
 | W-7 | 3 | Topic より下の適用範囲を書く（`applicRefId` が指す `applic` の置き場所を core に足す） | `scopeRefs on a block, step or screen below the topic` 2 件 | core、変換関数 | 無し |
 | W-8 | 3 | 説明以外の Topic の `summary` と、`Manual.description` の置き場所を決める | `Topic.summary of a non-description topic` 9 件、`Manual.description` 1 件 | 変換関数 | 無し |
 
