@@ -19,7 +19,7 @@ TM 9-6115-749-10 を体験型マニュアルに写し、S1000D に変換して�
 | W-1 の core の分 | 済み（core `118fd99`〜`830de9f`）。形は model の区分からではなく XSD から決め直した（D-31、[design/core-preliminary-rqmts.md](../design/core-preliminary-rqmts.md)） |
 | W-3 の補足 | 「`dmRef` は DM の中の手順を指せない」としていたが、`dmRef/@referredFragment` で指せる。core は読み書きできるようになり（`830de9f`）、writer-mcp の変換関数も使うようになった（`1a3027c`） |
 | W-1 の変換関数の分、W-2 | 済み（writer-mcp `1a3027c`）。見本を model 0.3.0 の形に書き直して変換し直し、R1 と R2 が消えたことを XML で確かめた |
-| W-10（新規） | 見本の書き直しで見つかった。下の「core / writer への要望」に足した。`reqSupplies` は `noSupplies` か品目 1 件以上のどちらかしか書けないので、「`noSupplies` と書かない」ことはできない。識別子か数量の無い品目がある Topic の DM を作らないことにした（利用者の決定、writer-mcp `601e53e`）。品目番号だけの材料の書き方は残っている |
+| W-10（新規） | 見本の書き直しで見つかった。下の「core / writer への要望」に足した。`reqSupplies` は `noSupplies` か品目 1 件以上のどちらかしか書けないので、「`noSupplies` と書かない」ことはできない。識別子か数量の無い品目がある Topic の DM を作らないことにした（利用者の決定、writer-mcp `601e53e`）。品目番号だけの材料は、一覧（WP 0021）の NSN を `natoStockNumber` として書くことにした（利用者の決定、2026-11-15。model `f1daae5`・core `9bff422`・writer-mcp `870b38a`） |
 | 全体の方針 | s1000d-core は S1000D の構造を出発点にし、experiential-manual-model の都合で形を決めない（D-31）。下の「core / writer への要望」のうち core に足すものは、XSD と配布物の実測から形を決める |
 
 ## 材料と振り分け先

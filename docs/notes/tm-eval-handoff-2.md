@@ -35,7 +35,7 @@ MCP 4 本は、`package.json` が `@shuji-bonji/s1000d-core` を `^0.9.0` で指
 | 順 | 作業 | 待つもの・注意 |
 |---|---|---|
 | 1 | （済み、writer-mcp `85428f1`、2026-11-15 14:20 JST）R11: writer が `dmRef` の `dmTitle` に `infoName` を書く。いまは `techName`（マニュアルの題名）だけなので、「次に進む: 」の参照や PM の項目に、行き先の作業の名前が出ない | 無し。作業前の要件の `reqTechInfo` の参照には `infoName` が入っているので、書き方の違いを core の `dmRefEl` と writer-mcp の両方で確かめる |
-| 2 | 見本の材料 4 品目の書き方を決める | 元の文書は材料を「消耗品の一覧の品目番号」で示していて、部品番号と数量が無い。W-10 の後は、この 3 つの手順 DM は作られない。`reqQuantity` は文でも書ける。識別子は `supplyRqmtRef`（`supplyRqmtNumber` が必須）が近い形だが、使い方を仕様書で確かめていない。core が書ける識別子は `identNumber` だけ（core の設計の 5） |
+| 2 | （済み、2026-11-15 23:15 JST。識別子を `natoStockNumber` で書く。model `f1daae5`・core `9bff422`・writer-mcp `870b38a`、どれも未公開。経緯は [tm-eval-progress.md](./tm-eval-progress.md) の「材料 4 品目の書き方」）見本の材料 4 品目の書き方を決める | 元の文書は材料を「消耗品の一覧の品目番号」で示していて、部品番号と数量が無い。W-10 の後は、この 3 つの手順 DM は作られない。`reqQuantity` は文でも書ける。識別子は `supplyRqmtRef`（`supplyRqmtNumber` が必須）が近い形だが、使い方を仕様書で確かめていない。core が書ける識別子は `identNumber` だけ（core の設計の 5） |
 | 3 | Bike Samples で、読み取りの結果に無いテキスト節点 66 個を減らす | `displayText`（15）、`partNumber`（7）、`faultDescr`（6）など。`src/content/coverage.spec.test.ts` の上限を、減った数に下げる |
 | 4 | W-4 → W-5 → RD-2（hotspot） | core に足す形は、XSD の `hotspot` と配布物の実測から決める（D-31） |
 | 5 | 仕様書のプロセス DM の章を読んでから W-6 | |
@@ -55,12 +55,14 @@ MCP 4 本は、`package.json` が `@shuji-bonji/s1000d-core` を `^0.9.0` で指
 
 | 場所 | 内容 |
 |---|---|
-| `src/build.mts` | 見本を組み立てるスクリプト（model 0.3.0 の形）。`MODEL_DIST=<model の dist/index.js> node src/build.mts` で `manual/manual.json` を出力する |
-| `manual/manual.json` | model 0.3.0 の形の見本。`manual.0.2.0.json` は前の形の控え |
+| `src/build.mts` | 見本を組み立てるスクリプト（model 0.4.0 の形。2026-11-15 23:05 JST に、冷却系統の材料 4 品目へ `natoStockNumber` などを足した）。`MODEL_DIST=<model の dist/index.js> node src/build.mts` で `manual/manual.json` を出力する |
+| `manual/manual.json` | model 0.4.0 の形の見本（0.3.0 の形に、品目の `natoStockNumber` を足したもの）。`manual.0.2.0.json` は前の形の控え |
 | `manual/manual.ledger.json` | 採番の台帳（`icnNext` は 21） |
 | `csdb-0.3/` | 第 3 回の変換の結果（DM 23 件、PM 1 件、ICN 20 件）。W-10 の前に書いたので、冷却系統の 3 件は `reqSupplies` が `noSupplies` のまま |
+| `csdb-r11/` | R11 の確認の結果（DM 20 件、PM 1 件。冷却系統の 3 件は W-10 のとおり作っていない） |
+| `csdb-nsn/` | 材料 4 品目を NSN で書いた後の変換の結果（2026-11-15 23:08 JST。DM 23 件、PM 1 件、ICN 20 件）。応答は `csdb-nsn.convert.json`、`verify_csdb` の報告は `csdb-nsn.verify.json` |
 | `csdb/` | 第 2 回の変換の結果（model 0.2.0 の形） |
-| `NOTES.md` | 記録。R1〜R13 |
+| `NOTES.md` | 記録。R1〜R14 と、材料 4 品目を NSN で書いた結果 |
 
 ## 作業の仕方で分かっていること
 
