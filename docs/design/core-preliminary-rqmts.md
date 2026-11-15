@@ -57,7 +57,7 @@ preliminaryRqmts
 | `reqPersons/@applicRefId`（XSD では `personnel`・`person` に `applicRefId` が無く、ここに付く） | 人員の節点の `applicRefId` に写す | 書ける（同じ `applicRefId` が続く人員を 1 つの `reqPersons` にまとめる） |
 | `reqTechInfo` | `document` の節点（参照は `refs`、外部の文書は題名と番号、`reqTechInfoCategory`） | 書ける。外部の文書の発行情報は書けない |
 | 品目（`identNumber` を持つもの） | `equipment`・`supply`・`spare` の節点 | 書ける（名前、製造者コード、部品番号、数量、単位、補足） |
-| 品目の `natoStockNumber`（`9bff422` から） | 節点の `natoStockNumber`（3 つの属性をつないだ番号。属性が無ければ `fullNatoStockNumber`、要素の文）。2 つ目からと、子の `refs` は知らせる | 書ける（13 桁の番号を 3 つの属性に分けて書く。`fullNatoStockNumber` と `refs` は書けない） |
+| 品目の `natoStockNumber`（`682dde2` から） | 節点の `natoStockNumber`（3 つの属性をつないだ番号。属性が無ければ `fullNatoStockNumber`、要素の文）。2 つ目からと、子の `refs` は知らせる | 書ける（13 桁の番号を 3 つの属性に分けて書く。`fullNatoStockNumber` と `refs` は書けない） |
 | 品目のほかの識別子（`toolRef`・`partRef`・`supplyRef`・`supplyRqmtRef`・`catalogSeqNumberRef`・`materialSetRef`） | 知らせる（`attrs.otherIdentifiers` に要素名） | 書けない |
 | `shortName`・`@materialUsage`・`@supplyCategory` | `attrs` に読む | 書けない |
 | `hazards`・`embedded…Descr`・脚注 | 知らせる | 書けない |
@@ -145,7 +145,7 @@ flowchart TB
 | 2 | `person` に `personCategoryCode`・`skillLevelCode`・`estimatedTime`・`estimatedTimeUnit` を足す | `personCategory`、`personSkill`、`estimatedTime` | 済み |
 | 3 | `document` に `reqTechInfoCategory` を足す | `reqTechInfo/@reqTechInfoCategory` | 済み |
 | 4 | 条件の `para` が `refs`（`dmRef`・`pmRef` を 1 つ）を受け取る。`closeRqmts` でも同じ | `reqCondDm`、`reqCondPm` | 済み |
-| 5 | 品目の識別子を増やす（`toolRef`、`partRef`、`supplyRef`、`natoStockNumber` など） | 識別子の選択肢 | `natoStockNumber` は済み（`9bff422`、2026-11-15。実在の TM の消耗品の一覧が NSN で品目を示していたため）。品目に要る識別子は「`natoStockNumber` か `manufacturerCode` のどちらか 1 つ以上」になった。ほかは次の版。形を決める必要がある |
+| 5 | 品目の識別子を増やす（`toolRef`、`partRef`、`supplyRef`、`natoStockNumber` など） | 識別子の選択肢 | `natoStockNumber` は済み（`682dde2`、2026-11-15。実在の TM の消耗品の一覧が NSN で品目を示していたため）。品目に要る識別子は「`natoStockNumber` か `manufacturerCode` のどちらか 1 つ以上」になった。ほかは次の版。形を決める必要がある |
 | 6 | 安全の要件を参照で書く（`@warningRefs` / `@cautionRefs` と `warningsAndCautionsRef`） | 共通の警告・注意 | 次の版。DM の先頭に別の要素を足す必要があり、範囲が広い |
 
 1〜4 をすべて入れた手順 DM と故障探求 DM を組み立て、Issue 7 の XSD で valid、既定 BREX で違反 0 件を確かめました（2026-11-15）。
