@@ -36,7 +36,7 @@ MCP 4 本は、`package.json` が `@shuji-bonji/s1000d-core` を `^0.9.0` で指
 |---|---|---|
 | 1 | （済み、writer-mcp `85428f1`、2026-11-15 14:20 JST）R11: writer が `dmRef` の `dmTitle` に `infoName` を書く。いまは `techName`（マニュアルの題名）だけなので、「次に進む: 」の参照や PM の項目に、行き先の作業の名前が出ない | 無し。作業前の要件の `reqTechInfo` の参照には `infoName` が入っているので、書き方の違いを core の `dmRefEl` と writer-mcp の両方で確かめる |
 | 2 | （済み、2026-11-15 23:15 JST。識別子を `natoStockNumber` で書く。model 0.4.0 `4137a87`・core 0.10.0 `682dde2`・writer-mcp `e642dd8`。経緯は [tm-eval-progress.md](./tm-eval-progress.md) の「材料 4 品目の書き方」）見本の材料 4 品目の書き方を決める | 元の文書は材料を「消耗品の一覧の品目番号」で示していて、部品番号と数量が無い。W-10 の後は、この 3 つの手順 DM は作られない。`reqQuantity` は文でも書ける。識別子は `supplyRqmtRef`（`supplyRqmtNumber` が必須）が近い形だが、使い方を仕様書で確かめていない。core が書ける識別子は `identNumber` だけ（core の設計の 5） |
-| 3 | Bike Samples で、読み取りの結果に無いテキスト節点 66 個を減らす | `displayText`（15）、`partNumber`（7）、`faultDescr`（6）など。`src/content/coverage.spec.test.ts` の上限を、減った数に下げる |
+| 3 | （済み、core `eacf347`、2026-11-16 08:30 JST。66 個 → 13 個。経緯は tm-eval-progress.md の「Bike Samples の 66 個」）Bike Samples で、読み取りの結果に無いテキスト節点 66 個を減らす | `displayText`（15）、`partNumber`（7）、`faultDescr`（6）など。`src/content/coverage.spec.test.ts` の上限を、減った数に下げる |
 | 4 | W-4 → W-5 → RD-2（hotspot） | core に足す形は、XSD の `hotspot` と配布物の実測から決める（D-31） |
 | 5 | 仕様書のプロセス DM の章を読んでから W-6 | |
 | 6 | M-4〜M-7 と W-9、その後に優先 3 | |

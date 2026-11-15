@@ -60,12 +60,14 @@ preliminaryRqmts
 | 品目の `natoStockNumber`（`682dde2` から） | 節点の `natoStockNumber`（3 つの属性をつないだ番号。属性が無ければ `fullNatoStockNumber`、要素の文）。2 つ目からと、子の `refs` は知らせる | 書ける（13 桁の番号を 3 つの属性に分けて書く。`fullNatoStockNumber` と `refs` は書けない） |
 | 品目のほかの識別子（`toolRef`・`partRef`・`supplyRef`・`supplyRqmtRef`・`catalogSeqNumberRef`・`materialSetRef`） | 知らせる（`attrs.otherIdentifiers` に要素名） | 書けない |
 | `shortName`・`@materialUsage`・`@supplyCategory` | `attrs` に読む | 書けない |
-| `hazards`・`embedded…Descr`・脚注 | 知らせる | 書けない |
+| 入れ子の品目（`embedded…Descr`。`eacf347` から） | 親の品目の `children`（同じ種類の節点） | 書けない（下書きの品目は子を受け取らない） |
+| `hazards`・脚注 | 知らせる | 書けない |
 | `safetyRqmts` の `warning`・`caution`・`note` | 子の `admonition` | 書ける |
 | `safetyRqmts` の `@warningRefs`・`@cautionRefs` | 参照先を `admonition` として返す（`attrs.referencedId`。見つからなければ `attrs.unresolved`） | 書けない |
 | `productionMaintData` | 知らせる | 書けない |
 | 参照（`dmRef`・`pmRef`）の版（`issueInfo`）・言語・`@applicRefId`、`dmRef` の `@referredFragment` と題名の内訳 | 参照の `issueInfo`・`language`・`applicRefId`・`fragment`・`techName`・`infoName` | 書ける |
-| 参照の `behavior`・`identExtension`、外部の文書の発行情報 | 知らせる | 書けない |
+| 外部の文書の版と発行日（`externalPubIssue`・`externalPubIssueDate` の文。`eacf347` から） | 参照の `externalPubIssue`・`externalPubIssueDate` | 書けない |
+| 参照の `behavior`・`identExtension`、外部の文書のほかの発行情報 | 知らせる | 書けない |
 
 経過:
 

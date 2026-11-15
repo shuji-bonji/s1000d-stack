@@ -2,7 +2,7 @@
 
 [tm-eval-requests.md](./tm-eval-requests.md) の「進める順」に沿って行った作業の記録です。要望の ID（RD-1、W-3 など）は同じ文書のものです。
 
-- 作成日: 2026-11-15（JST）、更新: 同日 23:15 JST 頃（順 4、W-10、RD-3、R11、材料 4 品目の書き方まで）、同日 23:55 JST 頃（core 0.10.0 と model 0.4.0 の公開、MCP 4 本の依存の更新）、2026-11-16 07:40 JST 頃（MCP 4 本が core 0.10.0 で動くことの確認）、同日 08:05 JST 頃（MCP 4 本の公開）
+- 作成日: 2026-11-15（JST）、更新: 同日 23:15 JST 頃（順 4、W-10、RD-3、R11、材料 4 品目の書き方まで）、同日 23:55 JST 頃（core 0.10.0 と model 0.4.0 の公開、MCP 4 本の依存の更新）、2026-11-16 07:40 JST 頃（MCP 4 本が core 0.10.0 で動くことの確認）、同日 08:05 JST 頃（MCP 4 本の公開）、同日 08:30 JST 頃（Bike Samples の 66 個）
 - 評価フォルダー: `/Users/bonji/s1000d-stack-eval/tm-9-6115-749-10/`
 
 ## 済んだ作業
@@ -29,6 +29,7 @@
 | 材料 | 品目の識別子として `natoStockNumber` を読み書きする | s1000d-core | `682dde2` |
 | 材料 | `convert_manual` が品目の `natoStockNumber` を書く。W-10 の判定を「識別子（NSN か製造者のコード）か数量の無い品目」に変える | s1000d-writer-mcp | `e642dd8` |
 | 材料の後 | 依存を core `^0.10.0` に上げる | s1000d-reader-mcp / s1000d-verify-mcp / s1000d-brex-mcp | `473c29a` / `00105ac` / `b9ba18e` |
+| RD-3 の後 | Bike Samples で、読み取りの結果に無いテキスト節点を 66 個から 13 個に減らす | s1000d-core | `eacf347`（未公開） |
 | 材料 | 見本の材料 4 品目に、WP 0021 の NSN・部品番号・CAGE コードと「As required」を書き、変換し直す | 評価フォルダー（リポジトリには入れない） | — |
 
 設計と決定は次の文書にあります。
@@ -40,7 +41,7 @@
 | [DECISIONS.md](../DECISIONS.md) の D-31 | core は S1000D の構造を出発点にし、model の都合で形を決めない |
 
 > [!IMPORTANT]
-> 公開と push の状態です（2026-11-16 08:03 JST に確かめた）。core・model・MCP 4 本はすべて公開済みで、6 つのリポジトリとも `origin/main` と一致しています。未公開のコミットはありません。
+> 公開と push の状態です（2026-11-16 08:03 JST に確かめた）。core・model・MCP 4 本はすべて公開済みで、その時点では 6 つのリポジトリとも `origin/main` と一致していました。その後のコミットは、core の `eacf347`（Bike Samples の 66 個。08:28 JST、未公開・未 push）だけです。
 >
 > | リポジトリ | 公開した版（`package.json`・git の tag・npm が同じ） | core への依存 |
 > |---|---|---|
@@ -203,6 +204,45 @@ PM は、`pmEntry` 13 件・DM への参照 23 件がすべて解決していて
 >
 > 確かめていないこと: core 自身の配布物を使うテスト（core のフォルダーでの `S1000D_SPEC_TESTS=1 npm test`）を、今回の変更の後に実行したかどうかは、記録がありません。Bike Samples の `preliminaryRqmts` には `natoStockNumber` が無い（`grep` で確かめた）ので、往復の数は変わらない見込みです。
 
+## Bike Samples の 66 個（2026-11-16 08:30 JST まで）
+
+本文のテキスト節点のうち、読み取りの結果に無かった 66 個を、要素ごとに調べて直しました（core `eacf347`、未公開。次の版は 0.11.0）。
+
+| 対象（Bike Samples、本文を構造化して読む 59 件、テキスト節点 1,587 個） | core 0.10.0 | `eacf347` |
+|---|---|---|
+| 読み取りの結果に無いテキスト節点 | 66 個 | 13 個 |
+| そのうち、reader が知らせていないもの | 数えていなかった | 0 個 |
+| 1 つも落とさずに読めた DM | 39 件 | 55 件 |
+
+66 個の内訳と扱いです。
+
+| 個数 | 場所 | 0.10.0 での扱い | 直した後 |
+|---|---|---|---|
+| 15 | 本文の先頭の適用性の文（`referencedApplicGroup/applic/displayText`） | `readApplicStatements` が読んでいた。測り方が `readContentFromXml` の結果だけを見ていた | 測り方を直した（適用性の読み取りの結果も含めて数える）。reader は変えていない |
+| 6 | 不具合の説明（`faultDescr/descr`） | 黙って落としていた（同じ親の `fault/@faultCode` も） | `kind: "para"`・`element: "faultDescr"` の節点。`attrs.faultCode` |
+| 4 | メニューの選択肢と知らせ（`menuChoice/prompt`・`message/prompt`） | 黙って落としていた（選択肢は空の `listItem`） | 選択肢は `listItem` の `text`、知らせは `prompt` ごとの `para` |
+| 8 | 図の凡例（`figure/legend` の中の定義リスト）、定義リストの見出し（`definitionListHeader`） | 黙って落としていた | 凡例は `figure` の `children`、見出しは `list` の `attrs.termTitle`・`definitionTitle` |
+| 1 | 折り込みの中の図の題名（`foldout/figure/title`） | `foldout` を 1 つの `figure` として読み、中の図の題名を落としていた | `foldout` を容れ物として辿り、中の `figure` を題名つきで返す |
+| 7 | 外部の文書の版と発行日（`externalPubIssue`・`externalPubIssueDate`） | 知らせていた（`notReadElements`） | 参照の `externalPubIssue`・`externalPubIssueDate` |
+| 11 | 入れ子の品目（`embedded…Descr` の名前と部品番号） | 知らせていた | 親の品目の `children`（同じ種類の節点） |
+| 2 | プロセス DM の変数の値（`variableDeclarations`・`variablePreSet` の中の `stringValue`） | 黙って落としていた | 読まないが、`notReadElements` で知らせる（`variablePostSet`・`validate`・`assertion` も同じ） |
+| 1 | 図の改訂の理由（`graphic/reasonForAmendment`） | 黙って落としていた | 読まないが、`notReadElements` で知らせる |
+| 11 | 品目の危険性（`hazards`、4）、作業の場所（`productionMaintData`、5）、`supplyRef` の名前（1）、品目の脚注（1）。作業の場所のうち 1 個は「and」という短い文で、直した後は別の場所の同じ文字列に一致して数に入らなくなった | 知らせていた | そのまま（返す形を決める必要がある） |
+
+残りの 13 個は、`hazards` 4、`productionMaintData` 4、変数の値 2、`supplyRef`・`reasonForAmendment`・脚注が各 1 で、どれも `notReadElements` に入っている要素の中にあります。
+
+確かめたこと:
+
+- クラウド側のテスト: 289 件が通った（配布物を使う 39 件はスキップ）。上の変更を確かめるテストを 4 件足した。
+- 配布物を使うテストと同じ計算を、Mac 側の VM で Bike Samples に対して動かした（core の `src` とテスト用の `src/__fixtures__` を一時フォルダーでビルドした）。本文の文字は上の表のとおり。`preliminaryRqmts` の往復は変わらず（失われる要素・属性 602 個、何も失わずに往復できる DM 26 件）、reader が読まず知らせてもいない要素・属性は 0 種類だった。
+- 評価フォルダーの `csdb-nsn/`（23 件、テキスト節点 577 個）: 読み取りの結果に無いものは 0 個、`unknownElements` は空。`notReadElements` は `variableDeclarations` 1（プロセス DM の変数の宣言。これまでは知らせていなかった）。
+- `coverage.spec.test.ts` の上限を 13 個・55 件に下げ、知らせていないものが 0 個であることも確かめるようにした。
+
+> [!NOTE]
+> vitest での配布物のテスト（core のフォルダーで `S1000D_SPEC_TESTS=1 npm test`）は、Mac でまだ実行していません。上の数は、同じ計算を VM で動かした結果です。
+>
+> reader-mcp は core の節点をそのまま返すので、core を上げると `read_data_module` の応答も同じように変わります。`element: "foldout"` の `figure` を前提にしている利用側があれば、影響を受けます（Skill 4 つは確かめていません）。
+
 ## 作業中に分かったこと
 
 | 項目 | 内容 | 扱い |
@@ -226,7 +266,8 @@ PM は、`pmEntry` 13 件・DM への参照 23 件がすべて解決していて
 
 | 順 | 作業 | 待つもの |
 |---|---|---|
-| RD-3 の後 | Bike Samples で残っている 66 個を減らす | 無し |
+| 公開 | core 0.11.0 を公開し、MCP 4 本の依存を `^0.11.0` に上げる（0.x の `^` は minor を固定するので、`package.json` の書き換えが要る） | 利用者の作業。先に、core のフォルダーで `S1000D_SPEC_TESTS=1 npm test` を実行する |
+| Bike の後 | 知らせているだけの残り（`hazards`、`productionMaintData`、`supplyRef` の名前、品目の脚注、プロセス DM の変数の操作）を読む | 返す形を XSD から決める（D-31）。`fault` の DM には、`unknown` のまま返している要素（`lru`・`bitMessage`・`circuitBreakerDescr` など）もある |
 | R11 の後 | 作らなかった DM への参照（R14）の扱いを決める | W-10 の続き。見本では起きなくなったが、識別子の無い品目を持つマニュアルでは今も起きる |
 | 5 | W-4 → W-5 → RD-2 | core に足す形は、XSD の `hotspot` と配布物の実測から決める（D-31） |
 | 6 | 仕様書のプロセス DM の章を読んでから W-6 | — |
