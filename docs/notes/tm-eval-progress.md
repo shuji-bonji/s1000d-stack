@@ -2,7 +2,7 @@
 
 [tm-eval-requests.md](./tm-eval-requests.md) の「進める順」に沿って行った作業の記録です。要望の ID（RD-1、W-3 など）は同じ文書のものです。
 
-- 作成日: 2026-11-15（JST）、更新: 同日 23:15 JST 頃（順 4、W-10、RD-3、R11、材料 4 品目の書き方まで）、同日 23:55 JST 頃（core 0.10.0 と model 0.4.0 の公開、MCP 4 本の依存の更新）、2026-11-16 07:40 JST 頃（MCP 4 本が core 0.10.0 で動くことの確認）
+- 作成日: 2026-11-15（JST）、更新: 同日 23:15 JST 頃（順 4、W-10、RD-3、R11、材料 4 品目の書き方まで）、同日 23:55 JST 頃（core 0.10.0 と model 0.4.0 の公開、MCP 4 本の依存の更新）、2026-11-16 07:40 JST 頃（MCP 4 本が core 0.10.0 で動くことの確認）、同日 08:05 JST 頃（MCP 4 本の公開）
 - 評価フォルダー: `/Users/bonji/s1000d-stack-eval/tm-9-6115-749-10/`
 
 ## 済んだ作業
@@ -27,8 +27,8 @@
 | R11 | `dmRef` の `dmTitle` に行き先の DM の `infoName` を書く | s1000d-writer-mcp | `85428f1` |
 | 材料 | 品目に NATO 物品番号（`natoStockNumber`）を足す（0.4.0） | experiential-manual-model | `4137a87` |
 | 材料 | 品目の識別子として `natoStockNumber` を読み書きする | s1000d-core | `682dde2` |
-| 材料 | `convert_manual` が品目の `natoStockNumber` を書く。W-10 の判定を「識別子（NSN か製造者のコード）か数量の無い品目」に変える | s1000d-writer-mcp | `7dfaea3` |
-| 材料の後 | 依存を core `^0.10.0` に上げる | s1000d-reader-mcp / s1000d-verify-mcp / s1000d-brex-mcp | `45330a0` / `91519f8` / `f9f4a6e` |
+| 材料 | `convert_manual` が品目の `natoStockNumber` を書く。W-10 の判定を「識別子（NSN か製造者のコード）か数量の無い品目」に変える | s1000d-writer-mcp | `e642dd8` |
+| 材料の後 | 依存を core `^0.10.0` に上げる | s1000d-reader-mcp / s1000d-verify-mcp / s1000d-brex-mcp | `473c29a` / `00105ac` / `b9ba18e` |
 | 材料 | 見本の材料 4 品目に、WP 0021 の NSN・部品番号・CAGE コードと「As required」を書き、変換し直す | 評価フォルダー（リポジトリには入れない） | — |
 
 設計と決定は次の文書にあります。
@@ -40,21 +40,20 @@
 | [DECISIONS.md](../DECISIONS.md) の D-31 | core は S1000D の構造を出発点にし、model の都合で形を決めない |
 
 > [!IMPORTANT]
-> 公開と push の状態です（2026-11-16 07:38 JST に確かめた）。core 0.10.0 と model 0.4.0 は公開済みで、`origin/main` と一致しています。MCP 4 本は push していません。
+> 公開と push の状態です（2026-11-16 08:03 JST に確かめた）。core・model・MCP 4 本はすべて公開済みで、6 つのリポジトリとも `origin/main` と一致しています。未公開のコミットはありません。
 >
-> 利用者が公開のときに署名を付け直したので、コミットのハッシュが変わりました（model `f1daae5` → `4137a87`、core `9bff422` → `682dde2`、writer-mcp `870b38a` → `7dfaea3`）。この文書は新しいハッシュで書いています。
+> | リポジトリ | 公開した版（`package.json`・git の tag・npm が同じ） | core への依存 |
+> |---|---|---|
+> | s1000d-core | 0.10.0（2026-11-15） | — |
+> | experiential-manual-model | 0.4.0（2026-11-15） | — |
+> | s1000d-writer-mcp | 0.3.0（2026-11-16） | `^0.10.0`（model は `^0.4.0`） |
+> | s1000d-reader-mcp | 0.9.0（2026-11-16） | `^0.10.0` |
+> | s1000d-verify-mcp | 0.7.1（2026-11-16） | `^0.10.0` |
+> | s1000d-brex-mcp | 0.6.1（2026-11-16） | `^0.10.0` |
 >
-> | リポジトリ | `origin/main` との差 | `package.json` の版 | npm の最新 | core への依存 |
-> |---|---|---|---|---|
-> | s1000d-core | 一致（`682dde2`、`4b588c6` 0.10.0） | 0.10.0 | 0.10.0 | — |
-> | experiential-manual-model | 一致（`4137a87`） | 0.4.0 | 0.4.0 | — |
-> | s1000d-writer-mcp | 4 コミット先（`601e53e`・`5a97182`・`85428f1`・`7dfaea3`） | 0.2.0（上げていない。CHANGELOG は「未リリース」の節） | 0.2.0 | `^0.10.0`。`package-lock.json` と `node_modules` は 0.10.0（model は 0.4.0） |
-> | s1000d-reader-mcp | 3 コミット先（`2154c17`・`ad55420`・`45330a0`） | 0.8.0（同上） | 0.8.0 | `^0.10.0`。`package-lock.json` と `node_modules` は 0.10.0 |
-> | s1000d-verify-mcp | 3 コミット先（`4c4c14a`・`2471a66`・`91519f8`） | 0.7.0（同上） | 0.7.0 | 同上 |
-> | s1000d-brex-mcp | 3 コミット先（`656cf5f`・`bb71254`・`f9f4a6e`） | 0.6.0（同上） | 0.6.0 | 同上 |
-> | s1000d-stack（hub） | 文書のコミットの分だけ先 | — | — | — |
+> MCP 4 本は、MCP Registry（`mcp-publisher publish`）にも同じ版で登録済みです。claude-plugins リポジトリの台帳も 4 本の版に合わせてあります（`4452056`）。hub の `stack.json` の `published` も同じ版です。
 >
-> writer-mcp は、Mac で `S1000D_SPEC_TESTS=1 npm test` が通り（54 件）、`npm run build` も済んでいます（2026-11-15 23:45 JST）。
+> 利用者が公開のときに署名を付け直したので、コミットのハッシュが変わりました（model `f1daae5` → `4137a87`、core `9bff422` → `682dde2`、writer-mcp `870b38a` → `7dfaea3` → `e642dd8`、reader-mcp `45330a0` → `473c29a`、verify-mcp `91519f8` → `00105ac`、brex-mcp `f9f4a6e` → `b9ba18e`）。この文書は新しいハッシュで書いています。
 >
 > reader-mcp・verify-mcp・brex-mcp は、2026-11-15 23:45 JST の `npm update @shuji-bonji/s1000d-core` では core が上がりませんでした。`^0.9.0` の範囲に 0.10.0 が入らないためです（0.x の `^` は minor を固定します）。`package.json` と `package-lock.json` を 0.10.0 に直してコミットし（`package-lock.json` は、writer-mcp の同じ項目の `version`・`resolved`・`integrity` を写しました）、利用者が 3 本で `npm ci`、`S1000D_SPEC_TESTS=1 npm test`、`npm run build` を実行しました（2026-11-16 07:30 JST。reader 32 件、verify 40 件、brex 26 件が通った）。
 >
@@ -180,7 +179,7 @@ PM は、`pmEntry` 13 件・DM への参照 23 件がすべて解決していて
 
 - **model 0.4.0**（`4137a87`）: 品目（`equipment`・`supplies`・`spares`）に `natoStockNumber`（任意）。13 桁の数字で、4-2-3-4 桁をハイフンで区切って書ける。`validateManual` と JSON Schema が形を検査する。テスト 15 件。
 - **core 0.10.0**（`682dde2`）: 下書きの `equipment`・`supply`・`spare` に `natoStockNumber`。3 つの属性に、0 で始まる桁をそのまま書く。品目に要る識別子は「`natoStockNumber` か `manufacturerCode` のどちらか 1 つ以上」になった。`partNumber` は `identNumber` に書くので、NSN があっても `manufacturerCode` が要る。読む側は、節点の `natoStockNumber` に番号を返し（属性 → `fullNatoStockNumber` → 要素の文の順）、要約の文に「NSN …」を入れる。同じ品目の 2 つ目からの `natoStockNumber` と、その子の `refs` は `notReadElements` に数える。テスト 285 件（配布物を使う 39 件はスキップ）。
-- **writer-mcp**（`7dfaea3`）: `convert_manual` が model の `natoStockNumber` を core の下書きに写す。W-10 の判定は「識別子（`natoStockNumber` か `manufacturerCode`）か `quantity` の無い品目」になった。NSN だけがある品目の `partNumber` は書かず、`notRepresented` に返す。テスト 52 件（配布物を使う 2 件はスキップ）。
+- **writer-mcp**（`e642dd8`）: `convert_manual` が model の `natoStockNumber` を core の下書きに写す。W-10 の判定は「識別子（`natoStockNumber` か `manufacturerCode`）か `quantity` の無い品目」になった。NSN だけがある品目の `partNumber` は書かず、`notRepresented` に返す。テスト 52 件（配布物を使う 2 件はスキップ）。
 - **見本**: `src/build.mts` の冷却系統の材料 4 品目に、上の表の NSN・部品番号・CAGE コードと `quantity: 'As required'` を書いた。支給単位は `note` に書いた（`remarks` になる）。`validateManual` はエラー 0 件・警告 0 件で、`manual.json` の差は 3 つの Topic の `supplies` だけ。
 
 変換の結果（評価フォルダーの `csdb-nsn/`、応答は `csdb-nsn.convert.json`、2026-11-15 23:08 JST）:
@@ -227,7 +226,6 @@ PM は、`pmEntry` 13 件・DM への参照 23 件がすべて解決していて
 
 | 順 | 作業 | 待つもの |
 |---|---|---|
-| push | MCP 4 本と hub を push する | 利用者の作業。MCP 4 本は版を上げていない（CHANGELOG は「未リリース」の節） |
 | RD-3 の後 | Bike Samples で残っている 66 個を減らす | 無し |
 | R11 の後 | 作らなかった DM への参照（R14）の扱いを決める | W-10 の続き。見本では起きなくなったが、識別子の無い品目を持つマニュアルでは今も起きる |
 | 5 | W-4 → W-5 → RD-2 | core に足す形は、XSD の `hotspot` と配布物の実測から決める（D-31） |
