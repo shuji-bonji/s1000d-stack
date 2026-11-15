@@ -118,7 +118,7 @@ MCP 3 本の依存を core `^0.9.0` に上げました（決定は同じとき�
 |---|---|---|
 | 説明 DM の箇条書きが、文の無い段落になる。用語の DM は、文の無い段落 1 つだけになる | core の reader は、`para` の中のブロック要素（`randomList`・`definitionList` など）を、文にも子にも入れていなかった。`unknownElements` にも `notReadElements` にも数えていなかった。core の writer はリストを `para` の中に書く（S1000D の普通の書き方） | 直した（core `9328bbf`） |
 | プロセス DM の `dmNode` が、題名だけで返る。その画面の手順 DM への `dmRef` が返らない | reader が `dmNode` の直下の参照を読んでいなかった（テストにも「reader は読まない」と書いてあった） | 直した（同上） |
-| 参照の題名が、どれもマニュアルの題名（`techName`）になる。「次に進む: [→ …-12A-520A-D AMMPS 5 kW 発電機 操作の手引き…]」のように、行き先の作業の名前が出ない | writer が `dmRef` の `dmTitle` に `infoName` を書いていない（作業前の要件の `reqTechInfo` の参照には書いている） | 未着手（R11） |
+| 参照の題名が、どれもマニュアルの題名（`techName`）になる。「次に進む: [→ …-12A-520A-D AMMPS 5 kW 発電機 操作の手引き…]」のように、行き先の作業の名前が出ない | writer が `dmRef` の `dmTitle` に `infoName` を書いていない（作業前の要件の `reqTechInfo` の参照には書いている） | 済み（R11、writer-mcp `85428f1`） |
 
 D-31 の「読む側は落とさない」を、`preliminaryRqmts` 以外でも数で確かめるために、本文のテキスト節点が読み取りの結果に残っているかを数えるテストを core に足しました（`src/content/coverage.spec.test.ts`）。
 
@@ -133,6 +133,13 @@ PM は、`pmEntry` 13 件・DM への参照 23 件がすべて解決していて
 
 > [!IMPORTANT]
 > 読み取りの修正は core の未公開のコミットです。reader-mcp の応答に反映するには、core の公開（0.9.1）と、reader-mcp の依存の更新が要ります。それまで、`s1000d-reader-dev` は箇条書きと用語集を空の段落として返します。
+
+## R11: 参照の題名（2026-11-15 14:20 JST まで）
+
+- 起動し直した後の `s1000d-reader-dev` で用語の DM（`AMMPS5KW-A-10-20-00-05A-040A-D`）を読み、`kind: "list"`（`definitionList`）と `definition` 6 件が返った。core 0.9.1 の修正が `-dev` 版に反映されている。
+- writer-mcp `85428f1`: `convert_manual` が、`dmRef` の `dmTitle` に行き先の DM の `infoName` を書く。`infoName` は行き先の DM 自身の `dmTitle/infoName` と同じ値（Topic は題名、画面は「Topic の題名 - 画面の名前」、用語は「用語」）。対象は、手順の飛び先、困ったときの対処、画面の流れの節、PM の項目、作業前の要件の参照の 5 つ。core の `dmRefEl` は既に `infoName` を書けた（`title` が必須）ので、core は変えていない。
+- クラウド側のテスト: 51 件が通った（仕様のテスト 2 件は配布物が無いので飛ばした）。
+- Mac でビルドした writer で見本を変換し、`csdb-r11/` に書いた（DM 20 件、PM 1 件。冷却系統の 3 件は W-10 のとおり `input-error`）。`dmRef` 38 件すべてに `infoName` が入った。XSD は 21 件すべて valid、BREX の違反は 0 件。
 
 ## 作業中に分かったこと
 
@@ -150,6 +157,7 @@ PM は、`pmEntry` 13 件・DM への参照 23 件がすべて解決していて
 | model の CHANGELOG | 0.2.0 は npm に公開済みだが、見出しが「0.2.0 (未リリース)」のままだった | 済み（`cb254e1` で日付にした） |
 | 文書の置き場所 | 設計・記録の文書は、Project と hub のリポジトリ（`s1000d-stack/docs/`）の両方に置く。2026-11-15 の途中まで、新しい文書を Project にだけ書いていた | 両方に置くようにした |
 | テストの実行場所 | Mac 側の Linux VM では、`node_modules` が macOS 用のため vitest が起動しない（空きも 75 MB）。GitHub から clone したクラウド側で実行した。`tsc` と、ビルドした JS を node で動かすこと（libxml2-wasm での XSD 検証、Bike Samples の読み取りを含む）は VM でもできる | 作業の仕方の記録 |
+| W-10 で作らなかった DM への参照 | 冷却系統の 3 件の DM を作らなかったので、PM の項目 3 件と故障探求の DM（`…-00A-411A-D`）の参照 1 件が、無い DM を指す。`convert_manual` の応答では `references` が `unresolved` になり、`unresolvedReferenceCount` は 4 だった（2026-11-15 14:20 JST） | 未着手（R14） |
 | writer-mcp の `.git/objects/maintenance.lock` | 2026-11-05 の日付の、大きさ 0 のファイルが残っている | 触っていない |
 
 ## 残り
@@ -157,8 +165,8 @@ PM は、`pmEntry` 13 件・DM への参照 23 件がすべて解決していて
 | 順 | 作業 | 待つもの |
 |---|---|---|
 | 4 の後 | 見本の材料 4 品目の書き方を決める（数量を文で書く、識別子を `supplyRqmtRef` などにする） | core が書ける識別子は `identNumber` だけ（core の設計の 5）。仕様書で `supplyRqmtRef` の使い方を確かめる |
-| RD-3 の後 | core 0.9.1 の公開と、reader-mcp の依存の更新 | 利用者の公開 |
-| RD-3 の後 | R11（`dmRef` の `dmTitle` に `infoName` を書く）。Bike Samples で残っている 66 個を減らす | 無し |
+| RD-3 の後 | Bike Samples で残っている 66 個を減らす | 無し |
+| R11 の後 | 作らなかった DM への参照（R14）の扱いを決める | W-10 の続き。材料 4 品目の書き方が決まれば、見本では起きなくなる |
 | 5 | W-4 → W-5 → RD-2 | core に足す形は、XSD の `hotspot` と配布物の実測から決める（D-31） |
 | 6 | 仕様書のプロセス DM の章を読んでから W-6 | — |
 | 7 | M-4〜M-7 と W-9、その後に優先 3 | — |
