@@ -2,7 +2,7 @@
 
 [tm-eval-requests.md](./tm-eval-requests.md) の「進める順」に沿って行った作業の記録です。要望の ID（RD-1、W-3 など）は同じ文書のものです。
 
-- 作成日: 2026-11-15（JST）、更新: 同日 23:15 JST 頃（順 4、W-10、RD-3、R11、材料 4 品目の書き方まで）、同日 23:55 JST 頃（core 0.10.0 と model 0.4.0 の公開、MCP 4 本の依存の更新）
+- 作成日: 2026-11-15（JST）、更新: 同日 23:15 JST 頃（順 4、W-10、RD-3、R11、材料 4 品目の書き方まで）、同日 23:55 JST 頃（core 0.10.0 と model 0.4.0 の公開、MCP 4 本の依存の更新）、2026-11-16 07:40 JST 頃（MCP 4 本が core 0.10.0 で動くことの確認）
 - 評価フォルダー: `/Users/bonji/s1000d-stack-eval/tm-9-6115-749-10/`
 
 ## 済んだ作業
@@ -40,7 +40,7 @@
 | [DECISIONS.md](../DECISIONS.md) の D-31 | core は S1000D の構造を出発点にし、model の都合で形を決めない |
 
 > [!IMPORTANT]
-> 公開と push の状態です（2026-11-15 23:50 JST に確かめた）。core 0.10.0 と model 0.4.0 は公開済みで、`origin/main` と一致しています。MCP 4 本は push していません。
+> 公開と push の状態です（2026-11-16 07:38 JST に確かめた）。core 0.10.0 と model 0.4.0 は公開済みで、`origin/main` と一致しています。MCP 4 本は push していません。
 >
 > 利用者が公開のときに署名を付け直したので、コミットのハッシュが変わりました（model `f1daae5` → `4137a87`、core `9bff422` → `682dde2`、writer-mcp `870b38a` → `7dfaea3`）。この文書は新しいハッシュで書いています。
 >
@@ -49,14 +49,16 @@
 > | s1000d-core | 一致（`682dde2`、`4b588c6` 0.10.0） | 0.10.0 | 0.10.0 | — |
 > | experiential-manual-model | 一致（`4137a87`） | 0.4.0 | 0.4.0 | — |
 > | s1000d-writer-mcp | 4 コミット先（`601e53e`・`5a97182`・`85428f1`・`7dfaea3`） | 0.2.0（上げていない。CHANGELOG は「未リリース」の節） | 0.2.0 | `^0.10.0`。`package-lock.json` と `node_modules` は 0.10.0（model は 0.4.0） |
-> | s1000d-reader-mcp | 3 コミット先（`2154c17`・`ad55420`・`45330a0`） | 0.8.0（同上） | 0.8.0 | `^0.10.0`。`package-lock.json` は 0.10.0、`node_modules` は 0.9.1 のまま |
+> | s1000d-reader-mcp | 3 コミット先（`2154c17`・`ad55420`・`45330a0`） | 0.8.0（同上） | 0.8.0 | `^0.10.0`。`package-lock.json` と `node_modules` は 0.10.0 |
 > | s1000d-verify-mcp | 3 コミット先（`4c4c14a`・`2471a66`・`91519f8`） | 0.7.0（同上） | 0.7.0 | 同上 |
 > | s1000d-brex-mcp | 3 コミット先（`656cf5f`・`bb71254`・`f9f4a6e`） | 0.6.0（同上） | 0.6.0 | 同上 |
 > | s1000d-stack（hub） | 文書のコミットの分だけ先 | — | — | — |
 >
-> writer-mcp は、Mac で `S1000D_SPEC_TESTS=1 npm test` が通り（54 件）、`npm run build` も済んでいます（23:45 JST）。
+> writer-mcp は、Mac で `S1000D_SPEC_TESTS=1 npm test` が通り（54 件）、`npm run build` も済んでいます（2026-11-15 23:45 JST）。
 >
-> reader-mcp・verify-mcp・brex-mcp は、23:45 JST の `npm update @shuji-bonji/s1000d-core` では core が上がりませんでした。`^0.9.0` の範囲に 0.10.0 が入らないためです（0.x の `^` は minor を固定します）。そのときのテスト（reader 32 件、verify 40 件、brex 26 件）は core 0.9.1 での結果です。`package.json` と `package-lock.json` を 0.10.0 に直してコミットしました（`package-lock.json` は、writer-mcp の同じ項目の `version`・`resolved`・`integrity` を写しました）。`node_modules` は変えていないので、3 本で `npm ci`、`S1000D_SPEC_TESTS=1 npm test`、`npm run build` を実行してください。
+> reader-mcp・verify-mcp・brex-mcp は、2026-11-15 23:45 JST の `npm update @shuji-bonji/s1000d-core` では core が上がりませんでした。`^0.9.0` の範囲に 0.10.0 が入らないためです（0.x の `^` は minor を固定します）。`package.json` と `package-lock.json` を 0.10.0 に直してコミットし（`package-lock.json` は、writer-mcp の同じ項目の `version`・`resolved`・`integrity` を写しました）、利用者が 3 本で `npm ci`、`S1000D_SPEC_TESTS=1 npm test`、`npm run build` を実行しました（2026-11-16 07:30 JST。reader 32 件、verify 40 件、brex 26 件が通った）。
+>
+> `s1000d-reader-dev` への反映も確かめました（2026-11-16 07:37 JST）。`csdb-nsn/` の `AMMPS5KW-A-10-20-00-11A-520A-D` を読むと、材料 4 品目の節点に `natoStockNumber`（`6850-00-181-7933` など）が返り、要約の文に「NSN …」が入り、`unknownElements` と `notReadElements` は空でした。
 
 ## 順 1〜3 の要点
 
@@ -198,7 +200,7 @@ PM は、`pmEntry` 13 件・DM への参照 23 件がすべて解決していて
 - R8 と、この見本での R14 は消えた。
 
 > [!NOTE]
-> 変換は、公開の前に、Mac 側の VM に writer-mcp の `src` を写してビルドしたもので行いました（`node_modules` の core と model を、hub の `lib/` の作業コピーに向けた）。`s1000d-reader-dev` は、reader-mcp を core 0.10.0 でビルドし直して Claude Desktop を起動し直すまで、NSN を `attrs.otherIdentifiers` と `notReadElements` に `natoStockNumber` として返します。
+> 変換は、公開の前に、Mac 側の VM に writer-mcp の `src` を写してビルドしたもので行いました（`node_modules` の core と model を、hub の `lib/` の作業コピーに向けた）。`s1000d-reader-dev` は、2026-11-16 07:37 JST の時点で core 0.10.0 で動いていて、NSN を節点の `natoStockNumber` に返します。
 >
 > 確かめていないこと: core 自身の配布物を使うテスト（core のフォルダーでの `S1000D_SPEC_TESTS=1 npm test`）を、今回の変更の後に実行したかどうかは、記録がありません。Bike Samples の `preliminaryRqmts` には `natoStockNumber` が無い（`grep` で確かめた）ので、往復の数は変わらない見込みです。
 
@@ -225,7 +227,7 @@ PM は、`pmEntry` 13 件・DM への参照 23 件がすべて解決していて
 
 | 順 | 作業 | 待つもの |
 |---|---|---|
-| 依存の後 | reader-mcp・verify-mcp・brex-mcp で `npm ci`、`S1000D_SPEC_TESTS=1 npm test`、`npm run build` を実行し、Claude Desktop を起動し直す。その後に MCP 4 本を push する | 利用者の作業。起動し直した後、`s1000d-reader-dev` で `csdb-nsn/` の `…-11A-520A-D` を読み、品目の節点に `natoStockNumber` が返れば反映されている |
+| push | MCP 4 本と hub を push する | 利用者の作業。MCP 4 本は版を上げていない（CHANGELOG は「未リリース」の節） |
 | RD-3 の後 | Bike Samples で残っている 66 個を減らす | 無し |
 | R11 の後 | 作らなかった DM への参照（R14）の扱いを決める | W-10 の続き。見本では起きなくなったが、識別子の無い品目を持つマニュアルでは今も起きる |
 | 5 | W-4 → W-5 → RD-2 | core に足す形は、XSD の `hotspot` と配布物の実測から決める（D-31） |
