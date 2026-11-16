@@ -31,8 +31,8 @@
 | 材料の後 | 依存を core `^0.10.0` に上げる | s1000d-reader-mcp / s1000d-verify-mcp / s1000d-brex-mcp | `473c29a` / `00105ac` / `b9ba18e` |
 | RD-3 の後 | Bike Samples で、読み取りの結果に無いテキスト節点を 66 個から 13 個に減らす | s1000d-core | `9a23910`（0.11.0） |
 | Bike の後 | 依存を core `^0.11.0` に上げる | s1000d-reader-mcp / s1000d-verify-mcp / s1000d-brex-mcp / s1000d-writer-mcp | 0.10.0 / 0.7.2 / 0.6.2 / 0.3.1 に入っている |
-| 候補 | 条件付きで禁止する BREX ルールの修正候補を、条件を成り立たなくする変更にする | s1000d-core | `5357014`（未公開） |
-| Bike の残り | Bike Samples で、読み取りの結果に無いテキスト節点を 13 個から 0 個に減らす | s1000d-core | `fd54bf3`（未公開） |
+| 候補 | 条件付きで禁止する BREX ルールの修正候補を、条件を成り立たなくする変更にする | s1000d-core | `f1c58a7`（未公開） |
+| Bike の残り | Bike Samples で、読み取りの結果に無いテキスト節点を 13 個から 0 個に減らす | s1000d-core | `69e6bbf`（未公開） |
 | 材料 | 見本の材料 4 品目に、WP 0021 の NSN・部品番号・CAGE コードと「As required」を書き、変換し直す | 評価フォルダー（リポジトリには入れない） | — |
 
 設計と決定は次の文書にあります。
@@ -279,7 +279,7 @@ PM は、`pmEntry` 13 件・DM への参照 23 件がすべて解決していて
 
 違反の内訳は、BREX-S1-00030（初版までの DM の `issueNumber` と `issueType`）が 9 件、BREX-S1-00038（`issueNumber` が 001 より大きく `issueType` が changed でない DM には、更新の理由が要る）が 8 件、BREX-S1-00121（目次の DM への参照に適用性の情報が要る）が 1 件です。解決しない参照は、配布物に無い PM（`S1000DBIKE-B6865-SAFE1-00`）や DM を指すもの、コードが食い違うもの（`…-00-00AA-941A-D` を指すが、実在するのは `…-00-01AA-941A-D`）などです。Bike Samples は規格の見本として書かれたものですが、XSD と BREX の両方に通る手本ではありません。
 
-### 条件付きで禁止する BREX ルールの修正候補（core `5357014`）
+### 条件付きで禁止する BREX ルールの修正候補（core `f1c58a7`）
 
 `suggest_fixes` は、BREX-S1-00030 に「`identAndStatusSection` を取り除く」、BREX-S1-00038 に「`dmodule` を取り除く」を `exact` で返していました。既定 BREX の禁止ルール 160 件のうち 158 件は、objectPath に述語があります。禁じているのは要素ではなく、述語の条件が成り立っている状態です。`exact` の候補は writer が自動で適用するので、選べないだけでなく危険でもありました。
 
@@ -302,7 +302,7 @@ Bike Samples の 10 件で確かめた候補です（Mac 側の VM で、XSD を
 
 `applyFix` は、この形の `replace`（場所から見た別の場所の属性）と `add`（子孫への要素）を適用します。足した要素は空で、中身は人が書きます。
 
-### Bike Samples の残り 13 個（core `fd54bf3`）
+### Bike Samples の残り 13 個（core `69e6bbf`）
 
 決定（利用者、同 12:37 JST）: 知らせているだけの残りを読む。返す形は、Issue 7 の `proced.xsd`・`process.xsd` と Bike Samples の実物から決めました（D-31）。
 
@@ -325,12 +325,13 @@ Bike Samples の 10 件で確かめた候補です（Mac 側の VM で、XSD を
 確かめたこと:
 
 - Mac 側の VM で、配布物を使う vitest を実行した（core の `src` を `/tmp` に写して `npm ci`。`S1000D_SPEC_TESTS=1`）。335 件が通った。`coverage.spec.test.ts` の上限は 0 個・0 個・59 件に下げた。`preliminaryRqmts` の往復（失われる要素・属性 602 個、26 件）と、reader が読まず知らせてもいない要素・属性が 0 種類であることは変わらない。
+- 利用者が Mac で `S1000D_SPEC_TESTS=1 npm test` を実行し、335 件が通った（2026-11-16 16:08 JST、スキップなし）。
 - クラウド側のテスト: core 296 件が通った（配布物を使う 39 件はスキップ）。この core の `dist` を入れた状態で、reader 27 件、verify 34 件、brex 23 件、writer 52 件が通った（コードの変更なし）。
 
 Bike Samples 全体で、まだ `notReadElements` に数えているのは、`globalPropertyRef` 1（代入先が大域の属性）、`behavior` 2、`pubMedia` 2、`shortExternalPubTitle` 2 です。どれも文を持たない要素か、参照の付随情報です。`unknown` のまま返している要素（故障探求 DM の `lru`・`bitMessage`・`circuitBreakerDescr` など、プロセス DM の `dmIf` の式のうち人が読む文の無いもの）は、文を落としてはいませんが、構造としては読めていません。
 
 > [!IMPORTANT]
-> core の 2 つのコミットは未公開です。公開の版は 0.12.0 の見込みです（読み取りの結果と修正候補が変わる）。reader-mcp の応答に反映するには、core の公開と、MCP 4 本の依存の更新（`^0.12.0`）が要ります。reader-mcp の `src/server.ts` の説明文は、読んでいない要素の例として `productionMaintData, hazards` を挙げているので、そのときに直します。
+> core の 2 つのコミットは、署名を付けて push 済みですが、npm には未公開です（署名の付け直しでハッシュが変わりました: `5357014` → `f1c58a7`、`fd54bf3` → `69e6bbf`）。公開の版は 0.12.0 の見込みです（読み取りの結果と修正候補が変わる）。reader-mcp の応答に反映するには、core の公開と、MCP 4 本の依存の更新（`^0.12.0`）が要ります。reader-mcp の `src/server.ts` の説明文は、読んでいない要素の例として `productionMaintData, hazards` を挙げているので、そのときに直します。
 
 ## 作業中に分かったこと
 
@@ -355,7 +356,7 @@ Bike Samples 全体で、まだ `notReadElements` に数えているのは、`gl
 
 | 順 | 作業 | 待つもの |
 |---|---|---|
-| すぐ | core 0.12.0 の公開（`5357014`・`fd54bf3`）と、MCP 4 本の依存の更新・公開。reader-mcp の説明文の例を直す | 利用者の作業（版を上げる、署名、公開）。依存の書き換えと説明文はこちらで行える |
+| すぐ | core 0.12.0 の公開（`f1c58a7`・`69e6bbf`）と、MCP 4 本の依存の更新・公開。reader-mcp の説明文の例を直す | 利用者の作業（版を上げる、署名、公開）。依存の書き換えと説明文はこちらで行える |
 | Bike の後 | `unknown` のまま返している要素を読む（故障探求 DM の `lru`・`bitMessage`・`circuitBreakerDescr` など、`dmIf` の式のうち人が読む文の無いもの） | 返す形を XSD から決める（D-31） |
 | 候補の後 | BREX-S1-00121 のように、足す属性の値を決められないルールの候補（文書の中の `applic` の id を候補にする、など） | 方針の決定 |
 | R11 の後 | 作らなかった DM への参照（R14）の扱いを決める | W-10 の続き。見本では起きなくなったが、識別子の無い品目を持つマニュアルでは今も起きる |
