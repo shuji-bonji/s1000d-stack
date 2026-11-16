@@ -36,7 +36,7 @@ flowchart LR
 - 段落の中の参照は `[→ DMC 題名]` の形で文に埋め込み、`refs` にも集めます。参照先の題名は CSDB から読みます。LLM が DMC だけを見て中身を推測しないためです。
 - 要件（`preliminaryRqmts` / `closeRqmts`）は「conditions: … / persons: … / support equipment: …」の 1 文に要約します。
 - 故障探求の問いと答えは `question` と `choices`（答えごとの次の手順の id）にします。
-- 読み取り部分が知らない要素は捨てず、`kind: "unknown"` として文だけを残し、`content.unknownElements` に名前と数を返します。読み取り部分を広げる材料になります。Issue 7 の Bike Samples では、`descript` と `pm` に未知の要素は無く、`proced` の未知は回路遮断器（`circuitBreaker…`）の群だけです。
+- 読み取り部分が知らない要素は捨てず、`kind: "unknown"` として文だけを残し、`content.unknownElements` に名前と数を返します。読み取り部分を広げる材料になります。Issue 7 の Bike Samples では、本文を構造化している 5 種のどれにも未知の要素はありません（s1000d-core 0.12.0 以降）。
 
 ## 適用性と検証状態
 

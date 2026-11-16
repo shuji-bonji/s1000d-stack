@@ -36,7 +36,7 @@ flowchart LR
 - References inside a paragraph are embedded in the sentence in the form `[→ DMC title]` and also collected in `refs`. The title of the referenced target is read from the CSDB, so that the LLM does not guess the content from the DMC alone.
 - Requirements (`preliminaryRqmts` / `closeRqmts`) are summarised in one sentence: "conditions: … / persons: … / support equipment: …".
 - Fault isolation questions and answers become `question` and `choices` (the id of the next step for each answer).
-- Elements that the reading code does not know are not discarded: they are kept as `kind: "unknown"` with their text only, and their names and counts are returned in `content.unknownElements`. This gives material for extending the reading code. In the Issue 7 Bike Samples, `descript` and `pm` have no unknown elements, and the only unknown elements in `proced` are the circuit breaker group (`circuitBreaker…`).
+- Elements that the reading code does not know are not discarded: they are kept as `kind: "unknown"` with their text only, and their names and counts are returned in `content.unknownElements`. This gives material for extending the reading code. In the Issue 7 Bike Samples, none of the 5 structured types has unknown elements (s1000d-core 0.12.0 and later).
 
 ## Applicability and verification status
 

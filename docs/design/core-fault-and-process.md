@@ -5,7 +5,7 @@ s1000d-core の `readContent` が、故障探求 DM の故障の報告（`faultR
 形は、Issue 7 の XSD（`fault.xsd`・`process.xsd`）と Bike Samples の実測から決めました（[DECISIONS.md](../DECISIONS.md) の D-31）。experiential-manual-model の形は出発点にしていません。
 
 - 決めた日: 2026-11-16（利用者が 3 つの案を採用）
-- 実装: s1000d-core の `2065390`（式）、`a8744db`（BREX の候補）、`88f5e14`（故障の報告・回路遮断器）。0.12.0 として公開する予定です
+- 実装: s1000d-core の `2065390`（式）、`944209e`（BREX の候補）、`00e99b9`（故障の報告・回路遮断器）。0.12.0 として公開する予定です
 - 対象は読む側だけです。新しく作る側（`DraftNode` → `buildContent`）は変えていません
 
 ## 共通の決まり
@@ -126,7 +126,7 @@ Bike Samples の BREX-S1-00121（009A）は、目次の `dmRef` 82 個すべて�
 
 既定 BREX には、ほかに `dmRef[not(@referredFragment)]` と `brDecision[… not(@brDecisionIdentNumber)]` があります。どちらも値の出どころが文書の中に無いので、候補なしで、`note` に場所だけが入ります。
 
-## Bike Samples の実測（core `88f5e14`、2026-11-16 17:55 JST）
+## Bike Samples の実測（core `00e99b9`、2026-11-16 17:55 JST）
 
 | 測ったもの | 0.11.0 の後（`69e6bbf`） | いま |
 |---|---|---|
