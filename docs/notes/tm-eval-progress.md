@@ -2,7 +2,7 @@
 
 [tm-eval-requests.md](./tm-eval-requests.md) の「進める順」に沿って行った作業の記録です。要望の ID（RD-1、W-3 など）は同じ文書のものです。
 
-- 作成日: 2026-11-15（JST）、更新: 同日 23:15 JST 頃（順 4、W-10、RD-3、R11、材料 4 品目の書き方まで）、同日 23:55 JST 頃（core 0.10.0 と model 0.4.0 の公開、MCP 4 本の依存の更新）、2026-11-16 07:40 JST 頃（MCP 4 本が core 0.10.0 で動くことの確認）、同日 08:05 JST 頃（MCP 4 本の公開）、同日 08:30 JST 頃（Bike Samples の 66 個）、同日 10:05 JST 頃（公開版の試用と、core 0.11.0・MCP 4 本の公開）
+- 作成日: 2026-11-15（JST）、更新: 同日 23:15 JST 頃（順 4、W-10、RD-3、R11、材料 4 品目の書き方まで）、同日 23:55 JST 頃（core 0.10.0 と model 0.4.0 の公開、MCP 4 本の依存の更新）、2026-11-16 07:40 JST 頃（MCP 4 本が core 0.10.0 で動くことの確認）、同日 08:05 JST 頃（MCP 4 本の公開）、同日 08:30 JST 頃（Bike Samples の 66 個）、同日 10:05 JST 頃（公開版の試用と、core 0.11.0・MCP 4 本の公開）、同日 12:55 JST 頃（BREX の修正候補と、Bike Samples の残り 13 個）
 - 評価フォルダー: `/Users/bonji/s1000d-stack-eval/tm-9-6115-749-10/`
 
 ## 済んだ作業
@@ -31,6 +31,8 @@
 | 材料の後 | 依存を core `^0.10.0` に上げる | s1000d-reader-mcp / s1000d-verify-mcp / s1000d-brex-mcp | `473c29a` / `00105ac` / `b9ba18e` |
 | RD-3 の後 | Bike Samples で、読み取りの結果に無いテキスト節点を 66 個から 13 個に減らす | s1000d-core | `9a23910`（0.11.0） |
 | Bike の後 | 依存を core `^0.11.0` に上げる | s1000d-reader-mcp / s1000d-verify-mcp / s1000d-brex-mcp / s1000d-writer-mcp | 0.10.0 / 0.7.2 / 0.6.2 / 0.3.1 に入っている |
+| 候補 | 条件付きで禁止する BREX ルールの修正候補を、条件を成り立たなくする変更にする | s1000d-core | `5357014`（未公開） |
+| Bike の残り | Bike Samples で、読み取りの結果に無いテキスト節点を 13 個から 0 個に減らす | s1000d-core | `fd54bf3`（未公開） |
 | 材料 | 見本の材料 4 品目に、WP 0021 の NSN・部品番号・CAGE コードと「As required」を書き、変換し直す | 評価フォルダー（リポジトリには入れない） | — |
 
 設計と決定は次の文書にあります。
@@ -263,6 +265,73 @@ PM は、`pmEntry` 13 件・DM への参照 23 件がすべて解決していて
 - `apply_fixes` の `selections` で、`suggest_fixes` の候補の `target`（例: `@securityClassification`）を写さないと、`candidate-not-offered` で断られる。`target` も写すと適用される。断る理由からは `target` が足りないことが読み取れない。直すかどうかは決めていない。
 - 確かめていないのは、DML がある CSDB での `reconcile_dml` と、plugin 経由の verify。
 
+## BREX の修正候補と、Bike Samples の残り 13 個（2026-11-16 12:55 JST まで）
+
+### Bike Samples を verify-mcp で確かめた結果
+
+`s1000d-verify-dev` の `verify_csdb` を Bike Samples（DM 106 件 ＋ PM 4 件）に対して実行しました（12:07 JST）。
+
+| 項目 | 件数 |
+|---|---|
+| XSD に valid | 110 件 |
+| BREX の違反がある | 10 件（違反は合計 18 個） |
+| 解決しない参照がある | 6 件 |
+
+違反の内訳は、BREX-S1-00030（初版までの DM の `issueNumber` と `issueType`）が 9 件、BREX-S1-00038（`issueNumber` が 001 より大きく `issueType` が changed でない DM には、更新の理由が要る）が 8 件、BREX-S1-00121（目次の DM への参照に適用性の情報が要る）が 1 件です。解決しない参照は、配布物に無い PM（`S1000DBIKE-B6865-SAFE1-00`）や DM を指すもの、コードが食い違うもの（`…-00-00AA-941A-D` を指すが、実在するのは `…-00-01AA-941A-D`）などです。Bike Samples は規格の見本として書かれたものですが、XSD と BREX の両方に通る手本ではありません。
+
+### 条件付きで禁止する BREX ルールの修正候補（core `5357014`）
+
+`suggest_fixes` は、BREX-S1-00030 に「`identAndStatusSection` を取り除く」、BREX-S1-00038 に「`dmodule` を取り除く」を `exact` で返していました。既定 BREX の禁止ルール 160 件のうち 158 件は、objectPath に述語があります。禁じているのは要素ではなく、述語の条件が成り立っている状態です。`exact` の候補は writer が自動で適用するので、選べないだけでなく危険でもありました。
+
+決定（利用者、2026-11-16 12:37 JST）: 実際に要る修正（`issueType` を直す、更新の理由を足す）を候補にする。
+
+直した後の動きです。
+
+- objectPath に書いてある属性の比較と、要素が無いこと（`not(child::e)`）を拾い、文書を 1 か所だけ変えて objectPath を評価し直す。その要素が選ばれなくなる変更だけを候補にする。条件の and / or / not の組み立ては解釈しない。
+- 属性の値は、XSD が列挙していればその中から試す。要素を足す親は、XSD がその子を許す要素から探す。
+- 対象そのものの識別（`dmAddress` の下のコード・`issueNumber`・`inWork`）を変える候補は出さない。
+- 条件付きのルールの確からしさは `several` か `none`。決められなければ候補なしで、取り除く候補は出さない。述語の無い objectPath は、これまでどおり「取り除く」を `exact` で返す。
+
+Bike Samples の 10 件で確かめた候補です（Mac 側の VM で、XSD を渡して実行）。
+
+| ルール | 違反の場所 | 候補 |
+|---|---|---|
+| BREX-S1-00030（9 件） | `/dmodule/identAndStatusSection` | `dmStatus/@issueType` を `changed`・`deleted`・`revised`・`status`・`rinstate-changed`・`rinstate-revised`・`rinstate-status` のどれかにする（7 つ、`several`） |
+| BREX-S1-00038（8 件） | `/dmodule` | `identAndStatusSection/dmStatus/@issueType` を `changed` にする。または `identAndStatusSection/dmStatus` に `reasonForUpdate` を足す（`several`） |
+| BREX-S1-00121（1 件） | `/dmodule/content/frontMatter` | 候補なし（`none`）。足す `applicRefId` の値を決められない |
+
+`applyFix` は、この形の `replace`（場所から見た別の場所の属性）と `add`（子孫への要素）を適用します。足した要素は空で、中身は人が書きます。
+
+### Bike Samples の残り 13 個（core `fd54bf3`）
+
+決定（利用者、同 12:37 JST）: 知らせているだけの残りを読む。返す形は、Issue 7 の `proced.xsd`・`process.xsd` と Bike Samples の実物から決めました（D-31）。
+
+| 対象（Bike Samples、本文を構造化して読む 59 件、テキスト節点 1,587 個） | core 0.11.0 | 直した後 |
+|---|---|---|
+| 読み取りの結果に無いテキスト節点 | 13 個 | 0 個 |
+| 1 つも落とさずに読めた DM | 55 件 | 59 件 |
+
+| 要素 | 返す形 |
+|---|---|
+| 品目の危険性（`hazards`） | 品目の節点の `children`。`hazard` は `kind: "list"`（`refs` が記号の図、`attrs.hazardousClass` が区分の値、子の `listItem` が `safetyInformation` の文）、`hazardRef` は `kind: "para"`（`attrs.hazardIdentNumber` と参照） |
+| 品目のほかの識別子（`toolRef`・`supplyRef`・`supplyRqmtRef`・`materialSetRef`・`catalogSeqNumberRef`・`partRef`・`functionalItemRef`、2 つ目からの `natoStockNumber`） | 品目の節点の `identifiers`。1 件は、要素名・書かれている属性すべて・`name`・`shortName`・参照 |
+| 備考の脚注（`footnoteRemarks`・`footnoteRef`）、グループの直下の `footnote` | 文は品目の `text`、`footnoteRef` は `refs`（`note: "footnoteRef"`）。`footnote` は、その種類の品目の後ろの `kind: "para"` の節点 |
+| 作業の場所・所要時間・間隔（`productionMaintData`） | `requirements` の子の `kind: "para"` の節点。`attrs` に `taskDuration` の属性、子に `thresholdInterval` と `workAreaLocationGroup`（その子が `zoneRef`・`accessPointRef`・`workLocation`） |
+| プロセス DM の変数の宣言・代入・検査 | `variableDeclarations` は `kind: "list"`（子の `variable` の `attrs` に属性と `initialValue`）。`variablePreSet`・`variablePostSet`・`assertion` は `attrs.variableName` と `attrs.expression`、`validate` は `attrs.errorMessage` と `attrs.expression` |
+| 図の改訂の理由（`graphic/reasonForAmendment`） | 図への参照の `reasonForAmendment` |
+
+式は評価せず、書かれた値と演算の名前を並べた文にします。Bike Samples のプロセス DM では、`(age greaterThanOrEqual 4) and (age lessThanOrEqual 100)`、`tourMistakes plus 1`、`approved Bikers add name`、`"experienced"` になりました。
+
+確かめたこと:
+
+- Mac 側の VM で、配布物を使う vitest を実行した（core の `src` を `/tmp` に写して `npm ci`。`S1000D_SPEC_TESTS=1`）。335 件が通った。`coverage.spec.test.ts` の上限は 0 個・0 個・59 件に下げた。`preliminaryRqmts` の往復（失われる要素・属性 602 個、26 件）と、reader が読まず知らせてもいない要素・属性が 0 種類であることは変わらない。
+- クラウド側のテスト: core 296 件が通った（配布物を使う 39 件はスキップ）。この core の `dist` を入れた状態で、reader 27 件、verify 34 件、brex 23 件、writer 52 件が通った（コードの変更なし）。
+
+Bike Samples 全体で、まだ `notReadElements` に数えているのは、`globalPropertyRef` 1（代入先が大域の属性）、`behavior` 2、`pubMedia` 2、`shortExternalPubTitle` 2 です。どれも文を持たない要素か、参照の付随情報です。`unknown` のまま返している要素（故障探求 DM の `lru`・`bitMessage`・`circuitBreakerDescr` など、プロセス DM の `dmIf` の式のうち人が読む文の無いもの）は、文を落としてはいませんが、構造としては読めていません。
+
+> [!IMPORTANT]
+> core の 2 つのコミットは未公開です。公開の版は 0.12.0 の見込みです（読み取りの結果と修正候補が変わる）。reader-mcp の応答に反映するには、core の公開と、MCP 4 本の依存の更新（`^0.12.0`）が要ります。reader-mcp の `src/server.ts` の説明文は、読んでいない要素の例として `productionMaintData, hazards` を挙げているので、そのときに直します。
+
 ## 作業中に分かったこと
 
 | 項目 | 内容 | 扱い |
@@ -286,7 +355,9 @@ PM は、`pmEntry` 13 件・DM への参照 23 件がすべて解決していて
 
 | 順 | 作業 | 待つもの |
 |---|---|---|
-| Bike の後 | 知らせているだけの残り（`hazards`、`productionMaintData`、`supplyRef` の名前、品目の脚注、プロセス DM の変数の操作）を読む | 返す形を XSD から決める（D-31）。`fault` の DM には、`unknown` のまま返している要素（`lru`・`bitMessage`・`circuitBreakerDescr` など）もある |
+| すぐ | core 0.12.0 の公開（`5357014`・`fd54bf3`）と、MCP 4 本の依存の更新・公開。reader-mcp の説明文の例を直す | 利用者の作業（版を上げる、署名、公開）。依存の書き換えと説明文はこちらで行える |
+| Bike の後 | `unknown` のまま返している要素を読む（故障探求 DM の `lru`・`bitMessage`・`circuitBreakerDescr` など、`dmIf` の式のうち人が読む文の無いもの） | 返す形を XSD から決める（D-31） |
+| 候補の後 | BREX-S1-00121 のように、足す属性の値を決められないルールの候補（文書の中の `applic` の id を候補にする、など） | 方針の決定 |
 | R11 の後 | 作らなかった DM への参照（R14）の扱いを決める | W-10 の続き。見本では起きなくなったが、識別子の無い品目を持つマニュアルでは今も起きる |
 | 5 | W-4 → W-5 → RD-2 | core に足す形は、XSD の `hotspot` と配布物の実測から決める（D-31） |
 | 6 | 仕様書のプロセス DM の章を読んでから W-6 | — |
