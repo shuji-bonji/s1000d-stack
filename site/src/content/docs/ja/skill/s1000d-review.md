@@ -80,4 +80,4 @@ Claude Code では、次のコマンドで入れます。
 - [s1000d-verify-mcp](/s1000d-stack/ja/mcp/verify-mcp/): 指摘と修正の候補を返すサーバーです。
 - [s1000d-brex-mcp](/s1000d-stack/ja/mcp/brex-mcp/): BREX の取り決めを説明するサーバーです。
 - [s1000d-writer-mcp](/s1000d-stack/ja/mcp/writer-mcp/): comment DM を作るサーバーです。
-- [s1000d-publish](/s1000d-stack/ja/skill/s1000d-publish/): 指摘をもとにデータモジュールを書き直すときの Skill です。
+- [s1000d-publish](/s1000d-stack/ja/skill/s1000d-publish/): 指摘のうち、検証で見つかった問題の修正（`apply_fixes`）を行う Skill です。

@@ -82,14 +82,14 @@ flowchart LR
 | 項目 | 内容 |
 |---|---|
 | 必須の MCP | writer（`build_data_module`、`apply_fixes`）、verify（`verify_data_module`、`reconcile_dml`） |
-| 任意の MCP | brex（`explain_brex`。プロジェクトの BREX の決まりを書き手に説明する）、reader（既存の DM を読んで書き直す） |
+| 任意の MCP | brex（`explain_brex`。プロジェクトの BREX の決まりを書き手に説明する）、reader（CSDB にある DM の題名・版・参照先を確かめる） |
 | 発火の例 | 「この手順を S1000D の手順 DM にして」「仕様メモから説明 DM を作って」「この DM を書き直して版を上げて」 |
 
 手順:
 
 1. **種類を決める**: 利用者の材料が説明（descript）・手順（proced）・故障探求（fault）・プロセス（process）のどれかを決める。迷うときは利用者に聞く（種類の意味は `references/kinds.md`）。
 2. **プロジェクトの決まりを読む**: brex-mcp があれば `explain_brex` でプロジェクトの BREX を読み、書き手が守る決まり（使えない要素、許可値）を要約する。
-3. **下書きを作る**: 材料から `DraftDataModule` の木を作る。題名・段落・手順・警告・表・参照だけを書き、DMC・ICN・BREX の参照は書かない。既存の DM を書き直すときは reader の `read_data_module` で読み、同じ語彙の木として直す。
+3. **下書きを作る**: 材料から `DraftDataModule` の木を作る。題名・段落・手順・警告・表・参照だけを書き、DMC・ICN・BREX の参照は書かない。CSDB にある DM を reader で読んで下書きに写し、作り直すことはしない（D-31。2026-11-17 に手順から外した。構造を変える編集の経路は、core に元の XML を保つ操作を足すときに設計する）。
 4. **組み立てと検証**: `build_data_module`（`write: false`）。`input-error` なら `path` の箇所を直して呼び直す。残った `fixes[]` は experience-to-s1000d の手順 5 と同じに扱う。
 5. **書き込みと DML の照合**: 確認後に `write: true`。DML があれば `reconcile_dml` で、新しい DM が DML に載っているか（`notListed`）を確かめて報告する。DML の作成・更新は writer にまだ無いので、載っていなければ利用者に伝える。
 

@@ -80,4 +80,4 @@ The required MCP servers are declared as dependencies in the `plugin.json` of th
 - [s1000d-verify-mcp](/s1000d-stack/mcp/verify-mcp/): the server that returns findings and fix candidates.
 - [s1000d-brex-mcp](/s1000d-stack/mcp/brex-mcp/): the server that explains the agreements of a BREX.
 - [s1000d-writer-mcp](/s1000d-stack/mcp/writer-mcp/): the server that creates comment DMs.
-- [s1000d-publish](/s1000d-stack/skill/s1000d-publish/): the Skill for rewriting a data module on the basis of the findings.
+- [s1000d-publish](/s1000d-stack/skill/s1000d-publish/): the Skill that applies fixes for the problems found by verification (`apply_fixes`).

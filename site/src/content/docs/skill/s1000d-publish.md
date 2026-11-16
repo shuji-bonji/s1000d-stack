@@ -19,7 +19,7 @@ description: Explains what you provide to the Skill that builds S1000D data modu
 | [s1000d-writer-mcp](/s1000d-stack/mcp/writer-mcp/) | Required | 0.1.1 | Builds and verifies a data module from a draft (`build_data_module`) and applies the fixes you chose (`apply_fixes`) |
 | [s1000d-verify-mcp](/s1000d-stack/mcp/verify-mcp/) | Required | 0.6.0 | Verifies the data module that was written (`verify_data_module`) and reconciles it with the DML (`reconcile_dml`) |
 | [s1000d-brex-mcp](/s1000d-stack/mcp/brex-mcp/) | Optional | 0.4.0 | Explains the rules of the BREX of the project to the author (`explain_brex`) |
-| [s1000d-reader-mcp](/s1000d-stack/mcp/reader-mcp/) | Optional | 0.7.0 | Reads an existing data module to use as the basis of a rewrite (`read_data_module`) |
+| [s1000d-reader-mcp](/s1000d-stack/mcp/reader-mcp/) | Optional | 0.7.0 | Checks the title, issue and references of a data module in the CSDB (`read_data_module`). It is not used to rebuild a data module from what was read |
 
 When a required server is not connected, the Skill does not start; it explains how to connect the server and stops. When an optional server is not connected, the Skill writes "not performed (tool not connected)" in the matching item of the report.
 
@@ -36,7 +36,7 @@ flowchart LR
   G --> H["Publish Report"]
 ```
 
-1. It confirms the material, whether this is new or a rewrite, the CSDB folder to write to and the security classification, and decides the kind of data module with you.
+1. It confirms the material, whether this is a new data module or a new issue built from revised material, the CSDB folder to write to and the security classification, and decides the kind of data module with you.
 2. When the brex server is connected, it summarises the rules of the BREX of the project for the author. It adds no rule that is not in the response.
 3. It asks for the numbering rules. There is no default information code, so it asks for the codes your project has registered.
 4. It creates a draft made only of titles, paragraphs, steps, warnings, tables and references, and shows it to you for confirmation. It does not write the DMC or the BREX reference.
