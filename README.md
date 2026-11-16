@@ -82,9 +82,9 @@ The expert agents (MCP and Skills) come first; the two product projects (experie
 | [s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | mcp | mcp-server | released | 0.8.1 | `@shuji-bonji/s1000d-verify-mcp` |
 | [s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | mcp | mcp-server | released | 0.11.1 | `@shuji-bonji/s1000d-reader-mcp` |
 | [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | model | library | released | 0.4.0 | `@shuji-bonji/experiential-manual-model` |
-| [s1000d-writer-mcp](https://github.com/shuji-bonji/s1000d-writer-mcp) | mcp | mcp-server | released | 0.5.0 | `@shuji-bonji/s1000d-writer-mcp` |
+| [s1000d-writer-mcp](https://github.com/shuji-bonji/s1000d-writer-mcp) | mcp | mcp-server | released | 0.5.1 | `@shuji-bonji/s1000d-writer-mcp` |
 | [experience-to-s1000d-skill](https://github.com/shuji-bonji/experience-to-s1000d-skill) | procedure | skill | released | 0.1.2 | — |
-| [s1000d-publish-skill](https://github.com/shuji-bonji/s1000d-publish-skill) | procedure | skill | released | 0.2.0 | — |
+| [s1000d-publish-skill](https://github.com/shuji-bonji/s1000d-publish-skill) | procedure | skill | released | 0.3.0 | — |
 | [s1000d-review-skill](https://github.com/shuji-bonji/s1000d-review-skill) | procedure | skill | released | 0.1.1 | — |
 | [s1000d-translate-skill](https://github.com/shuji-bonji/s1000d-translate-skill) | procedure | skill | released | 0.1.1 | — |
 
