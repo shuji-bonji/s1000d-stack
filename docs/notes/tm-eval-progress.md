@@ -2,7 +2,7 @@
 
 [tm-eval-requests.md](./tm-eval-requests.md) の「進める順」に沿って行った作業の記録です。要望の ID（RD-1、W-3 など）は同じ文書のものです。
 
-- 作成日: 2026-11-15（JST）、更新: 同日 23:15 JST 頃（順 4、W-10、RD-3、R11、材料 4 品目の書き方まで）、同日 23:55 JST 頃（core 0.10.0 と model 0.4.0 の公開、MCP 4 本の依存の更新）、2026-11-16 07:40 JST 頃（MCP 4 本が core 0.10.0 で動くことの確認）、同日 08:05 JST 頃（MCP 4 本の公開）、同日 08:30 JST 頃（Bike Samples の 66 個）
+- 作成日: 2026-11-15（JST）、更新: 同日 23:15 JST 頃（順 4、W-10、RD-3、R11、材料 4 品目の書き方まで）、同日 23:55 JST 頃（core 0.10.0 と model 0.4.0 の公開、MCP 4 本の依存の更新）、2026-11-16 07:40 JST 頃（MCP 4 本が core 0.10.0 で動くことの確認）、同日 08:05 JST 頃（MCP 4 本の公開）、同日 08:30 JST 頃（Bike Samples の 66 個）、同日 10:05 JST 頃（公開版の試用と、core 0.11.0・MCP 4 本の公開）
 - 評価フォルダー: `/Users/bonji/s1000d-stack-eval/tm-9-6115-749-10/`
 
 ## 済んだ作業
@@ -29,7 +29,8 @@
 | 材料 | 品目の識別子として `natoStockNumber` を読み書きする | s1000d-core | `682dde2` |
 | 材料 | `convert_manual` が品目の `natoStockNumber` を書く。W-10 の判定を「識別子（NSN か製造者のコード）か数量の無い品目」に変える | s1000d-writer-mcp | `e642dd8` |
 | 材料の後 | 依存を core `^0.10.0` に上げる | s1000d-reader-mcp / s1000d-verify-mcp / s1000d-brex-mcp | `473c29a` / `00105ac` / `b9ba18e` |
-| RD-3 の後 | Bike Samples で、読み取りの結果に無いテキスト節点を 66 個から 13 個に減らす | s1000d-core | `eacf347`（未公開） |
+| RD-3 の後 | Bike Samples で、読み取りの結果に無いテキスト節点を 66 個から 13 個に減らす | s1000d-core | `9a23910`（0.11.0） |
+| Bike の後 | 依存を core `^0.11.0` に上げる | s1000d-reader-mcp / s1000d-verify-mcp / s1000d-brex-mcp / s1000d-writer-mcp | 0.10.0 / 0.7.2 / 0.6.2 / 0.3.1 に入っている |
 | 材料 | 見本の材料 4 品目に、WP 0021 の NSN・部品番号・CAGE コードと「As required」を書き、変換し直す | 評価フォルダー（リポジトリには入れない） | — |
 
 設計と決定は次の文書にあります。
@@ -41,18 +42,20 @@
 | [DECISIONS.md](../DECISIONS.md) の D-31 | core は S1000D の構造を出発点にし、model の都合で形を決めない |
 
 > [!IMPORTANT]
-> 公開と push の状態です（2026-11-16 08:03 JST に確かめた）。core・model・MCP 4 本はすべて公開済みで、その時点では 6 つのリポジトリとも `origin/main` と一致していました。その後のコミットは、core の `eacf347`（Bike Samples の 66 個。08:28 JST、未公開・未 push）だけです。
+> 公開と push の状態です（2026-11-16 10:00 JST に確かめた）。core・model・MCP 4 本はすべて公開済みで、6 つのリポジトリとも `origin/main` と一致しています。未公開のコミットはありません。
 >
 > | リポジトリ | 公開した版（`package.json`・git の tag・npm が同じ） | core への依存 |
 > |---|---|---|
-> | s1000d-core | 0.10.0（2026-11-15） | — |
+> | s1000d-core | 0.11.0（2026-11-16） | — |
 > | experiential-manual-model | 0.4.0（2026-11-15） | — |
-> | s1000d-writer-mcp | 0.3.0（2026-11-16） | `^0.10.0`（model は `^0.4.0`） |
-> | s1000d-reader-mcp | 0.9.0（2026-11-16） | `^0.10.0` |
-> | s1000d-verify-mcp | 0.7.1（2026-11-16） | `^0.10.0` |
-> | s1000d-brex-mcp | 0.6.1（2026-11-16） | `^0.10.0` |
+> | s1000d-writer-mcp | 0.3.1（2026-11-16） | `^0.11.0`（model は `^0.4.0`） |
+> | s1000d-reader-mcp | 0.10.0（2026-11-16） | `^0.11.0` |
+> | s1000d-verify-mcp | 0.7.2（2026-11-16） | `^0.11.0` |
+> | s1000d-brex-mcp | 0.6.2（2026-11-16） | `^0.11.0` |
 >
-> MCP 4 本は、MCP Registry（`mcp-publisher publish`）にも同じ版で登録済みです。claude-plugins リポジトリの台帳も 4 本の版に合わせてあります（`4452056`）。hub の `stack.json` の `published` も同じ版です。
+> MCP 4 本は、MCP Registry（`mcp-publisher publish`）にも同じ版で登録済みです。claude-plugins リポジトリの台帳と、hub の `stack.json` の `published` も同じ版です。
+>
+> 下の文は、core 0.10.0 と MCP 4 本（0.3.0・0.9.0・0.7.1・0.6.1）を公開したときの記録です。
 >
 > 利用者が公開のときに署名を付け直したので、コミットのハッシュが変わりました（model `f1daae5` → `4137a87`、core `9bff422` → `682dde2`、writer-mcp `870b38a` → `7dfaea3` → `e642dd8`、reader-mcp `45330a0` → `473c29a`、verify-mcp `91519f8` → `00105ac`、brex-mcp `f9f4a6e` → `b9ba18e`）。この文書は新しいハッシュで書いています。
 >
@@ -206,9 +209,9 @@ PM は、`pmEntry` 13 件・DM への参照 23 件がすべて解決していて
 
 ## Bike Samples の 66 個（2026-11-16 08:30 JST まで）
 
-本文のテキスト節点のうち、読み取りの結果に無かった 66 個を、要素ごとに調べて直しました（core `eacf347`、未公開。次の版は 0.11.0）。
+本文のテキスト節点のうち、読み取りの結果に無かった 66 個を、要素ごとに調べて直しました（core 0.11.0。コミットは `9a23910`。署名の付け直しの前は `eacf347`）。
 
-| 対象（Bike Samples、本文を構造化して読む 59 件、テキスト節点 1,587 個） | core 0.10.0 | `eacf347` |
+| 対象（Bike Samples、本文を構造化して読む 59 件、テキスト節点 1,587 個） | core 0.10.0 | core 0.11.0 |
 |---|---|---|
 | 読み取りの結果に無いテキスト節点 | 66 個 | 13 個 |
 | そのうち、reader が知らせていないもの | 数えていなかった | 0 個 |
@@ -239,9 +242,26 @@ PM は、`pmEntry` 13 件・DM への参照 23 件がすべて解決していて
 - `coverage.spec.test.ts` の上限を 13 個・55 件に下げ、知らせていないものが 0 個であることも確かめるようにした。
 
 > [!NOTE]
-> vitest での配布物のテスト（core のフォルダーで `S1000D_SPEC_TESTS=1 npm test`）は、Mac でまだ実行していません。上の数は、同じ計算を VM で動かした結果です。
+> vitest での配布物のテスト（core のフォルダーで `S1000D_SPEC_TESTS=1 npm test`）は、Mac でまだ実行できていません。2026-11-16 09:22 JST の実行は、`S1000D_SPEC_TESTS=1` を別の行で設定していたので npm に渡らず、配布物を使う 39 件がスキップされました（289 件が通過）。上の数は、同じ計算を VM で動かした結果です。
 >
 > reader-mcp は core の節点をそのまま返すので、core を上げると `read_data_module` の応答も同じように変わります。`element: "foldout"` の `figure` を前提にしている利用側があれば、影響を受けます（Skill 4 つは確かめていません）。
+
+## 公開版の試用と、core 0.11.0 での試用（2026-11-16 10:05 JST まで）
+
+公開の前後で、MCP 4 本を実際に起動して呼びました。相手は、評価フォルダーの `csdb-nsn/` と Bike Samples です。
+
+| 対象 | 起動の仕方 | 結果 |
+|---|---|---|
+| 公開版（reader 0.9.0、verify 0.7.1、brex 0.6.1、writer 0.3.0） | Mac 側の VM で `npx -y @shuji-bonji/…@latest`。reader・verify・brex は全ツール、writer は 6 つのうち 5 つ | 期待どおり。`csdb-nsn/` の 24 件が XSD valid・BREX passed・参照は解決。`convert_manual` は DM 23 件 ＋ PM 1 件を作り、冷却系統の DM に NSN が 4 件入る。壊した DM では、XSD の誤り、未解決の参照、BREX-S1-00231 の違反を検出した |
+| 公開版（plugin 経由） | reader の `read_data_module`、writer の `create_comment`、brex の `lookup_value` | 期待どおり。comment DM は `comment.xsd` で valid |
+| core 0.11.0 を使った 4 本（公開の前） | 4 本の `src` を一時フォルダーでビルドし、`node_modules` の core を `lib/s1000d-core`（`2c176f7`）に向けて起動 | 4 本ともコードの変更なしでビルドでき、公開版と同じ呼び出しが同じ結果になった。reader は Bike Samples で、不具合の説明と `faultCode`、メニューの選択肢、知らせ、図の凡例、定義リストの見出し、折り込みの中の図、外部の文書の版と発行日、入れ子の品目を返した |
+
+クラウド側のテストは、core の同じ内容を入れた状態で、reader 27 件、verify 34 件、brex 23 件、writer 52 件が通りました（配布物を使う分はスキップ）。
+
+試用で気づいた点（不具合ではない）:
+
+- `apply_fixes` の `selections` で、`suggest_fixes` の候補の `target`（例: `@securityClassification`）を写さないと、`candidate-not-offered` で断られる。`target` も写すと適用される。断る理由からは `target` が足りないことが読み取れない。直すかどうかは決めていない。
+- 確かめていないのは、DML がある CSDB での `reconcile_dml` と、plugin 経由の verify。
 
 ## 作業中に分かったこと
 
@@ -266,7 +286,7 @@ PM は、`pmEntry` 13 件・DM への参照 23 件がすべて解決していて
 
 | 順 | 作業 | 待つもの |
 |---|---|---|
-| 公開 | core 0.11.0 を公開し、MCP 4 本の依存を `^0.11.0` に上げる（0.x の `^` は minor を固定するので、`package.json` の書き換えが要る） | 利用者の作業。先に、core のフォルダーで `S1000D_SPEC_TESTS=1 npm test` を実行する |
+| 公開の後 | core のフォルダーで `S1000D_SPEC_TESTS=1 npm test` を 1 行で実行する（配布物を使う 39 件。`coverage.spec.test.ts` の上限 13 個・55 件を vitest で確かめる） | 利用者の作業。変数を別の行で設定するときは `export` が要る |
 | Bike の後 | 知らせているだけの残り（`hazards`、`productionMaintData`、`supplyRef` の名前、品目の脚注、プロセス DM の変数の操作）を読む | 返す形を XSD から決める（D-31）。`fault` の DM には、`unknown` のまま返している要素（`lru`・`bitMessage`・`circuitBreakerDescr` など）もある |
 | R11 の後 | 作らなかった DM への参照（R14）の扱いを決める | W-10 の続き。見本では起きなくなったが、識別子の無い品目を持つマニュアルでは今も起きる |
 | 5 | W-4 → W-5 → RD-2 | core に足す形は、XSD の `hotspot` と配布物の実測から決める（D-31） |
