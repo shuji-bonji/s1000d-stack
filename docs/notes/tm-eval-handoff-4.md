@@ -34,6 +34,9 @@ hub と 10 のリポジトリは、すべて `origin/main` と一致していま
 
 MCP 4 本は、どれも core `^0.11.0` に依存しています。core・writer-mcp・Skill 2 つの CHANGELOG は「未リリース」の見出しで書いてあり、`package.json` と `plugin.json` の版は上げていません。
 
+> [!NOTE]
+> 2026-11-17 02:15 JST に、core の CHANGELOG の見出しを「0.12.0 (2026-11-17)」に変えるコミットを足しました（push の前。署名でハッシュが変わるので、ここには書きません）。`package.json` の版は 0.11.0 のままで、`npm version minor` は利用者の作業です。公開が別の日になったら、見出しの日付を直します。
+
 core の公開していない変更は次のとおりです。上の 3 つは 3 回目の引き継ぎの時点でありました。
 
 | コミット | 内容 |
@@ -120,9 +123,24 @@ core の公開していない変更は次のとおりです。上の 3 つは 3 
 | Skill 4 つが、変わる前の応答を前提にしていないか | 済み。該当は `s1000d-publish` の 1 か所だけで、直した |
 | reader-mcp の説明文 | 済み |
 | 修正候補の副作用（適用の後の検証し直し） | 済み。writer-mcp の `apply_fixes` が自分で検証し直して `verification` を返し、Skill 2 つはそれを読み直すと書いている |
-| DML がある CSDB での `reconcile_dml` | **まだ** |
-| plugin 経由の verify | **まだ** |
+| DML がある CSDB での `reconcile_dml` | 済み（2026-11-17 02:10 JST）。下の「`reconcile_dml` の確認」 |
+| plugin 経由の verify | **まだ**。公開の後に行う（2026-11-17 に利用者が決定。plugin は公開済みの core 0.11.0 で動くため） |
 | MCP 4 本の依存 | core の公開の後。`package.json` を `^0.12.0` に書き換える（0.x の `^` は minor を固定するので、`npm update` では上がらない）。`package-lock.json` は、1 本で `npm install` した結果の `version`・`resolved`・`integrity` を、ほかの 3 本に写す。VM の npm（v10）で `--package-lock-only` を使うと、関係の無い行が書き換わる |
+
+### `reconcile_dml` の確認（2026-11-17 02:10 JST）
+
+`s1000d-verify-dev`（verify-mcp `09a1931`、`node_modules` の core は 0.11.0）で確かめました。core の `src/dml/` は `v0.11.0` から `00e99b9` まで変わっていないので、0.12.0 でも同じ結果になります。
+
+| CSDB | 一覧 | 結果 |
+|---|---|---|
+| Bike Samples（184 ファイル） | DML `S1000DBIKE-B6865-S-2026-00001`（108 件） | `found` 108。`notListed` は PM 4 件（この DML に `pmRef` は無い） |
+| Bike Samples | DDN `S1000DBIKE-B6865-B6865-2026-00001`（184 件） | `found` 180、`issue-mismatch` 1、`not-found` 3 |
+| 評価フォルダーの `csdb/` | DML `KENBAIKI-K0001-S-2026-00001`（4 件） | `found` 2、`issue-mismatch` 1、`not-found` 1。`notListed` は 13 件 |
+
+Bike Samples の結果は、DML の `dmlEntry` の数と、DDN の `dispatchFileName` とフォルダーのファイル名の突き合わせ（`grep` と `comm`）で確かめ、一致しました。DDN の `issue-mismatch` と `not-found` は、配布物の DDN に書かれたファイル名がフォルダーに無いためで、ツールの誤りではありません。
+
+> [!NOTE]
+> フォルダーにあって DDN に書かれていないファイル（Bike Samples では ICN 1、IMF 1、PDF 1）は、応答に出ません。`notListed` は DML だけの項目です。DDN でも知らせるかどうかは、決めていません。
 
 ## 公開の手順（利用者の作業）
 
@@ -164,7 +182,7 @@ flowchart TD
 
 | 順 | 作業 | 待つもの |
 |---|---|---|
-| 1 | DML がある CSDB での `reconcile_dml`、plugin 経由の verify | 公開の前に行うかどうかの決定 |
+| 1 | plugin 経由の verify（`reconcile_dml` は済み） | core 0.12.0 と MCP 4 本の公開 |
 | 2 | core 0.12.0 と MCP 4 本、Skill 2 つの公開（上の手順） | 利用者の作業 |
 | 3 | 既にある DM の構造を変える編集の経路 | core に、元の XML を保ったまま構造を変える操作を足すときに設計する（D-31） |
 | R11 の後 | 作らなかった DM への参照（R14）の扱いを決める | 方針の決定 |
