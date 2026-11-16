@@ -113,7 +113,7 @@ core の公開していない変更は次のとおりです。上の 3 つは 3 
 
 測り直していない数は次のとおりです。3 回目の引き継ぎの値のままだと考えていますが、確かめてはいません。
 
-- `verify_csdb`（XSD valid 110 件、BREX の違反 18 個、解決しない参照がある 6 件）
+- `verify_csdb`（XSD valid 110 件、BREX の違反 18 個、解決しない参照がある 6 件）。2026-11-17 に core 0.12.0 で測り直し、同じ値でした（下の「公開の結果」）
 - `preliminaryRqmts` の往復で失われる要素・属性（602 個）。配布物を使う vitest が同じ上限で通っているので、増えてはいません
 
 ## 公開の前に確かめること
@@ -166,9 +166,15 @@ plugin 経由の verify（`plugin_s1000d-verify-mcp`）は、次の 3 つを確�
 | `verify_csdb`（Bike Samples、1 件だけ） | 対象 110 件。1 件目は XSD `valid`、BREX `passed`（2 層）、参照 `resolved` |
 | `suggest_fixes`（Bike Samples の 009A） | BREX-S1-00121 に候補なし。`note` に、82 か所の `dmRef` に `applicRefId` が無いこと、最初の 3 つの道、使える `id` 6 個。上の「Bike Samples の実測」と同じなので、plugin は core 0.12.0 で動いている |
 
-`verify_csdb` を 110 件すべてに実行した数は、測っていません。
+`verify_csdb` を 110 件すべてに実行した数は、2026-11-17 03:26 JST に測り直しました（verify-mcp 0.8.0 の `dist/index.js` を VM で起動し、`tools/call` を送った結果）。3 回目の引き継ぎの値と同じです。
 
-Skill 2 つは、コミットまで行いました（署名と tag、push は利用者の作業）。
+| 測ったもの | 値 |
+|---|---|
+| XSD | `valid` 110 件 |
+| BREX | `passed` 100 件、`violations` 10 件（違反は合わせて 18 個） |
+| 参照 | `resolved` 104 件、`unresolved` 6 件 |
+
+Skill 2 つも公開しました（tag は `v0.2.0` と `v0.1.2`）。claude-plugins の `marketplace-version-check.mjs` は、31 件とも一致しました。
 
 | Skill | 版 | 変えたこと |
 |---|---|---|
@@ -220,8 +226,7 @@ flowchart TD
 
 | 順 | 作業 | 待つもの |
 |---|---|---|
-| 1 | Skill 2 つの公開（署名、tag、push）と plugin の更新、その後に hub で `node scripts/generate-stack.mjs --readme` | 利用者の作業。core と MCP 4 本の公開、plugin 経由の verify は済み |
-| 2 | Bike Samples の `verify_csdb` の数（XSD valid 110 件、BREX の違反 18 個、解決しない参照がある 6 件）を core 0.12.0 で測り直す | — |
+| 済み | core 0.12.0、MCP 4 本、Skill 2 つ（`s1000d-publish` 0.2.0、`experience-to-s1000d` 0.1.2）の公開、plugin と hub の `stack.json` の更新（2026-11-17 03:20 JST まで） | — |
 | 3 | 既にある DM の構造を変える編集の経路 | core に、元の XML を保ったまま構造を変える操作を足すときに設計する（D-31） |
 | R11 の後 | 作らなかった DM への参照（R14）の扱いを決める | 方針の決定 |
 | 5 | W-4 → W-5 → RD-2（hotspot） | core に足す形は、XSD の `hotspot` と配布物の実測から決める（D-31） |
