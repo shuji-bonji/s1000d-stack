@@ -242,7 +242,7 @@ PM は、`pmEntry` 13 件・DM への参照 23 件がすべて解決していて
 - `coverage.spec.test.ts` の上限を 13 個・55 件に下げ、知らせていないものが 0 個であることも確かめるようにした。
 
 > [!NOTE]
-> vitest での配布物のテストは、2026-11-16 10:08 JST に VM で実行しました（core の `src` を `/tmp` に写し、`npm ci` の後に `S1000D_SPEC_TESTS=1 S1000D_SPEC_DIR=… npx vitest run`）。328 件のうち 327 件が通り、`src/spec.test.ts` の 1 件が落ちました。Bike Samples の descript 14 件の `para` を 72 個と書いてあり、実際は 91 個です。公開済みの core 0.10.0 でも 91 個なので、0.11.0 の変更で変わった数ではなく、実測値の更新漏れです。72 を 91 に直すと 328 件が通ります（core `4ae0580`、テストだけの変更なので公開は要りません）。`coverage.spec.test.ts` の上限（13 個・0 個・55 件）は、このとき通っています。
+> vitest での配布物のテストは、2026-11-16 10:08 JST に VM で実行しました（core の `src` を `/tmp` に写し、`npm ci` の後に `S1000D_SPEC_TESTS=1 S1000D_SPEC_DIR=… npx vitest run`）。328 件のうち 327 件が通り、`src/spec.test.ts` の 1 件が落ちました。Bike Samples の descript 14 件の `para` を 72 個と書いてあり、実際は 91 個です。公開済みの core 0.10.0 でも 91 個なので、0.11.0 の変更で変わった数ではなく、実測値の更新漏れです。72 を 91 に直すと 328 件が通ります（core `cdd8c2a`、テストだけの変更なので公開は要りません）。利用者が Mac で `S1000D_SPEC_TESTS=1 npm test` を実行し、328 件が通りました（2026-11-16 10:23 JST、スキップなし）。`coverage.spec.test.ts` の上限（13 個・0 個・55 件）は、このとき通っています。
 >
 > reader-mcp は core の節点をそのまま返すので、core を上げると `read_data_module` の応答も同じように変わります。`element: "foldout"` の `figure` を前提にしている利用側があれば、影響を受けます（Skill 4 つは確かめていません）。
 
@@ -286,7 +286,6 @@ PM は、`pmEntry` 13 件・DM への参照 23 件がすべて解決していて
 
 | 順 | 作業 | 待つもの |
 |---|---|---|
-| 公開の後 | core の `4ae0580`（テストの実測値の更新）と hub のコミットに署名を付けて push する。Mac で `S1000D_SPEC_TESTS=1 npm test` を 1 行で実行する（328 件） | 利用者の作業。変数を別の行で設定するときは `export` が要る |
 | Bike の後 | 知らせているだけの残り（`hazards`、`productionMaintData`、`supplyRef` の名前、品目の脚注、プロセス DM の変数の操作）を読む | 返す形を XSD から決める（D-31）。`fault` の DM には、`unknown` のまま返している要素（`lru`・`bitMessage`・`circuitBreakerDescr` など）もある |
 | R11 の後 | 作らなかった DM への参照（R14）の扱いを決める | W-10 の続き。見本では起きなくなったが、識別子の無い品目を持つマニュアルでは今も起きる |
 | 5 | W-4 → W-5 → RD-2 | core に足す形は、XSD の `hotspot` と配布物の実測から決める（D-31） |
