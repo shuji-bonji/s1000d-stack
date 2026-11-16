@@ -6,7 +6,7 @@
     "layer = 役割 / form = 配布形態（誰が起動するか）/ status = released・developing・planned・concept。",
     "developing はリポジトリで開発中で npm 未公開。planned / concept はディレクトリも npm も無い。"
   ],
-  "generatedAt": "2026-11-16T23:15:33.752Z",
+  "generatedAt": "2026-11-16T23:57:42.928Z",
   "generatedBy": "scripts/generate-stack.mjs",
   "npmScope": "@shuji-bonji",
   "repos": [
@@ -82,16 +82,16 @@
       "status": "released",
       "public": true,
       "note": "段階 2。データモジュールの本文を構造化して返す、参照の解決、適用性の判定（式は LLM に渡さない）。応答に検証状態を含める。list_data_modules / read_data_module / read_publication_module / resolve_reference / describe_applicability / read_icn_metadata の 6 tools",
-      "published": "0.11.1",
+      "published": "0.12.0",
       "local": {
-        "version": "0.11.1",
-        "tag": "v0.11.1",
+        "version": "0.12.0",
+        "tag": "v0.12.0",
         "dirty": false,
         "unpushedCommits": 0
       },
       "consistency": {
         "status": "match",
-        "detail": "0.11.1"
+        "detail": "0.12.0"
       }
     },
     {
@@ -168,8 +168,8 @@
       "note": "段階 3。構造化した下書きからデータモジュールを 1 件ずつ作り、検証して CSDB に入れる Skill（writer の build_data_module、verify の reconcile_dml）。plugin 名 s1000d-publish",
       "published": null,
       "local": {
-        "version": "0.3.0",
-        "tag": "v0.3.0",
+        "version": "0.3.1",
+        "tag": "v0.3.1",
         "dirty": false,
         "unpushedCommits": 0
       },
