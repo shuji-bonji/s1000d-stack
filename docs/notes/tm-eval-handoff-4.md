@@ -227,7 +227,7 @@ flowchart TD
 | 順 | 作業 | 待つもの |
 |---|---|---|
 | 済み | core 0.12.0、MCP 4 本、Skill 2 つ（`s1000d-publish` 0.2.0、`experience-to-s1000d` 0.1.2）の公開、plugin と hub の `stack.json` の更新（2026-11-17 03:20 JST まで） | — |
-| 3 | 既にある DM の構造を変える編集の経路 | core に、元の XML を保ったまま構造を変える操作を足すときに設計する（D-31） |
+| 3 | 既にある DM の構造を変える編集の経路 | 案を [design/core-structural-edit.md](../design/core-structural-edit.md) に書いた（2026-11-17）。「決めること」の 5 つの決定を待つ |
 | R11 の後 | 作らなかった DM への参照（R14）の扱いを決める | 方針の決定 |
 | 5 | W-4 → W-5 → RD-2（hotspot） | core に足す形は、XSD の `hotspot` と配布物の実測から決める（D-31） |
 | 6 | 仕様書のプロセス DM の章を読んでから W-6。式の文の書き方（`assert` を含む）も見直す | — |
