@@ -124,8 +124,8 @@ core の公開していない変更は次のとおりです。上の 3 つは 3 
 | reader-mcp の説明文 | 済み |
 | 修正候補の副作用（適用の後の検証し直し） | 済み。writer-mcp の `apply_fixes` が自分で検証し直して `verification` を返し、Skill 2 つはそれを読み直すと書いている |
 | DML がある CSDB での `reconcile_dml` | 済み（2026-11-17 02:10 JST）。下の「`reconcile_dml` の確認」 |
-| plugin 経由の verify | **まだ**。公開の後に行う（2026-11-17 に利用者が決定。plugin は公開済みの core 0.11.0 で動くため） |
-| MCP 4 本の依存 | core の公開の後。`package.json` を `^0.12.0` に書き換える（0.x の `^` は minor を固定するので、`npm update` では上がらない）。`package-lock.json` は、1 本で `npm install` した結果の `version`・`resolved`・`integrity` を、ほかの 3 本に写す。VM の npm（v10）で `--package-lock-only` を使うと、関係の無い行が書き換わる |
+| plugin 経由の verify | 済み（2026-11-17 03:05 JST、公開の後）。下の「公開の結果」 |
+| MCP 4 本の依存 | 済み（2026-11-17）。行ったことは次のとおり。`package.json` を `^0.12.0` に書き換える（0.x の `^` は minor を固定するので、`npm update` では上がらない）。`package-lock.json` は、1 本で `npm install` した結果の `version`・`resolved`・`integrity` を、ほかの 3 本に写す。VM の npm（v10）で `--package-lock-only` を使うと、関係の無い行が書き換わる |
 
 ### `reconcile_dml` の確認（2026-11-17 02:10 JST）
 
@@ -141,6 +141,44 @@ Bike Samples の結果は、DML の `dmlEntry` の数と、DDN の `dispatchFile
 
 > [!NOTE]
 > フォルダーにあって DDN に書かれていないファイル（Bike Samples では ICN 1、IMF 1、PDF 1）は、応答に出ません。`notListed` は DML だけの項目です。DDN でも知らせるかどうかは、決めていません。
+
+## 公開の結果（2026-11-17 03:10 JST）
+
+core と MCP 4 本を公開しました。npm の版と MCP Registry の版は同じです。
+
+| パッケージ | 公開した版 | 版をそう決めた理由 |
+|---|---|---|
+| s1000d-core | 0.12.0 | — |
+| s1000d-brex-mcp | 0.6.3 | 動きは変わらない |
+| s1000d-reader-mcp | 0.11.0 | `read_data_module` の応答が変わる |
+| s1000d-verify-mcp | 0.8.0 | `suggest_fixes` が返す BREX の修正候補が変わる（これまでの core の更新は patch だった） |
+| s1000d-writer-mcp | 0.4.0 | 修正候補が変わり、`apply_fixes` の入力に `position` が増える |
+
+- 公開の前に、4 本とも core 0.12.0 を入れた状態で、配布物を使うテストを含む vitest（brex 26 件、reader 32 件、verify 40 件、writer 55 件）と `tsc --noEmit` が通ることを、VM の `/tmp` で確かめました。
+- `package-lock.json` は、core の `version`・`resolved`・`integrity` の 3 行を `npm view` の値に書き換えました。core 0.12.0 は依存を変えていないので、ほかの行は変わりません。
+- hub の `stack.json` と README は、利用者が更新しました（MCP 4 本の版）。
+
+plugin 経由の verify（`plugin_s1000d-verify-mcp`）は、次の 3 つを確かめました。
+
+| 呼び出し | 結果 |
+|---|---|
+| `list_schemas` | Issue 7 の `xml_schema_flat`（XSD 33 個）を見つけている |
+| `verify_csdb`（Bike Samples、1 件だけ） | 対象 110 件。1 件目は XSD `valid`、BREX `passed`（2 層）、参照 `resolved` |
+| `suggest_fixes`（Bike Samples の 009A） | BREX-S1-00121 に候補なし。`note` に、82 か所の `dmRef` に `applicRefId` が無いこと、最初の 3 つの道、使える `id` 6 個。上の「Bike Samples の実測」と同じなので、plugin は core 0.12.0 で動いている |
+
+`verify_csdb` を 110 件すべてに実行した数は、測っていません。
+
+Skill 2 つは、コミットまで行いました（署名と tag、push は利用者の作業）。
+
+| Skill | 版 | 変えたこと |
+|---|---|---|
+| s1000d-publish | 0.2.0（手順が変わるので minor） | 前提の s1000d-writer-mcp の最低版を 0.1.1 → 0.4.0。`position` を受け取る版を「writer 0.4.0 以降」に |
+| experience-to-s1000d | 0.1.2 | 同じ |
+
+writer の最低版を 0.4.0 にしたのは、0.3.1 までは条件付きで禁止する BREX ルールの違反に「この要素を取り除く」を `exact` で返し、自動で適用することがあったためです。`s1000d-review` と `s1000d-translate` の最低版は変えていません。
+
+> [!NOTE]
+> VM での削除の許可は、この回も途中で切れました（30 分ほど）。切れた状態で `git commit` をすると、コミットはできますが `.git/HEAD.lock` と `.git/objects/*/tmp_obj_*` が残ります。許可を取り直して消し、`git fsck` で確かめました。
 
 ## 公開の手順（利用者の作業）
 
@@ -182,8 +220,8 @@ flowchart TD
 
 | 順 | 作業 | 待つもの |
 |---|---|---|
-| 1 | plugin 経由の verify（`reconcile_dml` は済み） | core 0.12.0 と MCP 4 本の公開 |
-| 2 | core 0.12.0 と MCP 4 本、Skill 2 つの公開（上の手順） | 利用者の作業 |
+| 1 | Skill 2 つの公開（署名、tag、push）と plugin の更新、その後に hub で `node scripts/generate-stack.mjs --readme` | 利用者の作業。core と MCP 4 本の公開、plugin 経由の verify は済み |
+| 2 | Bike Samples の `verify_csdb` の数（XSD valid 110 件、BREX の違反 18 個、解決しない参照がある 6 件）を core 0.12.0 で測り直す | — |
 | 3 | 既にある DM の構造を変える編集の経路 | core に、元の XML を保ったまま構造を変える操作を足すときに設計する（D-31） |
 | R11 の後 | 作らなかった DM への参照（R14）の扱いを決める | 方針の決定 |
 | 5 | W-4 → W-5 → RD-2（hotspot） | core に足す形は、XSD の `hotspot` と配布物の実測から決める（D-31） |
