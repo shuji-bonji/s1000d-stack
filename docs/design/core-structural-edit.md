@@ -262,6 +262,42 @@ flowchart LR
 | 5 | Skill | `s1000d-publish` に行を足すか、別の Skill にするか |
 | — | 層 2（改版）の設計文書 | 3-3（`move` の印）と、Chap 3.9.5.2.1.1 の Para 2.5〜2.7 の確認 |
 
+## writer-mcp の `edit_data_module`（2026-11-17 05:10 JST）
+
+決定（利用者、2026-11-17 04:48 JST）: 編集の前には無かった XSD のエラーが出たら、`write: true` でも書き込まず、増えたエラーを返す（案 A）。
+
+| 項目 | 内容 |
+|---|---|
+| 入力 | `path` か `xml`、`edits[]`（`op`・`at`・`to`・`position`・`node`）、`allowReleasedIssue`、`write`、`overwrite`、`allowInvalid`、`csdbDirs`、`product`、`maxFixes` |
+| 流れ | 検証 → core の `editContent`（XSD の定義を必ず渡す）→ 検証し直す → 増えた XSD のエラーと、ほかのオブジェクトからの参照を調べる → 書き込む |
+| `newSchemaErrors[]` | 編集の前には無かった XSD のエラー。文章ごとに数え、増えた分だけ返す（行番号は編集でずれるので比べない）。1 つでもあれば書き込まない（`writeSkipped.reason` は `new-schema-errors`） |
+| `referencedFromOtherObjects[]` | 編集で無くなった `id` を、CSDB のほかの DM・PM の `dmRef/@referredFragment` が指している場所。1 つでもあれば書き込まない（`referenced-from-other-objects`）。この扱いは実装で決めたもので、利用者の決定ではない |
+| `allowInvalid` | 元から XSD に合わない文書を書くときだけ効く。増えたエラーがある結果は、これを付けても書かない |
+| 書き込む先 | `path` を渡したときは、そのファイルに上書きする（版を変えないので、ファイル名は変わらない） |
+
+XSD のエラーが増える編集を、Bike Samples の手順 DM 2 件で確かめました（編集の前は、どちらもエラー 0 個）。
+
+| 種類 | 編集の例 | libxml2 の応答（要約） |
+|---|---|---|
+| 親が求める子が無くなる | トップレベルの手順をすべて取り除く／手順のただ 1 つの段落を取り除く／リストの項目をすべて取り除く | `mainProcedure`・`proceduralStep`・`randomList` に、子が足りない |
+| 並びの順が合わない | 警告を手順の最後の子として足す／段落を警告の前に移す／入れ子の手順を段落の前に足す | `warning`（または `proceduralStep`）はここに置けない |
+| 親がその要素を取れない | `note` を `mainProcedure` の直下に移す | core に XSD の定義を渡していれば、適用の前に `not-allowed-here` で断る |
+
+存在しない `id` を指す `applicRefId` を持つ段落を足しても、XSD のエラーは増えませんでした。libxml2 の XSD の検証は、IDREF の行き先があるかを報告していません。参照の検証で見つかるかは確かめていません。
+
+Bike Samples の手順 DM（`…DA1-10-00-00AA-251A-A`）に、配布物の XSD と既定 BREX を使って `edit_data_module` を呼んだ結果（1 回 0.1〜0.3 秒）:
+
+| 編集 | 結果 |
+|---|---|
+| `allowReleasedIssue` なし | `released-issue` で断る |
+| 最初の手順の後ろに手順を足す | XSD `valid`、BREX `passed`、参照 `resolved` |
+| 警告を最後の子として足す（`write: true`） | `newSchemaErrors` 1 個。書き込まない |
+| 警告を最初の子として足す | XSD `valid`、BREX `passed` |
+| トップレベルの手順 2 つを入れ替える | XSD `valid`、BREX `passed` |
+
+> [!NOTE]
+> writer-mcp の変更は、core の `editContent` が npm に出るまでコミットできません（公開済みの core 0.12.0 には `editContent` が無く、ビルドが通らないため）。パッチは評価フォルダーの `work/writer-edit-1.patch` にあります。core を公開した後に、依存の範囲を上げて当てます。
+
 ## 残っている点
 
 | 項目 | 内容 |
