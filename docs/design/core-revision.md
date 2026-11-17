@@ -7,7 +7,7 @@ s1000d-core と s1000d-writer-mcp に、発行済みのデータモジュール�
 - 前提の設計: [core-structural-edit.md](./core-structural-edit.md)（層 1。`editContent` と `edit_data_module`）。変更の印の一般の決まり（Chap 3.9.5.2.1.1 の Para 1〜2.4.2）は、その文書の「版と変更の印の決まり」にあります。この文書には、足りなかった分だけを書きます
 
 > [!WARNING]
-> 仕様書の文章は写していません。決まりは自分の言葉で書き、章の番号を添えています。仕様書の表は、PDF から取り出した文章で読みました。表の列の対応が崩れている可能性がある箇所は、「確かめること」に書いています。
+> 仕様書の文章は写していません。決まりは自分の言葉で書き、章の番号を添えています。仕様書の表は、PDF から取り出した文章で読みました。Chap 3.9.5.1 の Table 3 だけは、PDF のページを画像にして目で確かめました。
 
 ## 目的
 
@@ -47,7 +47,9 @@ s1000d-core と s1000d-writer-mcp に、発行済みのデータモジュール�
 | 文や要素を変えたとき | 要素全体の変更でも、文の一部の変更でも、`issueType` は `changed` にする | Chap 3.9.5.2.1.1 Para 2.4 |
 
 > [!IMPORTANT]
-> BREX-S1-00030 があるので、`001-00`（`issueType="new"`）の DM を `001-01` に進めるときは、`issueType` を `new` のままにできません。作業中の版を始める操作は、`issueType` も変える必要があります。何に変えるか（`changed`・`revised`・`status`）は、これから行う変更の種類で決まり、core は決められません。
+> **仕様書の表と既定 BREX が食い違っています。** Chap 3.9.5.1 の Table 3 は、`001-01`・`001-02`・`001-NN`（最初の発行の後の作業中の版）の `issueType` を `new` と書いています。`002-00` で `changed`（例）になります。PDF の 421 ページを画像にして目で確かめたので、文章の取り出しの崩れではありません（2026-11-17 09:47 JST）。一方、既定 BREX の BREX-S1-00030 の `objectPath` は、`issueType="new"` で、版が `000-NN` でも `001-00` でもない DM を違反にします。`001-01` で `new` の DM は、表には合い、既定 BREX には違反します。
+>
+> どちらに合わせるかは、core が決められません（R-1）。`dmStatus` に `issueType` の属性を書かなければ、BREX-S1-00030 の `objectPath` はどちらの条件にも当たりません（評価フォルダーの `work/EDIT-1/` の `001-01` の DM がこの形で、BREX は `passed` でした）。ただし、これは属性が無いために条件に当たらないだけで、決まりに合っていることにはなりません。
 
 ### 2. 変更の印の一般の決まり（層 1 の文書に無かった分）
 
@@ -89,12 +91,12 @@ Chap 3.9.5.2.1.1 の全体を読みましたが、要素を移したときの印
 | 測ったもの | 値 |
 |---|---|
 | `dmStatus/@issueType` | `changed` 60、`status` 30、`new` 10、`revised` 3、`deleted` 3 |
-| `issueType="new"` の 10 件の `issueNumber` | `001` が 1 件、`001` でないものが 9 件 |
+| `issueType="new"` の 10 件の版 | `001-00` が 1 件、`002-00` が 9 件 |
 | `reasonForUpdate/@updateReasonType` | `urt03` 97、`urt01` 19、`urt02` 4 |
 | `changeType` を持つ DM | 3 件（層 1 の文書の実測。要素は `wire`・`electricalEquip`・`graphic`） |
 | `inWork` が `00` でないファイル | 0 件（層 1 の文書の実測） |
 
-`issueType="new"` で `issueNumber` が `001` でない 9 件は、BREX-S1-00030 の条件に当たるように見えます。`verify_csdb` の BREX の違反（10 件の DM に 18 個）のうち、どれがこれに当たるかは確かめていません。
+`002-00` で `issueType="new"` の 9 件は、仕様書の本文（`002` からは `new` にしない。Chap 3.9.5.1）にも、BREX-S1-00030 の条件にも合いません。配布物のサンプルが、版の決まりの手本になるとは限りません。`verify_csdb` の BREX の違反（10 件の DM に 18 個）のうち、どれがこれに当たるかは確かめていません。
 
 > [!NOTE]
 > Bike Samples には、作業中の版（`inWork` が `00` でない）の DM が 1 件もありません。作業中の版を始める操作のテストは、Bike Samples の発行済みの DM から自分で作った結果を、XSD と既定 BREX で確かめる形になります。
@@ -109,7 +111,19 @@ Chap 3.9.5.2.1.1 の全体を読みましたが、要素を移したときの印
 | `dmStatus/@issueType` | `src/write/` に、この属性を書くコードは無い（`issueType` で検索して 0 件） |
 | `reasonForUpdate`・`changeType`・`changeMark` | 書くコードは無い。`src/edit/` は、`reasonForUpdateRefIds` を「`id` を指す属性」の 1 つとして見る（取り除く `id` が指されていないかの確認）ほかは、変えないことを知らせる文の中でだけ触れている |
 
-reader が `changeType`・`changeMark`・`reasonForUpdateRefIds` と、識別・状態部の `reasonForUpdate`・`issueType` を応答に返しているかは、この回は確かめていません（「確かめること」）。
+reader の応答（2026-11-17 09:46 JST。dev の reader-mcp で、Bike Samples の `…D00-00-00-00AA-040A-A_011-00` を `section: "all"` で読んだ。この DM は、`reasonForUpdate` 1 つと、`changeType`・`changeMark`・`reasonForUpdateRefIds` を持つ `graphic` 2 つを持つ）:
+
+| 項目 | 応答 |
+|---|---|
+| `dmStatus/@issueType` | 返す（`identAndStatus.issueType` が `changed`） |
+| 識別・状態部の `reasonForUpdate` | 返さない（`id`・`updateReasonType`・文のどれも、応答に無い） |
+| `graphic` の `changeType`・`changeMark`・`reasonForUpdateRefIds` | 返さない（図の節点の `refs` に、ICN だけが入る） |
+| 返していないことの知らせ | 無い（`content.notReadElements` と `content.unknownElements` は空） |
+
+core の `src/content/read.ts` には、`changeType`・`changeMark`・`reasonForUpdate` を読むコードがありません（検索して 0 件）。段落や手順に付いた変更の印も、同じく返らないと見ています（Bike Samples には、段落・手順に印を持つ DM が無いので、応答では確かめていません）。
+
+> [!IMPORTANT]
+> 変更の印と更新の理由は、D-31 の「読む側は落とさない」に当たらないまま残っています。層 2 では、印を付けた結果を reader で読んで確かめる手順が要るので、core の読み取り（`IdentAndStatus` に `reasonForUpdate`、`ContentNode` と `ContentRef` に変更の印）を先に足します。Skill `s1000d-review` が変更の印を見られないことも、同じ原因です。
 
 ## 案
 
@@ -130,7 +144,7 @@ flowchart LR
 
 | 項目 | 案 |
 |---|---|
-| 入力 | DM の XML、`issueType`（`changed`・`revised`・`status` のどれか。必須。core は決めない） |
+| 入力 | DM の XML、`issueType`（`changed`・`revised`・`status` のどれか。`001-00` から始めるときは `new` も。必須。core は決めない。R-1） |
 | 断る場合 | `inWork` が `00` でない（既に作業中の版）。`issueType` が `deleted`（復帰は範囲の外） |
 | `issueInfo` | `issueNumber` はそのまま、`inWork` を `01` にする |
 | `issueType` | 入力の値にする |
@@ -170,7 +184,7 @@ flowchart LR
 
 | # | 項目 | 選択肢 | 提案 |
 |---|---|---|---|
-| R-1 | 作業中の版を始めるときの `issueType` | A: 入力で必ず受け取る（`changed`・`revised`・`status`）／B: 変えず、最初に印を付けたときに `changed` にする | A。BREX-S1-00030 があるので、`001-00` の `new` はそのままにできない。変更の種類は書き手が知っていて、core は決められない |
+| R-1 | 作業中の版を始めるときの `issueType` | A: 入力で必ず受け取る（`changed`・`revised`・`status`）／B: 変えず、最初に印を付けたときに `changed` にする | A。変更の種類は書き手が知っていて、core は決められない。`001-00`（`new`）から始めるときだけは、仕様書の Table 3（`new` のまま）と既定 BREX の BREX-S1-00030（`new` は違反）が食い違うので、`new` のままにする値も入力で選べるようにし、選んだ結果が既定 BREX に違反することを応答で知らせる。`002` 以降の版から始めるときは、食い違いは無い |
 | R-2 | 前の版の印を、いつ、どこまで消すか | A: 作業中の版を始めるときに、印の属性・`changeInline` のタグ・`reasonForUpdate` を消し、`changeType="delete"` の要素は取り除く／B: 属性と `reasonForUpdate` だけを消し、`delete` の要素は残して知らせる／C: 発行のときに消す | A。ただし、`delete` の要素を取り除くことは、読んだ範囲の仕様書に明記されていない（「前の版で示した変更は、版を上げるときに消す」という決まりからの解釈）。取り除く要素の `id` を指す参照が残っていれば断る |
 | R-3 | `move` の変更の印（層 1 の文書の 3-3） | A: 印を付ける編集では `move` を断る／B: 同じ親の中の移動は、親の要素に `changeType="modify"` を付ける。親が変わる移動は断る（利用者が remove と insert で指定する）／C: 元の場所に `delete` の印を付けた写しを残し、行き先に `add` で足す | B。仕様書に移動の決まりは無い。C は、同じ `id` を持つ要素が 2 つになり、XSD の ID の重複になる（元の側の `id` を外すと、参照の行き先が変わる）。B の親（`mainProcedure`・`proceduralStep`・`sequentialList`・`randomList`）は、`proced.xsd` で変更の印の属性を持てる。`levelledPara` が持てるかは `descript.xsd` で確かめる |
 | R-4 | 技術的な変更か、編集上の変更か | A: `updateReasonType` を必須の入力にする／B: 省略を許し、省略時は属性を書かない（仕様書では技術的な変更として扱われる） | A。値を補わない（D-31）。編集上の変更（`urt01`）は、`marking` を渡さずに層 1 の動きで編集し、`reasonForUpdate` だけを足す入口を別に用意するかは、実装のときに決める |
@@ -183,12 +197,11 @@ flowchart LR
 
 | 項目 | 内容 |
 |---|---|
-| Chap 3.9.5.1 の Table 3 | PDF から取り出した文章では、`001-01`・`001-02` の行の `issueType` が `new` に見える。BREX-S1-00030 は、`001-00` でない `001` の版の `new` を違反にするので、食い違う。表の列の対応が崩れている可能性があるので、PDF の表を目で確かめる |
 | Chap 3.5（データモジュールの更新） | 層 1 の設計のときに Para 2.3.1 を読んだ。作業中の版を始めるときに `issueDate` と `qualityAssurance` をどうするか、`delete` の印の要素を次の版でどうするかの記述があるかを、読み直して確かめる |
 | 手順の並べ替えの記述 | 手順 DM の章など、Chap 3.9.5.2.1.1 のほかに、移動・並べ替えの印についての記述があるか |
 | `descript.xsd` | `levelledPara`・`para` の親になる要素が、変更の印の属性を持てるか |
-| reader の応答 | `changeType`・`changeMark`・`reasonForUpdateRefIds`、識別・状態部の `reasonForUpdate`・`issueType` を返しているか。plugin か dev の MCP を呼んで、応答の形で確かめる |
-| Bike Samples の `new` の 9 件 | BREX-S1-00030 の違反として `verify_csdb` に出ているか |
+| Bike Samples の `002-00` で `new` の 9 件 | BREX-S1-00030 の違反として `verify_csdb` に出ているか |
+| 仕様書の Table 3 と BREX-S1-00030 の食い違い | 仕様書のほかの版（Issue 6 など）の同じ表と既定 BREX に、同じ食い違いがあるか |
 | `buildDataModule` と `issueType` | `issuePolicy` で版を上げた DM に `issueType` を書いていない。`002-00` 以降の DM が既定 BREX に通るかを確かめる（この文書の範囲の外だが、同じ決まりに関わる） |
 
 ## テスト（案）
