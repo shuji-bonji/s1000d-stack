@@ -73,14 +73,14 @@ The expert agents (MCP and Skills) come first; the two product projects (experie
 
 <!-- stack:begin — scripts/generate-stack.mjs が生成。手で編集しない -->
 
-> Versions are measured (`npm view` as of 2026-11-16).
+> Versions are measured (`npm view` as of 2026-11-17).
 
 | Repository | Layer | Form | Status | Version | npm |
 | --- | --- | --- | --- | --- | --- |
-| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | core | library | released | 0.13.0 | `@shuji-bonji/s1000d-core` |
+| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | core | library | released | 0.14.0 | `@shuji-bonji/s1000d-core` |
 | [s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | mcp | mcp-server | released | 0.6.4 | `@shuji-bonji/s1000d-brex-mcp` |
 | [s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | mcp | mcp-server | released | 0.8.1 | `@shuji-bonji/s1000d-verify-mcp` |
-| [s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | mcp | mcp-server | released | 0.12.0 | `@shuji-bonji/s1000d-reader-mcp` |
+| [s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | mcp | mcp-server | released | 0.13.0 | `@shuji-bonji/s1000d-reader-mcp` |
 | [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | model | library | released | 0.4.0 | `@shuji-bonji/experiential-manual-model` |
 | [s1000d-writer-mcp](https://github.com/shuji-bonji/s1000d-writer-mcp) | mcp | mcp-server | released | 0.5.1 | `@shuji-bonji/s1000d-writer-mcp` |
 | [experience-to-s1000d-skill](https://github.com/shuji-bonji/experience-to-s1000d-skill) | procedure | skill | released | 0.1.2 | — |
