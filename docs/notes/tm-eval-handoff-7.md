@@ -14,42 +14,34 @@
 3. [DECISIONS.md](../DECISIONS.md) の D-32・D-33・D-34
 4. [tm-eval-handoff-3.md](./tm-eval-handoff-3.md) の「作業の仕方」と、4 回目〜6 回目の「作業の仕方」の追加、この文書の「作業の仕方（6 回目からの追加）」
 
-## いまの状態（2026-11-17 10:55 JST）
+## いまの状態（2026-11-17 11:52 JST に確かめた）
 
-公開した版は、5 回目の引き継ぎの表のままです（core 0.13.0、writer-mcp 0.5.1、reader-mcp 0.12.0、verify-mcp 0.8.1、brex-mcp 0.6.4、`s1000d-publish` 0.3.1）。
+この文書を書いた後（10:55 JST）に、同じチャットで公開まで進めました。この節と「最初にやること」「残り」は、その結果に直してあります。
 
-| リポジトリ | 状態 |
+| リポジトリ | 公開した版 | 状態 |
+|---|---|---|
+| s1000d-core | **0.14.0**（2026-11-17。git の tag `v0.14.0`、npm） | `origin/main` と一致。利用者が Mac で `S1000D_SPEC_TESTS=1 npm test` を実行し、367 件が通った（スキップなし） |
+| s1000d-reader-mcp | **0.13.0**（同日。tag `v0.13.0`、npm、MCP Registry） | `origin/main` と一致。依存は core `^0.14.0`。利用者の Mac で 34 件が通った（配布物を使う 5 件を含む） |
+| s1000d-publish-skill | 0.3.1 のまま（0.3.2 は**未公開**） | `origin/main` と一致。E2 を直したコミット（`56b2b92`）は push 済み。`plugin.json` の版は 0.3.1、CHANGELOG の見出しは「未リリース」のまま |
+| s1000d-stack（hub） | — | この節を直したコミットが未 push（署名なし）。それより前は push 済み |
+| writer-mcp・verify-mcp・brex-mcp | 5 回目の引き継ぎの表のまま（0.5.1・0.8.1・0.6.4） | 触っていない。依存は core `^0.13.0` のまま。core 0.14.0 で動きは変わらないので、依存を上げるのは層 2 の実装（core 0.15.0 の見込み）とまとめてもよい |
+
+評価フォルダーは `/Users/bonji/s1000d-stack-eval/tm-9-6115-749-10/` です。`work/` の 3 つのパッチ（`core-read-change.patch`・`reader-mcp-change-marks.patch`・`s1000d-publish-skill-textlocations.patch`）は、どれもコミット済みの内容なので、消してかまいません。
+
+### 利用者が行うこと
+
+| 順 | 作業 |
 |---|---|
-| s1000d-stack（hub） | `origin/main` より先に、未 push のコミットが 2 つある（U-08 の付録を分けたもの、この回の文書）。どちらも署名が無い。6 回目の 3 つのコミットは、利用者が署名して push 済み（`ba4caf0` まで） |
-| s1000d-core | `origin/main` より先に、未 push のコミットが 1 つある（署名の前の値は `270a1fc`。読み取りに、更新の理由・変更の印・手順の段落の場所を足した）。署名が無い。npm に未公開 |
-| s1000d-reader-mcp | 変更なし。パッチが評価フォルダーの `work/reader-mcp-change-marks.patch` にある |
-| s1000d-publish-skill | 変更なし。パッチが評価フォルダーの `work/s1000d-publish-skill-textlocations.patch` にある |
+| 1 | hub で署名して push する（`git rebase --exec 'git commit --amend --no-edit -S' origin/main && git push`） |
+| 2 | `s1000d-publish` を 0.3.2 として公開する（CHANGELOG の見出し、`plugin.json` の版、tag） |
+| 3 | Claude Desktop を起動し直す（下の「Desktop 経由の応答」） |
+| 4 | hub の `stack.json` の `published` を合わせる。11:52 JST の時点で、core は `0.13.0`、reader-mcp は `0.12.0` のまま。claude-plugins の台帳は確かめていない |
 
-評価フォルダーは `/Users/bonji/s1000d-stack-eval/tm-9-6115-749-10/` です。`work/core-read-change.patch` は、core のコミットと同じ内容です（消してかまいません）。
+### Desktop 経由の応答（確かめ終わっていない）
 
-### 利用者が行うこと（この順）
+2026-11-17 11:47 JST に、plugin 版（`s1000d-reader`）と `s1000d-reader-dev` の両方で `…D00-00-00-00AA-040A-A` の識別・状態部を読みました。どちらの応答にも `identAndStatus.reasonForUpdates` が無く、`includeLocation` の説明文も 0.12.0 のものでした。Claude Desktop を起動し直していないので、起動したときのプロセスが動き続けているためと見ています（確かめてはいません）。
 
-```mermaid
-flowchart TB
-  A["hub と core: 署名して push"] --> B["core: Mac で S1000D_SPEC_TESTS=1 npm test"]
-  B --> C["core: CHANGELOG の「未リリース」を 0.14.0 にして、版を上げて公開"]
-  C --> D["チャット: reader-mcp にパッチを当て、依存を ^0.14.0 に上げてコミット"]
-  D --> E["reader-mcp: 0.13.0 を公開。Mac でビルドして s1000d-reader-dev で確かめる"]
-  E --> F["チャット: Skill にパッチを当ててコミット"]
-  F --> G["s1000d-publish: 0.3.2 を公開"]
-```
-
-署名と push のコマンド（hub と core で同じ）:
-
-```
-cd /Users/bonji/workspace/shuji-bonji/s1000d-stack
-git rebase --exec 'git commit --amend --no-edit -S' origin/main && git push
-
-cd /Users/bonji/workspace/shuji-bonji/s1000d-stack/lib/s1000d-core
-git rebase --exec 'git commit --amend --no-edit -S' origin/main && git push
-```
-
-verify-mcp・brex-mcp・writer-mcp は、core 0.14.0 で動きが変わりません。依存を上げるかどうかは、層 2 の実装（core 0.15.0 の見込み）とまとめてもかまいません。
+同じ日の 11:40 JST ごろに、Mac でビルドした `mcp/s1000d-reader-mcp/dist/index.js` を VM から直接起動して stdio で呼んだときは、`reasonForUpdates` 1 件、`content.changeMarks` 2 件、図の参照 2 つの `change`、`…BIKE-AAA-D00-00-00-00AA-121A-A` の手順 5.1・6.1・6.2.1.2 に `textLocations` が 2 つずつ返りました。
 
 ### Project の文書
 
@@ -69,9 +61,9 @@ verify-mcp・brex-mcp・writer-mcp は、core 0.14.0 で動きが変わりませ
 
 ## 最初にやること
 
-1. **状態を確かめる。** hub と core で `git status -sb` と `git log --oneline -5` を見ます。未 push のコミットが残っていれば、署名と push を利用者に頼みます。core が npm に 0.14.0 として出ているかを `npm view @shuji-bonji/s1000d-core version` で見ます。
+1. **状態を確かめる。** hub・core・reader-mcp・`s1000d-publish-skill` で `git status -sb` と `git log --oneline -3` を見ます。未 push のコミットが残っていれば、署名と push を利用者に頼みます。`s1000d-publish` が 0.3.2 として出ているかを、`plugin.json` と tag で見ます。
 2. **Project の 5 つの文書を、hub の内容にする。** 下の「作業の仕方」の「Project の文書の置き換え」のとおり、1 つずつ行います。`core-structural-edit.md`・`reader-mcp.md`・`writer-mcp.md`・`skills-and-editor.md` は、層 2 の実装でまた直すので、実装の後に 1 度で反映してかまいません。`tm-eval-progress.md` は先に反映できます。
-3. **core が公開済みなら、reader-mcp と Skill にパッチを当てる。** reader-mcp は `package.json` と `package-lock.json` の core を 0.14.0 にしてからコミットします。公開の後に、`s1000d-reader-dev` か plugin 経由で `read_data_module` を呼び、`textLocations`・`change`・`content.changeMarks`・`identAndStatus.reasonForUpdates` が返ることを見ます。
+3. **Desktop 経由の応答を確かめる。** 利用者が Claude Desktop を起動し直した後に、`s1000d-reader-dev` と plugin 版の `read_data_module` で `…D00-00-00-00AA-040A-A` を読み、`identAndStatus.reasonForUpdates`・`content.changeMarks`・図の参照の `change` が返ることを見ます。`…BIKE-AAA-D00-00-00-00AA-121A-A` を `includeLocation: true` で読み、手順 5.1 に `textLocations` が 2 つ返ることを見ます。plugin 版だけ返らないときは、`npx` が古い版を使っていないかを調べます。
 4. **層 2 を実装する。** 6 回目の引き継ぎの「次に作るもの」の 3〜5（core の `startRevision`、`editContent` の `marking`、writer-mcp）と 6 の残り（Skill の E1）です。先に、6 回目の「確かめること（未読・未測）」の Chap 3.5 と `descript.xsd` を読みます。
 
 ## この回で決まったこと（2026-11-17、利用者の決定）
@@ -122,7 +114,7 @@ verify-mcp・brex-mcp・writer-mcp は、core 0.14.0 で動きが変わりませ
 | 順 | 作業 | 待つもの |
 |---|---|---|
 | 1 | Project の 5 つの文書を hub の内容にする | — |
-| 2 | reader-mcp と Skill にパッチを当てて公開する。公開版で応答を確かめる | core 0.14.0 の公開（利用者） |
+| 2 | `s1000d-publish` 0.3.2 の公開。Desktop 経由（dev と plugin）で reader-mcp 0.13.0 の応答を確かめる | 利用者の公開と、Claude Desktop の起動し直し |
 | 3 | 層 2 の実装（core → writer-mcp → Skill）。Bike Samples と plugin 経由で確かめる | 仕様書の Chap 3.5 と `descript.xsd` の確認 |
 | 4 | `applyFix`・`applySegments` の差分を測る | — |
 | 5 | 同じ言語のまま文だけを直す経路。`changeInline` の扱いを含む | 層 2 の実装 |
