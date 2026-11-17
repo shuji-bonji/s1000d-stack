@@ -75,7 +75,7 @@ console.log(applied.appliedCount, applied.results.filter((r) => !r.applied).map(
 
 ### 下書き（`DraftDataModule`）
 
-`buildDataModule(draft, allocation, options)` は、`DraftDataModule` から識別・状態部と内容部の XML を組み立てます。種類は descript / proced / process / fault / pm の 5 つで、内容部は `buildContent` が組み立てます。下書きの本文 `DraftNode` は、`readContent` が返す `ContentNode` と同じ語彙の部分集合です。読んだ木をそのまま書き戻せることを、往復のテストで固定しています。
+`buildDataModule(draft, allocation, options)` は、`DraftDataModule` から識別・状態部と内容部の XML を組み立てます。種類は descript / proced / process / fault / pm の 5 つで、内容部は `buildContent` が組み立てます。下書きの本文 `DraftNode` は、`readContent` が返す `ContentNode` と同じ語彙の部分集合です。下書きに書けるのは、`readContent` が読める構造の一部なので、既にあるデータモジュールを読んで下書きに写し、作り直す使い方はしません。既にあるデータモジュールは、`applyFix`・`editContent`・`applySegments` で、元の XML に対して直します。
 
 XSD 検証の前に入力の形を検査し、誤りは `DraftInputError` で返します。この検査は XSD 検証の代わりではありません。proced と fault で必須の前提・事後条件のうち入力に無い項目は、「なし」を表す要素で埋めます。`qualityAssurance` は検証していないことを表す `unverified` にします。補った内容は結果の `notes` に書きます。入力の JSON Schema は `@shuji-bonji/s1000d-core/schema/draft.schema.json` で配布しており、MCP のツールの入力スキーマにそのまま使えます。
 
@@ -88,6 +88,17 @@ XSD 検証の前に入力の形を検査し、誤りは `DraftInputError` で返
 ### 修正の適用（`applyFix`）
 
 `applyFix` / `applyFixes` は、`suggestFixes` が返した候補（`replace` / `remove` / `add` / `retarget`）を DOM で文書に適用します。`verify` か `offered` を渡すと、候補を計算し直して場所と候補が一致するか照合し、一致しない選択は `candidate-not-offered` で適用しません。`range` と `pattern` の候補は、値が範囲や正規表現に合うかを `matchesRange` / `matchesPattern` で確かめます。`add` で要素を足す位置は、XSD の子要素の順序（`XsdIndex`）から決めます。XML 宣言と DOCTYPE（ICN の `ENTITY` / `NOTATION` 宣言）は保ちます。開始タグの中の空白だけは 1 つに揃います。
+
+### 構造を変える編集（`editContent`）
+
+0.13.0 で足しました。`editContent(xml, edits, options)` は、既にある手順・説明のデータモジュールに、節点を足す（`insert`）・取り除く（`remove`）・移す（`move`）編集を行います。[s1000d-writer-mcp](/s1000d-stack/ja/mcp/writer-mcp/) の `edit_data_module` がこれを呼びます。
+
+- 場所は、編集の前の文書の `location.path`（`readContent` が返すもの）で指します。足す節点は `DraftNode`（`step`・`para`・`admonition`・`listItem`）で渡します。
+- **元の文字列の、編集した範囲だけを書き換えます。** 触っていない部分は 1 文字も変わりません。`applyFix`・`applySegments` は文書要素の全体を直列化し直すので、開始タグの属性の改行などが変わります。`editContent` はこの方法を使いません。要素が元の文字列の中で占める範囲は、`scanElementRanges`・`rangeOfElement` で求めます。
+- 1 つでも断る理由があれば、1 つも適用しません。結果は `applied`・`xml`・`refusals[]`・`changes[]`・`notes[]` です。
+- 文字列を書き換えた結果を読み直し、DOM で同じ操作をした結果と比べます。合わなければ `internal-mismatch` で断ります。
+- 版（`issueInfo`）も変更の印（`changeType`・`changeMark`・`reasonForUpdate`）も変えません。発行済みの版（`inWork` が `00`）は `released-issue` で断り、`allowReleasedIssue: true` を渡したときだけ適用します。
+- XSD の内容モデルの順序は確かめません。`options.xsd`（`XsdIndex`）を渡すと、親がその名前の子を取れるかだけを確かめます。順序の誤りは、適用の後の XSD 検証で見つけてください。
 
 ### 書き込める置き場所（`WritableCsdbSource`）
 

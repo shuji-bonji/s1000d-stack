@@ -1,15 +1,15 @@
 ---
 title: s1000d-writer-mcp
-description: Configuration and tools of the MCP server that lets an LLM create data modules without writing XML, verify and repair them, and hand sentences out and back for translation.
+description: Configuration and tools of the MCP server that lets an LLM create data modules without writing XML, verify and repair them, edit the structure of existing data modules, and hand sentences out and back for translation.
 ---
 
-`s1000d-writer-mcp` is an MCP server that lets an LLM create S1000D® data modules **without writing XML**. The LLM passes titles, paragraphs, steps and reference targets as a tree (a draft) together with the numbering rules. The server assigns the DMC and ICNs, builds the XML, verifies it against the XSD, BREX (Business Rules Exchange) and references, and automatically applies only the fixes that have exactly one way to be fixed. The fixes that remain are returned with candidates. It has 6 tools, which create data modules, convert experiential manuals, apply fixes, create comment data modules, and hand sentences out and back for translation.
+`s1000d-writer-mcp` is an MCP server that lets an LLM create S1000D® data modules **without writing XML**. The LLM passes titles, paragraphs, steps and reference targets as a tree (a draft) together with the numbering rules. The server assigns the DMC and ICNs, builds the XML, verifies it against the XSD, BREX (Business Rules Exchange) and references, and automatically applies only the fixes that have exactly one way to be fixed. The fixes that remain are returned with candidates. It has 7 tools, which create data modules, convert experiential manuals, apply fixes, edit the structure of existing data modules, create comment data modules, and hand sentences out and back for translation.
 
 [GitHub](https://github.com/shuji-bonji/s1000d-writer-mcp) / [npm](https://www.npmjs.com/package/@shuji-bonji/s1000d-writer-mcp)
 
 ## Three principles
 
-- **It does not let the LLM write XML.** The only input is a tree called a draft (`draft`); there is no entry point for XML. The LLM does not invent DMCs, ICNs or the BREX reference: the server assigns them from the numbering rules. Existing XML can be passed only to `apply_fixes` and `extract_segments` / `apply_segments`, and none of them changes the structure of the document.
+- **It does not let the LLM write XML.** When a data module is created, the only input is a tree called a draft (`draft`); there is no entry point for XML written by an LLM. The LLM does not invent DMCs, ICNs or the BREX reference: the server assigns them from the numbering rules. The tools that take existing XML are `apply_fixes`, `edit_data_module`, `extract_segments` and `apply_segments`. Only `edit_data_module` changes the structure of the document, and the content to add is given as draft nodes, not as XML.
 - **It does not fix with values outside the candidates.** When a fix is applied, the server computes the candidates again and applies only a selection that matches one of them. There is no way to write a value freely.
 - **It does not write by default.** The XML it builds is only returned in the response. It is written to the CSDB only when you pass `write: true`.
 
@@ -20,6 +20,7 @@ description: Configuration and tools of the MCP server that lets an LLM create d
 | `build_data_module` | Builds one data module from one draft (descriptive, procedural, process, fault isolation or publication module) and the numbering rules. After building, it verifies the XSD, BREX and references, and automatically applies only the `exact` fixes, up to `maxFixRounds` times (default 3). The fixes that remain are returned in `fixes[]` with candidates |
 | `convert_manual` | Converts an experiential manual ([`@shuji-bonji/experiential-manual-model`](https://www.npmjs.com/package/@shuji-bonji/experiential-manual-model)) into one data module per Topic and one publication module. Each data module is built and verified in the same flow as `build_data_module`. References between data modules, publication modules and ICNs are resolved against the CSDB with the data modules built in this call laid over it. What the conversion cannot express is returned as counts in `notRepresented` |
 | `apply_fixes` | Applies to an existing data module the fixes selected from the candidates returned in `fixes[]`. A selection must be a copy of a candidate; a value outside the candidates, or a value that does not fit a range, is put into `rejected[]` with a reason. The result is verified again |
+| `edit_data_module` | Changes the structure of an existing procedural or descriptive data module: inserts, removes or moves a node. Places are `location.path` values, and a node to insert is a draft node (`step`, `para`, `admonition`, `listItem`). Only the edited ranges of the original text are rewritten; every other character stays as it was. It changes neither the issue information nor change markup (`changeType` and so on). A result with XSD errors that the edits introduced is not written |
 | `create_comment` | Builds and verifies a comment data module (`comment`). If the sequence number is omitted, it is the next number in the CSDB |
 | `extract_segments` | Takes out of a data module the sentences that a person reads (titles, paragraphs, steps, warnings, table cells, figure titles) for translation. Inline elements are replaced by the placeholders `{1}` `{2}`, and `skeletonHash`, used to check the skeleton, is returned |
 | `apply_segments` | Puts translated sentences back into the original data module. The DMC stays the same and only the language changes. If the data module has changed since the sentences were taken out, it stops with `skeleton-mismatch` |
@@ -28,7 +29,7 @@ description: Configuration and tools of the MCP server that lets an LLM create d
 
 ### The draft (`draft`)
 
-A draft consists of the type of data module (`kind`: `descript` / `proced` / `process` / `fault` / `pm`), the language, the title, the security classification (`securityClassification`) and a tree of content nodes (`body`). The node kinds (section / para / list / table / figure / admonition / step and so on) are the same as the nodes returned by `read_data_module` of [s1000d-reader-mcp](/s1000d-stack/mcp/reader-mcp/). A tree that was read can be written back as it is.
+A draft consists of the type of data module (`kind`: `descript` / `proced` / `process` / `fault` / `pm`), the language, the title, the security classification (`securityClassification`) and a tree of content nodes (`body`). The names of the node kinds (section / para / list / table / figure / admonition / step and so on) are the same as those of the nodes returned by `read_data_module` of [s1000d-reader-mcp](/s1000d-stack/mcp/reader-mcp/). A draft, however, can express only part of the structures that the reader can read. If you read a data module in the CSDB, copy the tree into a draft and build it again, the elements and attributes that a draft cannot express are lost from the new issue. To change an existing data module, use `apply_fixes` (problems found by verification), `edit_data_module` (inserting, removing or moving nodes) or `apply_segments` (translation).
 
 - Each `kind` has the node kinds it accepts. A node that does not fit is returned as `input-error` before any XML is built. This is a check of the shape of the input and does not replace XSD validation.
 - References are not embedded in a sentence; they go in the `refs` of the node.
@@ -92,7 +93,55 @@ A mistake in the draft or in the numbering rules is returned not as a tool failu
 - It does not write XML that violates the XSD (`schema-invalid`). Pass `allowInvalid: true` to write it. `schema-not-found` (no XSD was found) is not a violation, and the XML is written as not validated.
 - With `write: true`, `convert_manual` copies the original files of figures and the like under their ICN file names.
 - If you pass `path` to `apply_fixes` with `write: true`, that file is rewritten in place. If you pass `xml`, the result is written to the first folder under the data module's own file name.
+- `edit_data_module` also rewrites the file in place when you pass `path` with `write: true` (the issue does not change, so the file name does not change). A result with XSD errors that the edits introduced, and a result that removes an `id` to which another data module refers, are not written even with `allowInvalid: true`.
 - The paths that were written are listed in `written[]` of the response.
+
+## Editing the structure of an existing data module
+
+`edit_data_module` inserts (`insert`), removes (`remove`) or moves (`move`) nodes in a procedural (`proced`) or descriptive (`descript`) data module that is already in the CSDB. It does not build the data module again from a draft: it rewrites only the edited ranges of the original XML text. The parts that were not touched, such as the layout of attributes, line breaks and comments, stay the same character for character.
+
+```mermaid
+flowchart LR
+  R["s1000d-reader-mcp<br/>read_data_module<br/>includeLocation: true"] -->|"location.path"| E["edit_data_module<br/>edits[]"]
+  E --> C{"Any reason<br/>to refuse?"}
+  C -->|"Yes"| X["Nothing is applied<br/>refusals[]"]
+  C -->|"No"| V["Rewrite only the edited ranges<br/>and verify again"]
+  V -->|"New XSD errors"| N["Not written<br/>newSchemaErrors[]"]
+  V -->|"No new errors"| W["Written to the original file<br/>only with write: true"]
+```
+
+### How to write the edits (`edits[]`)
+
+| `op` | Fields |
+| --- | --- |
+| `insert` | `to` (the place of the anchor node), `position`, `node` (the node to insert: one draft node) |
+| `remove` | `at` (the place of the node to remove) |
+| `move` | `at` (the place of the node to move), `to` (the place of the anchor node), `position` |
+
+- A place is the `location.path` of a node in the response of `read_data_module` of [s1000d-reader-mcp](/s1000d-stack/mcp/reader-mcp/), called with `includeLocation: true` (for example `/dmodule/content/procedure/mainProcedure/proceduralStep[2]`). Copy it as it is; do not build a place yourself.
+- When you pass several edits, write every place as it is in the document before the edits. The caller does not need to work out how an earlier edit shifts the numbers.
+- `position` is before or after the anchor node (`before`, `after`) or inside it (`first-child`, `last-child`).
+- The elements that can be removed or moved are `proceduralStep`, `para`, `warning`, `caution`, `note` and `listItem`. The nodes that can be inserted are `step`, `para`, `admonition` and `listItem`.
+- If the node to insert has no `id`, the server does not give it one. It adds no value just to make verification pass.
+
+### Reading the response
+
+| Field | Description |
+| --- | --- |
+| `applied` | When it is `false`, nothing was applied. If there is a reason to refuse even one edit, none of the edits is applied |
+| `refusals[]` | The reason and the place for each refused edit. Examples: `released-issue` (a released issue), `location-not-found` (the place selects no node), `unsupported-node` (an element that is not supported), `not-allowed-here` (the parent cannot take that element as a child), `id-referenced` (another place in the same data module refers to the `id` of the node to remove) and `id-duplicate` (the `id` of the node to insert already exists) |
+| `newSchemaErrors[]` | XSD errors that were not there before the edits. If there is even one, the result is not written. The XSD fixes the order of elements (in a step, warnings and cautions come before paragraphs), so change the position or the edit and call again against the original document. This result cannot be passed to `apply_fixes` |
+| `referencedFromOtherObjects[]` | The places where a `dmRef` in another data module or publication module in the CSDB refers to an `id` that was removed. If there is even one, the result is not written. Decide whether to fix the referring side first or to give up the edit |
+| `verification` | The verification status after the edits |
+| `fixes[]` | Fix candidates for the problems that were there before the edits |
+| `changes[]` | The edits that were applied |
+
+### The issue and change markup are not changed
+
+`edit_data_module` changes neither the issue information (`issueInfo`) nor change markup (`changeType`, `changeMark`, `reasonForUpdate`).
+
+- A released issue (`inWork` of `issueInfo` is `00`) is refused with `released-issue`. In S1000D, when you change a released data module, you move it to an in-work issue and give technical changes change markup and a reason for update. This server does not have that operation yet.
+- Only when it is acceptable to rewrite the data module without changing its issue, as in a prototype or an exercise, pass `allowReleasedIssue: true` to edit it.
 
 ## Converting an experiential manual
 
@@ -123,7 +172,8 @@ What the conversion cannot express (the coordinates of hotspots, part of `scopeR
 
 ## What it does not do
 
-- **It does not accept XML written by an LLM.** It builds only from a draft.
+- **It does not accept XML written by an LLM.** It builds only from a draft. The content that `edit_data_module` adds is also given as draft nodes, not as XML.
+- **It does not revise a data module to a new issue.** `edit_data_module` does not raise the issue and does not add change markup. It also cannot yet insert, remove or move tables, illustrations or the items of the preliminary requirements, rewrite the text of a paragraph, or replace a node with other content.
 - **It does not fix with values outside the candidates.**
 - **It does not skip verification.** The XML it builds is always verified before being returned.
 - **It does not judge conformance to S1000D, and it does not interpret the severity of findings.** Read the details of findings with [`s1000d-verify-mcp`](/s1000d-stack/mcp/verify-mcp/) and the explanation of BREX rules with [`s1000d-brex-mcp`](/s1000d-stack/mcp/brex-mcp/). Values such as `commentType` and `commentPriorityCode` are written as the enumeration given, with no meaning attached.

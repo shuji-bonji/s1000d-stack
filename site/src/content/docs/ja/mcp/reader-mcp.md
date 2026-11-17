@@ -12,7 +12,7 @@ description: データモジュールを XML ではなく構造として読み�
 | ツール | 内容 |
 | --- | --- |
 | `list_data_modules` | CSDB の中のデータモジュール（指定すれば PM・DML・DDN・IMF・UPF も）を、DMC・題名・版・言語・スキーマ名・適用性の表示文付きで一覧にします。モデル識別コード・システムコード・情報コード・スキーマ名・題名の文字で絞れます。DML・DDN の行には、コードと行数（納入物の件数）、CSDB との照合の集計（`found` / `issue-mismatch` / `not-found` / `not-checked`）が付きます。行ごとの結果は `s1000d-verify-mcp` の `reconcile_dml` が返します |
-| `read_data_module` | データモジュール 1 件を構造で読みます。識別・状態部、本文の木、参照（題名付き）、検証状態。`product` を渡すとブロックごとに `applicable` / `notApplicable` / `undetermined` を付けます |
+| `read_data_module` | データモジュール 1 件を構造で読みます。識別・状態部、本文の木、参照（題名付き）、検証状態。`product` を渡すとブロックごとに `applicable` / `notApplicable` / `undetermined` を付けます。`includeLocation: true` を渡すと、各節点に `location`（`path`・`line`・`column`）が付きます |
 | `read_publication_module` | パブリケーションモジュールを目次として読みます。`pmEntry` の木と、各 `dmRef` / `pmRef` の解決先（ファイル・題名・版） |
 | `resolve_reference` | DMC・PMC・ICN を CSDB のファイルに解決します。ICN は参照元の DOCTYPE 宣言（ファイル名と NOTATION）も返します |
 | `describe_applicability` | 適用性の語彙を返します。ACT の製品属性、CCT の条件、PCT の製品、文書の `applic` 文（id と表示文）、PCT が値を割り当てていない属性。ここでは何も判定しません |
@@ -37,6 +37,14 @@ flowchart LR
 - 要件（`preliminaryRqmts` / `closeRqmts`）は「conditions: … / persons: … / support equipment: …」の 1 文に要約します。
 - 故障探求の問いと答えは `question` と `choices`（答えごとの次の手順の id）にします。
 - 読み取り部分が知らない要素は捨てず、`kind: "unknown"` として文だけを残し、`content.unknownElements` に名前と数を返します。読み取り部分を広げる材料になります。Issue 7 の Bike Samples では、本文を構造化している 5 種のどれにも未知の要素はありません（s1000d-core 0.12.0 以降）。
+
+### 節点の場所（`includeLocation`）
+
+`read_data_module` に `includeLocation: true` を渡すと、本文と概要（`section: "outline"`）の各節点に、`location`（`path`・`line`・`column`）が付きます。`path` は、その節点の元になった要素の、いまの文書での場所です（例: `/dmodule/content/procedure/mainProcedure/proceduralStep[2]`）。既定は `false` で、`location` は付きません。
+
+[s1000d-writer-mcp](/s1000d-stack/ja/mcp/writer-mcp/) の `edit_data_module` は、編集する場所をこの `location.path` で受け取ります。値はそのまま写し、自分で組み立てないでください。
+
+親の節点の `text` として返る段落には、節点が無いので `location` もありません。手順（`proceduralStep`）の直下にある、子を持たない段落は、手順の節点の `text` にまとめて返すので、これに当たります。その段落だけを取り除く・移すことは、いまはできません。
 
 ## 適用性と検証状態
 

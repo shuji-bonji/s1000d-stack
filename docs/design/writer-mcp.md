@@ -139,9 +139,25 @@ export interface Allocation {
 | `apply_fixes` | `path` または `xml`、`csdbDirs`、`selections[]`（`{ location, action, target?, value? }`。`suggest_fixes` の `Fix.location` と `candidates[]` の 1 つを写したもの）、`write` | `xml`、`applied[]`、`rejected[]`（候補と一致しなかった選択と理由）、`verification`（適用後に再検証）、`fixes[]`（残り）、`_notes` |
 | `create_comment` | `refs[]`（`dmRef` / `pmRef` / `dmlRef` / `ddnRef` の対象と版）、`commentType`（`q` / `i` / `r`）、`commentPriorityCode`（`cp01`〜`cp99`）、`title`、`paragraphs[]`（`simplePara` の文）、`originator`（`enterpriseCode` と `enterpriseName`）、`senderIdent`、`modelIdentCode`、`securityClassification`、`seqNumber`（省略時は CSDB の同じ年の次の番号）、`responseType`（省略可）、`csdbDirs`、`write` | `xml`、`fileName`、`commentCode`、`verification`（`comment.xsd` で検証、BREX の `rulesContext` に comment があれば照合）、`_notes` |
 | `extract_segments` | `path` または `xml`、`include`（`title` / `para` / `step` / `admonition` / `table` / `caption`。既定は全部）、`maxSegments` | `dmCode`、`language`、`skeletonHash`、`segments[]`（`{ id, xpath, element, context, text, placeholders[] }`）、`counts`、`_notes` |
+| `edit_data_module`（0.5.0 で追加） | `path` または `xml`、`edits[]`（`{ op: insert / remove / move, at?, to?, position?, node? }`。`at`・`to` は reader-mcp の `read_data_module` を `includeLocation: true` で呼んだ応答の `location.path`、`node` は下書きの節点 1 つ）、`allowReleasedIssue`、`write`、`overwrite`、`allowInvalid`、`includeXml`、`csdbDirs`、`product`、`maxFixes` | `applied`、`changes[]`、`refusals[]`（断った編集ごとの理由と場所。1 つでもあれば何も適用しない）、`newSchemaErrors[]`（編集で増えた XSD のエラー）、`referencedFromOtherObjects[]`（取り除いた `id` を指す、ほかの DM・PM の場所）、`verification`、`fixes[]`（編集の前からあった問題への候補だけ）、`xml`、`written[]` か `writeSkipped`、`_notes` |
 | `apply_segments` | `path` または `xml`、`skeletonHash`、`segments[]`（`{ id, text }`。訳した文）、`language`（訳先）、`issueInfo`（省略時は元と同じ）、`write` | `xml`、`fileName`（`language` だけ違う）、`verification`、`unapplied[]`（`id` が無い、プレースホルダーが欠けた文）、`_notes` |
 
 `build_data_module` が主で、`convert_manual` はそれを Topic ごとに呼ぶものです。`apply_fixes` は verify-mcp の `suggest_fixes` の続きで、`suggest_fixes` の候補を writer 側でもう一度計算し、一致した選択だけを適用します。brex-mcp・verify-mcp・reader-mcp の機能は持ち込まず、`instructions` に「BREX の説明は brex-mcp、検証の詳細は verify-mcp、読むのは reader-mcp」と書きます。
+
+### `edit_data_module`（0.5.0・0.5.1）
+
+CSDB にある手順・説明の DM に、節点を足す・取り除く・移す編集を行います。設計、決定、実測は [core-structural-edit.md](./core-structural-edit.md) にあります。ここには、ほかのツールとの違いだけを書きます。
+
+| 項目 | 内容 |
+|---|---|
+| 流れ | 検証 → core の `editContent`（XSD の定義を渡す）→ 検証し直す → 増えた XSD のエラーと、ほかのオブジェクトからの参照を調べる → 書き込む |
+| 文字列の保ち方 | 元の文字列の、編集した範囲だけを書き換える。`apply_fixes`・`apply_segments` は文書要素の全体を直列化し直すので、開始タグの属性の改行などが変わる |
+| 版と変更の印 | 変えない。発行済みの版（`inWork` が `00`）は、`allowReleasedIssue: true` が無ければ `released-issue` で断る |
+| 書き込まない場合 | `newSchemaErrors[]` が 1 つでもある（`writeSkipped.reason` は `new-schema-errors`。`allowInvalid` でも書かない）。`referencedFromOtherObjects[]` が 1 つでもある（`referenced-from-other-objects`） |
+| `fixes[]` | 編集で増えた XSD のエラーへの候補は載せない（0.5.1）。増えたエラーは、位置か編集を変えて `edit_data_module` を呼び直して無くす |
+| `includeXml` | 既定は、`write` が `false` のとき `true`、`write` が `true` のとき `false`（0.5.1） |
+| 書き込む先 | `path` を渡したときは、そのファイルに上書きする（版を変えないので、ファイル名は変わらない） |
+| 「LLM に XML を書かせない」との関係 | 足す節点は下書きの節点で受け取り、XML は受け取らない。「既存の XML を渡せるツールは構造を変えない」という 0.4.0 までの説明は、このツールには当てはまらない |
 
 ### `convert_manual` の対応
 
@@ -248,7 +264,7 @@ D-10・D-17 と同じく、処理は core に置き、writer-mcp はそれを呼
 | Skill | 使うツール | writer に入れないもの |
 |---|---|---|
 | `experience-to-s1000d` | `convert_manual` → 残った `fixes[]` を `apply_fixes` で → verify-mcp `verify_csdb` で全体を確認 | `allocation` の決め方（モデル識別コード・SNS・情報コード）。Skill が利用者に聞く |
-| `s1000d-publish` | `build_data_module` / `apply_fixes` → verify-mcp `reconcile_dml`（DML との照合） | DML・DDN の生成（段階 3 では作らない。必要になったら writer に足す） |
+| `s1000d-publish` | `build_data_module` / `apply_fixes` → verify-mcp `reconcile_dml`（DML との照合）。CSDB にある DM の構造を変えるときは、reader-mcp `read_data_module`（`includeLocation: true`）→ `edit_data_module` → verify-mcp `verify_data_module` | DML・DDN の生成（段階 3 では作らない。必要になったら writer に足す） |
 | `s1000d-review` | reader-mcp で読む → verify-mcp `suggest_fixes` → 指摘を `create_comment` に | STE の用語集（利用者のファイルを参照）、指摘の文章、`commentPriorityCode` の選び方 |
 
 翻訳の手順（`extract_segments` → 訳す → xcomet-mcp → `apply_segments`）は 3 つの Skill のどれにも入らないので、4 つ目の Skill（`s1000d-translate`。名前は U-09 と一緒に決める）にします。

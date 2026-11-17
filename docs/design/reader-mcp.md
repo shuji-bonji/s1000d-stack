@@ -36,7 +36,7 @@ LLM が S1000D のデータモジュールの本文・参照・適用性を、�
 | ツール | 入力 | 返すもの |
 |---|---|---|
 | `list_data_modules` | `csdbDirs`、`filter`（`modelIdentCode` / `systemCode` / `infoCode` / `schemaName` / `text`（techName・infoName の部分一致））、`include`（DMC のほか PMC / DML / DDN / IMF / UPF）、`offset`、`limit` | オブジェクトごとに DMC の各部、`techName` / `infoName`、`issueInfo`、`language`、`schemaName`、`issue`、`applicDisplayText`、パス。件数の集計（`schemaName` 別） |
-| `read_data_module` | `path` または `dmc`（CSDB から探す）、`csdbDirs`、`product`（適用性の判定に使う製品属性。後述）、`section`（`identAndStatus` / `content` / `all`。既定 `all`）、`verify`（`schema` / `full` / `none`。既定 `schema`） | 識別・状態部（core の `IdentAndStatus`）、本文の構造（後述）、`applicability`（判定の一覧）、`references`（本文中の `dmRef` / `pmRef` / ICN の一覧と解決先）、`verification` |
+| `read_data_module` | `path` または `dmc`（CSDB から探す）、`csdbDirs`、`product`（適用性の判定に使う製品属性。後述）、`section`（`identAndStatus` / `content` / `all` / `outline`。既定 `all`）、`verify`（`schema` / `full` / `none`。既定 `schema`）、`includeLocation`（0.12.0 で追加。既定 `false`） | 識別・状態部（core の `IdentAndStatus`）、本文の構造（後述）、`applicability`（判定の一覧）、`references`（本文中の `dmRef` / `pmRef` / ICN の一覧と解決先）、`verification` |
 | `read_publication_module` | `path` または `pmc`、`csdbDirs`、`product`、`depth` | `pmEntry` の木（題名、`dmRef` ごとに解決したデータモジュールの `techName` / `infoName` / 版 / パス、適用性の判定）。目次として使う |
 | `resolve_reference` | `dmRef` / `pmRef` / `icn` のいずれか 1 つ（文字列）、`csdbDirs` | 見つかったファイルのパス、版、題名。ICN は DOCTYPE の宣言を持つデータモジュールの `path` を併せて渡したときに、宣言のファイル名まで解決する |
 | `describe_applicability` | `path` または `dmc`、`csdbDirs` | その DM が参照する ACT・CCT・PCT の場所と、使える製品属性（`productAttribute/@id`、`valuePattern`、取り得る値）・条件（`condType` / `cond`）の一覧。DM 内の `applic` 文の一覧（`id`、`displayText`）。LLM が利用者に「どの機種・構成ですか」と聞くための材料 |
@@ -57,6 +57,17 @@ LLM が S1000D のデータモジュールの本文・参照・適用性を、�
 | `brex` | — | brex-mcp の `explain_brex` に任せる。`_notes` にその旨を書く |
 
 Bike Samples の内訳（proced 39、comrep 15、descript 14、learning 5、fault 5、pm 4 ほか）から、最初に構造化するのは `descript`・`proced`・`process`・`fault`・`pm` の 5 種です。
+
+### 節点の場所: `includeLocation`（0.12.0）
+
+`read_data_module` に `includeLocation: true` を渡すと、本文（`content.blocks`）と概要（`content.outline`）の各節点に、`location`（`path`・`line`・`column`）が付きます。s1000d-writer-mcp の `edit_data_module` は、編集する場所をこの `location.path` で受け取ります（[core-structural-edit.md](./core-structural-edit.md)）。
+
+| 項目 | 内容 |
+|---|---|
+| 既定 | `false`。応答は 0.11.1 までと変わらない（0.11.1 までは、core が返す `location` を応答から外していて、得る手段が無かった） |
+| `path` | 文書要素からの XPath（例: `/dmodule/content/procedure/mainProcedure/proceduralStep[2]`）。編集の前の、いまの文書での場所 |
+| 場所が付かないもの | 親の節点の `text` として返る段落。手順（`proceduralStep`）の直下にある、子の節点を持たない `para` は、すべて手順の節点の `text` にまとめるので、節点が無く `location` も無い |
+| 決まっていて、まだ実装していないこと | `includeLocation: true` のときに、手順の節点へ `textLocations[]`（`text` にまとめた段落ごとの `location` を、並びの順に）を添える（2026-11-17 に利用者が決定） |
 
 本文中の参照は `references[]` に集め、`dmRef` は CSDB から解決した `techName` / `infoName` / 版を添えます（LLM が DMC だけを見て中身を推測しないようにするため）。図は `figure/graphic/@infoEntityIdent` → DOCTYPE の `ENTITY` 宣言 → ファイル名まで解決し、`hotspot` があれば `applicationStructureIdent` と `id` を返します（段階 4 の閲覧ソフトで 3D のノード名と対応付ける。background.md「設計のヒント」）。
 

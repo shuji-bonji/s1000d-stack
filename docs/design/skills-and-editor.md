@@ -81,17 +81,32 @@ flowchart LR
 
 | 項目 | 内容 |
 |---|---|
-| 必須の MCP | writer（`build_data_module`、`apply_fixes`）、verify（`verify_data_module`、`reconcile_dml`） |
-| 任意の MCP | brex（`explain_brex`。プロジェクトの BREX の決まりを書き手に説明する）、reader（CSDB にある DM の題名・版・参照先を確かめる） |
-| 発火の例 | 「この手順を S1000D の手順 DM にして」「仕様メモから説明 DM を作って」「この DM を書き直して版を上げて」 |
+| 必須の MCP | writer（`build_data_module`、`apply_fixes`、`edit_data_module`）、verify（`verify_data_module`、`reconcile_dml`） |
+| 任意の MCP | brex（`explain_brex`。プロジェクトの BREX の決まりを書き手に説明する）、reader（CSDB にある DM の題名・版・参照先を確かめる。`edit_data_module` を使うときは、場所を得るために必ず要る。0.12.0 以降） |
+| 発火の例 | 「この手順を S1000D の手順 DM にして」「仕様メモから説明 DM を作って」「この DM を書き直して版を上げて」「CSDB にある手順 DM に手順を足して」「この DM の段落を削って」「手順の順を入れ替えて」 |
 
 手順:
 
 1. **種類を決める**: 利用者の材料が説明（descript）・手順（proced）・故障探求（fault）・プロセス（process）のどれかを決める。迷うときは利用者に聞く（種類の意味は `references/kinds.md`）。
 2. **プロジェクトの決まりを読む**: brex-mcp があれば `explain_brex` でプロジェクトの BREX を読み、書き手が守る決まり（使えない要素、許可値）を要約する。
-3. **下書きを作る**: 材料から `DraftDataModule` の木を作る。題名・段落・手順・警告・表・参照だけを書き、DMC・ICN・BREX の参照は書かない。CSDB にある DM を reader で読んで下書きに写し、作り直すことはしない（D-31。2026-11-17 に手順から外した。構造を変える編集の経路は、core に元の XML を保つ操作を足すときに設計する）。
+3. **下書きを作る**: 材料から `DraftDataModule` の木を作る。題名・段落・手順・警告・表・参照だけを書き、DMC・ICN・BREX の参照は書かない。CSDB にある DM を reader で読んで下書きに写し、作り直すことはしない（D-31。2026-11-17 に手順から外した。CSDB にある DM の構造を変える編集は、下の「CSDB にある DM の構造を変える」の手順で行う）。
 4. **組み立てと検証**: `build_data_module`（`write: false`）。`input-error` なら `path` の箇所を直して呼び直す。残った `fixes[]` は experience-to-s1000d の手順 5 と同じに扱う。
 5. **書き込みと DML の照合**: 確認後に `write: true`。DML があれば `reconcile_dml` で、新しい DM が DML に載っているか（`notListed`）を確かめて報告する。DML の作成・更新は writer にまだ無いので、載っていなければ利用者に伝える。
+
+### CSDB にある DM の構造を変える（`s1000d-publish` 0.3.0 から）
+
+CSDB にある手順・説明の DM に、節点を足す・取り除く・移す依頼は、writer の `edit_data_module`（0.5.1 以降）で行います。元の XML の編集した範囲だけを書き換え、DM を下書きから作り直しません。手順は Skill の `references/edit.md` にあり、設計は [core-structural-edit.md](./core-structural-edit.md) にあります。
+
+| 段階 | 行うこと |
+|---|---|
+| E1 | 何を変えるかを利用者に確かめ、reader で `issueInfo` の `inWork` を見る。`00`（発行済みの版）なら、このツールが版も変更の印も変えないことを伝えて、どうするかを聞く。`allowReleasedIssue: true` は、利用者が明示したときだけ渡す |
+| E2 | reader の `read_data_module` を `includeLocation: true` で呼び、節点の `location.path` を写す。path を自分で組み立てない |
+| E3 | `edits[]`（`insert`・`remove`・`move`）を組む。path は、すべて編集の前の文書のもの。`id` を作らない。XML を書かない |
+| E4 | `write` なしで呼ぶ。`refusals[]` があれば理由ごとに対処する。`newSchemaErrors[]` があれば、位置か編集を変えて、元の文書に対して呼び直す（`apply_fixes` には渡さない）。`referencedFromOtherObjects[]` があれば、利用者に聞く |
+| E5 | 変わる場所、検証状態、版と変更の印を変えていないことを利用者に示して、確認を得る |
+| E6 | `write: true` で呼び、verify の `verify_data_module` で確かめて報告する |
+
+`s1000d-publish` が扱わない依頼は、表・図・前提条件の品目の変更、段落の文の書き換え、節点の置き換え、発行済みの DM の改版（版を上げて変更の印を付ける）です。手順の `text` として返る段落だけを取り除く・移す依頼も、いまは path を得られないので扱えません（core-structural-edit.md の「手順の段落に場所が付かない」）。
 
 ## 3. s1000d-review
 

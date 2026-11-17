@@ -333,6 +333,27 @@ Bike Samples 全体で、まだ `notReadElements` に数えているのは、`gl
 > [!IMPORTANT]
 > core の 2 つのコミットは、署名を付けて push 済みですが、npm には未公開です（署名の付け直しでハッシュが変わりました: `5357014` → `f1c58a7`、`fd54bf3` → `69e6bbf`）。公開の版は 0.12.0 の見込みです（読み取りの結果と修正候補が変わる）。reader-mcp の応答に反映するには、core の公開と、MCP 4 本の依存の更新（`^0.12.0`）が要ります。reader-mcp の `src/server.ts` の説明文は、読んでいない要素の例として `productionMaintData, hazards` を挙げているので、そのときに直します。
 
+## 既にある DM の構造を変える編集（2026-11-17 09:05 JST まで）
+
+core 0.12.0・0.13.0、writer-mcp 0.4.0〜0.5.1、reader-mcp 0.11.0〜0.12.0、verify-mcp 0.8.0・0.8.1、brex-mcp 0.6.3・0.6.4、Skill `s1000d-publish` 0.2.0〜0.3.1、`experience-to-s1000d` 0.1.2 を公開しました。詳しい記録は [tm-eval-handoff-5.md](./tm-eval-handoff-5.md)、設計と実測は [design/core-structural-edit.md](../design/core-structural-edit.md)、決定は DECISIONS の D-32 にあります。
+
+| 作ったもの | 要点 |
+|---|---|
+| core `editContent`（0.13.0） | 節点を足す・取り除く・移す。元の文字列の編集した範囲だけを書き換える。版と変更の印は変えない |
+| writer-mcp `edit_data_module`（0.5.0・0.5.1） | 検証 → 編集 → 検証し直す → 書き込む。XSD のエラーが増えた結果と、取り除いた `id` をほかの DM・PM が指している結果は書き込まない |
+| reader-mcp `includeLocation`（0.12.0） | `true` のときだけ、節点に `location` を付ける |
+| Skill `s1000d-publish` の `references/edit.md`（0.3.0・0.3.1） | E1（版を確かめる）〜 E6（書き込んで確かめる） |
+
+Bike Samples の実測（110 件すべてで要素の範囲が DOM と対応、手順 DM 39 件すべてで足した 3 行のほかは元の文字列と同じ、など）と、plugin 経由の確認の結果は、設計文書にあります。
+
+この作業で分かったこと:
+
+| 項目 | 内容 | 扱い |
+|---|---|---|
+| 型だけを根拠に手順を書いた | reader-mcp は 0.11.1 まで応答から `location` を外していた。設計文書、writer-mcp の説明、Skill の手順は、reader の実際の応答を確かめずに「`location.path` を写す」と書いていた | reader-mcp 0.12.0 と `s1000d-publish` 0.3.1 で直した。手順や説明を書く前に、plugin か dev の MCP を呼んで応答の形を見る |
+| 自作の DM だけで確かめた | `editContent` の `insert` が、`content` の先頭に `refs` などがある DM をすべて断っていた。Bike Samples で初めて見つかった | core 0.13.0 で直した。自作のテスト用の DM だけで確かめたものは、Bike Samples と plugin 経由でも確かめる |
+| 手順の段落に場所が付かない | reader は、手順の直下の子を持たない段落を、すべて手順の節点の `text` にまとめる。その段落だけを取り除く・移すことができない | `includeLocation: true` のときに `textLocations[]` を添えると決まった（2026-11-17。未実装） |
+
 ## 作業中に分かったこと
 
 | 項目 | 内容 | 扱い |

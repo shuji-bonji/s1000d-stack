@@ -1,15 +1,15 @@
 ---
 title: s1000d-writer-mcp
-description: LLM が XML を書かずにデータモジュールを作り、検証して直し、翻訳用に文を出し入れする MCP サーバーの設定とツールを説明します。
+description: LLM が XML を書かずにデータモジュールを作り、検証して直し、既にあるデータモジュールの構造を編集し、翻訳用に文を出し入れする MCP サーバーの設定とツールを説明します。
 ---
 
-`s1000d-writer-mcp` は、S1000D® のデータモジュールを LLM が **XML を書かずに**作るための MCP サーバーです。LLM は題名・段落・手順・参照先を木の形（下書き）で渡し、採番の規則を添えます。サーバーが DMC や ICN を付けて XML を組み立て、XSD・BREX・参照で検証し、直し方が 1 つに決まる修正だけを自動で適用します。残った修正は候補を付けて返します。ツールは 6 つで、データモジュールの作成、体験型マニュアルの変換、修正の適用、コメントデータモジュールの作成、翻訳用の文の取り出しと書き戻しを行います。
+`s1000d-writer-mcp` は、S1000D® のデータモジュールを LLM が **XML を書かずに**作るための MCP サーバーです。LLM は題名・段落・手順・参照先を木の形（下書き）で渡し、採番の規則を添えます。サーバーが DMC や ICN を付けて XML を組み立て、XSD・BREX・参照で検証し、直し方が 1 つに決まる修正だけを自動で適用します。残った修正は候補を付けて返します。ツールは 7 つで、データモジュールの作成、体験型マニュアルの変換、修正の適用、既にあるデータモジュールの構造の編集、コメントデータモジュールの作成、翻訳用の文の取り出しと書き戻しを行います。
 
 [GitHub](https://github.com/shuji-bonji/s1000d-writer-mcp) / [npm](https://www.npmjs.com/package/@shuji-bonji/s1000d-writer-mcp)
 
 ## 3 つの方針
 
-- **LLM に XML を書かせません。** 入力は下書き（`draft`）の木だけで、XML を渡す入口はありません。DMC・ICN・BREX の参照は、LLM が考え出さずに、採番の規則からサーバーが付けます。既存の XML を渡せるのは `apply_fixes` と `extract_segments` / `apply_segments` だけで、どれも文書の構造を変えません。
+- **LLM に XML を書かせません。** 新しく作るときの入力は下書き（`draft`）の木だけで、LLM が書いた XML を渡す入口はありません。DMC・ICN・BREX の参照は、LLM が考え出さずに、採番の規則からサーバーが付けます。既存の XML を渡せるのは `apply_fixes`・`edit_data_module`・`extract_segments`・`apply_segments` です。文書の構造を変えるのは `edit_data_module` だけで、足す中身は XML ではなく下書きの節点で渡します。
 - **候補の外の値で直しません。** 修正を適用するとき、サーバーは候補を計算し直し、その候補と一致する選択だけを適用します。値を自由に書き込む入口はありません。
 - **既定では書き込みません。** 組み立てた XML は応答に返すだけです。CSDB への書き込みは、`write: true` を渡したときだけ行います。
 
@@ -20,6 +20,7 @@ description: LLM が XML を書かずにデータモジュールを作り、検�
 | `build_data_module` | 下書き 1 件（説明・手順・プロセス・故障探求・パブリケーションモジュール）と採番の規則から、データモジュールを 1 件組み立てます。組み立てたあとに XSD・BREX・参照を検証し、`exact` の修正だけを最大 `maxFixRounds` 回（既定 3）まで自動で適用します。残った修正は `fixes[]` に候補付きで返します |
 | `convert_manual` | 体験型マニュアル（[`@shuji-bonji/experiential-manual-model`](https://www.npmjs.com/package/@shuji-bonji/experiential-manual-model)）を、Topic ごとのデータモジュールとパブリケーションモジュール 1 件に変換します。各データモジュールは `build_data_module` と同じ流れで組み立てて検証します。データモジュール・パブリケーションモジュール・ICN の相互の参照は、CSDB に今回作ったデータモジュールを重ねた上で解決します。変換で表せなかったものは `notRepresented` に件数で返します |
 | `apply_fixes` | 既存のデータモジュールに、`fixes[]` で返した候補の中から選んだ修正を適用します。選択は候補の写しでなければならず、候補の外の値や範囲に合わない値は、理由を付けて `rejected[]` に入れます。適用後に再検証します |
+| `edit_data_module` | 既にある手順・説明のデータモジュールに、節点を足す・取り除く・移す編集を行います。場所は `location.path` で指し、足す節点は下書きの節点（`step`・`para`・`admonition`・`listItem`）で渡します。元の文字列の編集した範囲だけを書き換え、ほかは 1 文字も変えません。版と変更の印（`changeType` など）は変えません。編集で XSD のエラーが増えた結果は書き込みません |
 | `create_comment` | コメントデータモジュール（`comment`）を組み立てて検証します。連番は、省略すると CSDB の次の番号になります |
 | `extract_segments` | データモジュールから、人が読む文（題名・段落・手順・警告・表のセル・図の題）を翻訳用に取り出します。インライン要素は `{1}` `{2}` の記号に置き換え、骨組みの照合に使う `skeletonHash` を返します |
 | `apply_segments` | 訳した文を元のデータモジュールに戻します。DMC は同じで、言語だけが変わります。取り出したあとにデータモジュールが変わっていれば、`skeleton-mismatch` で止まります |
@@ -28,7 +29,7 @@ description: LLM が XML を書かずにデータモジュールを作り、検�
 
 ### 下書き（`draft`）
 
-下書きは、データモジュールの種類（`kind`: `descript` / `proced` / `process` / `fault` / `pm`）、言語、題名、機密区分（`securityClassification`）と、本文の節点の木（`body`）からなります。節点の種類（section / para / list / table / figure / admonition / step など）は、[s1000d-reader-mcp](/s1000d-stack/ja/mcp/reader-mcp/) の `read_data_module` が返す節点と同じです。読んだ木は、そのまま書き戻せます。
+下書きは、データモジュールの種類（`kind`: `descript` / `proced` / `process` / `fault` / `pm`）、言語、題名、機密区分（`securityClassification`）と、本文の節点の木（`body`）からなります。節点の種類（section / para / list / table / figure / admonition / step など）の名前は、[s1000d-reader-mcp](/s1000d-stack/ja/mcp/reader-mcp/) の `read_data_module` が返す節点と同じです。ただし、下書きに書ける構造は、reader が読める構造の一部です。CSDB にあるデータモジュールを読んで下書きに写し、作り直すと、下書きに書けない要素と属性が新しい版から無くなります。既にあるデータモジュールを直すときは、`apply_fixes`（検証で見つかった問題）、`edit_data_module`（節点を足す・取り除く・移す）、`apply_segments`（翻訳）を使ってください。
 
 - `kind` ごとに置ける節点が決まっています。合わない節点は、XML を組み立てる前に `input-error` で返します。これは入力の形の検査で、XSD 検証の代わりではありません。
 - 参照は文に埋め込まず、節点の `refs` に書きます。
@@ -92,7 +93,55 @@ XSD・BREX・参照の各工程の状態です。形と意味は [s1000d-verify-
 - XSD に違反する XML は書きません（`schema-invalid`）。`allowInvalid: true` を渡すと書きます。XSD が見つからない `schema-not-found` は違反ではなく、未検証として書きます。
 - `convert_manual` は、`write: true` のとき、図などの原本を ICN のファイル名でコピーします。
 - `apply_fixes` に `path` を渡して `write: true` にすると、そのファイルを直接書き換えます。`xml` を渡したときは、データモジュール自身の名前で最初のフォルダーに書きます。
+- `edit_data_module` も、`path` を渡して `write: true` にすると、そのファイルを直接書き換えます（版を変えないので、ファイル名は変わりません）。編集で XSD のエラーが増えた結果と、取り除いた `id` をほかのデータモジュールが指している結果は、`allowInvalid: true` を渡しても書きません。
 - 書いたパスは、応答の `written[]` に入ります。
+
+## 既にあるデータモジュールの構造を編集する
+
+`edit_data_module` は、CSDB にある手順（`proced`）・説明（`descript`）のデータモジュールに、節点を足す（`insert`）・取り除く（`remove`）・移す（`move`）編集を行います。データモジュールを下書きから作り直さず、元の XML の文字列のうち、編集した範囲だけを書き換えます。属性の並べ方、改行、コメントなど、触っていない部分は 1 文字も変わりません。
+
+```mermaid
+flowchart LR
+  R["s1000d-reader-mcp<br/>read_data_module<br/>includeLocation: true"] -->|"location.path"| E["edit_data_module<br/>edits[]"]
+  E --> C{"断る理由が<br/>あるか"}
+  C -->|"ある"| X["何も適用しない<br/>refusals[]"]
+  C -->|"ない"| V["編集した範囲だけを書き換え<br/>検証し直す"]
+  V -->|"XSD のエラーが増えた"| N["書き込まない<br/>newSchemaErrors[]"]
+  V -->|"増えていない"| W["write: true のときだけ<br/>元のファイルに書く"]
+```
+
+### 編集の書き方（`edits[]`）
+
+| `op` | 書く項目 |
+| --- | --- |
+| `insert` | `to`（基準の節点の場所）、`position`、`node`（足す節点。下書きの節点 1 つ） |
+| `remove` | `at`（取り除く節点の場所） |
+| `move` | `at`（移す節点の場所）、`to`（基準の節点の場所）、`position` |
+
+- 場所は、[s1000d-reader-mcp](/s1000d-stack/ja/mcp/reader-mcp/) の `read_data_module` を `includeLocation: true` で呼んだ応答にある、各節点の `location.path` を写します（例: `/dmodule/content/procedure/mainProcedure/proceduralStep[2]`）。場所を自分で組み立てないでください。
+- 複数の編集を渡すときも、場所はすべて編集の前の文書のものを書きます。前の編集でずれる番号を、呼ぶ側が計算する必要はありません。
+- `position` は、基準の節点の前後（`before`・`after`）か、基準の節点の中（`first-child`・`last-child`）です。
+- 取り除ける・移せる要素は、`proceduralStep`・`para`・`warning`・`caution`・`note`・`listItem` です。足せる節点は、`step`・`para`・`admonition`・`listItem` です。
+- 足す節点に `id` が無ければ、サーバーは `id` を付けません。検証を通すための値も補いません。
+
+### 応答の読み方
+
+| 項目 | 内容 |
+| --- | --- |
+| `applied` | `false` のときは、1 つも適用されていません。1 つでも断る理由があれば、すべての編集を適用しません |
+| `refusals[]` | 断った編集ごとの理由と場所です。たとえば、`released-issue`（発行済みの版）、`location-not-found`（場所が節点を選ばない）、`unsupported-node`（対象でない要素）、`not-allowed-here`（その親がその要素を子に取れない）、`id-referenced`（取り除く節点の `id` を、同じデータモジュールのほかの場所が指している）、`id-duplicate`（足す節点の `id` が既にある）があります |
+| `newSchemaErrors[]` | 編集の前には無かった XSD のエラーです。1 つでもあれば、その結果は書き込みません。要素の並びの順は XSD が決めているので（手順の中では、警告・注意が段落より前です）、位置か編集を変えて、元の文書に対して呼び直してください。この結果は `apply_fixes` には渡せません |
+| `referencedFromOtherObjects[]` | 取り除いた `id` を、CSDB のほかのデータモジュール・パブリケーションモジュールの `dmRef` が指している場所です。1 つでもあれば書き込みません。指している側を先に直すか、編集をやめるかを決めてください |
+| `verification` | 編集の後の検証状態です |
+| `fixes[]` | 編集の前からあった問題への修正候補です |
+| `changes[]` | 適用した編集です |
+
+### 版と変更の印は変えません
+
+`edit_data_module` は、版（`issueInfo`）も、変更の印（`changeType`・`changeMark`・`reasonForUpdate`）も変えません。
+
+- 発行済みの版（`issueInfo` の `inWork` が `00`）は、`released-issue` で断ります。S1000D では、発行済みのデータモジュールを直すときに作業中の版へ進め、技術的な変更には変更の印と更新の理由を付けます。その操作は、このサーバーにまだありません。
+- 試作や練習で、版を変えずに書き換えてよい場合だけ、`allowReleasedIssue: true` を渡すと編集できます。
 
 ## 体験型マニュアルの変換
 
@@ -123,7 +172,8 @@ XSD・BREX・参照の各工程の状態です。形と意味は [s1000d-verify-
 
 ## できないこと
 
-- **LLM が書いた XML は受け取りません。** 組み立てるのは下書きからだけです。
+- **LLM が書いた XML は受け取りません。** 組み立てるのは下書きからだけです。`edit_data_module` で足す中身も、XML ではなく下書きの節点で渡します。
+- **改版はしません。** `edit_data_module` は、版を上げず、変更の印も付けません。表・図・前提条件の品目を足す・取り除く・移すこと、段落の文を書き換えること、節点を別の内容に置き換えることも、まだできません。
 - **候補の外の値では直しません。**
 - **検証を省きません。** 組み立てた XML は必ず検証して返します。
 - **S1000D への準拠は判定せず、違反の重大度も解釈しません。** 違反の中身は [`s1000d-verify-mcp`](/s1000d-stack/ja/mcp/verify-mcp/)、BREX のルールの説明は [`s1000d-brex-mcp`](/s1000d-stack/ja/mcp/brex-mcp/) で読んでください。`commentType` や `commentPriorityCode` なども、列挙のまま書き、意味は付けません。

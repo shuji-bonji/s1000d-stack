@@ -1,8 +1,9 @@
-# 既にある DM の構造を変える編集（案）
+# 既にある DM の構造を変える編集
 
 s1000d-core に、CSDB にあるデータモジュール（DM）の手順を足す・段落を削る・順を入れ替える操作を足すための設計です。
 
-- 状態: **層 1 の core の分を実装済み**（2026-11-17 04:30 JST、core の「未リリース」）。「決めること」の 1・2・4・5 は 2026-11-17 03:54 JST に、3-1・3-2 は 03:59 JST に、利用者が提案どおりと決めました。3-3 は層 2 の設計のときに決めます。実装で案から変えた点は、末尾の「実装の結果」にあります
+- 状態: **層 1 は公開済み**（2026-11-17。core 0.13.0、writer-mcp 0.5.1、reader-mcp 0.12.0、Skill `s1000d-publish` 0.3.1）。「決めること」の 1・2・4・5 は 2026-11-17 03:54 JST に、3-1・3-2 は 03:59 JST に、利用者が提案どおりと決めました。3-3 は層 2 の設計のときに決めます。実装で案から変えた点は「実装の結果」に、公開の後に分かった制約は「手順の段落に場所が付かない」にあります
+- 層 2（改版）の設計: [core-revision.md](./core-revision.md)
 - 前提の決定: D-19（決定論的に確かめられることは core が行う）、D-27（書く処理も core に置く）、D-31（既にある DM は元の XML を保ったまま直す。読んだ木を下書きに写して作り直さない）
 - 関連: [core-preliminary-rqmts.md](./core-preliminary-rqmts.md) の「3 つの経路」、[writer-mcp.md](./writer-mcp.md) の `apply_fixes`
 
@@ -48,7 +49,7 @@ Bike Samples の DMC 106 件と PMC 4 件を、何も変えずに読んで `seri
 
 | 部品 | 場所 | 使い道 |
 |---|---|---|
-| `ContentNode.location`（`path`・`line`・`column`） | `src/content/types.ts` | 編集する場所を指す。`readContent` の応答の `location.path` をそのまま渡せる |
+| `ContentNode.location`（`path`・`line`・`column`） | `src/content/types.ts` | 編集する場所を指す。core の `readContent` が返す `location.path` をそのまま渡せる。reader-mcp の `read_data_module` は、`includeLocation: true` を渡したときだけ応答に `location` を入れる（reader-mcp 0.12.0。下の「reader-mcp の `includeLocation`」） |
 | `Writer` の `para`・`proceduralStep`・`admonition`・`listEl`・`table`・`figure` | `src/write/content/common.ts` | 足す節点（`DraftNode`）から要素を組み立てる |
 | `XsdIndex.allowedChildren` | `src/fix/xsd-index.ts` | その親に、その要素を、その位置に置けるかを確かめる |
 
@@ -63,7 +64,7 @@ Issue 7 の `proced.xsd` に、次の定義があります。core には、こ�
 
 ### 4. 版と変更の印の決まり（Issue 7 の仕様書で確かめたこと、2026-11-17 04:05 JST）
 
-読んだのは、Chap 3.5（データモジュールの更新）、Chap 3.9.5.1 の `issueInfo` の説明、Chap 3.9.5.2.1.1（変更の印）の Para 1〜2.4.2、既定 BREX の BREX-S1-00013・00036・00038〜00044 です。表・図・警告と注意の特別な決まり（Chap 3.9.5.2.1.1 の Para 2.5〜2.7）は、見出しだけを見て中身は読んでいません。
+読んだのは、Chap 3.5（データモジュールの更新）、Chap 3.9.5.1 の `issueInfo` の説明、Chap 3.9.5.2.1.1（変更の印）の Para 1〜2.4.2、既定 BREX の BREX-S1-00013・00036・00038〜00044 です。表・図・警告と注意の特別な決まり（Chap 3.9.5.2.1.1 の Para 2.5〜2.7）は、このときは見出しだけを見て、中身は読んでいません（2026-11-17 09:22 JST に読み、[core-revision.md](./core-revision.md) に書きました）。
 
 | 項目 | 仕様書の決まり | 出どころ |
 |---|---|---|
@@ -230,7 +231,7 @@ flowchart LR
 | 足す要素の字下げ | 基準の要素の行頭の空白だけを写す | 子が要素だけの要素は、1 行に 1 つずつ字下げして書く。文を含む要素は 1 行で書く | 手順を 1 行に書くと読みにくい |
 
 > [!IMPORTANT]
-> XSD の内容モデルの順序（例: `proceduralStep` の中では、警告・注意が段落より前）を core は確かめません。writer-mcp のツールを作るときに、「編集で XSD のエラーが増えたら書き込まない」とするかどうかを決めます。
+> XSD の内容モデルの順序（例: `proceduralStep` の中では、警告・注意が段落より前）を core は確かめません。順序の誤りは、writer-mcp の `edit_data_module` が適用の後の XSD の検証で見つけ、その結果を書き込みません（下の「writer-mcp の `edit_data_module`」）。
 
 ### 足せる場所と節点
 
@@ -244,7 +245,7 @@ flowchart LR
 
 足せるのは、手順 DM と説明 DM だけです。`warning`・`caution`・`note` の中には足せません（中の段落の要素名が `warningAndCautionPara`・`notePara` で、下書きの `para` と対応しないため）。
 
-### 実測（Bike Samples、core `cd9b66e` の内容。ハッシュは署名の前の値）
+### 実測（Bike Samples、core 0.13.0）
 
 | 測ったもの | 値 |
 |---|---|
@@ -252,26 +253,27 @@ flowchart LR
 | 対象の要素を 1 つ取り除く編集（各ファイルで、種類ごとに最初・中央・最後の 1 つ） | すべて、適用できたか `id-referenced` で断ったかのどちらか。`internal-mismatch` は 0 件 |
 | トップレベルの手順が 2 つ以上ある手順 DM | 39 件 |
 | 最後の手順を 1 つ前の要素の前に移して戻すと、元の文字列と同じになった DM | 39 件のうち 37 件。残りの 2 件は、2 つの要素の間にコメントがあり、コメントの位置だけが入れ替わる（行の集まりは同じ） |
-| vitest | 配布物を使わないもの 316 件（42 件はスキップ）、配布物を使うもの 358 件 |
+| 最初の手順の後ろに手順を足す | 手順 DM 39 件のすべてで、足した 3 行のほかは元の文字列と同じ（core 0.13.0 で直した後の値。直す前は、`content` の先頭に `refs` などがある DM への `insert` をすべて断っていた。DM の種類を、`content` の最初の子要素だけで決めていたため） |
+| vitest | 配布物を使わないもの 316 件（43 件はスキップ）。配布物を使うものは 359 件のうち 351 件を確かめた（`src/write/schema.test.ts` の 8 件は、VM に `schema` フォルダーを写し忘れて実行できなかった。1 つ前の実行では通っている） |
 
-### 次に作るもの
+## writer-mcp の `edit_data_module`（writer-mcp 0.5.0・0.5.1）
 
-| 順 | 作るもの | 決めること |
-|---|---|---|
-| 4 | writer-mcp のツール（仮称 `edit_data_module`） | 編集で XSD のエラーが増えたときに書き込むかどうか。別の DM からの参照（`dmRef/@referredFragment`）の調べ方。ファイル名（版を変えないので、同じファイルに上書きする） |
-| 5 | Skill | `s1000d-publish` に行を足すか、別の Skill にするか |
-| — | 層 2（改版）の設計文書 | 3-3（`move` の印）と、Chap 3.9.5.2.1.1 の Para 2.5〜2.7 の確認 |
+決定（利用者）:
 
-## writer-mcp の `edit_data_module`（2026-11-17 05:10 JST）
-
-決定（利用者、2026-11-17 04:48 JST）: 編集の前には無かった XSD のエラーが出たら、`write: true` でも書き込まず、増えたエラーを返す（案 A）。
+| 日時（JST） | 決定 |
+|---|---|
+| 2026-11-17 04:48 | 編集の前には無かった XSD のエラーが出たら、`write: true` でも書き込まず、増えたエラーを返す（案 A） |
+| 2026-11-17 09:15 ごろ | 編集で無くなった `id` を、CSDB のほかの DM・PM の `dmRef/@referredFragment` が指しているときは、`referencedFromOtherObjects[]` に返して書き込まない（実装で決めていた動きを、そのまま採用） |
 
 | 項目 | 内容 |
 |---|---|
-| 入力 | `path` か `xml`、`edits[]`（`op`・`at`・`to`・`position`・`node`）、`allowReleasedIssue`、`write`、`overwrite`、`allowInvalid`、`csdbDirs`、`product`、`maxFixes` |
+| 入力 | `path` か `xml`、`edits[]`（`op`・`at`・`to`・`position`・`node`）、`allowReleasedIssue`、`write`、`overwrite`、`allowInvalid`、`includeXml`、`csdbDirs`、`product`、`maxFixes` |
+| 場所の得方 | `edits[]` の `at`・`to` には、reader-mcp の `read_data_module` を `includeLocation: true` で呼んだ応答の `location.path` を写す |
 | 流れ | 検証 → core の `editContent`（XSD の定義を必ず渡す）→ 検証し直す → 増えた XSD のエラーと、ほかのオブジェクトからの参照を調べる → 書き込む |
 | `newSchemaErrors[]` | 編集の前には無かった XSD のエラー。文章ごとに数え、増えた分だけ返す（行番号は編集でずれるので比べない）。1 つでもあれば書き込まない（`writeSkipped.reason` は `new-schema-errors`） |
-| `referencedFromOtherObjects[]` | 編集で無くなった `id` を、CSDB のほかの DM・PM の `dmRef/@referredFragment` が指している場所。1 つでもあれば書き込まない（`referenced-from-other-objects`）。この扱いは実装で決めたもので、利用者の決定ではない |
+| `referencedFromOtherObjects[]` | 編集で無くなった `id` を、CSDB のほかの DM・PM の `dmRef/@referredFragment` が指している場所。1 つでもあれば書き込まない（`writeSkipped.reason` は `referenced-from-other-objects`） |
+| `fixes[]` | 編集の前からあった問題への修正候補だけを載せる。編集で増えた XSD のエラーへの候補は載せない（0.5.1。0.5.0 は載せて `apply_fixes` を案内していたが、その結果は書き込まれないので `apply_fixes` には渡せない）。増えたエラーがあるときの `_notes` は、位置か編集を変えて `edit_data_module` を呼び直すことを書く |
+| `includeXml` | `false` で、応答に XML を入れない。既定は、`write` が `false` のとき `true`、`write` が `true` のとき `false`（0.5.1。`convert_manual` と同じ） |
 | `allowInvalid` | 元から XSD に合わない文書を書くときだけ効く。増えたエラーがある結果は、これを付けても書かない |
 | 書き込む先 | `path` を渡したときは、そのファイルに上書きする（版を変えないので、ファイル名は変わらない） |
 
@@ -295,14 +297,75 @@ Bike Samples の手順 DM（`…DA1-10-00-00AA-251A-A`）に、配布物の XSD 
 | 警告を最初の子として足す | XSD `valid`、BREX `passed` |
 | トップレベルの手順 2 つを入れ替える | XSD `valid`、BREX `passed` |
 
+## reader-mcp の `includeLocation`（reader-mcp 0.12.0）
+
+`read_data_module` に `includeLocation: true` を渡すと、本文（`content.blocks`）と概要（`content.outline`）の各節点に、`location`（`path`・`line`・`column`）が付きます。既定は `false` で、応答は 0.11.1 までと変わりません。
+
+> [!IMPORTANT]
+> reader-mcp は、0.11.1 まで応答から `location` を外していました。この文書、writer-mcp の説明文、Skill の手順は「`read_data_module` の応答の `location.path` を写す」と書いていましたが、その値を得る手段がありませんでした。core の型（`ContentNode.location`）だけを根拠にして、reader の実際の応答を確かめていなかったためです。plugin 経由で Skill の手順を通したときに見つかり、reader-mcp 0.12.0 と `s1000d-publish` 0.3.1 で直しました。
+
+## Skill（`s1000d-publish` 0.3.0・0.3.1）
+
+決定（利用者、2026-11-17）: 手順は `s1000d-publish` に書く（別の Skill にしない）。
+
+手順は `skills/s1000d-publish/references/edit.md` にあります。SKILL.md の「CSDB にある DM を直したいと頼まれたとき」から来ます。
+
+| 段階 | 行うこと |
+|---|---|
+| E1 | 何を変えるかを利用者に確かめ、reader で `issueInfo` の `inWork` を見る。`00`（発行済みの版）なら、版も変更の印も変わらないことを伝えて、どうするかを聞く。`allowReleasedIssue: true` は、利用者が明示したときだけ渡す |
+| E2 | reader の `read_data_module` を `includeLocation: true` で呼び、節点の `location.path` を写す。path を自分で組み立てない |
+| E3 | `edits[]` を組む。path は、すべて編集の前の文書のもの。`id` を作らない。XML を書かない |
+| E4 | `write` なしで呼び、`applied`・`refusals[]`・`newSchemaErrors[]`・`referencedFromOtherObjects[]` の順に読む。増えたエラーがあれば、位置か編集を変えて、元の文書に対して呼び直す（`apply_fixes` には渡さない） |
+| E5 | 変わる場所、検証状態、版と変更の印を変えていないことを利用者に示して、確認を得る |
+| E6 | `write: true` で呼び、verify の `verify_data_module` で確かめて報告する |
+
+## plugin 経由の確認（2026-11-17 09:00 JST）
+
+評価フォルダーの `work/EDIT-1/` に、手順 DM を作業中の版（`001-01`）にして写し、公開した plugin（reader-mcp 0.12.0、writer-mcp 0.5.1、verify-mcp 0.8.1、`s1000d-publish` 0.3.1）で Skill の手順どおりに進めました。
+
+| 手順 | 結果 |
+|---|---|
+| reader の `includeLocation: true` | 節点に `location.path` が付いた |
+| `edit_data_module`（注意を取り除き、2 つ目の手順を 1 つ目の前に移す。`write` なし） | `applied: true`。`refusals`・`newSchemaErrors`・`referencedFromOtherObjects` は空 |
+| 同じ編集を `write: true` | `written` にファイルのパス。XSD `valid`、BREX `passed` |
+| `verify_data_module` | XSD `valid`。参照は、図のファイルが無いための未解決が 1 つ（編集の前からある） |
+| 元のファイルとの `diff` | 2 回の編集を通して、足した手順の 3 行だけが違う |
+
+確かめていないこと:
+
+- `referencedFromOtherObjects[]` が返る場合を、plugin 経由では呼んでいない（writer-mcp の自作のテストでは通っている）
+- Skill の手順どおりに LLM が動くかは、上の 1 件（作業中の版への remove と move）しか試していない。発行済みの版を渡されたときに利用者に聞くか、`newSchemaErrors[]` が返ったときに呼び直すかは、Skill では試していない
+
+## 手順の段落に場所が付かない（公開の後に分かった制約）
+
+reader（core の `readContent`）は、手順（`proceduralStep`）の直下にある、子の節点を持たない段落（`para`）を、すべて手順の節点の `text` に空白でつないで返し、子の節点から外します（`src/content/read.ts` の `case 'step'`）。最初の段落だけではありません。これらの段落には節点が無いので、`includeLocation: true` でも `location` が付きません。
+
+| 測ったもの（Bike Samples の DMC 106 件。2026-11-17 09:12 JST に、XML を直接数えた） | 値 |
+|---|---|
+| `proceduralStep` | 340 個 |
+| 直下の `para`（中にリストを持たないもの）が 1 つ | 312 個 |
+| 同じく 2 つ以上 | 11 個（7 件の DM） |
+| 同じく 0 個 | 17 個 |
+
+いまの影響:
+
+| できないこと | できること |
+|---|---|
+| 手順の `text` になった段落だけを取り除く・移す（path を得られない） | その段落の前後に足す（手順の節点を基準にして `first-child`・`last-child` を使うか、隣の節点を基準にする） |
+
+決定（利用者、2026-11-17 09:15 JST ごろ）: `includeLocation: true` のときだけ、手順の節点に `textLocations[]` を添える。`text` にまとめた段落ごとの `location`（`path`・`line`・`column`）を、並びの順に入れる。既定の応答（`includeLocation` なし）は変えない。最初の段落 1 つ分だけを返す案（`textLocation`）は、段落が 2 つ以上ある手順で 2 つ目からを指せないので採らなかった。
+
 > [!NOTE]
-> writer-mcp の変更は、core の `editContent` が npm に出るまでコミットできません（公開済みの core 0.12.0 には `editContent` が無く、ビルドが通らないため）。パッチは評価フォルダーの `work/writer-edit-1.patch` にあります。core を公開した後に、依存の範囲を上げて当てます。
+> `textLocations[]` は、まだ実装していません。core の `ContentNode` に足し、reader-mcp が `includeLocation: true` のときに応答へ入れ、`s1000d-publish` の `references/edit.md` の E2 を直します。手順のほかに、子の段落を `text` にまとめている節点があるかは、実装のときに `src/content/read.ts` で確かめます。
 
 ## 残っている点
 
 | 項目 | 内容 |
 |---|---|
-| 走査器の難しさ | 文字参照や CDATA の中の `<`、属性の値の中の `>` を正しく読み飛ばす必要がある。配布物のテストで範囲の対応を確かめるまで、実装の大きさは見積もれない |
-| 字下げ | 足す要素の中の字下げ（子の要素の改行と空白）を、周りの書き方に合わせるかどうか。最初の版は、基準の要素の行頭の空白だけを写す |
+| 走査器 | 済み。コメント・CDATA・処理命令と、属性の値の中の `>` を読み飛ばす（`src/xml/ranges.ts`）。Bike Samples の 110 件すべてで、範囲が DOM と対応した |
+| 字下げ | 済み。「実装の結果」の「足す要素の字下げ」のとおり |
+| `applyFix`・`applySegments` を同じ方法に寄せるか | 未決定（「決めること」の 5）。要素の範囲の関数ができたので、2 つの操作の差分がどれだけ減るかを測ってから決める |
+| 対象の節点を広げる | 表の行、図、`preliminaryRqmts` の品目、プロセス DM・故障探求 DM の節点は、次の版 |
+| 同じ言語のまま文だけを直す経路 | `applySegments` を同じ言語で使う経路。版と変更の印の扱いを確かめていない。層 2 の設計の後に決める |
 | 改行の種類 | 元の文字列が CRLF のときに、足す要素の改行を合わせるかどうか。Bike Samples の改行の種類は数えていない |
 | 手順の番号 | S1000D の `proceduralStep` は番号の属性を持たないので、移しても番号を書き換える必要は無い。本文の文が「手順 3 を参照」のように番号を書いている場合は、core では直せない |

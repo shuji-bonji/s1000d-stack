@@ -75,7 +75,7 @@ console.log(applied.appliedCount, applied.results.filter((r) => !r.applied).map(
 
 ### The draft (`DraftDataModule`)
 
-`buildDataModule(draft, allocation, options)` builds the XML of the identification and status section and the content section from a `DraftDataModule`. There are 5 kinds (descript / proced / process / fault / pm), and `buildContent` builds the content section. The body of a draft, `DraftNode`, is a subset of the same vocabulary as the `ContentNode` that `readContent` returns. A round-trip test fixes the property that a tree that was read can be written back as it is.
+`buildDataModule(draft, allocation, options)` builds the XML of the identification and status section and the content section from a `DraftDataModule`. There are 5 kinds (descript / proced / process / fault / pm), and `buildContent` builds the content section. The body of a draft, `DraftNode`, is a subset of the same vocabulary as the `ContentNode` that `readContent` returns. A draft can express only part of the structures that `readContent` can read, so do not read an existing data module, copy the tree into a draft and build it again. Change an existing data module in its original XML with `applyFix`, `editContent` or `applySegments`.
 
 The shape of the input is checked before XSD validation, and a mistake is returned as `DraftInputError`. This check does not replace XSD validation. In proced and fault, the required preconditions and postconditions that the input does not give are filled with elements that mean "none". `qualityAssurance` is set to `unverified`, which states that nothing has been verified. What was filled in is written to `notes` of the result. The JSON Schema of the input is distributed as `@shuji-bonji/s1000d-core/schema/draft.schema.json` and can be used as is for the input schema of an MCP tool.
 
@@ -88,6 +88,17 @@ There is no default information code. `infoCodeByKind` is required, and omitting
 ### Applying fixes (`applyFix`)
 
 `applyFix` / `applyFixes` apply the candidates returned by `suggestFixes` (`replace` / `remove` / `add` / `retarget`) to a document through the DOM. When `verify` or `offered` is passed, they compute the candidates again and check that the location and the candidate match, and a selection that does not match is not applied (`candidate-not-offered`). For `range` and `pattern` candidates, `matchesRange` / `matchesPattern` check that the value fits the range or the regular expression. The position of an element added by `add` is decided from the order of child elements in the XSD (`XsdIndex`). The XML declaration and the DOCTYPE (the `ENTITY` / `NOTATION` declarations of ICNs) are kept. Only the whitespace inside a start tag is normalised to a single space.
+
+### Editing the structure (`editContent`)
+
+Added in 0.13.0. `editContent(xml, edits, options)` inserts (`insert`), removes (`remove`) or moves (`move`) nodes in an existing procedural or descriptive data module. `edit_data_module` of [s1000d-writer-mcp](/s1000d-stack/mcp/writer-mcp/) calls it.
+
+- A place is a `location.path` (as returned by `readContent`) in the document before the edits. A node to insert is given as a `DraftNode` (`step`, `para`, `admonition`, `listItem`).
+- **Only the edited ranges of the original text are rewritten.** The parts that were not touched stay the same character for character. `applyFix` and `applySegments` serialise the whole document element again, which changes, for example, the line breaks between attributes in a start tag. `editContent` does not use that method. `scanElementRanges` and `rangeOfElement` give the range that an element occupies in the original text.
+- If there is a reason to refuse even one edit, none is applied. The result has `applied`, `xml`, `refusals[]`, `changes[]` and `notes[]`.
+- The rewritten text is parsed again and compared with the result of the same operation on the DOM. If they differ, the edit is refused with `internal-mismatch`.
+- It changes neither the issue information (`issueInfo`) nor change markup (`changeType`, `changeMark`, `reasonForUpdate`). A released issue (`inWork` is `00`) is refused with `released-issue` and is edited only when `allowReleasedIssue: true` is passed.
+- It does not check the order of the XSD content model. When `options.xsd` (`XsdIndex`) is passed, it checks only whether the parent can take a child of that name. Find a mistake in the order with XSD validation after the edit.
 
 ### A place that can be written to (`WritableCsdbSource`)
 

@@ -12,7 +12,7 @@ description: Configuration and tools of the MCP server that reads data modules a
 | Tool | Description |
 | --- | --- |
 | `list_data_modules` | Lists the data modules in the CSDB (and, if requested, PM, DML, DDN, IMF and UPF as well) with DMC, title, issue, language, schema name and the display text of their applicability. The list can be narrowed by model identification code, system code, information code, schema name and characters in the title. A DML or DDN row also carries its code, its entry or item count and a reconciliation summary against the CSDB (`found` / `issue-mismatch` / `not-found` / `not-checked`). The per-entry result comes from `reconcile_dml` in `s1000d-verify-mcp` |
-| `read_data_module` | Reads one data module as structure: the identification and status section, the content tree, references (with titles) and the verification status. When `product` is passed, each block is marked `applicable` / `notApplicable` / `undetermined` |
+| `read_data_module` | Reads one data module as structure: the identification and status section, the content tree, references (with titles) and the verification status. When `product` is passed, each block is marked `applicable` / `notApplicable` / `undetermined`. With `includeLocation: true`, every node carries `location` (`path`, `line`, `column`) |
 | `read_publication_module` | Reads a publication module as a table of contents: the `pmEntry` tree and the resolved target (file, title, issue) of each `dmRef` / `pmRef` |
 | `resolve_reference` | Resolves a DMC, PMC or ICN to a file in the CSDB. For an ICN it also returns the DOCTYPE declaration of the referencing file (file name and NOTATION) |
 | `describe_applicability` | Returns the applicability vocabulary: the product attributes of the ACT, the conditions of the CCT, the products of the PCT, the `applic` statements in the document (id and display text), and the attributes to which the PCT assigns no value. Nothing is evaluated here |
@@ -37,6 +37,14 @@ flowchart LR
 - Requirements (`preliminaryRqmts` / `closeRqmts`) are summarised in one sentence: "conditions: … / persons: … / support equipment: …".
 - Fault isolation questions and answers become `question` and `choices` (the id of the next step for each answer).
 - Elements that the reading code does not know are not discarded: they are kept as `kind: "unknown"` with their text only, and their names and counts are returned in `content.unknownElements`. This gives material for extending the reading code. In the Issue 7 Bike Samples, none of the 5 structured types has unknown elements (s1000d-core 0.12.0 and later).
+
+### The place of a node (`includeLocation`)
+
+When you pass `includeLocation: true` to `read_data_module`, every node of the body and of the outline (`section: "outline"`) carries `location` (`path`, `line`, `column`). `path` is the place, in the document as it is now, of the element that the node was read from (for example `/dmodule/content/procedure/mainProcedure/proceduralStep[2]`). The default is `false`, and no `location` is returned.
+
+`edit_data_module` of [s1000d-writer-mcp](/s1000d-stack/mcp/writer-mcp/) takes this `location.path` as the place to edit. Copy the value as it is; do not build it yourself.
+
+A paragraph that is returned as the `text` of its parent node has no node of its own, so it has no `location`. This is the case for the paragraphs directly under a step (`proceduralStep`) that have no child nodes: they are merged into the `text` of the step node. Removing or moving only such a paragraph is not possible yet.
 
 ## Applicability and verification status
 

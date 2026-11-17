@@ -317,6 +317,22 @@ flowchart LR
 - どこまで扱えているかは、配布物のテストで数えて固定し、減らす方向にだけ動かす（最初は `preliminaryRqmts`。2026-11-15 の実測は、Bike Samples の 41 件で要素・属性 2,527 個のうち、最初は 898 個、人員・文書・条件の形を直した後は 631 個が往復で失われる。reader が読まずに知らせてもいない要素は 0 種類）。
 - きっかけ: 2026-11-15 に、実在の技術マニュアルを使った確認の要望（W-1）として、core の下書きの `requirements` に人員・文書・品目を足した。その形を experiential-manual-model の 7 つの区分から決め、model の設計文書の中で決めていた。利用者の指摘で見直した。
 - 設計は [design/core-preliminary-rqmts.md](./design/core-preliminary-rqmts.md)。読む・新しく作る・既にある DM を直す、の 3 つの経路を分ける方針と、公開の前に変える範囲は、同じ文書の「決まったこと」にある。
+- 既にある DM の構造を変える編集（節点を足す・取り除く・移す）の決定は D-32。
+
+### D-32 既にある DM の構造を変える編集は、層を分け、編集した範囲だけを書き換える（2026-11-17）
+
+D-31 の「既にある DM は元の XML を保ったまま直す」を、節点を足す・取り除く・移す編集に当てたときの決定。core の `editContent`（0.13.0）、writer-mcp の `edit_data_module`（0.5.0）、reader-mcp の `includeLocation`（0.12.0）、Skill `s1000d-publish` の `references/edit.md`（0.3.0）として公開した。
+
+- **文字列の保ち方**: 元の文字列の、編集した範囲だけを書き換える。文書要素の全体を直列化し直さない。`applyFix`・`applySegments` の方法（DOM を直列化し直す）では、Bike Samples の DMC・PMC 110 件を何も変えずに戻しても、91,215 行のうち 26,258 行（29 %）が変わるため。
+- **層を分ける**: 層 1（`editContent`）は、版（`issueInfo`）も変更の印（`changeType`・`changeMark`・`reasonForUpdate`）も変えない。層 2（改版。作業中の版を始める操作と、変更の印を付ける指定）は別の設計文書にする。
+- **発行済みの版**: 層 1 だけの間、`inWork` が `00` の DM は、利用者が明示したとき（`allowReleasedIssue: true`）だけ編集する。Skill は、自分の判断でこの値を渡さない。
+- **XSD のエラーが増えたとき**: 編集の前には無かった XSD のエラーが出た結果は、`write: true` でも書き込まず、増えたエラー（`newSchemaErrors[]`）を返す。
+- **ほかの DM・PM からの参照**: 編集で無くなった `id` を、CSDB のほかの DM・PM の `dmRef/@referredFragment` が指しているときは、`referencedFromOtherObjects[]` に返して書き込まない（2026-11-17 09:15 JST ごろ。実装で決めていた動きを、利用者がそのまま採用）。
+- **最初の版の対象**: 手順（`proceduralStep`）、段落、警告・注意・注記、リストの項目。節点の置き換え（replace）は入れない（reader が読んでいない属性と、下書きに書けない構造を落とすので、作り直しと同じ結果になる）。
+- **Skill の置き場所**: `s1000d-publish` に書く。別の Skill にしない。
+- **手順の段落の場所**: reader は、手順の直下の子を持たない段落を、手順の節点の `text` にまとめて返すので、その段落には `location` が付かない。`includeLocation: true` のときだけ、手順の節点に `textLocations[]`（まとめた段落ごとの場所を、並びの順に）を添える（2026-11-17 09:15 JST ごろ。未実装）。
+- 決めていないこと: `applyFix`・`applySegments` を同じ方法に寄せるか（差分を測ってから決める）。層 2 での `move` の変更の印。
+- 設計と実測は [design/core-structural-edit.md](./design/core-structural-edit.md)、層 2 は [design/core-revision.md](./design/core-revision.md)。
 
 ## 未決事項
 
