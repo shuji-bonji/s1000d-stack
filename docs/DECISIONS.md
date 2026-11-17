@@ -331,8 +331,22 @@ D-31 の「既にある DM は元の XML を保ったまま直す」を、節点
 - **最初の版の対象**: 手順（`proceduralStep`）、段落、警告・注意・注記、リストの項目。節点の置き換え（replace）は入れない（reader が読んでいない属性と、下書きに書けない構造を落とすので、作り直しと同じ結果になる）。
 - **Skill の置き場所**: `s1000d-publish` に書く。別の Skill にしない。
 - **手順の段落の場所**: reader は、手順の直下の子を持たない段落を、手順の節点の `text` にまとめて返すので、その段落には `location` が付かない。`includeLocation: true` のときだけ、手順の節点に `textLocations[]`（まとめた段落ごとの場所を、並びの順に）を添える（2026-11-17 09:15 JST ごろ。未実装）。
-- 決めていないこと: `applyFix`・`applySegments` を同じ方法に寄せるか（差分を測ってから決める）。層 2 での `move` の変更の印。
+- 決めていないこと: `applyFix`・`applySegments` を同じ方法に寄せるか（差分を測ってから決める）。層 2 での `move` の変更の印は D-33 で決めた。
 - 設計と実測は [design/core-structural-edit.md](./design/core-structural-edit.md)、層 2 は [design/core-revision.md](./design/core-revision.md)。
+
+### D-33 改版（層 2）は、作業中の版を始める操作と、変更の印を付ける指定に分ける（2026-11-17）
+
+D-32 の層 2 の決定。2026-11-17 09:56 JST に、利用者が設計文書の R-1〜R-8 をすべて提案どおりと決めた。実装はしていない。
+
+- **作業中の版を始める操作**（仮称 `startRevision`、writer-mcp は `start_revision`）: `inWork` を `01` にし、新しい版のファイル名で書く。元のファイルは変えない。`issueType` は入力で必ず受け取る（`changed`・`revised`・`status`）。core は決めない（R-1）。
+- **`001-00` から始めるときの `issueType`**: 仕様書の Chap 3.9.5.1 の Table 3（`001-01` は `new`）と、既定 BREX の BREX-S1-00030（`001-01` の `new` は違反）が食い違う。`new` のままにする値も入力で選べるようにし、選んだ結果が既定 BREX に違反することを応答で知らせる（R-1）。
+- **前の版の変更の印**: 作業中の版を始めるときに、印の属性・`changeInline` のタグ・`reasonForUpdate` を消し、`changeType="delete"` の要素は取り除く。`delete` の要素を取り除くことは、読んだ範囲の仕様書に明記が無く、解釈である。取り除く要素の `id` を指す参照が残っていれば断る（R-2）。
+- **変更の印を付ける指定**（`editContent` の `marking`）: insert は `changeType="add"`、remove は `changeType="delete"` を付けて残す。この作業中の版で足した要素（`add` の印を持つ）の remove は、印を付けずに取り除く。`reasonForUpdate` を 1 つ足し、同じ呼び出しの編集はすべてそれを指す。
+- **`move` の印**: 同じ親の中の移動は、親の要素に `changeType="modify"` を付ける。親が変わる移動は断る（利用者が remove と insert で指定する）。仕様書に移動の決まりは無い（R-3）。
+- **入力**: `updateReasonType` と `changeMark` は必須（値を補わない）。`reasonForUpdate/@id` は、省略時に core が文書に無い値を作る（R-4・R-5）。
+- **範囲に入れないもの**: 発行の操作（R-6）。編集のたびに `inWork` を上げること（R-7）。表・図の印は、対象の節点を表の行・図に広げるときに扱う（R-8）。
+- **先に要る作業**: reader（core の読み取り）は、識別・状態部の `reasonForUpdate` と、変更の印の属性を返していない。層 2 の実装の前に、読み取りに足す（D-31 の「読む側は落とさない」）。
+- 設計、仕様書で確かめたこと、残っている確認は [design/core-revision.md](./design/core-revision.md)。
 
 ## 未決事項
 
