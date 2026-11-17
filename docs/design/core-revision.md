@@ -125,6 +125,38 @@ core の `src/content/read.ts` には、`changeType`・`changeMark`・`reasonFor
 > [!IMPORTANT]
 > 変更の印と更新の理由は、D-31 の「読む側は落とさない」に当たらないまま残っています。層 2 では、印を付けた結果を reader で読んで確かめる手順が要るので、core の読み取り（`IdentAndStatus` に `reasonForUpdate`、`ContentNode` と `ContentRef` に変更の印）を先に足します。Skill `s1000d-review` が変更の印を見られないことも、同じ原因です。
 
+## 読み取りに足したもの（2026-11-17 10:50 JST。core の未公開のコミット、次の版は 0.14.0）
+
+上の「先に足す」分を実装しました。返す形は、XSD（`changeAttGroup`、`reasonForUpdateElemType`）と Bike Samples の実測から案を作り、利用者が 2026-11-17 10:40 JST ごろに決めました（DECISIONS の D-34）。値は書かれたまま返し、意味は付けません。
+
+| 返す場所 | 形 | 元の XML |
+|---|---|---|
+| `IdentAndStatus.reasonForUpdates[]` | `id`・`updateReasonType`・`updateHighlight`・`applicRefId`、そのほかの属性（`attrs`）、段落の文（`paragraphs[]`）。1 つも無ければ項目が無い | `dmStatus/reasonForUpdate`。子は `simplePara` か `simpleRefPara` |
+| `ContentNode.change`・`ContentRef.change` | `changeType`・`changeMark`・`reasonForUpdateRefIds`（空白で分けた配列）。3 つとも無ければ付かない | その節点・参照の要素自身の属性 |
+| `DataModuleContent.changeMarks[]` | `element`・`path`・`line`・`column` と、上の 3 つの属性。文書の順。無ければ空の配列 | 3 つの属性のどれかを持つ要素すべてと、`changeInline` |
+
+節点と一覧の両方に返す理由は、印を持てる要素の多くが節点にならないことと、Bike Samples の印のほとんどが本文を構造化して読まない DM にあることです。
+
+| 確かめたこと | 値 | 確かめ方 |
+|---|---|---|
+| 印の 3 つの属性を持てる要素の型 | `proced.xsd` は 233 のうち 136、`descript.xsd` は 183 のうち 91、`process.xsd` は 276 のうち 149、`fault.xsd` は 305 のうち 191、`pm.xsd` は 140 のうち 65 | Issue 7 の XSD で、`changeAttGroup` を参照する `complexType` を数えた |
+| 節点にならないが印を持てる要素の例 | `title`、表の `row`、`dmRef`・`internalRef`（参照になる）、手順の `text` にまとめる `para`、行内の `changeInline` | 同じ XSD |
+| Bike Samples の `reasonForUpdate` | 97 件に 124 個。すべて `dmStatus` の直下。`id` は 123 個、`updateReasonType` は 120 個（`urt03` 97・`urt01` 19・`urt02` 4）、`updateHighlight` は 1 個。子は `simplePara` 1 つが 119 個、2 つが 4 個、`simpleRefPara` 1 つが 1 個 | DMC・PMC 110 件の XML を直接数えた |
+| Bike Samples の変更の印 | 3 件に 14 個。`wrngdata` の DM 2 件に `wire` 10・`electricalEquip` 2、`descript` の DM 1 件に `graphic` 2。14 個とも 3 つの属性をすべて持つ。`changeInline` は 0 個 | 同上 |
+
+> [!NOTE]
+> 利用者に形を確かめたときの問いに、印を持つ要素を「13 個」と書きましたが、正しくは 14 個です（`wrngdata` の 12 個と `graphic` の 2 個）。選択肢の内容と理由には影響しません。
+
+読んでいないものは 1 つあります。パブリケーションモジュールの `pmStatus/reasonForUpdate` です（`IdentAndStatus` は DM の識別・状態部だけを読みます。Bike Samples の PMC 4 件に `reasonForUpdate` はありません）。PM の中の変更の印は `changeMarks[]` に入ります。
+
+確かめた結果:
+
+| 対象 | 結果 |
+|---|---|
+| core の vitest（クラウド側、配布物なし） | 321 件が通った（配布物を使う 46 件はスキップ）。足したテストは 5 件 |
+| core の vitest（Mac 側の VM、`S1000D_SPEC_TESTS=1`） | 367 件が通った（スキップなし）。足した配布物のテスト 3 件は、元の文字列を正規表現で数えた数と比べる（`reasonForUpdate` 124 個・97 件、印 14 個・3 件、段落が 2 つ以上の手順 11 個・7 件） |
+| reader-mcp（パッチを当てて VM でビルドし、stdio で `read_data_module` を呼んだ） | `…D00-00-00-00AA-040A-A` で、`identAndStatus.reasonForUpdates` 1 件、図の参照 2 つの `change`、`content.changeMarks` 2 件が返った。`wrngdata` の `…057A-A` は `structured: false` のまま `changeMarks` 10 件が返った |
+
 ## 案
 
 ### 版の流れ

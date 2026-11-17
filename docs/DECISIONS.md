@@ -330,7 +330,7 @@ D-31 の「既にある DM は元の XML を保ったまま直す」を、節点
 - **ほかの DM・PM からの参照**: 編集で無くなった `id` を、CSDB のほかの DM・PM の `dmRef/@referredFragment` が指しているときは、`referencedFromOtherObjects[]` に返して書き込まない（2026-11-17 09:15 JST ごろ。実装で決めていた動きを、利用者がそのまま採用）。
 - **最初の版の対象**: 手順（`proceduralStep`）、段落、警告・注意・注記、リストの項目。節点の置き換え（replace）は入れない（reader が読んでいない属性と、下書きに書けない構造を落とすので、作り直しと同じ結果になる）。
 - **Skill の置き場所**: `s1000d-publish` に書く。別の Skill にしない。
-- **手順の段落の場所**: reader は、手順の直下の子を持たない段落を、手順の節点の `text` にまとめて返すので、その段落には `location` が付かない。`includeLocation: true` のときだけ、手順の節点に `textLocations[]`（まとめた段落ごとの場所を、並びの順に）を添える（2026-11-17 09:15 JST ごろ。未実装）。
+- **手順の段落の場所**: reader は、手順の直下の子を持たない段落を、手順の節点の `text` にまとめて返すので、その段落には `location` が付かない。`includeLocation: true` のときだけ、手順の節点に `textLocations[]`（まとめた段落ごとの場所を、並びの順に）を添える（2026-11-17 09:15 JST ごろ。core の未公開のコミットで実装した。リストの項目には付けない。D-34）。
 - 決めていないこと: `applyFix`・`applySegments` を同じ方法に寄せるか（差分を測ってから決める）。層 2 での `move` の変更の印は D-33 で決めた。
 - 設計と実測は [design/core-structural-edit.md](./design/core-structural-edit.md)、層 2 は [design/core-revision.md](./design/core-revision.md)。
 
@@ -345,8 +345,20 @@ D-32 の層 2 の決定。2026-11-17 09:56 JST に、利用者が設計文書の
 - **`move` の印**: 同じ親の中の移動は、親の要素に `changeType="modify"` を付ける。親が変わる移動は断る（利用者が remove と insert で指定する）。仕様書に移動の決まりは無い（R-3）。
 - **入力**: `updateReasonType` と `changeMark` は必須（値を補わない）。`reasonForUpdate/@id` は、省略時に core が文書に無い値を作る（R-4・R-5）。
 - **範囲に入れないもの**: 発行の操作（R-6）。編集のたびに `inWork` を上げること（R-7）。表・図の印は、対象の節点を表の行・図に広げるときに扱う（R-8）。
-- **先に要る作業**: reader（core の読み取り）は、識別・状態部の `reasonForUpdate` と、変更の印の属性を返していない。層 2 の実装の前に、読み取りに足す（D-31 の「読む側は落とさない」）。
+- **先に要る作業**: reader（core の読み取り）は、識別・状態部の `reasonForUpdate` と、変更の印の属性を返していない。層 2 の実装の前に、読み取りに足す（D-31 の「読む側は落とさない」）。返す形は D-34。
 - 設計、仕様書で確かめたこと、残っている確認は [design/core-revision.md](./design/core-revision.md)。
+
+### D-34 更新の理由と変更の印は、節点と、DM 全体の一覧の両方に返す（2026-11-17）
+
+D-33 の「先に要る作業」の決定。2026-11-17 10:40 JST ごろに、利用者が 3 つの案から選んだ。core の未公開のコミット（次の版は 0.14.0）で実装した。
+
+- **更新の理由**: `IdentAndStatus.reasonForUpdates[]` に、`dmStatus/reasonForUpdate` を並びの順に返す（`id`・`updateReasonType`・`updateHighlight`・`applicRefId`・そのほかの属性・段落の文）。
+- **変更の印**: 節点と参照の `change`（`changeType`・`changeMark`・`reasonForUpdateRefIds`）と、DM 全体の一覧 `DataModuleContent.changeMarks[]`（要素名・場所・3 つの属性）の両方に返す。一覧には、節点にならない要素（`title`、表の `row`、手順の `text` にまとめた `para`、行内の `changeInline`）と、本文を構造化して読まない種類の DM の要素も入る。
+- **理由**: Issue 7 の `proced.xsd` では、233 の型のうち 136 が印の属性を持てて、その多くは節点にならない。Bike Samples で印を持つ要素 14 個のうち 12 個は、本文を構造化して読まない `wrngdata` の DM にある。節点だけに返す案では、この 12 個が数だけになる。一覧だけに返す案では、節点の印を知るのに場所の突き合わせが要る。
+- **値は解釈しない**: 書かれた値のまま返す。`updateReasonType` の値の意味、何が変わったか、印の付け方が仕様書の決まりに合っているかは、core は言わない。
+- **`textLocations[]` の範囲**: 手順の節点だけに付ける。リストの項目（段落が 1 つのときに、その段落を `text` にまとめる）には付けない。段落を取り除くと項目が空になり、XSD のエラーになるため、項目そのものを編集の対象にする。
+- 読んでいないもの: PM の `pmStatus/reasonForUpdate`。
+- 形と実測は [design/core-revision.md](./design/core-revision.md) の「読み取りに足したもの」。
 
 ## 未決事項
 

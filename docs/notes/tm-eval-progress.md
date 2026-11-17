@@ -352,7 +352,33 @@ Bike Samples の実測（110 件すべてで要素の範囲が DOM と対応、�
 |---|---|---|
 | 型だけを根拠に手順を書いた | reader-mcp は 0.11.1 まで応答から `location` を外していた。設計文書、writer-mcp の説明、Skill の手順は、reader の実際の応答を確かめずに「`location.path` を写す」と書いていた | reader-mcp 0.12.0 と `s1000d-publish` 0.3.1 で直した。手順や説明を書く前に、plugin か dev の MCP を呼んで応答の形を見る |
 | 自作の DM だけで確かめた | `editContent` の `insert` が、`content` の先頭に `refs` などがある DM をすべて断っていた。Bike Samples で初めて見つかった | core 0.13.0 で直した。自作のテスト用の DM だけで確かめたものは、Bike Samples と plugin 経由でも確かめる |
-| 手順の段落に場所が付かない | reader は、手順の直下の子を持たない段落を、すべて手順の節点の `text` にまとめる。その段落だけを取り除く・移すことができない | `includeLocation: true` のときに `textLocations[]` を添えると決まった（2026-11-17。未実装） |
+| 手順の段落に場所が付かない | reader は、手順の直下の子を持たない段落を、すべて手順の節点の `text` にまとめる。その段落だけを取り除く・移すことができない | `includeLocation: true` のときに `textLocations[]` を添えると決まった（2026-11-17）。core に実装した（下の節。未公開） |
+
+## 読み取りに、更新の理由・変更の印・手順の段落の場所を足した（2026-11-17 10:55 JST まで）
+
+層 2（改版）の前提の作業です。決定は DECISIONS の D-34、形と実測は [design/core-revision.md](../design/core-revision.md) の「読み取りに足したもの」と [design/core-structural-edit.md](../design/core-structural-edit.md) の「手順の段落に場所が付かない」にあります。
+
+| 作ったもの | 状態 | 置き場所 |
+|---|---|---|
+| core: `IdentAndStatus.reasonForUpdates[]`、`ContentNode.change`・`ContentRef.change`、`DataModuleContent.changeMarks[]`、`ContentNode.textLocations[]` | 作業コピーにコミット済み（`270a1fc`。署名なし、未 push、npm に未公開。次の版は 0.14.0） | `lib/s1000d-core` |
+| reader-mcp: 上の 4 つを応答に入れる。`textLocations` は `includeLocation: true` のときだけ | パッチ（コミットしていない。core 0.14.0 の公開の後に、依存を `^0.14.0` に上げてコミットする。次の版は 0.13.0） | 評価フォルダーの `work/reader-mcp-change-marks.patch` |
+| Skill `s1000d-publish`: `references/edit.md` の E2（`textLocations[]`）、前提の reader-mcp の最低版を 0.13.0 に | パッチ（コミットしていない。reader-mcp 0.13.0 の公開の後） | 評価フォルダーの `work/s1000d-publish-skill-textlocations.patch` |
+
+確かめたこと:
+
+- core の vitest は、クラウド側で 321 件（配布物を使う 46 件はスキップ）、Mac 側の VM で `S1000D_SPEC_TESTS=1` を付けて 367 件（スキップなし）が通った。
+- Bike Samples の DMC 106 件で、元の文字列を正規表現で数えた数と、読み取りの結果が合った。`reasonForUpdate` は 97 件に 124 個、変更の印を持つ要素は 3 件に 14 個（`wire` 10・`electricalEquip` 2・`graphic` 2）、まとめた段落が 2 つ以上の手順は 7 件に 11 個。
+- その 11 個すべてで、`textLocations` の場所の `para` を取り除く編集と移す編集が `editContent` で適用された。
+- reader-mcp は、パッチを当てて VM でビルドし、stdio で `read_data_module` を呼んで応答を見た（クラウド側の vitest は 29 件が通り、配布物を使う 5 件はスキップ）。plugin 経由と `s1000d-reader-dev` では、まだ呼んでいない（公開と Mac でのビルドの後になる）。
+
+この作業で分かったこと:
+
+| 項目 | 内容 |
+|---|---|
+| 印を持つ要素の数 | 5 回目・6 回目の引き継ぎは「`changeType` は 3 件」とだけ書いていた。要素の数は 14 個で、12 個は本文を構造化して読まない `wrngdata` の DM にある。節点だけに印を返す形では、Bike Samples の印のほとんどが応答に出ない |
+| `text` にまとめた段落が失うもの | 手順の `text` にまとめた `para` と、`listItem` の `text` になった `para` は、その要素自身の `id`・`applicRefId`・変更の印を節点として返さない。Bike Samples では、この形の `para` に属性を持つものは 0 個。変更の印は `changeMarks[]` に入るが、`id` と `applicRefId` は、いまも応答に無い |
+| Mac 側の VM の空き | `/sessions`（VM のホーム）が 100 % で、`npm ci` と `npx` が `ENOSPC` で止まる。`npm ci --cache /tmp/npm-cache`、`./node_modules/.bin/…` の直接の実行、`TMPDIR=/tmp` で動く。`/tmp` に作業コピーを作れば、配布物を使う vitest も VM で実行できる |
+| Project の文書の大きさ | `project_write` の `local_path` は、ファイルを 1 度の `Read` で全部読めることが条件で、`Read` の上限は 25,000 トークン。`DECISIONS.md` は 25,572 トークンで超えていたので、U-08 の付録を [u08-xsd-validation.md](./u08-xsd-validation.md) に分けた |
 
 ## 作業中に分かったこと
 

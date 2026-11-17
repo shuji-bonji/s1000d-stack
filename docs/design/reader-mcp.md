@@ -66,8 +66,20 @@ Bike Samples の内訳（proced 39、comrep 15、descript 14、learning 5、faul
 |---|---|
 | 既定 | `false`。応答は 0.11.1 までと変わらない（0.11.1 までは、core が返す `location` を応答から外していて、得る手段が無かった） |
 | `path` | 文書要素からの XPath（例: `/dmodule/content/procedure/mainProcedure/proceduralStep[2]`）。編集の前の、いまの文書での場所 |
-| 場所が付かないもの | 親の節点の `text` として返る段落。手順（`proceduralStep`）の直下にある、子の節点を持たない `para` は、すべて手順の節点の `text` にまとめるので、節点が無く `location` も無い |
-| 決まっていて、まだ実装していないこと | `includeLocation: true` のときに、手順の節点へ `textLocations[]`（`text` にまとめた段落ごとの `location` を、並びの順に）を添える（2026-11-17 に利用者が決定） |
+| 手順の `text` にまとめた段落 | 手順（`proceduralStep` など）の直下にある、子の節点を持たない `para` は、すべて手順の節点の `text` にまとめるので、節点が無く `location` も無い。代わりに、手順の節点の `textLocations[]` に、まとめた段落ごとの `location` を並びの順に返す（0.13.0。未公開。2026-11-17 に利用者が決定） |
+| 場所が付かないもの | リストの項目（`listItem`）の `text` になった段落（段落が 1 つだけの項目）。`textLocations` は付けない。編集は項目そのものを対象にする |
+
+### 更新の理由と変更の印（0.13.0、未公開）
+
+core 0.14.0 の読み取りを、そのまま応答に入れます（形と実測は [core-revision.md](./core-revision.md) の「読み取りに足したもの」、決定は D-34）。
+
+| 応答の項目 | 内容 |
+|---|---|
+| `identAndStatus.reasonForUpdates[]` | `dmStatus/reasonForUpdate` を並びの順に。1 つも無ければ項目が無い |
+| 節点・参照の `change` | その要素に書かれている `changeType`・`changeMark`・`reasonForUpdateRefIds` |
+| `content.changeMarks[]` | 3 つの属性のどれかを持つ要素と `changeInline` のすべて。`element`・`path`・`line`・`column` を持つ。`section: "outline"` でも、`structured: false` の DM でも返す。`includeLocation` が無くても `path` を返す（節点にならない要素を指す手段が、ほかに無いため） |
+
+値は書かれたまま返します。何が変わったか、印の付け方が仕様書の決まりに合っているかは、判定しません。
 
 本文中の参照は `references[]` に集め、`dmRef` は CSDB から解決した `techName` / `infoName` / 版を添えます（LLM が DMC だけを見て中身を推測しないようにするため）。図は `figure/graphic/@infoEntityIdent` → DOCTYPE の `ENTITY` 宣言 → ファイル名まで解決し、`hotspot` があれば `applicationStructureIdent` と `id` を返します（段階 4 の閲覧ソフトで 3D のノード名と対応付ける。background.md「設計のヒント」）。
 

@@ -355,8 +355,17 @@ reader（core の `readContent`）は、手順（`proceduralStep`）の直下に
 
 決定（利用者、2026-11-17 09:15 JST ごろ）: `includeLocation: true` のときだけ、手順の節点に `textLocations[]` を添える。`text` にまとめた段落ごとの `location`（`path`・`line`・`column`）を、並びの順に入れる。既定の応答（`includeLocation` なし）は変えない。最初の段落 1 つ分だけを返す案（`textLocation`）は、段落が 2 つ以上ある手順で 2 つ目からを指せないので採らなかった。
 
-> [!NOTE]
-> `textLocations[]` は、まだ実装していません。core の `ContentNode` に足し、reader-mcp が `includeLocation: true` のときに応答へ入れ、`s1000d-publish` の `references/edit.md` の E2 を直します。手順のほかに、子の段落を `text` にまとめている節点があるかは、実装のときに `src/content/read.ts` で確かめます。
+実装（2026-11-17 10:50 JST。core の未公開のコミット、次の版は 0.14.0）:
+
+| 項目 | 内容 |
+|---|---|
+| core | `ContentNode.textLocations`。手順（`kind: "step"`。`proceduralStep`・`isolationStep`・`isolationProcedureEnd`）の `text` にまとめた段落ごとの `NodeLocation` を、並びの順に持つ。まとめた段落が無い手順には付かない。core は常に返す |
+| reader-mcp | `includeLocation: true` のときだけ応答に入れる（パッチは評価フォルダーの `work/reader-mcp-change-marks.patch`。core 0.14.0 の公開の後にコミットする） |
+| Skill `s1000d-publish` | `references/edit.md` の E2 を直す（パッチは `work/s1000d-publish-skill-textlocations.patch`。reader-mcp の公開の後にコミットする） |
+| 手順のほかに、子の段落を `text` にまとめている節点 | リストの項目（`listItem`）。子が、子を持たない段落 1 つだけのときに、その段落を `text` にまとめる。Bike Samples の `listItem` 729 個のうち 728 個がこの形 |
+| `listItem` に `textLocations` を付けるか | 付けない（利用者、2026-11-17 10:40 JST ごろ）。段落を取り除くと項目が空になり、XSD のエラーになる。項目そのものを対象にする |
+
+Bike Samples で確かめたこと（Mac 側の VM、`S1000D_SPEC_TESTS=1`。`src/content/change.spec.test.ts`）: まとめた段落が 2 つ以上の手順は 7 件の DM に 11 個あり、その 11 個すべてで、`textLocations[1].path` の `para` を取り除く編集と、`textLocations[0]` の前に移す編集が、`editContent` で適用されました（`allowReleasedIssue: true`）。取り除いた後の `textLocations` は 1 つ減り、移した後の `text` は元と違う文になります。reader-mcp を stdio で呼んだ応答でも、手順 DM の 10 個に `textLocations` が 2 つ以上返りました（手順 DM だけを数えた値です）。
 
 ## 残っている点
 
