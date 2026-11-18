@@ -66,6 +66,33 @@
 3. **Desktop 経由の応答を確かめる。** 利用者が Claude Desktop を起動し直した後に、`s1000d-reader-dev` と plugin 版の `read_data_module` で `…D00-00-00-00AA-040A-A` を読み、`identAndStatus.reasonForUpdates`・`content.changeMarks`・図の参照の `change` が返ることを見ます。`…BIKE-AAA-D00-00-00-00AA-121A-A` を `includeLocation: true` で読み、手順 5.1 に `textLocations` が 2 つ返ることを見ます。plugin 版だけ返らないときは、`npx` が古い版を使っていないかを調べます。
 4. **層 2 を実装する。** 6 回目の引き継ぎの「次に作るもの」の 3〜5（core の `startRevision`、`editContent` の `marking`、writer-mcp）と 6 の残り（Skill の E1）です。先に、6 回目の「確かめること（未読・未測）」の Chap 3.5 と `descript.xsd` を読みます。
 
+## 「最初にやること」の 1〜3 の結果（2026-11-18 06:02 JST に確かめた）
+
+次のチャット（2026-11-18）で、1〜3 を行いました。4（層 2 の実装）は始めていません。上の「いまの状態」「利用者が行うこと」「Desktop 経由の応答」は 2026-11-17 の記録で、この節が新しい状態です。
+
+| 順 | 結果 |
+|---|---|
+| 1 | hub・core・reader-mcp・`s1000d-publish-skill` の 4 つとも、`git status -sb` は `main...origin/main` で、未 push のコミットと未コミットの変更は無い。`s1000d-publish` は 0.3.2 として出ている（`plugin.json` の `version` が `0.3.2`、CHANGELOG の見出しが `0.3.2 (2026-11-18)`、tag `v0.3.2` が HEAD `52b204f` と `origin/main` を指し、`git ls-remote --tags origin` にもある）。hub の `stack.json` の `published` は core `0.14.0`、reader-mcp `0.13.0`。claude-plugins の台帳は確かめていない |
+| 2 | `docs/notes/tm-eval-progress.md` を、hub の内容で Project に反映した（53,949 バイト。1 度の `Read` で読めた）。`core-structural-edit.md`・`reader-mcp.md`・`writer-mcp.md`・`skills-and-editor.md` は、層 2 の実装の後に反映する |
+| 3 | `s1000d-reader-dev` と plugin 版（`s1000d-reader`）の両方で、期待した応答が返った（下の表） |
+
+Desktop 経由の `read_data_module` の応答です（2026-11-18 06:01 JST。`csdbDirs` に Bike Samples のフォルダーを渡し、`verify: "none"`）。dev と plugin で、同じ内容でした。
+
+| DMC | 見たもの | dev | plugin |
+|---|---|---|---|
+| `S1000DLIGHTING-AAA-D00-00-00-00AA-040A-A` | `identAndStatus.reasonForUpdates` が 1 件（`id` は `RFU_CPF_2023-001US`、`updateReasonType` は `urt01`） | 返った | 返った |
+| 同上 | `content.changeMarks` が 2 件（`graphic[1]` が `modify`、`graphic[2]` が `add`） | 返った | 返った |
+| 同上 | 図 `fig-0001` の `refs` 2 つに `change` | 返った | 返った |
+| `S1000DBIKE-AAA-D00-00-00-00AA-121A-A`（`includeLocation: true`、`section: "content"`） | 手順 5.1・6.1・6.2.1.2 の `textLocations` が 2 つずつ | 返った | 返った |
+
+上の「最初にやること」の 3 は 040A の DMC を「…D00-00-00-00AA-040A-A」と略していました。modelIdentCode は `S1000DLIGHTING` です（`S1000DBIKE` に 040A-A の DM はありません）。
+
+このとき分かったことです。
+
+| 分かったこと | 確かめ方 | 扱い |
+|---|---|---|
+| `section: "outline"` と `includeLocation: true` を組にすると、outline の節点に `location` は付くが、`textLocations` は付かない。同じ応答の `_notes` には「手順は `textLocations` を持つ」という文が出る。ツールの `includeLocation` の説明も「body or the outline」の後に「A step also gets "textLocations"」と続く | plugin 版で 121A を `section: "outline"` で読んだ | 未着手。outline には付けないのなら、説明文と `_notes` を「`content`・`all` のときだけ」と直す |
+
 ## この回で決まったこと（2026-11-17、利用者の決定）
 
 | 時刻（JST） | 項目 | 内容 |
