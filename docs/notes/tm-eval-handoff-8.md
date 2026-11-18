@@ -103,6 +103,38 @@ writer-mcp と Skill は、パッチのままです（core が npm に出るま�
 - Skill のパッチ（`work/s1000d-publish-skill-revision.patch`）は、writer-mcp 0.6.0 が出てから入れます。
 - Project の文書を置き換えるときに、クラウド側のファイルを `Edit` で直した直後は、`Read` をし直さなくても `project_write` の `local_path` に渡せました。
 
+### 追記（2026-11-18 12:26 JST）: writer-mcp 0.6.0 の公開、Skill のコミット、Desktop 経由の確認
+
+- writer-mcp は 0.6.0 として出ました（利用者の作業。npm、MCP Registry、tag。`origin/main` と一致）。公開の前に、利用者が Mac で `npm ci` と `S1000D_SPEC_TESTS=1 npm test` を実行し、62 件が通りました（2026-11-18 12:00 JST）。claude-plugins の台帳は 31 件とも一致、hub の `stack.json` は core 0.15.0・writer-mcp 0.6.0 です（利用者が実行した `marketplace-version-check.mjs` と `generate-stack.mjs` の出力）。
+- Skill `s1000d-publish` に `work/s1000d-publish-skill-revision.patch` を入れ、CHANGELOG の見出しを `0.4.0 (2026-11-18)` にして、1 つのコミットにしました（`3ce6a18`。署名なし、未 push）。`plugin.json` の版は 0.3.2 のままです。
+
+Desktop 経由で、`s1000d-writer-dev` と plugin 版（`s1000d-writer`）の両方を呼びました（2026-11-18 12:22 JST）。Bike Samples の XML 118 件を、評価フォルダーの `work/REV-dev/` と `work/REV-plugin/` に写し、`S1000DBIKE-AAA-D00-00-00-00AA-121A-A_012-00` を対象にしました。dev と plugin で、4 回とも同じ応答でした。
+
+| 順 | 呼び出し | 応答 |
+|---|---|---|
+| 1 | `start_revision`（`issueType: "changed"`、`write: true`） | `started: true`。`fileName` は `…_012-01_EN-US.XML`。`removed.reasonForUpdate` は 1。XSD は `valid`、BREX は `passed` |
+| 2 | `edit_data_module`（remove と、その隣への insert。`marking.reason` は `urt02`） | `reasonForUpdate` は `rfu-0001`・`added: true`。`changes[0]` は `kept: true` と `delete` の印、`changes[1]` は `add` の印。XSD は `valid`、BREX は `passed` |
+| 3 | `edit_data_module`（同じ親の中の move。`marking.reasonRefId: "rfu-0001"`） | `reasonForUpdate.added` は `false`。親の `proceduralStep[1]` に `modify` の印 |
+| 4 | `add_reason_for_update`（`urt01`） | `added: true`。`reasonForUpdate` は `rfu-0002` |
+
+その後に確かめたことです。
+
+- `s1000d-reader-dev` で、書かれた `…_012-01` を読んだ。`identAndStatus.issueInfo` は `012-01`、`issueType` は `changed`、`reasonForUpdates` は 2 件（`rfu-0001`・`urt02`、`rfu-0002`・`urt01`）、`content.changeMarks` は 3 件（`modify`・`delete`・`add`。どれも `rfu-0001` を指す）だった。
+- 発行済みの版のファイル（`…_012-00`）は、`REV-dev/`・`REV-plugin/` のどちらでも、`specs/` の元のファイルと同じだった（`cmp`）。dev と plugin が書いた `…_012-01` も、互いに同じだった。
+- どの応答でも `verification.references` は `unresolved`（2 件）だった。図のファイル（ICN）を写していないためで、編集とは関係が無い。
+
+分かったことです。
+
+| 分かったこと | 扱い |
+|---|---|
+| `start_revision` の `_notes` に、「元の版は変えない」という内容の文が 2 つ並ぶ（writer-mcp が足す文と、core の `notes` の文） | 未着手。core の文を応答に入れないか、writer-mcp の文を短くする |
+| Claude Desktop を起動し直すと、接続したフォルダーでの削除の許可が切れ、Mac 側の VM の `/tmp` も消える。許可が切れたままコミットすると、コミットはできるが、`.git/HEAD.lock` と `.git/objects/*/tmp_obj_*` が残る | Skill のリポジトリで 1 度起きた。`HEAD.lock` を別の名前に移し、許可をもらい直してから消した。コミットの前に、許可があるかを `rm` できるファイルで確かめる |
+
+確かめていないことです。
+
+- Skill の手順どおりに LLM が動くかは、試していません（Skill 0.4.0 が plugin に出た後に、1 件を通します）。
+- `start_revision` に `reason` を渡す場合、`issueType` が `revised`・`status` の場合、断る場合（`released-issue`・`write-conflict` など）は、Desktop 経由では呼んでいません（自作のテストと、VM の stdio で確かめました）。
+
 ### 利用者が行うこと
 
 | 順 | 作業 |
@@ -111,7 +143,8 @@ writer-mcp と Skill は、パッチのままです（core が npm に出るま�
 | 2 | （済み）「決めていないこと」の 1 と 2 は決まり、core に入れた |
 | 3 | core を 0.15.0 として公開する（CHANGELOG の見出し、tag、npm）。公開の前に、Mac で `S1000D_SPEC_TESTS=1 npm test` を実行する |
 | 4 | （1〜3 は済み）writer-mcp のコミット（`dd57dcd`）を見て、Mac で `npm ci` と `S1000D_SPEC_TESTS=1 npm test` を実行し、署名を付けて、0.6.0 として公開する（`npm version minor`、push、npm、MCP Registry） |
-| 5 | writer-mcp の公開の後に、`s1000d-publish-skill` で `git apply` → 0.4.0 として公開する |
+| 5 | （4 は済み）`s1000d-publish-skill` のコミット（`3ce6a18`）を見て、署名を付け、0.4.0 として公開する（`plugin.json` の版、tag、push、claude-plugins の台帳、hub の `stack.json`） |
+| 6 | 評価フォルダーの `work/REV-dev/`・`work/REV-plugin/`（Bike Samples の XML の写しと、作業中の版 1 件ずつ）は、確認が済んだら消してかまわない。配布物の写しなので、リポジトリには入れない |
 
 ## 確かめたこと（2026-11-18 09:42 JST）
 
@@ -173,6 +206,8 @@ writer-mcp と Skill は、パッチのままです（core が npm に出るま�
 ## 最初にやること
 
 1. **状態を確かめる。** `lib/s1000d-core` で `git status -sb` と `git log --oneline -3` を見ます。core が 0.15.0 として出ているかを、`package.json`・tag・npm で見ます。
+次の 2〜4 のうち、2・3 と、4 の Skill の試行のほかは、2026-11-18 12:26 JST までに済みました（上の追記）。残っているのは、Skill 0.4.0 が plugin に出た後に手順どおりに 1 件を通すことと、5 です。
+
 2. **core が出ていれば、writer-mcp にパッチを入れる。** `work/writer-mcp-revision-b.patch` を `git apply` し、依存を core `^0.15.0` に上げます。Mac 側の VM で、配布物を使う vitest を実行します。
 3. **writer-mcp が出ていれば、Skill にパッチを入れる。** `work/s1000d-publish-skill-revision.patch` です。
 4. **Desktop 経由で確かめる。** `s1000d-writer-dev` と plugin 版で、上の stdio と同じ 4 つの呼び出しを行います（Bike Samples の写しを、接続したフォルダーの中に作ってから。`specs/` の中のファイルには書かない）。印を付けた後の DM を reader で読み、`changeMarks`・`reasonForUpdates` を見ます。Skill の手順どおりに 1 件を通します。
