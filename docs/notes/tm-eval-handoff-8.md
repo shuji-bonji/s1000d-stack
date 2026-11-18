@@ -9,24 +9,100 @@
 
 ## この回に行ったこと
 
-7 回目の「最初にやること」の 4（層 2 の実装）のうち、core の分（6 回目の「次に作るもの」の 3 と 4）を作りました。writer-mcp（5）と Skill の E1（6 の残り）は、始めていません。
+7 回目の「最初にやること」の 4（層 2 の実装）のうち、core の分（6 回目の「次に作るもの」の 3 と 4）を作りました。writer-mcp（5）と Skill の E1（6 の残り）は、同じ日の追記（下の「追記（2026-11-18 11:04 JST）」）で、パッチとして作りました。
 
 | 作ったもの | 状態 |
 |---|---|
-| core: `startRevision`（作業中の版を始める） | `lib/s1000d-core` の作業コピーに `git apply` で入れた。**コミットしていない**（未コミットの変更が 12 ファイル） |
+| core: `startRevision`（作業中の版を始める） | `lib/s1000d-core` の作業コピーに `git apply` で入れた。**コミットしていない**（未コミットの変更が 13 ファイル） |
 | core: `editContent` の `options.marking`（変更の印を付ける指定） | 同上 |
 | core: 開始タグの中の属性の範囲を求める関数（`scanAttributes`・`setAttributeSplice`・`removeAttributeSplice` など。`src/xml/ranges.ts`） | 同上 |
 | core の CHANGELOG | 「未リリース（0.15.0 の見込み）」の節を足した（同上） |
 
-同じ内容のパッチは、評価フォルダーの `work/core-revision-layer2-c.patch` です（sha256 の先頭は `a6bbb8d983888252`）。`work/core-revision-layer2.patch` と `core-revision-layer2-b.patch` は途中の版で、消してかまいません。
+同じ内容のパッチは、評価フォルダーの `work/core-revision-layer2-e.patch` です（sha256 の先頭は `6a7aa0468224758c`）。`work/` の `core-revision-layer2` で始まるほかの 7 つのパッチ（名前の末尾が無いもの、`-b`・`-c`・`-d`・`-d-increment`・`-e-increment`・`-e-reason`）は途中の版で、消してかまいません。
+
+### 追記（2026-11-18 10:24 JST）: 既にある `reasonForUpdate` を指す入口
+
+利用者の決定（2026-11-18 10:21 JST）: 既にある `reasonForUpdate` を `id` で指定できる入口を足す（下の「決めていないこと」の 1）。
+
+`marking` は、`reason`（新しい `reasonForUpdate` を足す）と `reasonRefId`（識別・状態部に既にある `reasonForUpdate` の `id`）の、どちらか一方だけを受け取ります。`reasonRefId` のときは、識別・状態部を変えず、付けた印がその `id` を指します。結果の `reasonForUpdate.added` は、足したときが `true`、既にあったものを指したときが `false` です。`id` が識別・状態部の `reasonForUpdate` に無ければ `marking-input-error`、その `reasonForUpdate` が `urt01` なら `editorial-reason` で断ります。
+
+この変更の後、クラウド側の vitest は 334 件（配布物を使う 49 件はスキップ）、Mac 側の VM の vitest（`S1000D_SPEC_TESTS=1`）は 383 件が通りました（スキップなし。`-d.patch` の内容で実行）。下の「確かめたこと」の件数（333 件・382 件）は、この追記の前の値です。
+
+### 追記（2026-11-18 10:45 JST）: 印を付けずに `reasonForUpdate` だけを足す入口
+
+利用者の決定（2026-11-18 10:40 JST）: `addReasonForUpdate` を core に足す（下の「決めていないこと」の 2）。
+
+`addReasonForUpdate(xml, reason)` は、`dmStatus` の中の XSD が決める位置（`productSafety`・`remarks` の前）に `reasonForUpdate` を 1 つ足します。本文には触らず、変更の印も付けません。`text` と `updateReasonType` は必須で、`urt01` も受け付けます。`id` を省略すると、文書に無い値を作ります。発行済みの版（`inWork` が `00`）は `released-issue` で断ります。
+
+3 つの入口の使い分けです。
+
+| 入口 | 本文の変更の印 | 識別・状態部の `reasonForUpdate` | 使う場面 |
+|---|---|---|---|
+| `editContent` の `marking.reason` | 付ける | 1 つ足す | その理由による最初の編集 |
+| `editContent` の `marking.reasonRefId` | 付ける | 変えない（既にあるものを指す） | 同じ理由による 2 回目からの編集 |
+| `addReasonForUpdate` | 付けない | 1 つ足す | 編集上の変更（`urt01`）。`issueType` が `revised`・`status` の版 |
+
+この変更の後、クラウド側の vitest は 337 件（配布物を使う 50 件はスキップ）、Mac 側の VM の vitest（`S1000D_SPEC_TESTS=1`）は 387 件が通りました（スキップなし。`-e.patch` の内容で実行）。
+
+配布物を使うテストを 1 件足しました。Bike Samples の DMC を 5 件に 1 件の割合で取り、`issueType: "status"` で作業中の版を始めると、`issueNumber` が `002` 以降のものは BREX-S1-00038 の違反になり、`000`・`001` のものはなりませんでした。`addReasonForUpdate` で `urt01` の理由を 1 つ足した後は、どれも BREX-S1-00038 の違反が無くなり、XSD のエラーは増えませんでした。下の「この回で分かったこと」に、決まりを読んで書いた「BREX-S1-00038 の条件に当たる」は、これで実測になりました。
+
+途中で、パッチに新しいファイル（`src/revision/reason.ts`）が入っていませんでした。`git diff`（ステージしていない差分）は、追跡していない新しいファイルを含みません。差分だけのパッチを作るときは、先に `git add -N` をするか、`git diff --cached` の全体のパッチを使います。
+
+### 追記（2026-11-18 11:04 JST）: writer-mcp と Skill（パッチ）
+
+利用者の決定（2026-11-18 10:57 JST）: writer-mcp では、`start_revision` の入力で理由を受け取り、理由だけを足すツールも別に作る（案 C）。
+
+core が npm に出ていないので、writer-mcp と Skill はコミットせず、評価フォルダーの `work/` にパッチを置きました。どちらも、Mac の作業コピーに `git apply --check` が通ることだけを確かめています（適用はしていません）。
+
+| パッチ | sha256 の先頭 | 内容 |
+|---|---|---|
+| `writer-mcp-revision-b.patch` | `8fe7e663ca102761` | 新しいツール `start_revision`・`add_reason_for_update`、`edit_data_module` の `marking`。ツールは 9 つになる。README（英・日）、CHANGELOG（「未リリース（0.6.0 の見込み）」）、`plugin.json` の説明の「7 tools」を「9 tools」に。`package.json` の core への依存（`^0.13.0`）と版は変えていない |
+| `s1000d-publish-skill-revision.patch` | `57abe4a78dc9e649` | `references/edit.md` の E1 を分け、E1a（作業中の版を始める）、「変更の印を付けるかを確かめる」、E3 の「変更の印」、E7（理由だけを足す）を足した。SKILL.md と README の前提の writer-mcp を 0.6.0 に。CHANGELOG（「未リリース（0.4.0 の見込み）」） |
+
+`writer-mcp-revision.patch` は途中の版で、消してかまいません。
+
+writer-mcp の 3 つの入口の動きです。
+
+| ツール | 動き |
+|---|---|
+| `start_revision` | 検証 → core の `startRevision` → `reason` があれば `addReasonForUpdate` → 検証し直す。`write: true` のときは、新しいファイル名で書く（`path` を渡したときは同じフォルダー、`xml` を渡したときは CSDB の書き込み先）。同じ名前があれば `write-conflict`。元のファイルは変えない。理由を足せないときは、版も始めない。XSD のエラーが増えた結果と、取り除いた `id` をほかの DM・PM が指している結果は書かない |
+| `add_reason_for_update` | 検証 → core の `addReasonForUpdate` → 検証し直す。`write: true` のときは、`path` のファイルを上書きする |
+| `edit_data_module` の `marking` | core の `editContent` にそのまま渡す。応答に `reasonForUpdate` と `changes[].mark` を返す。`_notes` に、次の同じ理由の編集では `marking.reasonRefId` を使うことを書く |
+
+core の `notes` と `refusals[].message` は、core の関数名（`startRevision`・`addReasonForUpdate`・`editContent`）で書いてあります。writer-mcp は、応答に入れるときにツールの名前（`start_revision`・`add_reason_for_update`・`edit_data_module`）に読み替えます。
+
+確かめたことです（2026-11-18 11:04 JST）。
+
+- クラウド側の vitest（core の `dist` を、この回の core に入れ替えた）: 60 件が通った（配布物を使う 2 件はスキップ）。`tsc`・`eslint`・`prettier`（`src`）も通った。
+- Mac 側の VM の vitest（`/tmp/writer`。core の `dist` は `/tmp/core` のもの。`S1000D_SPEC_TESTS=1`）: 62 件が通った（スキップなし）。
+- `/tmp/writer` でビルドした MCP を stdio で呼んだ（`tools/list` は 9 つ）。Bike Samples を `/tmp/bike` に写し、`…BIKE-AAA-D00-00-00-00AA-121A-A_012-00` に対して、`start_revision`（`changed`、`write: true`）→ `edit_data_module`（remove と、その隣への insert。`marking.reason`）→ `edit_data_module`（同じ親の中の move。`marking.reasonRefId`）→ `add_reason_for_update`（`urt01`）の順に呼んだ。4 回とも、応答の `verification` は XSD が `valid`、BREX が `passed` で、`newSchemaErrors[]` は空だった。作業中の版は `…_012-01_EN-US.XML` に書かれた。
+- 同じ DM を `issueType: "status"` で始めると（理由なし、`write` なし）、応答の `verification.brex` は `violations`（1 件）で、`_notes` に BREX-S1-00038 のことが出た。
+- 発行済みの版に `add_reason_for_update` を呼ぶと `released-issue` で断り、`message` は `start_revision` を案内した。
+
+確かめていないことです。
+
+- plugin 経由と `s1000d-writer-dev` では呼んでいません（core と writer-mcp の公開、Mac でのビルド、Claude Desktop の起動し直しの後になります）。
+- Skill の手順どおりに LLM が動くかは、試していません。手順は、上の stdio の応答の形を見てから書きました。
+- writer-mcp の `server.json`・サイト・hub の `stack.json` の説明（ツールの数）は直していません。
+- reader-mcp で、印を付けた後の DM を読むことは、この回は行っていません（core の `readContentFromXml` で `changeMarks` が返ることは、core の自作のテストで確かめました）。
+
+### 追記（2026-11-18 11:17 JST）: core のコミット
+
+利用者の指示（2026-11-18 11:16 JST）: コミットまで Claude が行う。署名・確認・push は利用者が行う。
+
+core の 13 ファイルを、`lib/s1000d-core` に 1 つのコミットにしました（`8eb5e36`。署名なし、未 push。`main` は `origin/main` より 1 つ先）。コミットの内容は `work/core-revision-layer2-e.patch` と同じです（コミットの前後の木と、パッチを当てた木を `diff -r` で比べました）。上の表の「コミットしていない」は、この追記の前の状態です。署名を付け直すと、ハッシュは変わります。
+
+writer-mcp と Skill は、パッチのままです（core が npm に出るまでコミットしない、という 6 回目からの決まりのとおり）。
 
 ### 利用者が行うこと
 
 | 順 | 作業 |
 |---|---|
-| 1 | `lib/s1000d-core` の差分を見て、署名を付けてコミットする |
-| 2 | 下の「決めていないこと」の 1 と 2 を決める（core の公開の前に決めると、公開が 1 度で済む） |
+| 1 | `lib/s1000d-core` のコミット（`8eb5e36`）を見て、署名を付けて push する。hub の `docs/notes/tm-eval-handoff-8.md` のコミットも同じ |
+| 2 | （済み）「決めていないこと」の 1 と 2 は決まり、core に入れた |
 | 3 | core を 0.15.0 として公開する（CHANGELOG の見出し、tag、npm）。公開の前に、Mac で `S1000D_SPEC_TESTS=1 npm test` を実行する |
+| 4 | core の公開の後に、writer-mcp で `git apply` → 依存を core `^0.15.0` に上げる（`package.json` と `package-lock.json`）→ `S1000D_SPEC_TESTS=1 npm test` → 0.6.0 として公開する。パッチの適用と依存の書き換えは、次のチャットで Claude が行える |
+| 5 | writer-mcp の公開の後に、`s1000d-publish-skill` で `git apply` → 0.4.0 として公開する |
 
 ## 確かめたこと（2026-11-18 09:42 JST）
 
@@ -79,8 +155,8 @@
 
 | # | 項目 | 内容 | 案 |
 |---|---|---|---|
-| 1 | 既にある `reasonForUpdate` を指す入口 | いまは、`marking` を渡した呼び出しのたびに `reasonForUpdate` が 1 つ増える。同じ理由の変更は同じ `reasonForUpdate` を指す、という決まり（Chap 3.9.5.2.1.1 Para 2.1.3）に沿うには、2 回目からの呼び出しで、既にある `id` を指定できる必要がある | `marking.reason` の代わりに `marking.reasonRefId`（文書にある `reasonForUpdate` の `id`）を受け付ける。どちらか一方を必須にする |
-| 2 | 印を付けずに `reasonForUpdate` だけを足す入口 | 6 回目から残っている項目（R-4 の補足）。編集上の変更（`urt01`）のほかに、上の `revised`・`status` の版でも要ることが分かった | core に `addReasonForUpdate`（XML と理由 1 つを受け取り、`dmStatus` に足す）を足し、writer-mcp の `start_revision` の入力にも理由を受け取れるようにする |
+| 1（決まった。上の追記） | 既にある `reasonForUpdate` を指す入口 | 決まる前は、`marking` を渡した呼び出しのたびに `reasonForUpdate` が 1 つ増える。同じ理由の変更は同じ `reasonForUpdate` を指す、という決まり（Chap 3.9.5.2.1.1 Para 2.1.3）に沿うには、2 回目からの呼び出しで、既にある `id` を指定できる必要がある | `marking.reason` の代わりに `marking.reasonRefId`（文書にある `reasonForUpdate` の `id`）を受け付ける。どちらか一方を必須にする |
+| 2（決まった。上の追記） | 印を付けずに `reasonForUpdate` だけを足す入口 | 6 回目から残っている項目（R-4 の補足）。編集上の変更（`urt01`）のほかに、上の `revised`・`status` の版でも要ることが分かった | core に `addReasonForUpdate`（XML と理由 1 つを受け取り、`dmStatus` に足す）を足し、writer-mcp の `start_revision` の入力にも理由を受け取れるようにする |
 | 3 | outline の `textLocations` | outline に付けるか、説明文と `_notes` を直すか | 説明文と `_notes` を「`content`・`all` のときだけ」と直す |
 
 7 回目の「決めていないこと」（`applyFix`・`applySegments` の寄せ方、`text` にまとめた `para` の `id`・`applicRefId`、PM の `reasonForUpdate`、Skill `s1000d-review` の観点）は、そのまま残っています。
@@ -88,10 +164,10 @@
 ## 最初にやること
 
 1. **状態を確かめる。** `lib/s1000d-core` で `git status -sb` と `git log --oneline -3` を見ます。core が 0.15.0 として出ているかを、`package.json`・tag・npm で見ます。
-2. **「決めていないこと」の 1 と 2 が決まっていれば、core に入れる。** core の公開の前なら同じ版に、後なら次の版にします。
-3. **writer-mcp を作る。** 設計文書の「writer-mcp」のとおり、`start_revision`（`path`・`issueType`・`write`）と、`edit_data_module` の `marking` です。先に、writer-mcp の `edit_data_module` の実装（検証 → 編集 → 検証し直す → 書き込む）を読みます。core が npm に出るまでは、writer-mcp にコミットせず、パッチを評価フォルダーの `work/` に置きます。`/tmp` にビルドした MCP を stdio で呼んで、応答の形を見ます。
-4. **Skill `s1000d-publish` の `references/edit.md` の E1 を分ける。** 手順を書く前に、3 の応答の形を見ます。
-5. **文書を直す。** `design/core-revision.md`（「案」を実装の結果に直し、「確かめること」の 3 つの結果を書く）、`design/writer-mcp.md`、`design/skills-and-editor.md`、`notes/tm-eval-progress.md`。その後に、Project の古い 4 つの文書（7 回目の表）と合わせて反映します。
+2. **core が出ていれば、writer-mcp にパッチを入れる。** `work/writer-mcp-revision-b.patch` を `git apply` し、依存を core `^0.15.0` に上げます。Mac 側の VM で、配布物を使う vitest を実行します。
+3. **writer-mcp が出ていれば、Skill にパッチを入れる。** `work/s1000d-publish-skill-revision.patch` です。
+4. **Desktop 経由で確かめる。** `s1000d-writer-dev` と plugin 版で、上の stdio と同じ 4 つの呼び出しを行います（Bike Samples の写しを、接続したフォルダーの中に作ってから。`specs/` の中のファイルには書かない）。印を付けた後の DM を reader で読み、`changeMarks`・`reasonForUpdates` を見ます。Skill の手順どおりに 1 件を通します。
+5. **文書を直す。** `design/core-revision.md`（「案」を実装の結果に直し、「確かめること」の 3 つの結果と、この回の 3 つの決定を書く）、`DECISIONS.md`（この回の 3 つの決定。D-33 の補足か、新しい番号か）、`design/writer-mcp.md`、`design/skills-and-editor.md`、`notes/tm-eval-progress.md`、サイト、hub の `stack.json` の説明。その後に、Project の古い 4 つの文書（7 回目の表）と合わせて反映します。
 
 ## Project の文書
 
