@@ -44,7 +44,19 @@ When you pass `includeLocation: true` to `read_data_module`, every node of the b
 
 `edit_data_module` of [s1000d-writer-mcp](/s1000d-stack/mcp/writer-mcp/) takes this `location.path` as the place to edit. Copy the value as it is; do not build it yourself.
 
-A paragraph that is returned as the `text` of its parent node has no node of its own, so it has no `location`. This is the case for the paragraphs directly under a step (`proceduralStep`) that have no child nodes: they are merged into the `text` of the step node. Removing or moving only such a paragraph is not possible yet.
+A paragraph that is returned as the `text` of its parent node has no node of its own, so it has no `location`. This is the case for the paragraphs directly under a step (`proceduralStep`) that have no child nodes: they are merged into the `text` of the step node. From 0.13.0, with `includeLocation: true`, the step node carries `textLocations` (the `location` of each merged paragraph, in order). To remove or move only such a paragraph, use the `path` in `textLocations`. A list item (one with a single paragraph, which becomes its `text`) has no `textLocations`, so edit the list item itself.
+
+### Reasons for update and change markup
+
+From 0.13.0, `read_data_module` returns the reasons for update and the change markup that are written in the data module. The values are returned as written; the server does not judge what changed or whether the markup follows the specification.
+
+| Item | Description |
+| --- | --- |
+| `identAndStatus.reasonForUpdates` | The `reasonForUpdate` elements of the identification and status section, in document order (`id`, `updateReasonType`, `updateHighlight`, `applicRefId`, `paragraphs`). When there is none, the item itself is absent |
+| `change` of a node or a reference | The `changeType`, `changeMark` and `reasonForUpdateRefIds` written on that element |
+| `content.changeMarks` | All the elements that have any of the three attributes, and `changeInline`, in document order (`element`, `path`, `line`, `column` and the three attributes). It also contains elements that do not become nodes (`title`, a table `row` and so on) and elements of the data module types whose content is not read as structure |
+
+To add change markup with `edit_data_module` of [s1000d-writer-mcp](/s1000d-stack/mcp/writer-mcp/) in an edit from the second one for the same reason, pass `identAndStatus.reasonForUpdates[].id` as `marking.reasonRefId`.
 
 ## Applicability and verification status
 

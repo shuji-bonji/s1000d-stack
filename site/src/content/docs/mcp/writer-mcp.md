@@ -1,15 +1,15 @@
 ---
 title: s1000d-writer-mcp
-description: Configuration and tools of the MCP server that lets an LLM create data modules without writing XML, verify and repair them, edit the structure of existing data modules, and hand sentences out and back for translation.
+description: Configuration and tools of the MCP server that lets an LLM create data modules without writing XML, verify and repair them, edit the structure of existing data modules, start an in-work issue of a released issue and add change markup, and hand sentences out and back for translation.
 ---
 
-`s1000d-writer-mcp` is an MCP server that lets an LLM create S1000D® data modules **without writing XML**. The LLM passes titles, paragraphs, steps and reference targets as a tree (a draft) together with the numbering rules. The server assigns the DMC and ICNs, builds the XML, verifies it against the XSD, BREX (Business Rules Exchange) and references, and automatically applies only the fixes that have exactly one way to be fixed. The fixes that remain are returned with candidates. It has 7 tools, which create data modules, convert experiential manuals, apply fixes, edit the structure of existing data modules, create comment data modules, and hand sentences out and back for translation.
+`s1000d-writer-mcp` is an MCP server that lets an LLM create S1000D® data modules **without writing XML**. The LLM passes titles, paragraphs, steps and reference targets as a tree (a draft) together with the numbering rules. The server assigns the DMC and ICNs, builds the XML, verifies it against the XSD, BREX (Business Rules Exchange) and references, and automatically applies only the fixes that have exactly one way to be fixed. The fixes that remain are returned with candidates. It has 9 tools, which create data modules, convert experiential manuals, apply fixes, edit the structure of existing data modules, start an in-work issue, add a reason for update, create comment data modules, and hand sentences out and back for translation.
 
 [GitHub](https://github.com/shuji-bonji/s1000d-writer-mcp) / [npm](https://www.npmjs.com/package/@shuji-bonji/s1000d-writer-mcp)
 
 ## Three principles
 
-- **It does not let the LLM write XML.** When a data module is created, the only input is a tree called a draft (`draft`); there is no entry point for XML written by an LLM. The LLM does not invent DMCs, ICNs or the BREX reference: the server assigns them from the numbering rules. The tools that take existing XML are `apply_fixes`, `edit_data_module`, `extract_segments` and `apply_segments`. Only `edit_data_module` changes the structure of the document, and the content to add is given as draft nodes, not as XML.
+- **It does not let the LLM write XML.** When a data module is created, the only input is a tree called a draft (`draft`); there is no entry point for XML written by an LLM. The LLM does not invent DMCs, ICNs or the BREX reference: the server assigns them from the numbering rules. The tools that take existing XML are `apply_fixes`, `edit_data_module`, `start_revision`, `add_reason_for_update`, `extract_segments` and `apply_segments`. Only `edit_data_module` inserts, removes or moves nodes, and the content to add is given as draft nodes, not as XML.
 - **It does not fix with values outside the candidates.** When a fix is applied, the server computes the candidates again and applies only a selection that matches one of them. There is no way to write a value freely.
 - **It does not write by default.** The XML it builds is only returned in the response. It is written to the CSDB only when you pass `write: true`.
 
@@ -20,7 +20,9 @@ description: Configuration and tools of the MCP server that lets an LLM create d
 | `build_data_module` | Builds one data module from one draft (descriptive, procedural, process, fault isolation or publication module) and the numbering rules. After building, it verifies the XSD, BREX and references, and automatically applies only the `exact` fixes, up to `maxFixRounds` times (default 3). The fixes that remain are returned in `fixes[]` with candidates |
 | `convert_manual` | Converts an experiential manual ([`@shuji-bonji/experiential-manual-model`](https://www.npmjs.com/package/@shuji-bonji/experiential-manual-model)) into one data module per Topic and one publication module. Each data module is built and verified in the same flow as `build_data_module`. References between data modules, publication modules and ICNs are resolved against the CSDB with the data modules built in this call laid over it. What the conversion cannot express is returned as counts in `notRepresented` |
 | `apply_fixes` | Applies to an existing data module the fixes selected from the candidates returned in `fixes[]`. A selection must be a copy of a candidate; a value outside the candidates, or a value that does not fit a range, is put into `rejected[]` with a reason. The result is verified again |
-| `edit_data_module` | Changes the structure of an existing procedural or descriptive data module: inserts, removes or moves a node. Places are `location.path` values, and a node to insert is a draft node (`step`, `para`, `admonition`, `listItem`). Only the edited ranges of the original text are rewritten; every other character stays as it was. It changes neither the issue information nor change markup (`changeType` and so on). A result with XSD errors that the edits introduced is not written |
+| `edit_data_module` | Changes the structure of an existing procedural or descriptive data module: inserts, removes or moves a node. Places are `location.path` values, and a node to insert is a draft node (`step`, `para`, `admonition`, `listItem`). Only the edited ranges of the original text are rewritten; every other character stays as it was. Without `marking`, it changes neither the issue information nor change markup (`changeType` and so on). With `marking`, it adds change markup to an in-work issue. A result with XSD errors that the edits introduced is not written |
+| `start_revision` | Starts an in-work issue of a released data module. `inWork` becomes `01`, `issueNumber` stays, and `issueType` is the value you give (`changed`, `revised` or `status`; the server does not choose it). The change markup and the reasons for update of the previous issue are removed, and elements marked `changeType="delete"` are taken out. The released issue is not changed: the in-work issue is written as a new file. If you pass `reason`, one reason for update is added in the same call |
+| `add_reason_for_update` | Adds one reason for update (`reasonForUpdate`) to the identification and status section of an in-work issue. It does not touch the content and adds no change markup. Use it to write the reason of a change that has no change markup (an editorial change `urt01`, or an issue whose `issueType` is `revised` or `status`) |
 | `create_comment` | Builds and verifies a comment data module (`comment`). If the sequence number is omitted, it is the next number in the CSDB |
 | `extract_segments` | Takes out of a data module the sentences that a person reads (titles, paragraphs, steps, warnings, table cells, figure titles) for translation. Inline elements are replaced by the placeholders `{1}` `{2}`, and `skeletonHash`, used to check the skeleton, is returned |
 | `apply_segments` | Puts translated sentences back into the original data module. The DMC stays the same and only the language changes. If the data module has changed since the sentences were taken out, it stops with `skeleton-mismatch` |
@@ -94,6 +96,8 @@ A mistake in the draft or in the numbering rules is returned not as a tool failu
 - With `write: true`, `convert_manual` copies the original files of figures and the like under their ICN file names.
 - If you pass `path` to `apply_fixes` with `write: true`, that file is rewritten in place. If you pass `xml`, the result is written to the first folder under the data module's own file name.
 - `edit_data_module` also rewrites the file in place when you pass `path` with `write: true` (the issue does not change, so the file name does not change). A result with XSD errors that the edits introduced, and a result that removes an `id` to which another data module refers, are not written even with `allowInvalid: true`.
+- With `write: true`, `start_revision` writes the in-work issue under a new file name. If you pass `path`, it is written to the same folder; if you pass `xml`, to the first folder. The file of the released issue is not changed. A file of the same name gives `write-conflict`.
+- If you pass `path` to `add_reason_for_update` with `write: true`, that file is rewritten in place.
 - The paths that were written are listed in `written[]` of the response.
 
 ## Editing the structure of an existing data module
@@ -134,14 +138,66 @@ flowchart LR
 | `referencedFromOtherObjects[]` | The places where a `dmRef` in another data module or publication module in the CSDB refers to an `id` that was removed. If there is even one, the result is not written. Decide whether to fix the referring side first or to give up the edit |
 | `verification` | The verification status after the edits |
 | `fixes[]` | Fix candidates for the problems that were there before the edits |
-| `changes[]` | The edits that were applied |
+| `changes[]` | The edits that were applied. With `marking`, each has the markup that was added (`mark`). `kept: true` is a node that was not taken out but kept with `delete` markup |
+| `reasonForUpdate` | With `marking`, the reason for update that the added markup refers to. `added: true` means it was added in this call |
 
-### The issue and change markup are not changed
+### Without `marking`, the issue and change markup are not changed
 
-`edit_data_module` changes neither the issue information (`issueInfo`) nor change markup (`changeType`, `changeMark`, `reasonForUpdate`).
+Without `marking`, `edit_data_module` changes neither the issue information (`issueInfo`) nor change markup (`changeType`, `changeMark`, `reasonForUpdate`).
 
-- A released issue (`inWork` of `issueInfo` is `00`) is refused with `released-issue`. In S1000D, when you change a released data module, you move it to an in-work issue and give technical changes change markup and a reason for update. This server does not have that operation yet.
-- Only when it is acceptable to rewrite the data module without changing its issue, as in a prototype or an exercise, pass `allowReleasedIssue: true` to edit it.
+- A released issue (`inWork` of `issueInfo` is `00`) is refused with `released-issue`. To change it by the S1000D rules, start an in-work issue first, as described in "Changing a released data module" below.
+- Only when it is acceptable to rewrite the data module without changing its issue, as in a prototype or an exercise, pass `allowReleasedIssue: true` to edit it. With `marking`, a released issue is refused even with `allowReleasedIssue: true`.
+
+## Changing a released data module
+
+In S1000D, when you change a released data module (`inWork` of `issueInfo` is `00`), you move it to an in-work issue, add change markup to the places that changed, and write a reason for update (`reasonForUpdate`) in the identification and status section. From 0.6.0, the server has three entry points for this.
+
+```mermaid
+flowchart LR
+  A["Released issue<br/>012-00"] -->|"start_revision"| B["In-work issue<br/>012-01 (a new file)"]
+  B -->|"edit_data_module<br/>marking.reason"| C["Change markup and<br/>a reason for update are added"]
+  C -->|"edit_data_module<br/>marking.reasonRefId"| C
+  B -->|"add_reason_for_update"| D["Only a reason for update<br/>is added"]
+```
+
+### Starting an in-work issue (`start_revision`)
+
+- `issueType` (`changed`, `revised` or `status`) is required. The server does not choose it. The writer decides the kind of change, so ask the user before you pass it. Only when you start from an issue whose issue number is `001`, you can also pass `new`. In that case, `_notes` reports that the result violates BREX-S1-00030 of the default BREX.
+- The result is a new document with the same `issueNumber` and `inWork` `01`. With `write: true`, it is written under a new file name (`fileName` in the response; `_012-00_` becomes `_012-01_`). The file of the released issue is not changed.
+- The change markup of the previous issue (`changeType`, `changeMark`, `reasonForUpdateRefIds`) and its reasons for update are removed, and elements marked `changeType="delete"` are taken out. The counts and the places of the elements taken out are returned in `removed` of the response.
+- An issue whose `issueType` is `revised` or `status` starts with no reason for update. When the issue number is `002` or later, this violates BREX-S1-00038 of the default BREX, so pass `reason` to add one reason in the same call. If the reason cannot be added, the in-work issue is not started either.
+- An issue that is already in work (`already-in-work`) and an issue whose `issueType` is `deleted` (`deleted-issue`) are refused.
+
+### Adding change markup (`marking` of `edit_data_module`)
+
+With `marking`, the server adds change markup to the edited places. Change markup can be added only to an in-work issue whose `issueType` is `changed`, `status`, `rinstate-changed` or `rinstate-status`.
+
+| Edit | Markup that is added |
+| --- | --- |
+| `insert` | The inserted element gets `changeType="add"` |
+| `remove` | The element is not taken out: it is kept with `changeType="delete"` (`changes[].kept` is `true`). An element that was inserted in this in-work issue is taken out without markup |
+| `move` | Only a move within the same parent is accepted, and the parent gets `changeType="modify"`. A move to another parent is refused with `move-across-parents`, and a move inside a parent that cannot have change markup with `parent-not-markable` |
+
+| Item | Description |
+| --- | --- |
+| `marking.reason` | Pass it in the first edit for that reason. `text` (the text of the reason) and `updateReasonType` are required. One reason for update is added to the identification and status section, and the markup refers to it. If `id` is omitted, a value that is not in the document is made (in the form `rfu-0001`) |
+| `marking.reasonRefId` | Pass it from the second edit for the same reason. It is the `id` of a reason for update that is already in the identification and status section. No reason for update is added |
+| `marking.changeMark` | `"1"` or `"0"`; required. It says whether a change mark such as a change bar is shown, and the project decides it |
+
+- Pass exactly one of `reason` and `reasonRefId`. All the edits of one call refer to the same reason. Use separate calls for edits that have different reasons.
+- An editorial change (`updateReasonType` is `urt01`) cannot have change markup (`editorial-reason`). Edit without `marking`, and add the reason with `add_reason_for_update`.
+- To replace a node with other content, pass in the same call a `remove` of the original node and an `insert` beside it. The original node is kept with `delete` markup, and the new node gets `add` markup.
+- `reasonForUpdate` of the response (`added: true` means it was added in this call) and `changes[].mark` return the reason the markup refers to and the markup that was added.
+- The server does not fill in the text of the reason, `updateReasonType` or `changeMark`.
+
+### Adding only a reason for update (`add_reason_for_update`)
+
+It adds one reason for update to the identification and status section of an in-work issue. It does not touch the content and adds no change markup. Use it for the reason of an editorial change (`urt01`) and for the reason of an issue whose `issueType` is `revised` or `status`. A released issue is refused with `released-issue`. If you pass `path` with `write: true`, that file is rewritten in place.
+
+### What these tools do not do
+
+- They do not release the issue (set `inWork` back to `00` and raise the issue number). The issue date and the quality assurance status are not changed either.
+- They do not add change markup to a part of a sentence (`changeInline`), or to tables and illustrations.
 
 ## Converting an experiential manual
 
@@ -173,7 +229,8 @@ What the conversion cannot express (the coordinates of hotspots, part of `scopeR
 ## What it does not do
 
 - **It does not accept XML written by an LLM.** It builds only from a draft. The content that `edit_data_module` adds is also given as draft nodes, not as XML.
-- **It does not revise a data module to a new issue.** `edit_data_module` does not raise the issue and does not add change markup. It also cannot yet insert, remove or move tables, illustrations or the items of the preliminary requirements, rewrite the text of a paragraph, or replace a node with other content.
+- **It does not release an issue.** `start_revision` only starts an in-work issue. There is no operation that sets `inWork` back to `00` and raises the issue number. The issue date and the quality assurance status are not changed either.
+- **It cannot yet insert, remove or move tables, illustrations or the items of the preliminary requirements, or rewrite the text of a paragraph.** It also cannot add change markup to a part of a sentence (`changeInline`), or to tables and illustrations.
 - **It does not fix with values outside the candidates.**
 - **It does not skip verification.** The XML it builds is always verified before being returned.
 - **It does not judge conformance to S1000D, and it does not interpret the severity of findings.** Read the details of findings with [`s1000d-verify-mcp`](/s1000d-stack/mcp/verify-mcp/) and the explanation of BREX rules with [`s1000d-brex-mcp`](/s1000d-stack/mcp/brex-mcp/). Values such as `commentType` and `commentPriorityCode` are written as the enumeration given, with no meaning attached.

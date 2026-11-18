@@ -35,6 +35,8 @@ npm install @shuji-bonji/s1000d-core
 | DML（データ管理リスト）・DDN（納入票）の読み取りと CSDB との照合 | `readDml` / `readDdn` / `reconcileDml` / `reconcileDdn` |
 | 下書き（`DraftDataModule`）からのデータモジュールの組み立てと、DMC・ICN・PMC の採番 | `buildDataModule` / `buildContent` / `allocateDmc` / `allocateIcn` / `allocatePmc` |
 | 修正候補の文書への適用（候補と一致する選択だけ） | `applyFix` / `applyFixes` |
+| 既にあるデータモジュールの構造の編集（節点を足す・取り除く・移す。変更の印も付けられる） | `editContent` |
+| 作業中の版の開始と、更新の理由の追加 | `startRevision` / `addReasonForUpdate` |
 | 書き込める CSDB の置き場所 | `WritableCsdbSource` / `isWritableCsdbSource` |
 | コメントデータモジュールの組み立て | `buildComment` |
 | 翻訳向けの文の取り出しと差し戻し | `extractSegments` / `applySegments` |
@@ -97,8 +99,17 @@ XSD 検証の前に入力の形を検査し、誤りは `DraftInputError` で返
 - **元の文字列の、編集した範囲だけを書き換えます。** 触っていない部分は 1 文字も変わりません。`applyFix`・`applySegments` は文書要素の全体を直列化し直すので、開始タグの属性の改行などが変わります。`editContent` はこの方法を使いません。要素が元の文字列の中で占める範囲は、`scanElementRanges`・`rangeOfElement` で求めます。
 - 1 つでも断る理由があれば、1 つも適用しません。結果は `applied`・`xml`・`refusals[]`・`changes[]`・`notes[]` です。
 - 文字列を書き換えた結果を読み直し、DOM で同じ操作をした結果と比べます。合わなければ `internal-mismatch` で断ります。
-- 版（`issueInfo`）も変更の印（`changeType`・`changeMark`・`reasonForUpdate`）も変えません。発行済みの版（`inWork` が `00`）は `released-issue` で断り、`allowReleasedIssue: true` を渡したときだけ適用します。
+- `options.marking` を渡さなければ、版（`issueInfo`）も変更の印（`changeType`・`changeMark`・`reasonForUpdate`）も変えません。発行済みの版（`inWork` が `00`）は `released-issue` で断り、`allowReleasedIssue: true` を渡したときだけ適用します。変更の印を付ける指定（`options.marking`）は、下の「改版の操作」にあります。
 - XSD の内容モデルの順序は確かめません。`options.xsd`（`XsdIndex`）を渡すと、親がその名前の子を取れるかだけを確かめます。順序の誤りは、適用の後の XSD 検証で見つけてください。
+
+### 改版の操作（`startRevision`・`marking`・`addReasonForUpdate`）
+
+0.15.0 で足しました。発行済みのデータモジュールを、S1000D の版の決まりに沿って直すための操作です。[s1000d-writer-mcp](/s1000d-stack/ja/mcp/writer-mcp/) の `start_revision`・`edit_data_module`・`add_reason_for_update` がこれを呼びます。どれも、元の文字列の書き換える範囲だけを書き換えます。
+
+- `startRevision(xml, options)` は、発行済みの版（`inWork` が `00`）の XML から、`inWork` が `01` の XML を作ります。`issueNumber` はそのままで、`issueType` は `options.issueType` の値（`changed`・`revised`・`status`。`001-00` から始めるときだけ `new` も）にします。値は補いません。前の版の変更の印（`changeType`・`changeMark`・`reasonForUpdateRefIds`、`changeInline` のタグ、`reasonForUpdate`）を消し、`changeType="delete"` の要素を取り除きます。データモジュールでは、作業中の版のファイル名（`fileName`）も返します。ファイルは書きません。
+- `editContent` の `options.marking` は、編集した場所に変更の印を付けます。`insert` は足した要素に `changeType="add"` を付け、`remove` は要素を取り除かずに `changeType="delete"` を付けて残し、同じ親の中の `move` は親に `changeType="modify"` を付けます。`marking.reason` は `dmStatus` に `reasonForUpdate` を 1 つ足し、付けた印がそれを指します。`marking.reasonRefId` は、既にある `reasonForUpdate` の `id` を指し、識別・状態部を変えません。`updateReasonType` と `changeMark` は必須です。
+- `addReasonForUpdate(xml, reason)` は、`dmStatus` に `reasonForUpdate` を 1 つ足します。本文には触らず、変更の印も付けません。編集上の変更（`urt01`）の理由と、`issueType` が `revised`・`status` の版の理由に使います。
+- 発行（`inWork` を `00` に戻し、`issueNumber` を上げること）、文の一部への変更の印（`changeInline` を付ける編集）、表・図への変更の印は扱いません。`issueDate` と `qualityAssurance` は変えません。
 
 ### 書き込める置き場所（`WritableCsdbSource`）
 
@@ -146,6 +157,6 @@ S1000D の仕様書・XSD・既定 BREX・公式サンプルは再配布でき�
 
 ## 公開と版
 
-現在の版は 0.8.0 です。
+現在の版は 0.15.0 です。
 
 npm への公開は、`v*` の tag を push したときに GitHub Actions が Trusted Publisher（OIDC）で行います。0.x の間、`^0.1.0` のような依存は minor をまたぎません。このライブラリの minor を上げたときは、MCP 側の依存範囲も上げて公開し直します。

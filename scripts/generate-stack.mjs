@@ -52,7 +52,7 @@ const README_FILE = join(ROOT, 'README.md');
 const REGISTRY = [
   // ── 公開済み ────────────────────────────────────────────────
   { name: 's1000d-core',      dir: 'lib/s1000d-core',      npm: '@shuji-bonji/s1000d-core',      layer: 'core', form: 'library',    status: 'released',   public: true,
-    note: 'DMC・ICN・PMC の分解、識別・状態部の読み取り、BREX の読み取りと照合（連鎖・層別）、XSD 検証（SchemaValidator、実装は libxml2-wasm のサブパス）、参照の解決、適用性の 3 値評価、本文（descript / proced / process / fault / pm）の共通の形への読み取り、検証状態 VerificationStatus、修正候補の決定。0.8.0 で「書く側」（データモジュールの組み立てと採番、修正候補の適用、WritableCsdbSource、comment DM、翻訳向けの文の出し入れ）を追加。全 MCP が依存' },
+    note: 'DMC・ICN・PMC の分解、識別・状態部の読み取り、BREX の読み取りと照合（連鎖・層別）、XSD 検証（SchemaValidator、実装は libxml2-wasm のサブパス）、参照の解決、適用性の 3 値評価、本文（descript / proced / process / fault / pm）の共通の形への読み取り、検証状態 VerificationStatus、修正候補の決定。0.8.0 で「書く側」（データモジュールの組み立てと採番、修正候補の適用、WritableCsdbSource、comment DM、翻訳向けの文の出し入れ）を追加。0.13.0 で構造を変える編集（editContent）、0.15.0 で改版の操作（startRevision、editContent の marking、addReasonForUpdate）を追加。全 MCP が依存' },
 
   // ── 公開済み（段階 2 の 3 部品と brex-mcp は 2026-10-26 に 0.1.0 を公開、D-16）────
   { name: 's1000d-brex-mcp',  dir: 'mcp/s1000d-brex-mcp',  npm: '@shuji-bonji/s1000d-brex-mcp',  layer: 'mcp',  form: 'mcp-server', status: 'released',   public: true,
@@ -64,12 +64,12 @@ const REGISTRY = [
   { name: 'experiential-manual-model', dir: 'lib/experiential-manual-model', npm: '@shuji-bonji/experiential-manual-model', layer: 'model', form: 'library', status: 'released',   public: true,
     note: '段階 2。体験型マニュアルの共通データモデル（型・JSON Schema・検査・2021 年の作品 JSON からの変換）。S1000D に依存しない。名前は U-04 で確定' },
   { name: 's1000d-writer-mcp', dir: 'mcp/s1000d-writer-mcp', npm: '@shuji-bonji/s1000d-writer-mcp', layer: 'mcp', form: 'mcp-server', status: 'released', public: true,
-    note: '段階 3。LLM に XML を書かせずにデータモジュールを作る。build_data_module / convert_manual / apply_fixes / create_comment / extract_segments / apply_segments の 6 tools。2026-10-28 に 0.1.0・0.1.1 を公開' },
+    note: '段階 3。LLM に XML を書かせずにデータモジュールを作り、既にあるデータモジュールを直す。build_data_module / convert_manual / apply_fixes / edit_data_module / start_revision / add_reason_for_update / create_comment / extract_segments / apply_segments の 9 tools。0.5.0 で構造を変える編集（edit_data_module）、0.6.0 で改版の入口（start_revision・add_reason_for_update、edit_data_module の marking）を追加' },
   // Skill は 1 つにリポジトリ 1 つ（D-28）。npm には載せず、GitHub Release の .plugin と claude-plugins で配る（2026-10-28 に 0.1.0）
   { name: 'experience-to-s1000d-skill', dir: 'skill/experience-to-s1000d-skill', npm: null, layer: 'procedure', form: 'skill', status: 'released',   public: true,
     note: '段階 3。体験型マニュアルの JSON を CSDB に変換する Skill（writer の convert_manual、verify の verify_csdb）。plugin 名 experience-to-s1000d' },
   { name: 's1000d-publish-skill', dir: 'skill/s1000d-publish-skill', npm: null, layer: 'procedure', form: 'skill', status: 'released',   public: true,
-    note: '段階 3。構造化した下書きからデータモジュールを 1 件ずつ作り、検証して CSDB に入れる Skill（writer の build_data_module、verify の reconcile_dml）。plugin 名 s1000d-publish' },
+    note: '段階 3。構造化した下書きからデータモジュールを 1 件ずつ作り、検証して CSDB に入れる Skill（writer の build_data_module、verify の reconcile_dml）。CSDB にあるデータモジュールの構造の編集と、作業中の版を始めて変更の印を付ける手順も持つ（writer の edit_data_module / start_revision / add_reason_for_update）。plugin 名 s1000d-publish' },
   { name: 's1000d-review-skill', dir: 'skill/s1000d-review-skill', npm: null, layer: 'procedure', form: 'skill', status: 'released',   public: true,
     note: '段階 3。データモジュールを 3 つの観点でレビューし、指摘を comment DM に残す Skill（reader、verify の suggest_fixes、writer の create_comment）。plugin 名 s1000d-review' },
   { name: 's1000d-translate-skill', dir: 'skill/s1000d-translate-skill', npm: null, layer: 'procedure', form: 'skill', status: 'released',   public: true,

@@ -35,6 +35,8 @@ npm install @shuji-bonji/s1000d-core
 | Reading a DML (data management list) and a DDN (data dispatch note) and reconciling them with the CSDB | `readDml` / `readDdn` / `reconcileDml` / `reconcileDdn` |
 | Building a data module from a draft (`DraftDataModule`) and numbering DMCs, ICNs and PMCs | `buildDataModule` / `buildContent` / `allocateDmc` / `allocateIcn` / `allocatePmc` |
 | Applying fix candidates to a document (only a selection that matches a candidate) | `applyFix` / `applyFixes` |
+| Editing the structure of an existing data module (inserting, removing and moving nodes; change markup can also be added) | `editContent` |
+| Starting an in-work issue, and adding a reason for update | `startRevision` / `addReasonForUpdate` |
 | A CSDB place that can be written to | `WritableCsdbSource` / `isWritableCsdbSource` |
 | Building a comment data module | `buildComment` |
 | Taking out sentences for translation and putting them back | `extractSegments` / `applySegments` |
@@ -97,8 +99,17 @@ Added in 0.13.0. `editContent(xml, edits, options)` inserts (`insert`), removes 
 - **Only the edited ranges of the original text are rewritten.** The parts that were not touched stay the same character for character. `applyFix` and `applySegments` serialise the whole document element again, which changes, for example, the line breaks between attributes in a start tag. `editContent` does not use that method. `scanElementRanges` and `rangeOfElement` give the range that an element occupies in the original text.
 - If there is a reason to refuse even one edit, none is applied. The result has `applied`, `xml`, `refusals[]`, `changes[]` and `notes[]`.
 - The rewritten text is parsed again and compared with the result of the same operation on the DOM. If they differ, the edit is refused with `internal-mismatch`.
-- It changes neither the issue information (`issueInfo`) nor change markup (`changeType`, `changeMark`, `reasonForUpdate`). A released issue (`inWork` is `00`) is refused with `released-issue` and is edited only when `allowReleasedIssue: true` is passed.
+- Without `options.marking`, it changes neither the issue information (`issueInfo`) nor change markup (`changeType`, `changeMark`, `reasonForUpdate`). A released issue (`inWork` is `00`) is refused with `released-issue` and is edited only when `allowReleasedIssue: true` is passed. The option that adds change markup (`options.marking`) is described in "Revision operations" below.
 - It does not check the order of the XSD content model. When `options.xsd` (`XsdIndex`) is passed, it checks only whether the parent can take a child of that name. Find a mistake in the order with XSD validation after the edit.
+
+### Revision operations (`startRevision`, `marking`, `addReasonForUpdate`)
+
+Added in 0.15.0. These operations change a released data module by the S1000D rules for issues. `start_revision`, `edit_data_module` and `add_reason_for_update` of [s1000d-writer-mcp](/s1000d-stack/mcp/writer-mcp/) call them. Each of them rewrites only the ranges of the original text that it changes.
+
+- `startRevision(xml, options)` makes, from the XML of a released issue (`inWork` is `00`), XML whose `inWork` is `01`. `issueNumber` stays, and `issueType` becomes the value of `options.issueType` (`changed`, `revised` or `status`; `new` only when starting from `001-00`). No value is filled in. The change markup of the previous issue (`changeType`, `changeMark`, `reasonForUpdateRefIds`, the tags of `changeInline`, and `reasonForUpdate`) is removed, and elements marked `changeType="delete"` are taken out. For a data module, the file name of the in-work issue (`fileName`) is also returned. No file is written.
+- `options.marking` of `editContent` adds change markup to the edited places. `insert` gives the inserted element `changeType="add"`, `remove` does not take the element out but keeps it with `changeType="delete"`, and `move` within the same parent gives the parent `changeType="modify"`. `marking.reason` adds one `reasonForUpdate` to `dmStatus`, and the markup refers to it. `marking.reasonRefId` refers to the `id` of a `reasonForUpdate` that is already there and does not change the identification and status section. `updateReasonType` and `changeMark` are required.
+- `addReasonForUpdate(xml, reason)` adds one `reasonForUpdate` to `dmStatus`. It does not touch the content and adds no change markup. Use it for the reason of an editorial change (`urt01`) and for the reason of an issue whose `issueType` is `revised` or `status`.
+- Releasing an issue (setting `inWork` back to `00` and raising `issueNumber`), change markup on a part of a sentence (an edit that adds `changeInline`), and change markup on tables and illustrations are not handled. `issueDate` and `qualityAssurance` are not changed.
 
 ### A place that can be written to (`WritableCsdbSource`)
 
@@ -146,6 +157,6 @@ The data dictionary in the distribution contains samples whose DMC in the file n
 
 ## Publishing and versions
 
-The current version is 0.8.0.
+The current version is 0.15.0.
 
 Publishing to npm happens in GitHub Actions as a Trusted Publisher (OIDC) when a `v*` tag is pushed. While the version is 0.x, a dependency such as `^0.1.0` does not cross minor versions. When this library's minor version goes up, the dependency ranges of the MCP servers are raised and published again as well.

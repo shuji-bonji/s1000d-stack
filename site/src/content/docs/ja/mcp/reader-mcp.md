@@ -44,7 +44,19 @@ flowchart LR
 
 [s1000d-writer-mcp](/s1000d-stack/ja/mcp/writer-mcp/) の `edit_data_module` は、編集する場所をこの `location.path` で受け取ります。値はそのまま写し、自分で組み立てないでください。
 
-親の節点の `text` として返る段落には、節点が無いので `location` もありません。手順（`proceduralStep`）の直下にある、子を持たない段落は、手順の節点の `text` にまとめて返すので、これに当たります。その段落だけを取り除く・移すことは、いまはできません。
+親の節点の `text` として返る段落には、節点が無いので `location` もありません。手順（`proceduralStep`）の直下にある、子を持たない段落は、手順の節点の `text` にまとめて返すので、これに当たります。0.13.0 から、`includeLocation: true` のときは、手順の節点に `textLocations`（まとめた段落ごとの `location`。並びの順）が付きます。その段落だけを取り除く・移すときは、`textLocations` の `path` を使ってください。リストの項目（段落が 1 つで、その段落が `text` になるもの）には `textLocations` が付かないので、項目そのものを対象にします。
+
+### 更新の理由と変更の印
+
+0.13.0 から、`read_data_module` は、データモジュールに書かれている更新の理由と変更の印を返します。値は書かれたまま返し、何が変わったかや、印の付け方が仕様に合っているかは判定しません。
+
+| 項目 | 内容 |
+| --- | --- |
+| `identAndStatus.reasonForUpdates` | 識別・状態部の `reasonForUpdate` を、並びの順に返します（`id`・`updateReasonType`・`updateHighlight`・`applicRefId`・`paragraphs`）。1 つも無ければ、項目そのものがありません |
+| 節点と参照の `change` | その要素に書かれている `changeType`・`changeMark`・`reasonForUpdateRefIds` です |
+| `content.changeMarks` | 3 つの属性のどれかを持つ要素と `changeInline` を、文書の順にすべて返します（`element`・`path`・`line`・`column` と 3 つの属性）。節点にならない要素（`title`、表の `row` など）と、本文を構造化して読まない種類のデータモジュールの要素も入ります |
+
+[s1000d-writer-mcp](/s1000d-stack/ja/mcp/writer-mcp/) の `edit_data_module` で、同じ理由による 2 回目からの編集に変更の印を付けるときは、`identAndStatus.reasonForUpdates[].id` を `marking.reasonRefId` に渡します。
 
 ## 適用性と検証状態
 

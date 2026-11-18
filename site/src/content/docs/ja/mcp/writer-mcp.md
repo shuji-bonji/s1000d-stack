@@ -1,15 +1,15 @@
 ---
 title: s1000d-writer-mcp
-description: LLM が XML を書かずにデータモジュールを作り、検証して直し、既にあるデータモジュールの構造を編集し、翻訳用に文を出し入れする MCP サーバーの設定とツールを説明します。
+description: LLM が XML を書かずにデータモジュールを作り、検証して直し、既にあるデータモジュールの構造を編集し、発行済みの版から作業中の版を始めて変更の印を付け、翻訳用に文を出し入れする MCP サーバーの設定とツールを説明します。
 ---
 
-`s1000d-writer-mcp` は、S1000D® のデータモジュールを LLM が **XML を書かずに**作るための MCP サーバーです。LLM は題名・段落・手順・参照先を木の形（下書き）で渡し、採番の規則を添えます。サーバーが DMC や ICN を付けて XML を組み立て、XSD・BREX・参照で検証し、直し方が 1 つに決まる修正だけを自動で適用します。残った修正は候補を付けて返します。ツールは 7 つで、データモジュールの作成、体験型マニュアルの変換、修正の適用、既にあるデータモジュールの構造の編集、コメントデータモジュールの作成、翻訳用の文の取り出しと書き戻しを行います。
+`s1000d-writer-mcp` は、S1000D® のデータモジュールを LLM が **XML を書かずに**作るための MCP サーバーです。LLM は題名・段落・手順・参照先を木の形（下書き）で渡し、採番の規則を添えます。サーバーが DMC や ICN を付けて XML を組み立て、XSD・BREX・参照で検証し、直し方が 1 つに決まる修正だけを自動で適用します。残った修正は候補を付けて返します。ツールは 9 つで、データモジュールの作成、体験型マニュアルの変換、修正の適用、既にあるデータモジュールの構造の編集、作業中の版の開始、更新の理由の追加、コメントデータモジュールの作成、翻訳用の文の取り出しと書き戻しを行います。
 
 [GitHub](https://github.com/shuji-bonji/s1000d-writer-mcp) / [npm](https://www.npmjs.com/package/@shuji-bonji/s1000d-writer-mcp)
 
 ## 3 つの方針
 
-- **LLM に XML を書かせません。** 新しく作るときの入力は下書き（`draft`）の木だけで、LLM が書いた XML を渡す入口はありません。DMC・ICN・BREX の参照は、LLM が考え出さずに、採番の規則からサーバーが付けます。既存の XML を渡せるのは `apply_fixes`・`edit_data_module`・`extract_segments`・`apply_segments` です。文書の構造を変えるのは `edit_data_module` だけで、足す中身は XML ではなく下書きの節点で渡します。
+- **LLM に XML を書かせません。** 新しく作るときの入力は下書き（`draft`）の木だけで、LLM が書いた XML を渡す入口はありません。DMC・ICN・BREX の参照は、LLM が考え出さずに、採番の規則からサーバーが付けます。既存の XML を渡せるのは `apply_fixes`・`edit_data_module`・`start_revision`・`add_reason_for_update`・`extract_segments`・`apply_segments` です。節点を足す・取り除く・移すのは `edit_data_module` だけで、足す中身は XML ではなく下書きの節点で渡します。
 - **候補の外の値で直しません。** 修正を適用するとき、サーバーは候補を計算し直し、その候補と一致する選択だけを適用します。値を自由に書き込む入口はありません。
 - **既定では書き込みません。** 組み立てた XML は応答に返すだけです。CSDB への書き込みは、`write: true` を渡したときだけ行います。
 
@@ -20,7 +20,9 @@ description: LLM が XML を書かずにデータモジュールを作り、検�
 | `build_data_module` | 下書き 1 件（説明・手順・プロセス・故障探求・パブリケーションモジュール）と採番の規則から、データモジュールを 1 件組み立てます。組み立てたあとに XSD・BREX・参照を検証し、`exact` の修正だけを最大 `maxFixRounds` 回（既定 3）まで自動で適用します。残った修正は `fixes[]` に候補付きで返します |
 | `convert_manual` | 体験型マニュアル（[`@shuji-bonji/experiential-manual-model`](https://www.npmjs.com/package/@shuji-bonji/experiential-manual-model)）を、Topic ごとのデータモジュールとパブリケーションモジュール 1 件に変換します。各データモジュールは `build_data_module` と同じ流れで組み立てて検証します。データモジュール・パブリケーションモジュール・ICN の相互の参照は、CSDB に今回作ったデータモジュールを重ねた上で解決します。変換で表せなかったものは `notRepresented` に件数で返します |
 | `apply_fixes` | 既存のデータモジュールに、`fixes[]` で返した候補の中から選んだ修正を適用します。選択は候補の写しでなければならず、候補の外の値や範囲に合わない値は、理由を付けて `rejected[]` に入れます。適用後に再検証します |
-| `edit_data_module` | 既にある手順・説明のデータモジュールに、節点を足す・取り除く・移す編集を行います。場所は `location.path` で指し、足す節点は下書きの節点（`step`・`para`・`admonition`・`listItem`）で渡します。元の文字列の編集した範囲だけを書き換え、ほかは 1 文字も変えません。版と変更の印（`changeType` など）は変えません。編集で XSD のエラーが増えた結果は書き込みません |
+| `edit_data_module` | 既にある手順・説明のデータモジュールに、節点を足す・取り除く・移す編集を行います。場所は `location.path` で指し、足す節点は下書きの節点（`step`・`para`・`admonition`・`listItem`）で渡します。元の文字列の編集した範囲だけを書き換え、ほかは 1 文字も変えません。`marking` を渡さなければ、版と変更の印（`changeType` など）は変えません。`marking` を渡すと、作業中の版に変更の印を付けます。編集で XSD のエラーが増えた結果は書き込みません |
+| `start_revision` | 発行済みのデータモジュールから、作業中の版を始めます。`inWork` を `01` にし、`issueNumber` はそのまま、`issueType` は渡された値（`changed`・`revised`・`status`。サーバーは選びません）にします。前の版の変更の印と更新の理由を消し、`changeType="delete"` の要素を取り除きます。発行済みの版は変えず、作業中の版を新しいファイルとして書きます。`reason` を渡すと、同じ呼び出しで更新の理由を 1 つ足します |
+| `add_reason_for_update` | 作業中の版の識別・状態部に、更新の理由（`reasonForUpdate`）を 1 つ足します。本文には触らず、変更の印も付けません。変更の印を付けない変更（編集上の変更 `urt01`、`issueType` が `revised`・`status` の版）の理由を書くときに使います |
 | `create_comment` | コメントデータモジュール（`comment`）を組み立てて検証します。連番は、省略すると CSDB の次の番号になります |
 | `extract_segments` | データモジュールから、人が読む文（題名・段落・手順・警告・表のセル・図の題）を翻訳用に取り出します。インライン要素は `{1}` `{2}` の記号に置き換え、骨組みの照合に使う `skeletonHash` を返します |
 | `apply_segments` | 訳した文を元のデータモジュールに戻します。DMC は同じで、言語だけが変わります。取り出したあとにデータモジュールが変わっていれば、`skeleton-mismatch` で止まります |
@@ -94,6 +96,8 @@ XSD・BREX・参照の各工程の状態です。形と意味は [s1000d-verify-
 - `convert_manual` は、`write: true` のとき、図などの原本を ICN のファイル名でコピーします。
 - `apply_fixes` に `path` を渡して `write: true` にすると、そのファイルを直接書き換えます。`xml` を渡したときは、データモジュール自身の名前で最初のフォルダーに書きます。
 - `edit_data_module` も、`path` を渡して `write: true` にすると、そのファイルを直接書き換えます（版を変えないので、ファイル名は変わりません）。編集で XSD のエラーが増えた結果と、取り除いた `id` をほかのデータモジュールが指している結果は、`allowInvalid: true` を渡しても書きません。
+- `start_revision` は、`write: true` のとき、作業中の版を新しいファイル名で書きます。`path` を渡したときは同じフォルダーに、`xml` を渡したときは最初のフォルダーに書きます。発行済みの版のファイルは変えません。同じ名前のファイルがあれば `write-conflict` です。
+- `add_reason_for_update` は、`path` を渡して `write: true` にすると、そのファイルを直接書き換えます。
 - 書いたパスは、応答の `written[]` に入ります。
 
 ## 既にあるデータモジュールの構造を編集する
@@ -134,14 +138,66 @@ flowchart LR
 | `referencedFromOtherObjects[]` | 取り除いた `id` を、CSDB のほかのデータモジュール・パブリケーションモジュールの `dmRef` が指している場所です。1 つでもあれば書き込みません。指している側を先に直すか、編集をやめるかを決めてください |
 | `verification` | 編集の後の検証状態です |
 | `fixes[]` | 編集の前からあった問題への修正候補です |
-| `changes[]` | 適用した編集です |
+| `changes[]` | 適用した編集です。`marking` を渡したときは、付けた印（`mark`）が入ります。`kept: true` は、取り除かずに `delete` の印を付けて残した節点です |
+| `reasonForUpdate` | `marking` を渡したときに、付けた印が指す更新の理由です。`added: true` は、この呼び出しで足したものです |
 
-### 版と変更の印は変えません
+### `marking` を渡さないとき、版と変更の印は変えません
 
-`edit_data_module` は、版（`issueInfo`）も、変更の印（`changeType`・`changeMark`・`reasonForUpdate`）も変えません。
+`marking` を渡さない `edit_data_module` は、版（`issueInfo`）も、変更の印（`changeType`・`changeMark`・`reasonForUpdate`）も変えません。
 
-- 発行済みの版（`issueInfo` の `inWork` が `00`）は、`released-issue` で断ります。S1000D では、発行済みのデータモジュールを直すときに作業中の版へ進め、技術的な変更には変更の印と更新の理由を付けます。その操作は、このサーバーにまだありません。
-- 試作や練習で、版を変えずに書き換えてよい場合だけ、`allowReleasedIssue: true` を渡すと編集できます。
+- 発行済みの版（`issueInfo` の `inWork` が `00`）は、`released-issue` で断ります。S1000D の決まりに沿って直すときは、下の「発行済みのデータモジュールを直す」のとおり、先に作業中の版を始めてください。
+- 試作や練習で、版を変えずに書き換えてよい場合だけ、`allowReleasedIssue: true` を渡すと編集できます。`marking` を渡したときは、`allowReleasedIssue: true` があっても、発行済みの版を断ります。
+
+## 発行済みのデータモジュールを直す
+
+S1000D では、発行済みのデータモジュール（`issueInfo` の `inWork` が `00`）を直すときに、作業中の版へ進め、変更した場所に変更の印を付け、識別・状態部に更新の理由（`reasonForUpdate`）を書きます。0.6.0 から、そのための入口が 3 つあります。
+
+```mermaid
+flowchart LR
+  A["発行済みの版<br/>012-00"] -->|"start_revision"| B["作業中の版<br/>012-01（新しいファイル）"]
+  B -->|"edit_data_module<br/>marking.reason"| C["変更の印と<br/>更新の理由が付く"]
+  C -->|"edit_data_module<br/>marking.reasonRefId"| C
+  B -->|"add_reason_for_update"| D["更新の理由だけが<br/>増える"]
+```
+
+### 作業中の版を始める（`start_revision`）
+
+- `issueType`（`changed`・`revised`・`status`）は必須です。サーバーは選びません。変更の種類は書き手が決めるものなので、利用者に聞いてから渡してください。発行番号が `001` の版から始めるときだけ、`new` も渡せます。このときは、既定 BREX の BREX-S1-00030 に違反することを `_notes` で知らせます。
+- 結果は、`issueNumber` がそのままで `inWork` が `01` の、新しい文書です。`write: true` のときは、新しいファイル名（応答の `fileName`。`_012-00_` が `_012-01_` になります）で書きます。発行済みの版のファイルは変えません。
+- 前の版の変更の印（`changeType`・`changeMark`・`reasonForUpdateRefIds`）と更新の理由を消し、`changeType="delete"` の要素を取り除きます。消した数と、取り除いた要素の場所は、応答の `removed` に入ります。
+- `issueType` が `revised`・`status` の版は、更新の理由が 1 つも無い状態で始まります。発行番号が `002` 以降のときは、既定 BREX の BREX-S1-00038 に違反するので、`reason` を渡して、同じ呼び出しで理由を 1 つ足してください。理由を足せないときは、版も始めません。
+- 既に作業中の版（`already-in-work`）と、`issueType` が `deleted` の版（`deleted-issue`）は断ります。
+
+### 変更の印を付ける（`edit_data_module` の `marking`）
+
+`marking` を渡すと、編集した場所に変更の印を付けます。印を付けられるのは、作業中の版で、`issueType` が `changed`・`status`・`rinstate-changed`・`rinstate-status` のときだけです。
+
+| 編集 | 付く印 |
+| --- | --- |
+| `insert` | 足した要素に `changeType="add"` が付きます |
+| `remove` | 要素を取り除かずに、`changeType="delete"` を付けて残します（`changes[].kept` が `true`）。この作業中の版で足した要素は、印を付けずに取り除きます |
+| `move` | 同じ親の中の移動だけを受け付け、親に `changeType="modify"` が付きます。親が変わる移動は `move-across-parents`、変更の印を持てない親の中の移動は `parent-not-markable` で断ります |
+
+| 項目 | 内容 |
+| --- | --- |
+| `marking.reason` | その理由による最初の編集で渡します。`text`（理由の文）と `updateReasonType` が必須です。識別・状態部に更新の理由を 1 つ足し、付けた印がそれを指します。`id` を省くと、文書に無い値（`rfu-0001` の形）を作ります |
+| `marking.reasonRefId` | 同じ理由による 2 回目からの編集で渡します。識別・状態部に既にある更新の理由の `id` です。更新の理由は増えません |
+| `marking.changeMark` | `"1"` か `"0"` で、必須です。変更線などの表示を出すかどうかを表し、プロジェクトが決めます |
+
+- `reason` と `reasonRefId` は、どちらか一方だけを渡します。1 回の呼び出しの編集は、すべて同じ理由を指します。理由が違う編集は、呼び出しを分けてください。
+- 編集上の変更（`updateReasonType` が `urt01`）には、変更の印を付けられません（`editorial-reason`）。`marking` を渡さずに編集し、理由は `add_reason_for_update` で足します。
+- 節点を別の内容に置き換えるときは、同じ呼び出しで、元の節点の `remove` と、その隣への `insert` を渡します。元の節点は `delete` の印で残り、新しい節点に `add` の印が付きます。
+- 応答の `reasonForUpdate`（`added` が `true` なら、この呼び出しで足したもの）と `changes[].mark` に、印が指す理由と付けた印を返します。
+- サーバーは、理由の文・`updateReasonType`・`changeMark` を補いません。
+
+### 更新の理由だけを足す（`add_reason_for_update`）
+
+作業中の版の識別・状態部に、更新の理由を 1 つ足します。本文には触らず、変更の印も付けません。編集上の変更（`urt01`）の理由と、`issueType` が `revised`・`status` の版の理由に使います。発行済みの版は `released-issue` で断ります。`path` を渡して `write: true` にすると、そのファイルを直接書き換えます。
+
+### 行わないこと
+
+- 発行（`inWork` を `00` に戻し、発行番号を上げること）は行いません。発行日と品質保証の状態も変えません。
+- 文の一部への変更の印（`changeInline`）と、表・図への変更の印は付けません。
 
 ## 体験型マニュアルの変換
 
@@ -173,7 +229,8 @@ flowchart LR
 ## できないこと
 
 - **LLM が書いた XML は受け取りません。** 組み立てるのは下書きからだけです。`edit_data_module` で足す中身も、XML ではなく下書きの節点で渡します。
-- **改版はしません。** `edit_data_module` は、版を上げず、変更の印も付けません。表・図・前提条件の品目を足す・取り除く・移すこと、段落の文を書き換えること、節点を別の内容に置き換えることも、まだできません。
+- **発行はしません。** `start_revision` は作業中の版を始めるだけです。`inWork` を `00` に戻して発行番号を上げる操作はありません。発行日と品質保証の状態も変えません。
+- **表・図・前提条件の品目を足す・取り除く・移すこと、段落の文を書き換えることは、まだできません。** 文の一部への変更の印（`changeInline`）と、表・図への変更の印も付けられません。
 - **候補の外の値では直しません。**
 - **検証を省きません。** 組み立てた XML は必ず検証して返します。
 - **S1000D への準拠は判定せず、違反の重大度も解釈しません。** 違反の中身は [`s1000d-verify-mcp`](/s1000d-stack/ja/mcp/verify-mcp/)、BREX のルールの説明は [`s1000d-brex-mcp`](/s1000d-stack/ja/mcp/brex-mcp/) で読んでください。`commentType` や `commentPriorityCode` なども、列挙のまま書き、意味は付けません。
