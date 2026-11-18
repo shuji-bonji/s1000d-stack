@@ -94,6 +94,15 @@ core の 13 ファイルを、`lib/s1000d-core` に 1 つのコミットにし�
 
 writer-mcp と Skill は、パッチのままです（core が npm に出るまでコミットしない、という 6 回目からの決まりのとおり）。
 
+### 追記（2026-11-18 11:55 JST）: core 0.15.0 の公開と、writer-mcp のコミット
+
+- core は 0.15.0 として出ました（利用者の作業。tag `v0.15.0`、npm。`origin/main` と一致）。公開の前に、利用者が Mac で `S1000D_SPEC_TESTS=1 npm test` を実行し、387 件が通りました（2026-11-18 11:23 JST、スキップなし）。CHANGELOG の見出しは、公開の前に `0.15.0 (2026-11-18)` に直しました。
+- writer-mcp に `work/writer-mcp-revision-b.patch` を入れ、依存を core `^0.15.0` に上げ、CHANGELOG の見出しを `0.6.0 (2026-11-18)` にして、1 つのコミットにしました（`dd57dcd`。署名なし、未 push）。`package.json` の版は 0.5.1 のままです（`npm version` は利用者が行います）。
+- `package-lock.json` は、手で 4 か所だけを直しました（ルートの依存の指定と、core の項目の `version`・`resolved`・`integrity`）。Mac 側の VM の npm（10.9.9）で `npm install` をすると、ほかの項目の `libc` が消える差分が出たので、その結果は使っていません。`libc` を除けば、VM の `npm install` の結果と同じ内容です。
+- npm から入れた core 0.15.0 で、Mac 側の VM の vitest（`/tmp/writer2`。`S1000D_SPEC_TESTS=1`）は 62 件が通りました（スキップなし）。`tsc`・`eslint`・`prettier`（`src`）も通りました。コミットしたファイルは、`package-lock.json` のほかは、このときのファイルと同じです（`cmp` で比べました）。
+- Skill のパッチ（`work/s1000d-publish-skill-revision.patch`）は、writer-mcp 0.6.0 が出てから入れます。
+- Project の文書を置き換えるときに、クラウド側のファイルを `Edit` で直した直後は、`Read` をし直さなくても `project_write` の `local_path` に渡せました。
+
 ### 利用者が行うこと
 
 | 順 | 作業 |
@@ -101,7 +110,7 @@ writer-mcp と Skill は、パッチのままです（core が npm に出るま�
 | 1 | `lib/s1000d-core` のコミット（`8eb5e36`）を見て、署名を付けて push する。hub の `docs/notes/tm-eval-handoff-8.md` のコミットも同じ |
 | 2 | （済み）「決めていないこと」の 1 と 2 は決まり、core に入れた |
 | 3 | core を 0.15.0 として公開する（CHANGELOG の見出し、tag、npm）。公開の前に、Mac で `S1000D_SPEC_TESTS=1 npm test` を実行する |
-| 4 | core の公開の後に、writer-mcp で `git apply` → 依存を core `^0.15.0` に上げる（`package.json` と `package-lock.json`）→ `S1000D_SPEC_TESTS=1 npm test` → 0.6.0 として公開する。パッチの適用と依存の書き換えは、次のチャットで Claude が行える |
+| 4 | （1〜3 は済み）writer-mcp のコミット（`dd57dcd`）を見て、Mac で `npm ci` と `S1000D_SPEC_TESTS=1 npm test` を実行し、署名を付けて、0.6.0 として公開する（`npm version minor`、push、npm、MCP Registry） |
 | 5 | writer-mcp の公開の後に、`s1000d-publish-skill` で `git apply` → 0.4.0 として公開する |
 
 ## 確かめたこと（2026-11-18 09:42 JST）
