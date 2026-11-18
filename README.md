@@ -73,11 +73,11 @@ The expert agents (MCP and Skills) come first; the two product projects (experie
 
 <!-- stack:begin — scripts/generate-stack.mjs が生成。手で編集しない -->
 
-> Versions are measured (`npm view` as of 2026-11-17).
+> Versions are measured (`npm view` as of 2026-11-18).
 
 | Repository | Layer | Form | Status | Version | npm |
 | --- | --- | --- | --- | --- | --- |
-| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | core | library | released | 0.14.0 | `@shuji-bonji/s1000d-core` |
+| [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | core | library | released | 0.15.0 | `@shuji-bonji/s1000d-core` |
 | [s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | mcp | mcp-server | released | 0.6.4 | `@shuji-bonji/s1000d-brex-mcp` |
 | [s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | mcp | mcp-server | released | 0.8.1 | `@shuji-bonji/s1000d-verify-mcp` |
 | [s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | mcp | mcp-server | released | 0.13.0 | `@shuji-bonji/s1000d-reader-mcp` |
