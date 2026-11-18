@@ -81,8 +81,8 @@ flowchart LR
 
 | 項目 | 内容 |
 |---|---|
-| 必須の MCP | writer（`build_data_module`、`apply_fixes`、`edit_data_module`）、verify（`verify_data_module`、`reconcile_dml`） |
-| 任意の MCP | brex（`explain_brex`。プロジェクトの BREX の決まりを書き手に説明する）、reader（CSDB にある DM の題名・版・参照先を確かめる。`edit_data_module` を使うときは、場所を得るために必ず要る。0.12.0 以降） |
+| 必須の MCP | writer（`build_data_module`、`apply_fixes`、`edit_data_module`、`start_revision`、`add_reason_for_update`。0.6.0 以降）、verify（`verify_data_module`、`reconcile_dml`） |
+| 任意の MCP | brex（`explain_brex`。プロジェクトの BREX の決まりを書き手に説明する）、reader（CSDB にある DM の題名・版・参照先を確かめる。`edit_data_module` を使うときは、場所を得るために必ず要る。0.13.0 以降） |
 | 発火の例 | 「この手順を S1000D の手順 DM にして」「仕様メモから説明 DM を作って」「この DM を書き直して版を上げて」「CSDB にある手順 DM に手順を足して」「この DM の段落を削って」「手順の順を入れ替えて」 |
 
 手順:
@@ -93,20 +93,25 @@ flowchart LR
 4. **組み立てと検証**: `build_data_module`（`write: false`）。`input-error` なら `path` の箇所を直して呼び直す。残った `fixes[]` は experience-to-s1000d の手順 5 と同じに扱う。
 5. **書き込みと DML の照合**: 確認後に `write: true`。DML があれば `reconcile_dml` で、新しい DM が DML に載っているか（`notListed`）を確かめて報告する。DML の作成・更新は writer にまだ無いので、載っていなければ利用者に伝える。
 
-### CSDB にある DM の構造を変える（`s1000d-publish` 0.3.0 から）
+### CSDB にある DM の構造を変える（`s1000d-publish` 0.3.0 から。改版の手順は 0.4.0 から）
 
-CSDB にある手順・説明の DM に、節点を足す・取り除く・移す依頼は、writer の `edit_data_module`（0.5.1 以降）で行います。元の XML の編集した範囲だけを書き換え、DM を下書きから作り直しません。手順は Skill の `references/edit.md` にあり、設計は [core-structural-edit.md](./core-structural-edit.md) にあります。
+CSDB にある手順・説明の DM に、節点を足す・取り除く・移す依頼は、writer の `edit_data_module` で行います。元の XML の編集した範囲だけを書き換え、DM を下書きから作り直しません。発行済みの版を S1000D の版の決まりに沿って直すときは、`start_revision` で作業中の版を始め、`edit_data_module` の `marking` で変更の印を付けます（writer 0.6.0 以降）。手順は Skill の `references/edit.md` にあり、設計は [core-structural-edit.md](./core-structural-edit.md)（層 1）と [core-revision.md](./core-revision.md)（層 2）にあります。
 
 | 段階 | 行うこと |
 |---|---|
-| E1 | 何を変えるかを利用者に確かめ、reader で `issueInfo` の `inWork` を見る。`00`（発行済みの版）なら、このツールが版も変更の印も変えないことを伝えて、どうするかを聞く。`allowReleasedIssue: true` は、利用者が明示したときだけ渡す |
-| E2 | reader の `read_data_module` を `includeLocation: true` で呼び、節点の `location.path` を写す。path を自分で組み立てない |
-| E3 | `edits[]`（`insert`・`remove`・`move`）を組む。path は、すべて編集の前の文書のもの。`id` を作らない。XML を書かない |
+| E1 | 何を変えるかを利用者に確かめ、reader で `issueInfo` の `inWork` を見る。`00`（発行済みの版）なら、「作業中の版を始めて、決まりに沿って直す」「版を変えずに書き換える」「やめる」の 3 つから、利用者に選んでもらう。`allowReleasedIssue: true` は、利用者が「版を変えずに書き換えてよい」と明示したときだけ渡す |
+| E1a | `start_revision` で作業中の版を始める。`issueType`（`changed`・`revised`・`status`。発行番号が `001` のときだけ `new` も）は利用者に聞く。`revised`・`status` で発行番号が `002` 以降のときは、更新の理由も聞いて `reason` に渡す。`write` なしで呼んで応答を示し、確認の後に `write: true` で呼ぶ。これ以降は、新しいファイルを対象にし、reader で読み直す |
+| 変更の印を付けるかを確かめる | 作業中の版を編集するときは、変更の種類を利用者に聞く。変更の印で示す変更は `marking` を渡す。編集上の変更（`urt01`）は `marking` を渡さずに編集し、理由を E7 で足す。印を付けるときは、理由の文、`updateReasonType`、`changeMark` も聞く |
+| E2 | reader の `read_data_module` を `includeLocation: true` で呼び、節点の `location.path` を写す。手順の `text` にまとめた段落だけを取り除く・移すときは、手順の節点の `textLocations[i].path` を写す（reader 0.13.0 以降）。path を自分で組み立てない |
+| E3 | `edits[]`（`insert`・`remove`・`move`）を組む。path は、すべて編集の前の文書のもの。`id` を作らない。XML を書かない。変更の印を付けるときは、その理由による最初の編集に `marking.reason`、2 回目からに `marking.reasonRefId` を書く。1 回の呼び出しの編集は、すべて同じ理由を指す |
 | E4 | `write` なしで呼ぶ。`refusals[]` があれば理由ごとに対処する。`newSchemaErrors[]` があれば、位置か編集を変えて、元の文書に対して呼び直す（`apply_fixes` には渡さない）。`referencedFromOtherObjects[]` があれば、利用者に聞く |
-| E5 | 変わる場所、検証状態、版と変更の印を変えていないことを利用者に示して、確認を得る |
-| E6 | `write: true` で呼び、verify の `verify_data_module` で確かめて報告する |
+| E5 | 変わる場所、検証状態を利用者に示して、確認を得る。`marking` を渡したときは、どの要素にどの `changeType` が付くかと、足される理由を示す。渡していないときは、版と変更の印を変えていないことを示す |
+| E6 | `write: true` で呼び、verify の `verify_data_module` で確かめて報告する。報告に、作業中の版を始めたか、付けた変更の印と理由、発行はしていないことを必ず入れる |
+| E7 | `add_reason_for_update` で、変更の印を付けない変更の理由（編集上の変更 `urt01`、`issueType` が `revised`・`status` の版の理由）を足す。理由の文と `updateReasonType` は利用者に聞く |
 
-`s1000d-publish` が扱わない依頼は、表・図・前提条件の品目の変更、段落の文の書き換え、節点の置き換え、発行済みの DM の改版（版を上げて変更の印を付ける）です。手順の `text` として返る段落だけを取り除く・移す依頼も、いまは path を得られないので扱えません（core-structural-edit.md の「手順の段落に場所が付かない」）。
+`s1000d-publish` が扱わない依頼は、表・図・前提条件の品目の変更、段落の文の書き換え、文の一部への変更の印（`changeInline`）、表・図への変更の印、発行（`inWork` を `00` に戻し、発行番号を上げる）です。節点の置き換えは、`marking` を渡すときだけ、同じ呼び出しの remove と、その隣への insert の組で書けます（元の節点は `delete` の印で残ります）。
+
+Skill の手順どおりに LLM が動くかは、0.4.0 では試していません（2026-11-18 の時点。手順は、writer-mcp を stdio で呼んだ応答の形を見てから書きました）。
 
 ## 3. s1000d-review
 

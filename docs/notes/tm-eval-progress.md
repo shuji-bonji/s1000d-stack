@@ -2,7 +2,7 @@
 
 [tm-eval-requests.md](./tm-eval-requests.md) の「進める順」に沿って行った作業の記録です。要望の ID（RD-1、W-3 など）は同じ文書のものです。
 
-- 作成日: 2026-11-15（JST）、更新: 同日 23:15 JST 頃（順 4、W-10、RD-3、R11、材料 4 品目の書き方まで）、同日 23:55 JST 頃（core 0.10.0 と model 0.4.0 の公開、MCP 4 本の依存の更新）、2026-11-16 07:40 JST 頃（MCP 4 本が core 0.10.0 で動くことの確認）、同日 08:05 JST 頃（MCP 4 本の公開）、同日 08:30 JST 頃（Bike Samples の 66 個）、同日 10:05 JST 頃（公開版の試用と、core 0.11.0・MCP 4 本の公開）、同日 12:55 JST 頃（BREX の修正候補と、Bike Samples の残り 13 個）
+- 作成日: 2026-11-15（JST）、更新: 同日 23:15 JST 頃（順 4、W-10、RD-3、R11、材料 4 品目の書き方まで）、同日 23:55 JST 頃（core 0.10.0 と model 0.4.0 の公開、MCP 4 本の依存の更新）、2026-11-16 07:40 JST 頃（MCP 4 本が core 0.10.0 で動くことの確認）、同日 08:05 JST 頃（MCP 4 本の公開）、同日 08:30 JST 頃（Bike Samples の 66 個）、同日 10:05 JST 頃（公開版の試用と、core 0.11.0・MCP 4 本の公開）、同日 12:55 JST 頃（BREX の修正候補と、Bike Samples の残り 13 個）、2026-11-17 10:55 JST 頃（構造を変える編集と、読み取りに足したもの）、2026-11-18 12:50 JST 頃（改版（層 2）の公開まで）
 - 評価フォルダー: `/Users/bonji/s1000d-stack-eval/tm-9-6115-749-10/`
 
 ## 済んだ作業
@@ -352,11 +352,14 @@ Bike Samples の実測（110 件すべてで要素の範囲が DOM と対応、�
 |---|---|---|
 | 型だけを根拠に手順を書いた | reader-mcp は 0.11.1 まで応答から `location` を外していた。設計文書、writer-mcp の説明、Skill の手順は、reader の実際の応答を確かめずに「`location.path` を写す」と書いていた | reader-mcp 0.12.0 と `s1000d-publish` 0.3.1 で直した。手順や説明を書く前に、plugin か dev の MCP を呼んで応答の形を見る |
 | 自作の DM だけで確かめた | `editContent` の `insert` が、`content` の先頭に `refs` などがある DM をすべて断っていた。Bike Samples で初めて見つかった | core 0.13.0 で直した。自作のテスト用の DM だけで確かめたものは、Bike Samples と plugin 経由でも確かめる |
-| 手順の段落に場所が付かない | reader は、手順の直下の子を持たない段落を、すべて手順の節点の `text` にまとめる。その段落だけを取り除く・移すことができない | `includeLocation: true` のときに `textLocations[]` を添えると決まった（2026-11-17）。core に実装した（下の節。未公開） |
+| 手順の段落に場所が付かない | reader は、手順の直下の子を持たない段落を、すべて手順の節点の `text` にまとめる。その段落だけを取り除く・移すことができない | `includeLocation: true` のときに `textLocations[]` を添えると決まった（2026-11-17）。core 0.14.0・reader-mcp 0.13.0 で公開した（下の節） |
 
 ## 読み取りに、更新の理由・変更の印・手順の段落の場所を足した（2026-11-17 10:55 JST まで）
 
 層 2（改版）の前提の作業です。決定は DECISIONS の D-34、形と実測は [design/core-revision.md](../design/core-revision.md) の「読み取りに足したもの」と [design/core-structural-edit.md](../design/core-structural-edit.md) の「手順の段落に場所が付かない」にあります。
+
+> [!NOTE]
+> 下の表の「状態」は、2026-11-17 10:55 JST の時点のものです。その後、3 つとも公開しました。core は 0.14.0（2026-11-17）、reader-mcp は 0.13.0（2026-11-17）、Skill `s1000d-publish` は 0.3.2（2026-11-18）です。`s1000d-reader-dev` で応答を見た結果は、下の「改版（層 2）」の節にあります。
 
 | 作ったもの | 状態 | 置き場所 |
 |---|---|---|
@@ -379,6 +382,53 @@ Bike Samples の実測（110 件すべてで要素の範囲が DOM と対応、�
 | `text` にまとめた段落が失うもの | 手順の `text` にまとめた `para` と、`listItem` の `text` になった `para` は、その要素自身の `id`・`applicRefId`・変更の印を節点として返さない。Bike Samples では、この形の `para` に属性を持つものは 0 個。変更の印は `changeMarks[]` に入るが、`id` と `applicRefId` は、いまも応答に無い |
 | Mac 側の VM の空き | `/sessions`（VM のホーム）が 100 % で、`npm ci` と `npx` が `ENOSPC` で止まる。`npm ci --cache /tmp/npm-cache`、`./node_modules/.bin/…` の直接の実行、`TMPDIR=/tmp` で動く。`/tmp` に作業コピーを作れば、配布物を使う vitest も VM で実行できる |
 | Project の文書の大きさ | `project_write` の `local_path` は、ファイルを 1 度の `Read` で全部読めることが条件で、`Read` の上限は 25,000 トークン。`DECISIONS.md` は 25,572 トークンで超えていたので、U-08 の付録を [u08-xsd-validation.md](./u08-xsd-validation.md) に分けた |
+
+## 改版（層 2）（2026-11-18 12:26 JST まで）
+
+発行済みの DM を、S1000D の版の決まりに沿って直すための操作です。core 0.15.0、writer-mcp 0.6.0、Skill `s1000d-publish` 0.4.0 を公開しました。詳しい記録は [tm-eval-handoff-8.md](./tm-eval-handoff-8.md)、設計と実装の結果は [design/core-revision.md](../design/core-revision.md)、決定は DECISIONS の D-33・D-35 にあります。
+
+| 作ったもの | 要点 |
+|---|---|
+| core `startRevision`（0.15.0） | 発行済みの版（`inWork` が `00`）から、`inWork` が `01` の XML を作る。`issueType` は入力の値にする。前の版の変更の印と `reasonForUpdate` を消し、`changeType="delete"` の要素を取り除く |
+| core `editContent` の `options.marking`（0.15.0） | insert は `changeType="add"`、remove は要素を残して `changeType="delete"`、同じ親の中の move は親に `changeType="modify"`。`marking.reason` は `reasonForUpdate` を 1 つ足し、`marking.reasonRefId` は既にあるものを指す |
+| core `addReasonForUpdate`（0.15.0） | `reasonForUpdate` を 1 つ足す。本文には触らず、変更の印も付けない |
+| writer-mcp `start_revision`・`add_reason_for_update`、`edit_data_module` の `marking`（0.6.0） | ツールは 9 つになった。`start_revision` は、作業中の版を新しいファイル名で書き、発行済みの版のファイルを変えない |
+| Skill `s1000d-publish` の `references/edit.md`（0.4.0） | E1 の分け直し、E1a（作業中の版を始める）、「変更の印を付けるかを確かめる」、E3 の「変更の印」、E7（理由だけを足す） |
+
+この回に利用者が決めたこと（DECISIONS の D-35）:
+
+| 決めた時刻（JST） | 決定 |
+|---|---|
+| 10:21 | `marking` に、既にある `reasonForUpdate` を `id` で指す入口（`reasonRefId`）を足す |
+| 10:40 | 印を付けずに `reasonForUpdate` だけを足す `addReasonForUpdate` を、core に足す |
+| 10:57 | writer-mcp では、`start_revision` の入力で理由を受け取り、理由だけを足すツールも別に作る（案 C） |
+
+確かめたこと:
+
+- core の vitest は、利用者が Mac で `S1000D_SPEC_TESTS=1 npm test` を実行し、387 件が通った（11:23 JST、スキップなし）。writer-mcp は 62 件が通った（12:00 JST）。
+- Bike Samples の 110 件（DMC 106 件・PMC 4 件）で作業中の版を始めると、107 件で始められた。断ったのは、`issueType` が `deleted` の DMC 3 件。取り除いた `reasonForUpdate` は 120 個、印の属性を取り除いた要素は 14 個だった。作業中の版にした DMC 103 件は、XSD のエラーも、版と印に関わる既定 BREX のルール（BREX-S1-00030・00032・00033・00036・00038）の違反も、元の版より増えなかった。
+- `issueType: "status"` で始めた作業中の版は、`issueNumber` が `002` 以降なら BREX-S1-00038 の違反になり、`addReasonForUpdate` で理由を 1 つ足すと違反が無くなった。
+- Desktop 経由で、`s1000d-writer-dev` と plugin 版の両方を呼んだ（12:22 JST）。Bike Samples の写しの `S1000DBIKE-AAA-D00-00-00-00AA-121A-A_012-00` に、`start_revision` → `edit_data_module`（`marking.reason`）→ `edit_data_module`（`marking.reasonRefId`）→ `add_reason_for_update` の順に呼び、dev と plugin で 4 回とも同じ応答だった。
+- `s1000d-reader-dev` で、書かれた `…_012-01` を読んだ。`reasonForUpdates` は 2 件、`content.changeMarks` は 3 件（`modify`・`delete`・`add`）だった。発行済みの版のファイル（`…_012-00`）は、元のファイルと同じだった（`cmp`）。
+- 仕様書の Chap 3.5 の全体を読み、並べ替え・移動を表す語を全文から探し、`descript.xsd` を見た。結果は設計文書の「確かめた結果」にある。
+
+この作業で分かったこと:
+
+| 項目 | 内容 | 扱い |
+|---|---|---|
+| `revised`・`status` の版に理由が無い | `startRevision` は前の版の `reasonForUpdate` をすべて取り除くので、`issueType` を `revised`・`status` にして始めた版は、`issueNumber` が `000`・`001` でなければ BREX-S1-00038 に違反する | `addReasonForUpdate` と、`start_revision` の `reason` を足した（D-35） |
+| 文字列の検索で数えた | 配布物を使うテストで、文字列の検索（`reasonForUpdate` など）で「印が残っていない」を確かめると、文の中に要素名を書いた DM（BREX の DM など）で落ちる | 要素と属性を、範囲の走査で数える形に直した |
+| 実行する前に数を書いた | 取り除いた `reasonForUpdate` の数を、実行する前に 121 個と書いた。実測は 120 個だった | テストの値は実測で書いた。数を書くときは、数えた結果を写す |
+| 差分のパッチに新しいファイルが入らない | `git diff`（ステージしていない差分）は、追跡していない新しいファイルを含まない | 差分だけのパッチを作るときは、先に `git add -N` をするか、`git diff --cached` の全体のパッチを使う |
+| `start_revision` の `_notes` | 「元の版は変えない」という内容の文が 2 つ並ぶ（writer-mcp が足す文と、core の `notes` の文） | 未着手 |
+| outline の `textLocations` | reader の `section: "outline"` と `includeLocation: true` の組では、`textLocations` が付かない | 決めていない。案は、説明文と `_notes` を「`content`・`all` のときだけ」と直す |
+| 削除の許可とコミット | Claude Desktop を起動し直すと、接続したフォルダーでの削除の許可が切れる。許可が切れたままコミットすると、`.git/HEAD.lock` と `.git/objects/*/tmp_obj_*` が残る | コミットの前に、許可があるかを `rm` できるファイルで確かめる |
+
+確かめていないこと:
+
+- Skill 0.4.0 の手順どおりに LLM が動くかは、試していない。
+- `start_revision` に `reason` を渡す場合、`issueType` が `revised`・`status` の場合、断る場合（`released-issue`・`write-conflict` など）は、Desktop 経由では呼んでいない（自作のテストと、Mac 側の VM の stdio で確かめた）。
+- 説明 DM の `levelledPara` の中の移動は、自作の DM でも Bike Samples でも確かめていない。
 
 ## 作業中に分かったこと
 
@@ -403,7 +453,9 @@ Bike Samples の実測（110 件すべてで要素の範囲が DOM と対応、�
 
 | 順 | 作業 | 待つもの |
 |---|---|---|
-| すぐ | core 0.12.0 の公開（`f1c58a7`・`69e6bbf`）と、MCP 4 本の依存の更新・公開。reader-mcp の説明文の例を直す | 利用者の作業（版を上げる、署名、公開）。依存の書き換えと説明文はこちらで行える |
+| すぐ | ~~core 0.12.0 の公開（`f1c58a7`・`69e6bbf`）と、MCP 4 本の依存の更新・公開~~。reader-mcp の説明文の例を直す | 公開は済み（2026-11-17）。説明文の例を直したかは、確かめていない |
+| 層 2 の後 | Skill `s1000d-publish` 0.4.0 の手順どおりに、1 件を通す。`start_revision` の `_notes` の重なりを直す。outline の `textLocations` の扱いを決める | — |
+| 層 2 の後 | 7 回目の引き継ぎの「決めていないこと」（`applyFix`・`applySegments` の寄せ方、`text` にまとめた `para` の `id`・`applicRefId`、PM の `reasonForUpdate`、Skill `s1000d-review` の観点） | 利用者の決定 |
 | Bike の後 | `unknown` のまま返している要素を読む（故障探求 DM の `lru`・`bitMessage`・`circuitBreakerDescr` など、`dmIf` の式のうち人が読む文の無いもの） | 返す形を XSD から決める（D-31） |
 | 候補の後 | BREX-S1-00121 のように、足す属性の値を決められないルールの候補（文書の中の `applic` の id を候補にする、など） | 方針の決定 |
 | R11 の後 | 作らなかった DM への参照（R14）の扱いを決める | W-10 の続き。見本では起きなくなったが、識別子の無い品目を持つマニュアルでは今も起きる |

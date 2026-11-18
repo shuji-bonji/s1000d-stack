@@ -135,6 +135,39 @@ Desktop 経由で、`s1000d-writer-dev` と plugin 版（`s1000d-writer`）の�
 - Skill の手順どおりに LLM が動くかは、試していません（Skill 0.4.0 が plugin に出た後に、1 件を通します）。
 - `start_revision` に `reason` を渡す場合、`issueType` が `revised`・`status` の場合、断る場合（`released-issue`・`write-conflict` など）は、Desktop 経由では呼んでいません（自作のテストと、VM の stdio で確かめました）。
 
+### 追記（2026-11-18 12:55 JST）: 文書を直した（「最初にやること」の 5）
+
+Skill `s1000d-publish` は 0.4.0 として出ました（利用者の作業。hub の `f99dc60`、`stack.json` の `local.version` は 0.4.0）。その後に、「最初にやること」の 5 を行いました。
+
+| 直したもの | 内容 |
+|---|---|
+| `docs/design/core-revision.md` | 状態を「実装済み、公開済み」にした。「案」の節を「実装」に書き直した（`startRevision`、`marking`、`addReasonForUpdate`、writer-mcp、Skill）。「実装のときに決めたこと」「設計と違う点、設計に無かった点」「確かめた結果」「残っている確認」「テストと確認の結果」を足した |
+| `docs/DECISIONS.md` | この回の 3 つの決定を、新しい番号の D-35 にした。D-33 と D-34 の「実装はしていない」「未公開」を、公開した版に直した |
+| `docs/design/writer-mcp.md` | 「ツール案」の表に `start_revision`・`add_reason_for_update` と、`edit_data_module` の `marking` を足した。「改版の入口」の節を足した |
+| `docs/design/skills-and-editor.md` | `s1000d-publish` の必須の MCP と最低版（writer 0.6.0、reader 0.13.0）、E1a・E7・変更の印の手順を足した。「手順の段落だけを取り除く・移すことはできない」という古い文を外した |
+| `docs/notes/tm-eval-progress.md` | 「改版（層 2）」の節を足した。「読み取りに足した」の節に、3 つとも公開済みであることを書いた。「残り」の表を直した |
+| サイト（日本語・英語） | `mcp/writer-mcp`（ツールは 9 つ。「発行済みのデータモジュールを直す」の節）、`skill/s1000d-publish`（手順を 9 段に。最低版）、`lib/s1000d-core`（「改版の操作」の節。「できること」の表に `editContent`・`startRevision`・`addReasonForUpdate`）、`mcp/reader-mcp`（「更新の理由と変更の印」の節、`textLocations`） |
+| `stack.json`・`scripts/generate-stack.mjs`・README（英・日） | core・writer-mcp・`s1000d-publish` の説明（`note`）と、README の writer-mcp の行。writer-mcp の説明は「6 tools」のままだったので、9 つの名前に直した |
+
+確かめたことです。
+
+- サイトの `node scripts/check-i18n.mjs` は、どのページも `ok` だった（日本語と英語で、見出し・表・図の数と順が合っている）。
+- サイトを Mac 側の VM の `/tmp/site-check` に写し、`npm ci` と `astro build` を実行した。47 ページができた。直した 8 ページの中の、サイト内のリンク 302 本は、行き先のページと見出しがすべてあった。
+- `stack.json` は JSON として読めた。`generate-stack.mjs` は実行していない（説明の文字列を、スクリプトと `stack.json` の両方で同じに直した）。
+
+確かめていないことです。
+
+- 英語のページは、日本語から自分で訳した。xcomet での採点と、DeepL の訳との比較は行っていない（[en-writing-guide.md](./en-writing-guide.md) の手順の一部）。
+- 足した Mermaid の図 3 つ（設計文書 1 つ、サイトの 2 ページ）は、ブラウザーで描画を見ていない。
+
+分かったことです。
+
+| 分かったこと | 扱い |
+|---|---|
+| core の CHANGELOG（0.15.0）は「配布物を使うテストを 3 件足しました」と書いているが、`src/revision/revision.spec.test.ts` のテストは 4 件ある（4 件目は `addReasonForUpdate` のテスト） | 設計文書には 4 件と書いた。CHANGELOG は直していない |
+| サイトには、reader-mcp 0.13.0 の内容（`reasonForUpdates`・`changeMarks`・`textLocations`）が無く、「手順の段落だけを取り除く・移すことはできません」のままだった。`lib/s1000d-core` のページは「現在の版は 0.8.0 です」のままだった | この回に直した |
+| Mac 側の VM のホーム（`/sessions`）は空きが 11 MB だが、`/tmp` に写せば、サイトの `npm ci`（`--cache /tmp/npm-cache`）とビルドができる | 作業の仕方の記録 |
+
 ### 利用者が行うこと
 
 | 順 | 作業 |
@@ -144,7 +177,8 @@ Desktop 経由で、`s1000d-writer-dev` と plugin 版（`s1000d-writer`）の�
 | 3 | core を 0.15.0 として公開する（CHANGELOG の見出し、tag、npm）。公開の前に、Mac で `S1000D_SPEC_TESTS=1 npm test` を実行する |
 | 4 | （1〜3 は済み）writer-mcp のコミット（`dd57dcd`）を見て、Mac で `npm ci` と `S1000D_SPEC_TESTS=1 npm test` を実行し、署名を付けて、0.6.0 として公開する（`npm version minor`、push、npm、MCP Registry） |
 | 5 | （4 は済み）`s1000d-publish-skill` のコミット（`3ce6a18`）を見て、署名を付け、0.4.0 として公開する（`plugin.json` の版、tag、push、claude-plugins の台帳、hub の `stack.json`） |
-| 6 | 評価フォルダーの `work/REV-dev/`・`work/REV-plugin/`（Bike Samples の XML の写しと、作業中の版 1 件ずつ）は、確認が済んだら消してかまわない。配布物の写しなので、リポジトリには入れない |
+| 6 | （5 は済み）hub の文書とサイトのコミットを見て、署名を付けて push する。サイトを公開し直す |
+| 7 | 評価フォルダーの `work/REV-dev/`・`work/REV-plugin/`（Bike Samples の XML の写しと、作業中の版 1 件ずつ）は、確認が済んだら消してかまわない。配布物の写しなので、リポジトリには入れない |
 
 ## 確かめたこと（2026-11-18 09:42 JST）
 
@@ -211,16 +245,21 @@ Desktop 経由で、`s1000d-writer-dev` と plugin 版（`s1000d-writer`）の�
 2. **core が出ていれば、writer-mcp にパッチを入れる。** `work/writer-mcp-revision-b.patch` を `git apply` し、依存を core `^0.15.0` に上げます。Mac 側の VM で、配布物を使う vitest を実行します。
 3. **writer-mcp が出ていれば、Skill にパッチを入れる。** `work/s1000d-publish-skill-revision.patch` です。
 4. **Desktop 経由で確かめる。** `s1000d-writer-dev` と plugin 版で、上の stdio と同じ 4 つの呼び出しを行います（Bike Samples の写しを、接続したフォルダーの中に作ってから。`specs/` の中のファイルには書かない）。印を付けた後の DM を reader で読み、`changeMarks`・`reasonForUpdates` を見ます。Skill の手順どおりに 1 件を通します。
-5. **文書を直す。** `design/core-revision.md`（「案」を実装の結果に直し、「確かめること」の 3 つの結果と、この回の 3 つの決定を書く）、`DECISIONS.md`（この回の 3 つの決定。D-33 の補足か、新しい番号か）、`design/writer-mcp.md`、`design/skills-and-editor.md`、`notes/tm-eval-progress.md`、サイト、hub の `stack.json` の説明。その後に、Project の古い 4 つの文書（7 回目の表）と合わせて反映します。
+5. **（済み。2026-11-18 12:55 JST の追記）文書を直す。** `design/core-revision.md`（「案」を実装の結果に直し、「確かめること」の 3 つの結果と、この回の 3 つの決定を書く）、`DECISIONS.md`（この回の 3 つの決定。D-33 の補足か、新しい番号か）、`design/writer-mcp.md`、`design/skills-and-editor.md`、`notes/tm-eval-progress.md`、サイト、hub の `stack.json` の説明。その後に、Project の古い 4 つの文書（7 回目の表）と合わせて反映します。
 
 ## Project の文書
 
 | 文書 | Project の状態 |
 |---|---|
-| `docs/notes/tm-eval-handoff-8.md`（この文書） | hub と同じ |
-| `docs/notes/tm-eval-handoff-7.md`・`docs/notes/tm-eval-progress.md` | hub と同じ（2026-11-18 06:02 JST に反映した） |
-| `docs/design/core-structural-edit.md`・`reader-mcp.md`・`writer-mcp.md`・`skills-and-editor.md` | **古い**（7 回目の表のまま） |
-| `docs/design/core-revision.md` | hub と同じだが、この回の結果（上の「確かめること」の結果、実装）は、どちらにも書いていない |
+| `docs/notes/tm-eval-handoff-8.md`（この文書） | hub と同じ（2026-11-18 13:10 JST ごろに反映した） |
+| `docs/design/core-revision.md`・`docs/design/writer-mcp.md`・`docs/design/skills-and-editor.md`・`docs/design/reader-mcp.md` | hub と同じ（同上。クラウド側の写しと hub のファイルの sha256 が合うことを確かめた） |
+| `docs/DECISIONS.md`・`docs/notes/tm-eval-progress.md` | **古い**（hub はこの回に直した。Project は 7 回目のまま） |
+| `docs/design/core-structural-edit.md` | **古い**（7 回目の表のまま） |
+| `docs/notes/tm-eval-handoff-7.md` | hub と同じ（2026-11-18 06:02 JST に反映した） |
+
+残った 3 つは、次のチャットの最初に反映します。既にある文書を置き換えるには、その会話で `project_read` をしてから、写したファイルを `Read` で全部読む必要があり、`project_read` は 42 KB の文書でも本文を応答にそのまま返します。3 つで 300 KB ほどを読むことになるので、この回は行いませんでした。
+
+`docs/design/reader-mcp.md` は、hub の「0.13.0、未公開」の 2 か所を「0.13.0」に直してから反映しました。
 
 ## 作業の仕方（7 回目からの追加）
 

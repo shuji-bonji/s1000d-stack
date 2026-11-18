@@ -330,27 +330,27 @@ D-31 の「既にある DM は元の XML を保ったまま直す」を、節点
 - **ほかの DM・PM からの参照**: 編集で無くなった `id` を、CSDB のほかの DM・PM の `dmRef/@referredFragment` が指しているときは、`referencedFromOtherObjects[]` に返して書き込まない（2026-11-17 09:15 JST ごろ。実装で決めていた動きを、利用者がそのまま採用）。
 - **最初の版の対象**: 手順（`proceduralStep`）、段落、警告・注意・注記、リストの項目。節点の置き換え（replace）は入れない（reader が読んでいない属性と、下書きに書けない構造を落とすので、作り直しと同じ結果になる）。
 - **Skill の置き場所**: `s1000d-publish` に書く。別の Skill にしない。
-- **手順の段落の場所**: reader は、手順の直下の子を持たない段落を、手順の節点の `text` にまとめて返すので、その段落には `location` が付かない。`includeLocation: true` のときだけ、手順の節点に `textLocations[]`（まとめた段落ごとの場所を、並びの順に）を添える（2026-11-17 09:15 JST ごろ。core の未公開のコミットで実装した。リストの項目には付けない。D-34）。
+- **手順の段落の場所**: reader は、手順の直下の子を持たない段落を、手順の節点の `text` にまとめて返すので、その段落には `location` が付かない。`includeLocation: true` のときだけ、手順の節点に `textLocations[]`（まとめた段落ごとの場所を、並びの順に）を添える（2026-11-17 09:15 JST ごろ。core 0.14.0、reader-mcp 0.13.0 で実装した。リストの項目には付けない。D-34）。
 - 決めていないこと: `applyFix`・`applySegments` を同じ方法に寄せるか（差分を測ってから決める）。層 2 での `move` の変更の印は D-33 で決めた。
 - 設計と実測は [design/core-structural-edit.md](./design/core-structural-edit.md)、層 2 は [design/core-revision.md](./design/core-revision.md)。
 
 ### D-33 改版（層 2）は、作業中の版を始める操作と、変更の印を付ける指定に分ける（2026-11-17）
 
-D-32 の層 2 の決定。2026-11-17 09:56 JST に、利用者が設計文書の R-1〜R-8 をすべて提案どおりと決めた。実装はしていない。
+D-32 の層 2 の決定。2026-11-17 09:56 JST に、利用者が設計文書の R-1〜R-8 をすべて提案どおりと決めた。core の `startRevision` と `editContent` の `marking`（0.15.0）、writer-mcp の `start_revision` と `edit_data_module` の `marking`（0.6.0）、Skill `s1000d-publish` の `references/edit.md`（0.4.0）として、2026-11-18 に公開した。実装のときに決めた 3 つは D-35。
 
-- **作業中の版を始める操作**（仮称 `startRevision`、writer-mcp は `start_revision`）: `inWork` を `01` にし、新しい版のファイル名で書く。元のファイルは変えない。`issueType` は入力で必ず受け取る（`changed`・`revised`・`status`）。core は決めない（R-1）。
+- **作業中の版を始める操作**（core は `startRevision`、writer-mcp は `start_revision`）: `inWork` を `01` にし、新しい版のファイル名で書く。元のファイルは変えない。`issueType` は入力で必ず受け取る（`changed`・`revised`・`status`）。core は決めない（R-1）。
 - **`001-00` から始めるときの `issueType`**: 仕様書の Chap 3.9.5.1 の Table 3（`001-01` は `new`）と、既定 BREX の BREX-S1-00030（`001-01` の `new` は違反）が食い違う。`new` のままにする値も入力で選べるようにし、選んだ結果が既定 BREX に違反することを応答で知らせる（R-1）。
-- **前の版の変更の印**: 作業中の版を始めるときに、印の属性・`changeInline` のタグ・`reasonForUpdate` を消し、`changeType="delete"` の要素は取り除く。`delete` の要素を取り除くことは、読んだ範囲の仕様書に明記が無く、解釈である。取り除く要素の `id` を指す参照が残っていれば断る（R-2）。
+- **前の版の変更の印**: 作業中の版を始めるときに、印の属性・`changeInline` のタグ・`reasonForUpdate` を消し、`changeType="delete"` の要素は取り除く。`delete` の要素を取り除くことは、読んだ範囲の仕様書に明記が無く、解釈である（2026-11-18 に Chap 3.5 の全体を読んだが、記述は無かった）。取り除く要素の `id` を指す参照が残っていれば断る（R-2）。
 - **変更の印を付ける指定**（`editContent` の `marking`）: insert は `changeType="add"`、remove は `changeType="delete"` を付けて残す。この作業中の版で足した要素（`add` の印を持つ）の remove は、印を付けずに取り除く。`reasonForUpdate` を 1 つ足し、同じ呼び出しの編集はすべてそれを指す。
-- **`move` の印**: 同じ親の中の移動は、親の要素に `changeType="modify"` を付ける。親が変わる移動は断る（利用者が remove と insert で指定する）。仕様書に移動の決まりは無い（R-3）。
+- **`move` の印**: 同じ親の中の移動は、親の要素に `changeType="modify"` を付ける。親が変わる移動は断る（利用者が remove と insert で指定する）。仕様書に移動の決まりは無い（R-3。2026-11-18 に仕様書の全文を語で探して確かめた）。印の属性を持てない親（`description`・`procedure` など）の中の移動も断る。
 - **入力**: `updateReasonType` と `changeMark` は必須（値を補わない）。`reasonForUpdate/@id` は、省略時に core が文書に無い値を作る（R-4・R-5）。
 - **範囲に入れないもの**: 発行の操作（R-6）。編集のたびに `inWork` を上げること（R-7）。表・図の印は、対象の節点を表の行・図に広げるときに扱う（R-8）。
 - **先に要る作業**: reader（core の読み取り）は、識別・状態部の `reasonForUpdate` と、変更の印の属性を返していない。層 2 の実装の前に、読み取りに足す（D-31 の「読む側は落とさない」）。返す形は D-34。
-- 設計、仕様書で確かめたこと、残っている確認は [design/core-revision.md](./design/core-revision.md)。
+- 設計、実装の結果、仕様書で確かめたこと、残っている確認は [design/core-revision.md](./design/core-revision.md)。
 
 ### D-34 更新の理由と変更の印は、節点と、DM 全体の一覧の両方に返す（2026-11-17）
 
-D-33 の「先に要る作業」の決定。2026-11-17 10:40 JST ごろに、利用者が 3 つの案から選んだ。core の未公開のコミット（次の版は 0.14.0）で実装した。
+D-33 の「先に要る作業」の決定。2026-11-17 10:40 JST ごろに、利用者が 3 つの案から選んだ。core 0.14.0 と reader-mcp 0.13.0 として、2026-11-17 に公開した。
 
 - **更新の理由**: `IdentAndStatus.reasonForUpdates[]` に、`dmStatus/reasonForUpdate` を並びの順に返す（`id`・`updateReasonType`・`updateHighlight`・`applicRefId`・そのほかの属性・段落の文）。
 - **変更の印**: 節点と参照の `change`（`changeType`・`changeMark`・`reasonForUpdateRefIds`）と、DM 全体の一覧 `DataModuleContent.changeMarks[]`（要素名・場所・3 つの属性）の両方に返す。一覧には、節点にならない要素（`title`、表の `row`、手順の `text` にまとめた `para`、行内の `changeInline`）と、本文を構造化して読まない種類の DM の要素も入る。
@@ -359,6 +359,17 @@ D-33 の「先に要る作業」の決定。2026-11-17 10:40 JST ごろに、利
 - **`textLocations[]` の範囲**: 手順の節点だけに付ける。リストの項目（段落が 1 つのときに、その段落を `text` にまとめる）には付けない。段落を取り除くと項目が空になり、XSD のエラーになるため、項目そのものを編集の対象にする。
 - 読んでいないもの: PM の `pmStatus/reasonForUpdate`。
 - 形と実測は [design/core-revision.md](./design/core-revision.md) の「読み取りに足したもの」。
+
+### D-35 更新の理由は、足す入口と、既にあるものを指す入口を分ける（2026-11-18）
+
+D-33 の実装のときの決定。2026-11-18 に、利用者が 3 つを決めた。core 0.15.0、writer-mcp 0.6.0、Skill `s1000d-publish` 0.4.0 として、同じ日に公開した。
+
+- **既にある `reasonForUpdate` を指す入口**（10:21 JST）: `editContent` の `marking` は、`reason`（新しい `reasonForUpdate` を足す）と `reasonRefId`（識別・状態部に既にある `reasonForUpdate` の `id`）の、どちらか一方だけを受け取る。`reasonRefId` のときは、識別・状態部を変えず、付けた印がその `id` を指す。同じ理由の変更は同じ `reasonForUpdate` を指す、という決まり（Chap 3.9.5.2.1.1 Para 2.1.3）に沿うためである。決める前は、`marking` を渡した呼び出しのたびに `reasonForUpdate` が 1 つ増えた。
+- **印を付けずに `reasonForUpdate` だけを足す入口**（10:40 JST）: core に `addReasonForUpdate` を足す。本文には触らず、変更の印も付けない。編集上の変更（`urt01`。この理由に結び付く変更の印があってはならない）と、`issueType` が `revised`・`status` の版で使う。`startRevision` は前の版の `reasonForUpdate` をすべて取り除くので、`revised`・`status` で始めた版は、`issueNumber` が `000`・`001` でなければ、既定 BREX の BREX-S1-00038 に違反する（Bike Samples で実測した）。D-33 の R-4 で「実装のときに決める」としていた項目である。
+- **writer-mcp の入口の形**（10:57 JST）: `start_revision` の入力で理由（`reason`）を受け取り、理由だけを足すツール（`add_reason_for_update`）も別に作る（案 C）。`start_revision` は、理由を足せないときは版も始めない。
+- **使い分け**: その理由による最初の編集は `marking.reason`、同じ理由による 2 回目からの編集は `marking.reasonRefId`、変更の印を付けない変更の理由は `addReasonForUpdate`。Skill は、どれを使うかを決めるための問い（変更の種類、理由の文、`updateReasonType`、`changeMark`）を利用者に聞き、自分で決めない。
+- 決めていないこと: PM の `pmStatus/reasonForUpdate` の読み取り。reader の `section: "outline"` と `includeLocation: true` の組で `textLocations` が付かないことの扱い。
+- 実装の結果と確認は [design/core-revision.md](./design/core-revision.md) の「実装」と「テストと確認の結果」、記録は [notes/tm-eval-handoff-8.md](./notes/tm-eval-handoff-8.md)。
 
 ## 未決事項
 
