@@ -170,7 +170,7 @@ flowchart LR
 | 7 | s1000d-reader-mcp を作る: 6 ツール（`list_data_modules` / `read_data_module` / `read_publication_module` / `resolve_reference` / `describe_applicability` / `read_icn_metadata`）、`instructions`、テスト | mcp/s1000d-reader-mcp | reader-mcp.md |
 | 8 | manual-model を作る: 型、JSON Schema、`validateManual`、`fromLegacyJson`、券売機の例 `examples/kenbaiki.manual.json`。core に依存しないので、作業 1〜7 と並行できる。名前は `@shuji-bonji/experiential-manual-model`（U-04） | lib/experiential-manual-model | manual-model.md |
 | 9 | サイトに「s1000d-verify-mcp」「s1000d-reader-mcp」「適用性」の 3 ページを足し、`stack.json` に verify / reader / manual-model を加える。既存の brex-mcp のページにある「XSD 未検証」の説明を verify-mcp への案内に直す | s1000d-stack/site、stack.json | — |
-| 10 | 公開（D-16 の 5 つの作業）と、verify-mcp・reader-mcp の初回の手動 `npm publish` と Trusted Publisher の登録（D-14） | hub、各 MCP | DECISIONS.md D-14・D-16 |
+| 10 | 公開（D-16 の 5 つの作業）と、verify-mcp・reader-mcp の初回の手動 `npm publish` と Trusted Publisher の登録（D-14） | hub、各 MCP | DECISIONS-archive.md D-14・D-16 |
 | 11 | MCP 3 本を MCP Registry（`io.github.shuji-bonji/*`）と claude-plugins marketplace に載せる（D-23） | 各 MCP、claude-plugins | DECISIONS.md D-23 |
 
 調査の宿題（Bike Samples 105 件に既定 BREX への違反 55 件が出る原因）は作業 6 のテストで同じ数が出ることを確かめたうえで、作業 9 のサイトの題材として調べます。

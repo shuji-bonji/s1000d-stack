@@ -108,7 +108,8 @@ s1000d-stack/
 ├── site/               documentation site (Astro Starlight; English, Japanese under /ja/)
 ├── docs/
 │   ├── ROADMAP.md      goals, stages, work procedure, progress (Japanese)
-│   ├── DECISIONS.md    decisions (D-01–) and open items (U-01–) (Japanese)
+│   ├── DECISIONS.md    decisions (D-21–) and open items (U-01–) (Japanese)
+│   ├── DECISIONS-archive.md   decisions D-01–D-20 (Japanese)
 │   └── notes/          research notes on IETM, S1000D, BREX, the distribution files and the specification (Japanese)
 ├── specs/              S1000D distribution files (not in git; placed by the user)
 └── lib/ mcp/ skill/ app/   working copies of each repository (not in git)
@@ -133,4 +134,4 @@ npm run dev
 
 ## License
 
-Code is MIT, the site's text is CC BY 4.0, and the sample data created for this project is MIT (`docs/DECISIONS.md` D-11).
+Code is MIT, the site's text is CC BY 4.0, and the sample data created for this project is MIT (`docs/DECISIONS-archive.md` D-11).

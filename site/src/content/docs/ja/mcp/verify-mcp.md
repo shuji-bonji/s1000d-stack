@@ -107,7 +107,7 @@ XSD が見つからなかったときは検証が行われていないだけで�
 
 配布物の中には `brex.xsd` を含む `xml_schema_flat/` が 2 つあります。XML Schema Package のものと、データ辞書（`data_dictionary_7/Files/`）の中の写しです。写しの方は `xs:import` が `http://www.w3.org/2001/xml.xsd` のような絶対 URL で、libxml2 がネットワークに出ようとして失敗するため、使いません。XML Schema Package 側の XSD は `xml.xsd` のように相対パスで import しているので、同じフォルダーの XSD をまとめて登録すれば解決します。
 
-XSD 検証は `libxml2-wasm`（libxml2 の WebAssembly 版）で行い、XSD ごとに 1 回コンパイルして使い回します。Issue 7 の Bike Samples 106 件を 0.5 秒以内で検証できます。採用の経緯（`xmllint-wasm` との比較）は hub リポジトリの `docs/DECISIONS.md` の D-15 にあります。
+XSD 検証は `libxml2-wasm`（libxml2 の WebAssembly 版）で行い、XSD ごとに 1 回コンパイルして使い回します。Issue 7 の Bike Samples 106 件を 0.5 秒以内で検証できます。採用の経緯（`xmllint-wasm` との比較）は hub リポジトリの `docs/DECISIONS-archive.md` の D-15 にあります。
 
 ## 公式サンプルで分かること
 

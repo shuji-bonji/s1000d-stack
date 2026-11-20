@@ -108,7 +108,8 @@ s1000d-stack/
 ├── site/               学習サイト（Astro Starlight。英語がルート、日本語は /ja/）
 ├── docs/
 │   ├── ROADMAP.md      目的・段階・作業手順・進捗
-│   ├── DECISIONS.md    決定事項（D-01〜）と未決事項（U-01〜）
+│   ├── DECISIONS.md    決定事項（D-21〜）と未決事項（U-01〜）
+│   ├── DECISIONS-archive.md   決定事項（D-01〜D-20）
 │   └── notes/          調査メモ（IETM・S1000D・BREX、配布物の性質、仕様書の読解結果）
 ├── specs/              S1000D の配布物（git 管理外。利用者が置く）
 └── lib/ mcp/ skill/ app/   各リポジトリの作業コピー（git 管理外）
@@ -133,4 +134,4 @@ npm run dev
 
 ## ライセンス
 
-コードは MIT、サイトの文章は CC BY 4.0、自作のサンプルデータは MIT です（`docs/DECISIONS.md` D-11）。
+コードは MIT、サイトの文章は CC BY 4.0、自作のサンプルデータは MIT です（`docs/DECISIONS-archive.md` D-11）。

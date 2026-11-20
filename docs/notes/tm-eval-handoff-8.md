@@ -253,13 +253,32 @@ Skill `s1000d-publish` は 0.4.0 として出ました（利用者の作業。hu
 |---|---|
 | `docs/notes/tm-eval-handoff-8.md`（この文書） | hub と同じ（2026-11-18 13:10 JST ごろに反映した） |
 | `docs/design/core-revision.md`・`docs/design/writer-mcp.md`・`docs/design/skills-and-editor.md`・`docs/design/reader-mcp.md` | hub と同じ（同上。クラウド側の写しと hub のファイルの sha256 が合うことを確かめた） |
-| `docs/DECISIONS.md`・`docs/notes/tm-eval-progress.md` | **古い**（hub はこの回に直した。Project は 7 回目のまま） |
-| `docs/design/core-structural-edit.md` | **古い**（7 回目の表のまま） |
+| `docs/DECISIONS.md`・`docs/notes/tm-eval-progress.md` | hub と同じ（2026-11-20 に、古い節を別の文書に分けてから反映した。下の追記） |
+| `docs/DECISIONS-archive.md`・`docs/notes/tm-eval-progress-1.md` | hub と同じ（2026-11-20 に分けて作り、反映した。下の追記） |
+| `docs/design/core-structural-edit.md` | hub と同じ（2026-11-20 16:34 JST ごろに反映した） |
 | `docs/notes/tm-eval-handoff-7.md` | hub と同じ（2026-11-18 06:02 JST に反映した） |
 
 残った 3 つは、次のチャットの最初に反映します。既にある文書を置き換えるには、その会話で `project_read` をしてから、写したファイルを `Read` で全部読む必要があり、`project_read` は 42 KB の文書でも本文を応答にそのまま返します。3 つで 300 KB ほどを読むことになるので、この回は行いませんでした。
 
 `docs/design/reader-mcp.md` は、hub の「0.13.0、未公開」の 2 か所を「0.13.0」に直してから反映しました。
+
+### 追記（2026-11-20 16:45 JST）: 残った 3 つの反映と、文書の分割
+
+上の「残った 3 つ」を、次のチャットで反映しました。上の表は、反映した後の状態に直してあります。
+
+- `docs/design/core-structural-edit.md` は、hub のファイルをそのまま反映しました。
+- `docs/DECISIONS.md` と `docs/notes/tm-eval-progress.md` は、hub のファイルのままでは反映できませんでした。`Read` は「25,137 トークン」「25,106 トークン」で、1 回の上限（25,000 トークン）を超えると断りました。`offset` と `limit` で 2 回に分けて全部を読んでも、写したファイルを `Edit` で 1 文字足して戻しても、`project_write` の `local_path` は「ファイルの全体を読むこと」を求めて断りました。
+- 利用者の決定（2026-11-20 16:37 JST ごろ）: hub の文書を分け、古い節をまとめて別の文書に移す。
+
+| 元の文書 | 移した範囲 | 移した先 | 分けた後の大きさ |
+|---|---|---|---|
+| `docs/DECISIONS.md`（63,950 バイト） | D-01〜D-20 | `docs/DECISIONS-archive.md`（26,099 バイト） | 38,584 バイト |
+| `docs/notes/tm-eval-progress.md`（61,446 バイト） | 「順 1〜3 の要点」から「BREX の修正候補と、Bike Samples の残り 13 個」までの 10 個の節（2026-11-16 まで） | `docs/notes/tm-eval-progress-1.md`（35,349 バイト） | 27,917 バイト |
+
+- 移した節の本文は変えていません（分ける前のファイルの行と、移した先の行を比べました）。元の文書には、移した先へのリンクを置きました。
+- D-11・D-14・D-15・D-16 を `docs/DECISIONS.md` の決定として指していた 5 か所（README の英語と日本語、`docs/ROADMAP.md`、サイトの `mcp/verify-mcp` の日本語と英語）は、`DECISIONS-archive.md` を指すように直しました。README の構成の図にも `DECISIONS-archive.md` の行を足しました。サイトの `node scripts/check-i18n.mjs` は、どのページも `ok` でした。
+- ほかの文書が D-01〜D-20 を指している箇所は、直していません。`docs/notes/handoff.md` の 2 か所は「DECISIONS.md（D-01〜）」のようにファイル名と一緒に書いていて、残りは番号だけです（`DECISIONS.md` と番号が近くに並ぶ箇所を `grep` で探した結果です）。2 回目・3 回目の引き継ぎは、移した節を「tm-eval-progress.md の「…」」と書いています。記録なので、直していません。
+- 次に `Read` の上限を超えるまでの余裕は、`DECISIONS.md` のほうが小さいです（分けた後で 38,584 バイト。超えたのは 63,950 バイトのとき）。
 
 ## 作業の仕方（7 回目からの追加）
 

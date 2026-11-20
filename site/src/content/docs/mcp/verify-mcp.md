@@ -107,7 +107,7 @@ The default is stdio. With `--http` the server starts over Streamable HTTP (defa
 
 The distribution contains 2 `xml_schema_flat/` folders that include `brex.xsd`: the one in the XML Schema Package, and a copy inside the data dictionary (`data_dictionary_7/Files/`). The copy is not used, because its `xs:import` uses absolute URLs such as `http://www.w3.org/2001/xml.xsd`, and libxml2 tries to go out to the network and fails. The XSDs on the XML Schema Package side import with relative paths such as `xml.xsd`, so registering all the XSDs in the same folder together resolves them.
 
-XSD validation is done with `libxml2-wasm` (the WebAssembly build of libxml2); each XSD is compiled once and reused. The 106 Bike Samples of Issue 7 can be validated in under 0.5 seconds. The background to this choice (the comparison with `xmllint-wasm`) is in D-15 of `docs/DECISIONS.md` in the hub repository.
+XSD validation is done with `libxml2-wasm` (the WebAssembly build of libxml2); each XSD is compiled once and reused. The 106 Bike Samples of Issue 7 can be validated in under 0.5 seconds. The background to this choice (the comparison with `xmllint-wasm`) is in D-15 of `docs/DECISIONS-archive.md` in the hub repository.
 
 ## What the official samples show
 
