@@ -321,6 +321,33 @@ writer-mcp について分かったことです。
 - `work/REV-dev/`・`work/REV-plugin/`・`work/REV-skill/` は、確認が済んだら消してかまわない（配布物の写しなので、リポジトリには入れない）。
 - この追記は、Project の文書に反映していない。
 
+### 追記（2026-11-21 10:55 JST）: Skill の手順の修正（0.4.1 の見込み）
+
+利用者の決定（2026-11-21 10:45 JST ごろ）: 「決めていないこと」の 3（outline の `textLocations`）は、outline には付けないままにし、reader-mcp の説明文と `_notes` を「`content`・`all` のときだけ」と直す。この回は Skill だけを直し、writer-mcp と reader-mcp のコードの変更は次のチャットで行う。
+
+上の追記の表の 1〜5 を、`skill/s1000d-publish-skill` に 1 つのコミットにしました（署名なし、未 push）。`plugin.json` の版を 0.4.1 に上げ、CHANGELOG の見出しを `0.4.1 (2026-11-21)` にしてあります。手順の文だけの変更です。
+
+| # | 直した場所 | 内容 |
+|---|---|---|
+| 1 | `references/edit.md` の E1 | reader の応答の `identAndStatus.issueType` も見る。`deleted` なら、版の扱いを聞く前に、作業中の版は始められないと伝える |
+| 2 | SKILL.md の表の最後の行 | 扱わないのは発行（発行番号を上げること）だけ、と書き直した |
+| 3 | E1・E1a の 6・E2 | 場所を得るための読み取りは、`section` を `content` か `all` にする（E1 は、識別・状態部も要るので `all`） |
+| 4 | E3 | 種類が変わる置き換えは、並びの順に合う場所への insert にする |
+| 5 | 新しい節「利用者に聞く項目のまとめ方」 | まとめて聞いてよい組を 4 つに分けた。書き込みの確認は、書かずに呼んだ結果を見せた後にだけ聞く |
+| — | E6・「やらないこと」 | `path` のファイルは上書きされるので `overwrite` を付けない。確認の後に編集・文・値を変えたら、書かずに呼び直す（試行のときに手順から外れた 2 点） |
+
+確かめていないことです。
+
+- 直した手順どおりに LLM が動くかは、試していません。
+- `edit_data_module` が `overwrite` なしで `path` のファイルを上書きすることは、2026-11-18 の Desktop 経由の呼び出しと設計文書の記述によります。2026-11-20 の試行で `overwrite` なしを確かめたのは `add_reason_for_update` だけです。
+
+次のチャットで行うことです。
+
+1. Skill 0.4.1 のコミットを利用者が見て、署名を付けて公開する（tag、push、claude-plugins の台帳、hub の `stack.json`）。
+2. writer-mcp: `start_revision` と `add_reason_for_update` の `_notes` の、同じ内容の文の重なりを直す。
+3. reader-mcp: `includeLocation` の説明文と `_notes` を、「`textLocations` は `section` が `content`・`all` のときだけ」と直す。サイトの `mcp/reader-mcp`（日・英）も合わせる。
+4. この文書（2026-11-21 の 2 つの追記）を、Project に反映する。
+
 ## 作業の仕方（7 回目からの追加）
 
 | 項目 | 内容 |
