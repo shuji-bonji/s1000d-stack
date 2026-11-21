@@ -73,7 +73,7 @@ flowchart TB
 
 <!-- stack:begin — scripts/generate-stack.mjs が生成。手で編集しない -->
 
-> 版は実測（2026-11-18 時点の `npm view`）。
+> 版は実測（2026-11-21 時点の `npm view`）。
 
 | リポジトリ | 役割 | 配布形態 | 状態 | 版 | npm |
 | --- | --- | --- | --- | --- | --- |
@@ -84,7 +84,7 @@ flowchart TB
 | [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | model | library | 公開済み | 0.4.0 | `@shuji-bonji/experiential-manual-model` |
 | [s1000d-writer-mcp](https://github.com/shuji-bonji/s1000d-writer-mcp) | mcp | mcp-server | 公開済み | 0.6.0 | `@shuji-bonji/s1000d-writer-mcp` |
 | [experience-to-s1000d-skill](https://github.com/shuji-bonji/experience-to-s1000d-skill) | procedure | skill | 公開済み | 0.1.2 | — |
-| [s1000d-publish-skill](https://github.com/shuji-bonji/s1000d-publish-skill) | procedure | skill | 公開済み | 0.4.0 | — |
+| [s1000d-publish-skill](https://github.com/shuji-bonji/s1000d-publish-skill) | procedure | skill | 公開済み | 0.4.1 | — |
 | [s1000d-review-skill](https://github.com/shuji-bonji/s1000d-review-skill) | procedure | skill | 公開済み | 0.1.1 | — |
 | [s1000d-translate-skill](https://github.com/shuji-bonji/s1000d-translate-skill) | procedure | skill | 公開済み | 0.1.1 | — |
 
