@@ -17,15 +17,15 @@ description: LLM が XML を書かずにデータモジュールを作り、検�
 
 | ツール | 内容 |
 | --- | --- |
-| `build_data_module` | 下書き 1 件（説明・手順・プロセス・故障探求・パブリケーションモジュール）と採番の規則から、データモジュールを 1 件組み立てます。組み立てたあとに XSD・BREX・参照を検証し、`exact` の修正だけを最大 `maxFixRounds` 回（既定 3）まで自動で適用します。残った修正は `fixes[]` に候補付きで返します |
-| `convert_manual` | 体験型マニュアル（[`@shuji-bonji/experiential-manual-model`](https://www.npmjs.com/package/@shuji-bonji/experiential-manual-model)）を、Topic ごとのデータモジュールとパブリケーションモジュール 1 件に変換します。各データモジュールは `build_data_module` と同じ流れで組み立てて検証します。データモジュール・パブリケーションモジュール・ICN の相互の参照は、CSDB に今回作ったデータモジュールを重ねた上で解決します。変換で表せなかったものは `notRepresented` に件数で返します |
-| `apply_fixes` | 既存のデータモジュールに、`fixes[]` で返した候補の中から選んだ修正を適用します。選択は候補の写しでなければならず、候補の外の値や範囲に合わない値は、理由を付けて `rejected[]` に入れます。適用後に再検証します |
-| `edit_data_module` | 既にある手順・説明のデータモジュールに、節点を足す・取り除く・移す編集を行います。場所は `location.path` で指し、足す節点は下書きの節点（`step`・`para`・`admonition`・`listItem`）で渡します。元の文字列の編集した範囲だけを書き換え、ほかは 1 文字も変えません。`marking` を渡さなければ、版と変更の印（`changeType` など）は変えません。`marking` を渡すと、作業中の版に変更の印を付けます。編集で XSD のエラーが増えた結果は書き込みません |
-| `start_revision` | 発行済みのデータモジュールから、作業中の版を始めます。`inWork` を `01` にし、`issueNumber` はそのまま、`issueType` は渡された値（`changed`・`revised`・`status`。サーバーは選びません）にします。前の版の変更の印と更新の理由を消し、`changeType="delete"` の要素を取り除きます。発行済みの版は変えず、作業中の版を新しいファイルとして書きます。`reason` を渡すと、同じ呼び出しで更新の理由を 1 つ足します |
-| `add_reason_for_update` | 作業中の版の識別・状態部に、更新の理由（`reasonForUpdate`）を 1 つ足します。本文には触らず、変更の印も付けません。変更の印を付けない変更（編集上の変更 `urt01`、`issueType` が `revised`・`status` の版）の理由を書くときに使います |
-| `create_comment` | コメントデータモジュール（`comment`）を組み立てて検証します。連番は、省略すると CSDB の次の番号になります |
-| `extract_segments` | データモジュールから、人が読む文（題名・段落・手順・警告・表のセル・図の題）を翻訳用に取り出します。インライン要素は `{1}` `{2}` の記号に置き換え、骨組みの照合に使う `skeletonHash` を返します |
-| `apply_segments` | 訳した文を元のデータモジュールに戻します。DMC は同じで、言語だけが変わります。取り出したあとにデータモジュールが変わっていれば、`skeleton-mismatch` で止まります |
+| [`build_data_module`](/s1000d-stack/ja/reference/stack/writer/build-data-module/) | 下書き 1 件（説明・手順・プロセス・故障探求・パブリケーションモジュール）と採番の規則から、データモジュールを 1 件組み立てます。組み立てたあとに XSD・BREX・参照を検証し、`exact` の修正だけを最大 `maxFixRounds` 回（既定 3）まで自動で適用します。残った修正は `fixes[]` に候補付きで返します |
+| [`convert_manual`](/s1000d-stack/ja/reference/stack/writer/convert-manual/) | 体験型マニュアル（[`@shuji-bonji/experiential-manual-model`](https://www.npmjs.com/package/@shuji-bonji/experiential-manual-model)）を、Topic ごとのデータモジュールとパブリケーションモジュール 1 件に変換します。各データモジュールは `build_data_module` と同じ流れで組み立てて検証します。データモジュール・パブリケーションモジュール・ICN の相互の参照は、CSDB に今回作ったデータモジュールを重ねた上で解決します。変換で表せなかったものは `notRepresented` に件数で返します |
+| [`apply_fixes`](/s1000d-stack/ja/reference/stack/writer/apply-fixes/) | 既存のデータモジュールに、`fixes[]` で返した候補の中から選んだ修正を適用します。選択は候補の写しでなければならず、候補の外の値や範囲に合わない値は、理由を付けて `rejected[]` に入れます。適用後に再検証します |
+| [`edit_data_module`](/s1000d-stack/ja/reference/stack/writer/edit-data-module/) | 既にある手順・説明のデータモジュールに、節点を足す・取り除く・移す編集を行います。場所は `location.path` で指し、足す節点は下書きの節点（`step`・`para`・`admonition`・`listItem`）で渡します。元の文字列の編集した範囲だけを書き換え、ほかは 1 文字も変えません。`marking` を渡さなければ、版と変更の印（`changeType` など）は変えません。`marking` を渡すと、作業中の版に変更の印を付けます。編集で XSD のエラーが増えた結果は書き込みません |
+| [`start_revision`](/s1000d-stack/ja/reference/stack/writer/start-revision/) | 発行済みのデータモジュールから、作業中の版を始めます。`inWork` を `01` にし、`issueNumber` はそのまま、`issueType` は渡された値（`changed`・`revised`・`status`。サーバーは選びません）にします。前の版の変更の印と更新の理由を消し、`changeType="delete"` の要素を取り除きます。発行済みの版は変えず、作業中の版を新しいファイルとして書きます。`reason` を渡すと、同じ呼び出しで更新の理由を 1 つ足します |
+| [`add_reason_for_update`](/s1000d-stack/ja/reference/stack/writer/add-reason-for-update/) | 作業中の版の識別・状態部に、更新の理由（`reasonForUpdate`）を 1 つ足します。本文には触らず、変更の印も付けません。変更の印を付けない変更（編集上の変更 `urt01`、`issueType` が `revised`・`status` の版）の理由を書くときに使います |
+| [`create_comment`](/s1000d-stack/ja/reference/stack/writer/create-comment/) | コメントデータモジュール（`comment`）を組み立てて検証します。連番は、省略すると CSDB の次の番号になります |
+| [`extract_segments`](/s1000d-stack/ja/reference/stack/writer/extract-segments/) | データモジュールから、人が読む文（題名・段落・手順・警告・表のセル・図の題）を翻訳用に取り出します。インライン要素は `{1}` `{2}` の記号に置き換え、骨組みの照合に使う `skeletonHash` を返します |
+| [`apply_segments`](/s1000d-stack/ja/reference/stack/writer/apply-segments/) | 訳した文を元のデータモジュールに戻します。DMC は同じで、言語だけが変わります。取り出したあとにデータモジュールが変わっていれば、`skeleton-mismatch` で止まります |
 
 ## 下書きと採番の規則
 

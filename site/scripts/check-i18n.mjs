@@ -57,7 +57,8 @@ for (const ja of walk(JA).sort()) {
     console.log(`     ${rel}: 英語版に /ja/ へのリンクが残っている`);
     bad++;
   }
-  if (/[぀-ヿ一-鿿]/.test(enText.replace(/IETM入門[^)\]]*/g, ''))) {
+  // reference/stack/ は tools/list の応答をそのまま載せる。writer-mcp の inputSchema には日本語の説明があるので、ここでは数えない
+  if (!rel.startsWith('reference/stack/') && /[぀-ヿ一-鿿]/.test(enText.replace(/IETM入門[^)\]]*/g, ''))) {
     console.log(`     ${rel}: 英語版に日本語が残っている`);
     bad++;
   }
