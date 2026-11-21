@@ -100,7 +100,20 @@ export default defineConfig({
           // 設計は docs/design/site-reference.md。区分の名前に「非公式」を入れる（D-02、SR-4）
           label: 'S1000D reference (unofficial)',
           translations: { ja: 'S1000D リファレンス（非公式）' },
-          items: [{ label: 'updateReasonType', slug: 'reference/s1000d/issue-7/update-reason-type' }],
+          collapsed: true,
+          items: [{ autogenerate: { directory: 'reference/s1000d/issue-7' } }],
+        },
+        {
+          // MCP のツール 1 つを 1 ページ。scripts/generate-reference.mjs が tools/list の応答から作る
+          label: 'Stack reference',
+          translations: { ja: 'Stack リファレンス' },
+          collapsed: true,
+          items: [
+            { label: 's1000d-brex-mcp', collapsed: true, items: [{ autogenerate: { directory: 'reference/stack/brex' } }] },
+            { label: 's1000d-verify-mcp', collapsed: true, items: [{ autogenerate: { directory: 'reference/stack/verify' } }] },
+            { label: 's1000d-reader-mcp', collapsed: true, items: [{ autogenerate: { directory: 'reference/stack/reader' } }] },
+            { label: 's1000d-writer-mcp', collapsed: true, items: [{ autogenerate: { directory: 'reference/stack/writer' } }] },
+          ],
         },
         {
           label: 'Use cases',

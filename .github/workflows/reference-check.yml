@@ -1,0 +1,35 @@
+name: Reference check
+
+# サイトのリファレンス（site/src/content/docs/reference/ と ja/reference/）が、
+# 元のデータ（tools/list の写し、配布物から取り出した値、手書きの欄）から作り直した結果と同じかを確かめる。
+# 違えば失敗する。直すのは手元で: node scripts/generate-reference.mjs render → commit → push
+# 仕様書も MCP も要らない（設計は docs/design/site-reference.md）。
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths: &paths
+      - 'scripts/generate-reference.mjs'
+      - 'site/src/data/reference/**'
+      - 'site/src/reference-notes/**'
+      - 'site/src/content/docs/reference/**'
+      - 'site/src/content/docs/ja/reference/**'
+      - 'site/src/content/docs/mcp/**'
+      - 'site/src/content/docs/ja/mcp/**'
+      - '.github/workflows/reference-check.yml'
+  push:
+    branches: [main]
+    paths: *paths
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/generate-reference.mjs --check
