@@ -2,7 +2,7 @@
 
 s1000d-stack のサイトに、S1000D の属性と値を引くページと、MCP のツールを引くページを足すための設計です。S1000D のデータモジュール（DM）を作る人と、S1000D を処理するコードを書く人が、属性名・値・ツール名から 1 ページで答えにたどり着けるようにします。
 
-- 状態: **提案（未実装）**。2026-11-22 に書きました。「決めること」の SR-1〜SR-9 は、まだ決まっていません
+- 状態: **実装済み、未マージ**（2026-11-22）。作業の順 1〜4 を、ブランチ `feature/site-reference` に実装しました。「決めること」の SR-1〜SR-9 は、利用者が 2026-11-22 に提案のとおりと決めました（DECISIONS の D-37）。設計から変えた点と残っている作業は、末尾の「実装の結果」にあります
 - 前提の決定: D-02（商標の注記）、D-03（仕様書・スキーマ・公式サンプルを同梱しない）、D-22（英語をルートにし、日本語を `/ja/` で提供する）、D-36（続編は Zenn Book、リファレンスはサイト）
 - 対応する Issue: Stack リファレンスは #9、S1000D リファレンスは #11、続編の Zenn Book は #10
 
@@ -123,7 +123,7 @@ Stack 側の件数です。
 
 | 欄 | 内容 | 作り方 |
 |---|---|---|
-| 注記 | Issue 7 の内容であること、ASD とは無関係であること、正式な定義は仕様書の該当章にあること | 生成（全ページ共通） |
+| 注記 | Issue 7 の内容であること、ASD とは無関係であること、正式な定義は仕様書の該当章にあること。生成の元にした配布物の日付（データ辞書の `README.txt` の日付。いまは 2026-07-16）も出す | 生成（全ページ共通） |
 | 何を表すか | 属性の役割を 1〜2 文で | 手書き |
 | 付く要素 | この属性を持つ要素と、スキーマの名前 | 生成（XSD） |
 | XSD の定め | 型の名前、列挙またはパターン | 生成（XSD） |
@@ -132,7 +132,7 @@ Stack 側の件数です。
 | 値の選び方 | 場面ごとに、どの値を選ぶか | 手書き |
 | 関連する決まり | ほかの属性との組み合わせのルール（ルール ID と章の番号） | 手書き |
 | Stack での扱い | 読むツール・書くツールへのリンク | 手書き（ツール名は生成物と照合する） |
-| 出典 | 章と表の番号、オンラインのデータ辞書の属性のページへのリンク | 生成（番号は `objectUse` から取り出す。リンクは属性名から組み立てる） |
+| 出典 | 章・Para・表の番号、オンラインのデータ辞書の属性のページへのリンク | 生成（章と Para の番号は `attributesDefinition.xml` の `chapter`・`para`、表の番号は `objectUse` から取り出す。リンクは属性名から組み立てる） |
 
 手書きの欄が空のページは、「何を表すか」から「Stack での扱い」までの見出しを出さず、生成した欄だけのページにします。
 
@@ -151,8 +151,26 @@ Stack 側の件数です。
 - **初回の表示は遅い**: 属性の XML は 5 行（176 バイト）で、説明の本文を持ちません。ブラウザーが `../xsl/datadict.xsl` を読み、XSLT が定義のファイルを読んで表示を組み立てます。サーバーの応答は 1 件 0.5〜0.75 秒ですが、フレームの中の表示には時間がかかります。一度読み込んだあとは、すぐに表示されます。
 - **もう 1 つのホスト**: `https://dd.s1000d.us`（Issue 7 は `/dd70`）も同じ内容を配信しています（トップと属性の XML の大きさが一致）。Issue 6-01・6-02 と単位のページもあります。運営者がページに書かれていないので、リンク先には公式サイトが案内している `users.s1000d.org` を使います。
 - **利用条件**: 配布物のデータ辞書の `README.txt` の LICENSE の節は、著作権の表示と免責だけで、外部からのリンクについての記載はありません。
-- **件数**（配布物の Issue 7）: `Files/attributes/` に属性のファイルが 523、`Files/elements/` に要素のファイルが 1,398 あります。既定 BREX が値を定めている属性（90）より多いので、リンクは既定 BREX に無い属性にも張れます。
+- **件数**（配布物の Issue 7）: `Files/definitions/attributesDefinition.xml` に定義がある属性は 636、`Files/attributes/` のファイルは 606 です。606 のうち 83 は名前が `AttRelation` で終わる属性（ビジネスルール文書で、設定可能な属性との関係を示す属性。Chap 4.10.1）で、これも定義を持ちます。既定 BREX が値を定めている属性（90）より多いので、リンクは既定 BREX に無い属性にも張れます。要素のファイルは 1,398 です。
+- **リンクを付ける条件**: 定義はあるのに `Files/attributes/` にファイルが無い属性が 31 あります（`apsid`、`background-color` など）。属性名から組み立てたリンクは、この 31 属性では切れます。`extract` は、手元の `Files/attributes/` にファイルがある属性だけにリンクを付けます。
 - **要素のページ**: `Files/elements/<要素名>.xml` の形です（`reasonForUpdate.xml` で 200 を確かめた）。要素のページを作るとき（SR-1）に使います。
+
+### データ辞書の定義と、MCP のツールとの分担
+
+データ辞書の中身は、[notes/data-dictionary-survey.md](../notes/data-dictionary-survey.md) に調べた結果があります（2026-11-22）。リファレンスに関係する点は次の 3 つです。
+
+- **値の意味は、データ辞書にもありません。** `securityClassification` の `01` などの意味は、プロジェクトが決める設定可能値（Chap 3.9.6.1）です。データ辞書でも既定 BREX でも埋まりません。「値の意味」の欄を書けるのは、既定 BREX に説明がある属性（`updateReasonType` など）だけです。残りの属性では、「プロジェクトが決める」と書きます。
+- **定義文は機械で読めます。** 「何を表すか」を書くときは、`attributesDefinition.xml` の定義を読んで、自分の言葉で書きます。定義の文は写しません。
+- **MCP は、XSD と BREX に合っているかは返せますが、要素や属性の使い方は返せません。** XSD と BREX に合っていても、内容として誤っている DM はあり得ます（前提条件の要素に書くべき内容を段落に書いた DM は、検証をすべて通ります）。「値の選び方」と「関連する決まり」の欄は、この部分を補うためのものです。
+
+調査の文書は、利用者の手元の定義ファイルを実行時に読んで定義文を返すツール（仮称 `describe_element`・`describe_attribute`）を挙げています。サイトのページとは、次のように分かれます。
+
+| 手段 | 返すもの | D-03 との関係 |
+|---|---|---|
+| サイトの S1000D リファレンス | 自分の言葉の説明、値の選び方、公式のデータ辞書へのリンク | 仕様書の文章を載せない |
+| MCP の `describe_attribute`（仮称、未決） | 利用者の手元にある定義文、章の番号、XML の例 | 利用者が入手したファイルを読むだけで、配布しない |
+
+このツールができたら、Stack リファレンスにページを足し、属性のページの「このスタックでは」の表に 1 行足します。
 
 ### 見本: `updateReasonType`（日本語）
 
@@ -165,7 +183,7 @@ DM を改版したときに、更新の理由（`reasonForUpdate`）がどの種
 
 **付く要素**
 
-`reasonForUpdate`（DM の `dmStatus` の中、パブリケーションモジュールの `pmStatus` の中）
+`reasonForUpdate` だけです。`reasonForUpdate` は、`dmStatus`（DM のスキーマ 21 本）、`pmStatus`、`imfStatus`、`scormContentPackageStatus`、`targetDmStatus`、`frontMatterDmEntry`・`frontMatterPmEntry`・`frontMatterExternalPubEntry` の中に書きます（Issue 7 の XSD 33 本を調べた結果）
 
 **XSD の定め**
 
@@ -288,7 +306,7 @@ flowchart TB
 
 | 段 | 入力 | 出力 | 動く場所 |
 |---|---|---|---|
-| `extract` | `S1000D_SPEC_DIR` の下の既定 BREX と XSD | `site/src/data/reference/s1000d-issue-7.json` | 手元だけ。仕様書が無ければ、何もせずに理由を出して終わる |
+| `extract` | `S1000D_SPEC_DIR` の下の既定 BREX、XSD、データ辞書の `attributesDefinition.xml` と `Files/attributes/` の一覧 | `site/src/data/reference/s1000d-issue-7.json` | 手元だけ。仕様書が無ければ、何もせずに理由を出して終わる |
 | `render` | 上の JSON、手書きの欄、MCP の `tools/list` | `site/src/content/docs/reference/` と `ja/reference/` の `.md` | 手元と CI |
 | `--check` | 同じ | 生成し直した結果と、コミットしてある `.md` の差。差があれば exit 1 | CI（`stack-check.yml` に足す） |
 
@@ -303,8 +321,9 @@ flowchart TB
 |---|---|
 | 入れる | 属性名、付く要素とスキーマの名前、XSD の型の名前、列挙の値、パターン |
 | 入れる | ルール ID、`objectPath`、`allowedObjectFlag`、値のコード、`valueForm`、`valueTailoring`、文脈 |
-| 入れる | `objectUse` から取り出した章と表の番号（`Chap 3.9.6.1`、`Table 82`） |
-| 入れない | `objectUse` の文、`objectValue` の説明の文、XSD の `xs:documentation` の文 |
+| 入れる | `attributesDefinition.xml` の `chapter`・`para`（`3.9.5.2.1.1`、`2.2`）と、`objectUse` から取り出した章と表の番号（`Chap 3.9.6.1`、`Table 82`） |
+| 入れる | データ辞書の属性のページがあるかどうか、生成の元にした配布物の日付 |
+| 入れない | `objectUse` の文、`objectValue` の説明の文、XSD の `xs:documentation` の文、データ辞書の `definition` の文 |
 
 ## 仕様書の扱い（D-03 との関係）
 
@@ -341,7 +360,7 @@ D-03 は、仕様書・スキーマ・公式サンプルの再配布と、翻訳
 
 | 順 | 作業 | 終わりの条件 |
 |---|---|---|
-| 1 | `updateReasonType` のページを、日本語と英語で手で書いて公開する | サイトで表示され、Pagefind で `updateReasonType` を検索すると出る |
+| 1 | `updateReasonType` のページを、日本語と英語で手で書いて公開する。**2026-11-22 に作成した**（`site/src/content/docs/reference/s1000d/issue-7/update-reason-type.md` と `ja/` の同じ場所。SR-1・SR-4・SR-7 は提案のとおりに作った。ビルドと `check-i18n.mjs` は通っている） | サイトで表示され、Pagefind で `updateReasonType` を検索すると出る |
 | 2 | Stack リファレンスの `render` と `--check` を作り、27 ツールのページを生成する | `--check` が CI で通る。`mcp/*.md` の表からリンクが張られている |
 | 3 | `extract` を作り、順 1 の 6 属性のページを、生成した欄と手書きの欄を合わせた形に置き換える | 順 1 で手で書いたページと、生成したページの内容が一致する |
 | 4 | 順 2〜4 の属性の手書きの欄を書く | 17 属性のページが日本語と英語で揃う |
@@ -358,3 +377,58 @@ D-03 は、仕様書・スキーマ・公式サンプルの再配布と、翻訳
 | ツールのページが実際のツールと一致する | `--check` を CI で実行する |
 | 日本語と英語のページが揃っている | `site/scripts/check-i18n.mjs` の対象に `reference/` を足す |
 | 仕様書が無い環境で `render` が動く | `S1000D_SPEC_DIR` を外して `render` と `npm run build` を実行する |
+
+## 実装の結果（2026-11-22）
+
+ブランチ `feature/site-reference` に実装しました。生成したページは 88 件です（S1000D リファレンス 17 属性、Stack リファレンス 27 ツール、それぞれ日本語と英語）。
+
+| 作ったもの | 場所 |
+|---|---|
+| 生成スクリプト（`collect`・`extract`・`render`・`--check`） | `scripts/generate-reference.mjs` |
+| `tools/list` の写し | `site/src/data/reference/stack-tools.json` |
+| 配布物から取り出した値（17 属性） | `site/src/data/reference/s1000d-issue-7.json` |
+| 手書きの欄（17 属性、日本語と英語） | `site/src/reference-notes/s1000d/<属性名>.ja.md`・`.en.md` |
+| 生成したページ | `site/src/content/docs/reference/` と `ja/reference/` |
+| CI | `.github/workflows/reference-check.yml` |
+
+### 設計から変えた点
+
+| 設計 | 実装 | 理由 |
+|---|---|---|
+| CI では npm の公開版から `tools/list` を取る | `collect` は手元だけで動かし、応答の写し（`stack-tools.json`）をコミットする。`render` と `--check` は写しを読む | CI で MCP を起動せずに済む。写しと実際のツールの差は、手元で `collect` を実行すると `--check` に出る |
+| 日本語の Stack リファレンスの説明は、手書きの訳を持つ（SR-5） | 訳のファイル（`stack-ja.json`）は作っていない。日本語のページは、概要に `ja/mcp/*.md` の表の手書きの文を使い、`tools/list` の説明と引数の説明は原文（英語）のまま載せる | 引数は 211 個、説明は合わせて約 43,000 文字ある。訳を持つと、MCP の版が上がるたびに訳し直しが要る |
+| `extract` は s1000d-core で読む | `lib/s1000d-core` の依存にある `@xmldom/xmldom` で、既定 BREX・XSD・定義ファイルを直接読む | 属性グループと基底型をたどって「この属性を持つ要素」を数える処理が、core に無い |
+| `--check` を `stack-check.yml` に足す | 別のワークフロー `reference-check.yml` にした | `stack-check.yml` は毎日 npm と照合する。リファレンスの照合は、関係するファイルが変わったときだけでよい |
+| 手書きの欄にリンクを直接書く | ツールは `{{tool:writer/start_revision}}`、属性は `{{attr:changeMark}}` と書き、`render` がその言語のページへのリンクにする | 日本語と英語で指す先が同じかを `--check` で確かめられる |
+| Stack リファレンスの「応答の例」「使う場面」 | 作っていない。「関連する属性」だけを、手書きの欄の `{{tool:…}}` から自動で作る | 応答の例は、自作の CSDB でツールを実行して集める必要がある |
+
+### 実装で分かったこと
+
+- **writer-mcp の `inputSchema` に、日本語の説明があります。** `build_data_module`・`convert_manual`・`edit_data_module`・`create_comment`・`apply_segments` の 5 ツールで、それぞれ約 100 個です（下書きの節点の定義）。D-22 は、ツールの説明を英語にすると決めています。直すのは writer-mcp の側です。それまで、`check-i18n.mjs` は `reference/stack/` の英語のページの日本語を数えません。
+- **既定 BREX の XPath は、属性を `attribute::名前` とも書きます**（例: BREX-S1-00117 の `attribute::listItemPrefix`）。`@名前` だけを探すと、関連するルールを見落とします。
+- **`changeType`・`changeMark` は 701 個、`reasonForUpdateRefIds` は 702 個、`securityClassification` は 567 個の要素に付きます。** 属性グループをたどって数えた結果です。ページには、持つスキーマの数が多い順の 12 個だけを載せます。
+- **データ辞書の章の番号は、属性 1 つに 1 つです。** `issueType` の定義は DML の章（Chap 3.9.5.2.16）を指していて、DM の章（Chap 3.9.5.1）は手書きの欄に書いています。
+- **`urt05` は「参照の記述だけの変更」です。** 既定 BREX の説明と仕様書の Chap 3.9.5.2.1.1 の Para 2.2 を読んで確かめました。値ごとの変更の印の扱いも、同じ Para から書いています。
+
+### 確かめたこと
+
+| 確認 | 結果 |
+|---|---|
+| `--check`（仕様書の場所を渡さずに実行） | 88 ページで差 0 件、問題 0 件 |
+| `check-i18n.mjs` | 全ページ一致 |
+| `npm run build` | 成功。135 ページ |
+| ビルドした HTML のサイト内リンク（リファレンスと MCP のページ、7,072 件） | 切れているものは無い |
+| 生成物に仕様書の文章が入っていない | 既定 BREX の `objectUse`・`objectValue` と、データ辞書の `definition` のうち 25 文字以上の 1,296 個を、JSON・生成したページ・手書きの欄で探し、一致は 0 件 |
+| 値の突き合わせ | `updateReasonType`（`urt06`）と `listItemPrefix`（`pf08`）を brex の `lookup_value` に渡し、ページの記述と一致することを確かめた。17 属性すべては突き合わせていない |
+
+### 残っている作業
+
+| 作業 | 内容 |
+|---|---|
+| 手書きの欄の確認 | 「値の選び方」の場面は、書いた側が考えた例である。実務の感覚と合うかを確かめる |
+| 英語の訳の採点 | `updateReasonType` の最初の版だけ xcomet で採点した。残りの 16 属性と、直したあとの `updateReasonType` は採点していない |
+| Stack リファレンスの手書きの欄 | 「応答の例」「使う場面」 |
+| 日本語の引数の説明 | 原文のままにするか、訳を持つかを決める |
+| writer-mcp の `inputSchema` | 日本語の説明を英語にする |
+| 残りの属性 | U-11 が決まってから |
+| 定義文を返すツール | `describe_attribute`（仮称）。[notes/data-dictionary-survey.md](../notes/data-dictionary-survey.md) |
