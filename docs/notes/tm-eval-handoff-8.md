@@ -251,7 +251,7 @@ Skill `s1000d-publish` は 0.4.0 として出ました（利用者の作業。hu
 
 | 文書 | Project の状態 |
 |---|---|
-| `docs/notes/tm-eval-handoff-8.md`（この文書） | hub と同じ（2026-11-18 13:10 JST ごろに反映した） |
+| `docs/notes/tm-eval-handoff-8.md`（この文書） | **古い**（下の 2026-11-21 10:45 JST の追記が入っていない） |
 | `docs/design/core-revision.md`・`docs/design/writer-mcp.md`・`docs/design/skills-and-editor.md`・`docs/design/reader-mcp.md` | hub と同じ（同上。クラウド側の写しと hub のファイルの sha256 が合うことを確かめた） |
 | `docs/DECISIONS.md`・`docs/notes/tm-eval-progress.md` | hub と同じ（2026-11-20 に、古い節を別の文書に分けてから反映した。下の追記） |
 | `docs/DECISIONS-archive.md`・`docs/notes/tm-eval-progress-1.md` | hub と同じ（2026-11-20 に分けて作り、反映した。下の追記） |
@@ -279,6 +279,47 @@ Skill `s1000d-publish` は 0.4.0 として出ました（利用者の作業。hu
 - D-11・D-14・D-15・D-16 を `docs/DECISIONS.md` の決定として指していた 5 か所（README の英語と日本語、`docs/ROADMAP.md`、サイトの `mcp/verify-mcp` の日本語と英語）は、`DECISIONS-archive.md` を指すように直しました。README の構成の図にも `DECISIONS-archive.md` の行を足しました。サイトの `node scripts/check-i18n.mjs` は、どのページも `ok` でした。
 - ほかの文書が D-01〜D-20 を指している箇所は、直していません。`docs/notes/handoff.md` の 2 か所は「DECISIONS.md（D-01〜）」のようにファイル名と一緒に書いていて、残りは番号だけです（`DECISIONS.md` と番号が近くに並ぶ箇所を `grep` で探した結果です）。2 回目・3 回目の引き継ぎは、移した節を「tm-eval-progress.md の「…」」と書いています。記録なので、直していません。
 - 次に `Read` の上限を超えるまでの余裕は、`DECISIONS.md` のほうが小さいです（分けた後で 38,584 バイト。超えたのは 63,950 バイトのとき）。
+
+### 追記（2026-11-21 10:45 JST）: Skill 0.4.0 の試行の結果と、その確認
+
+Skill `s1000d-publish` 0.4.0 の改版の手順（E1 → E1a → 変更の印を付けた編集 → E6 → E7）は、2026-11-20 17:09 JST に、plugin 版の MCP で 1 件を最後まで通しました（別のチャット）。その結果は、hub の文書に書いていませんでした。ここに記録します。
+
+| 項目 | 内容 |
+|---|---|
+| 対象 | 評価フォルダーの `work/REV-skill/`（Bike Samples の XML 118 件の写し）の `S1000DBIKE-AAA-DA2-10-00-00AA-520A-A`（発行済みの版 012-00） |
+| 作業中の版 | `start_revision`（`issueType` は `changed`。利用者の指定）で、`…_012-01_EN-US.XML` を書いた。消えた前の版の更新の理由は 1 件 |
+| 編集（1 回の呼び出し。`marking.reason`、`changeMark` は `"1"`） | 手順 2.3 を 2.2 の前に移す（親の手順 2 に `modify`）、手順 2.4 を取り除く（`delete` の印で残る）、手順 2.1 の前に注記を足す（`add`）。3 つとも `rfu-0001`（`urt03`）を指す |
+| E7 | `add_reason_for_update` で `rfu-0002`（`urt01`）を足した |
+
+2026-11-21 10:39 JST に、書かれたファイルを確かめ直しました。
+
+- plugin 版の `verify_data_module`: XSD は `valid`、BREX は `passed`（2 層。人の確認が要る項目は 3 件）、参照は `unresolved` が 1 件（図のファイル `ICN-C0419-S1000D0387-001-01` を写していないため）。
+- plugin 版の `read_data_module`: `issueInfo` は `012-01`、`content.changeMarks` は 3 件（手順 2 に `modify`、`note` に `add`、`proceduralStep[4]` に `delete`。どれも `rfu-0001` を指す）。
+- `work/REV-skill/` の 119 件のうち、`specs/` の元のファイルと違うのは、新しく書かれた `…_012-01` の 1 件だけだった（`cmp`）。発行済みの版（`…_012-00`）は元のファイルと同じ。
+- hub・core・writer-mcp・reader-mcp・Skill の 5 つのリポジトリは、どれも `origin/main` と一致し、未コミットの変更は無かった。
+
+試行で分かった、Skill の手順の足りない点です（直していません）。
+
+| # | 分かったこと | 直す案 |
+|---|---|---|
+| 1 | E1 は `inWork` しか見ない。reader の応答で `issueType` が `deleted` と分かっていても、版の扱いと `issueType` を聞いた後に `deleted-issue` で断られる | E1 の 2 に「`issueType` が `deleted` なら、作業中の版は始められないと先に伝える」を足す |
+| 2 | SKILL.md の「CSDB にある DM を直したいと頼まれたとき」の表の最後の行（「版を上げて変更の印を付ける操作は、writer にまだ無い」）が古いまま残り、2 つ上の行と食い違う | 「発行（発行番号を上げる）は扱わない」に書き直す |
+| 3 | E1a の 6 で読み直すときに `section: "outline"` を使うと、`textLocations` が付かない（「決めていないこと」の 3 を、手順の中で踏んだ） | 「決めていないこと」の 3 の決定と合わせて、E2 に「`section` は `content` か `all`」と書く |
+| 4 | 置き換えの説明（E3）は「元の節点の `after` か `before` への insert」だけを書いている。手順を注記に置き換える場合は、入れ子の手順より前にしか置けないので、別の場所への insert になる | E3 に、種類が変わる置き換えは XSD の並びの順に合う場所へ足す、と 1 文足す |
+| 5 | 聞く項目が多い（対象、版の扱い、`issueType`、変更の種類、理由の文と種類、`changeMark`、書き込みの確認 2 回）。1 度にまとめて聞いてよい項目が、手順からは分からない | E1a と「変更の印を付けるかを確かめる」に、まとめて聞ける組を書く |
+
+writer-mcp について分かったことです。
+
+- `add_reason_for_update` の `_notes` にも、「本文と変更の印は変えていない」という内容の文が 2 つ並ぶ（`start_revision` と同じ形の重なり）。
+- `edit_data_module` と `add_reason_for_update` は、`path` を渡せば、`overwrite` を付けなくても上書きする。
+
+試行のときに手順から外れた点は 2 つです。E7 の 3（足される理由を示して、確認の後に書く）は、理由の文と種類を先に選んでもらったので、書かずに呼んだ結果を示さずに書き込みました。注記の文を変えた後は、書かずに呼び直さずに書き込みました。
+
+残っていることです。
+
+- 上の 1〜5 を Skill に直す。writer-mcp の `_notes` の重なり（`start_revision`・`add_reason_for_update`）を直す。「決めていないこと」の 3（outline の `textLocations`）を決める。3 つは互いに関わるので、1 回にまとめる。
+- `work/REV-dev/`・`work/REV-plugin/`・`work/REV-skill/` は、確認が済んだら消してかまわない（配布物の写しなので、リポジトリには入れない）。
+- この追記は、Project の文書に反映していない。
 
 ## 作業の仕方（7 回目からの追加）
 
