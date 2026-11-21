@@ -44,7 +44,7 @@ When you pass `includeLocation: true` to `read_data_module`, every node of the b
 
 `edit_data_module` of [s1000d-writer-mcp](/s1000d-stack/mcp/writer-mcp/) takes this `location.path` as the place to edit. Copy the value as it is; do not build it yourself.
 
-A paragraph that is returned as the `text` of its parent node has no node of its own, so it has no `location`. This is the case for the paragraphs directly under a step (`proceduralStep`) that have no child nodes: they are merged into the `text` of the step node. From 0.13.0, with `includeLocation: true`, the step node carries `textLocations` (the `location` of each merged paragraph, in order). To remove or move only such a paragraph, use the `path` in `textLocations`. A list item (one with a single paragraph, which becomes its `text`) has no `textLocations`, so edit the list item itself.
+A paragraph that is returned as the `text` of its parent node has no node of its own, so it has no `location`. This is the case for the paragraphs directly under a step (`proceduralStep`) that have no child nodes: they are merged into the `text` of the step node. From 0.13.0, when you read the body with `includeLocation: true` (`section` `content` or `all`), the step node carries `textLocations` (the `location` of each merged paragraph, in order). The nodes of the outline (`section: "outline"`) do not carry it. To remove or move only such a paragraph, use the `path` in `textLocations`. A list item (one with a single paragraph, which becomes its `text`) has no `textLocations`, so edit the list item itself.
 
 ### Reasons for update and change markup
 

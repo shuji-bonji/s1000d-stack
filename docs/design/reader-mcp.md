@@ -66,7 +66,7 @@ Bike Samples の内訳（proced 39、comrep 15、descript 14、learning 5、faul
 |---|---|
 | 既定 | `false`。応答は 0.11.1 までと変わらない（0.11.1 までは、core が返す `location` を応答から外していて、得る手段が無かった） |
 | `path` | 文書要素からの XPath（例: `/dmodule/content/procedure/mainProcedure/proceduralStep[2]`）。編集の前の、いまの文書での場所 |
-| 手順の `text` にまとめた段落 | 手順（`proceduralStep` など）の直下にある、子の節点を持たない `para` は、すべて手順の節点の `text` にまとめるので、節点が無く `location` も無い。代わりに、手順の節点の `textLocations[]` に、まとめた段落ごとの `location` を並びの順に返す（0.13.0。2026-11-17 に利用者が決定） |
+| 手順の `text` にまとめた段落 | 手順（`proceduralStep` など）の直下にある、子の節点を持たない `para` は、すべて手順の節点の `text` にまとめるので、節点が無く `location` も無い。代わりに、手順の節点の `textLocations[]` に、まとめた段落ごとの `location` を並びの順に返す（0.13.0。2026-11-17 に利用者が決定）。概要（`section: "outline"`）の節点には付けない（2026-11-21 に利用者が決定。`includeLocation` の説明と `_notes` を、0.13.1 の見込みで、そのとおりに直した） |
 | 場所が付かないもの | リストの項目（`listItem`）の `text` になった段落（段落が 1 つだけの項目）。`textLocations` は付けない。編集は項目そのものを対象にする |
 
 ### 更新の理由と変更の印（0.13.0）

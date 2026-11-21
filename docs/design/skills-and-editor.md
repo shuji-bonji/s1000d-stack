@@ -102,7 +102,7 @@ CSDB にある手順・説明の DM に、節点を足す・取り除く・移�
 | E1 | 何を変えるかを利用者に確かめ、reader で `issueInfo` の `inWork` を見る。`00`（発行済みの版）なら、「作業中の版を始めて、決まりに沿って直す」「版を変えずに書き換える」「やめる」の 3 つから、利用者に選んでもらう。`allowReleasedIssue: true` は、利用者が「版を変えずに書き換えてよい」と明示したときだけ渡す |
 | E1a | `start_revision` で作業中の版を始める。`issueType`（`changed`・`revised`・`status`。発行番号が `001` のときだけ `new` も）は利用者に聞く。`revised`・`status` で発行番号が `002` 以降のときは、更新の理由も聞いて `reason` に渡す。`write` なしで呼んで応答を示し、確認の後に `write: true` で呼ぶ。これ以降は、新しいファイルを対象にし、reader で読み直す |
 | 変更の印を付けるかを確かめる | 作業中の版を編集するときは、変更の種類を利用者に聞く。変更の印で示す変更は `marking` を渡す。編集上の変更（`urt01`）は `marking` を渡さずに編集し、理由を E7 で足す。印を付けるときは、理由の文、`updateReasonType`、`changeMark` も聞く |
-| E2 | reader の `read_data_module` を `includeLocation: true` で呼び、節点の `location.path` を写す。手順の `text` にまとめた段落だけを取り除く・移すときは、手順の節点の `textLocations[i].path` を写す（reader 0.13.0 以降）。path を自分で組み立てない |
+| E2 | reader の `read_data_module` を `includeLocation: true` で呼び（`section` は `content` か `all`。`outline` では `textLocations` が付かない。Skill 0.4.1）、節点の `location.path` を写す。手順の `text` にまとめた段落だけを取り除く・移すときは、手順の節点の `textLocations[i].path` を写す（reader 0.13.0 以降）。path を自分で組み立てない |
 | E3 | `edits[]`（`insert`・`remove`・`move`）を組む。path は、すべて編集の前の文書のもの。`id` を作らない。XML を書かない。変更の印を付けるときは、その理由による最初の編集に `marking.reason`、2 回目からに `marking.reasonRefId` を書く。1 回の呼び出しの編集は、すべて同じ理由を指す |
 | E4 | `write` なしで呼ぶ。`refusals[]` があれば理由ごとに対処する。`newSchemaErrors[]` があれば、位置か編集を変えて、元の文書に対して呼び直す（`apply_fixes` には渡さない）。`referencedFromOtherObjects[]` があれば、利用者に聞く |
 | E5 | 変わる場所、検証状態を利用者に示して、確認を得る。`marking` を渡したときは、どの要素にどの `changeType` が付くかと、足される理由を示す。渡していないときは、版と変更の印を変えていないことを示す |

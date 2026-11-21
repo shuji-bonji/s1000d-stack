@@ -44,7 +44,7 @@ flowchart LR
 
 [s1000d-writer-mcp](/s1000d-stack/ja/mcp/writer-mcp/) の `edit_data_module` は、編集する場所をこの `location.path` で受け取ります。値はそのまま写し、自分で組み立てないでください。
 
-親の節点の `text` として返る段落には、節点が無いので `location` もありません。手順（`proceduralStep`）の直下にある、子を持たない段落は、手順の節点の `text` にまとめて返すので、これに当たります。0.13.0 から、`includeLocation: true` のときは、手順の節点に `textLocations`（まとめた段落ごとの `location`。並びの順）が付きます。その段落だけを取り除く・移すときは、`textLocations` の `path` を使ってください。リストの項目（段落が 1 つで、その段落が `text` になるもの）には `textLocations` が付かないので、項目そのものを対象にします。
+親の節点の `text` として返る段落には、節点が無いので `location` もありません。手順（`proceduralStep`）の直下にある、子を持たない段落は、手順の節点の `text` にまとめて返すので、これに当たります。0.13.0 から、`includeLocation: true` で本文を読むとき（`section` が `content`・`all`）は、手順の節点に `textLocations`（まとめた段落ごとの `location`。並びの順）が付きます。概要（`section: "outline"`）の節点には付きません。その段落だけを取り除く・移すときは、`textLocations` の `path` を使ってください。リストの項目（段落が 1 つで、その段落が `text` になるもの）には `textLocations` が付かないので、項目そのものを対象にします。
 
 ### 更新の理由と変更の印
 

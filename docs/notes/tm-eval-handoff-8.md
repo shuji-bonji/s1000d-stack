@@ -251,7 +251,7 @@ Skill `s1000d-publish` は 0.4.0 として出ました（利用者の作業。hu
 
 | 文書 | Project の状態 |
 |---|---|
-| `docs/notes/tm-eval-handoff-8.md`（この文書） | **古い**（下の 2026-11-21 10:45 JST の追記が入っていない） |
+| `docs/notes/tm-eval-handoff-8.md`（この文書） | hub と同じ（2026-11-21 13:00 JST ごろに、2026-11-21 の 2 つの追記を含めて反映した） |
 | `docs/design/core-revision.md`・`docs/design/writer-mcp.md`・`docs/design/skills-and-editor.md`・`docs/design/reader-mcp.md` | hub と同じ（同上。クラウド側の写しと hub のファイルの sha256 が合うことを確かめた） |
 | `docs/DECISIONS.md`・`docs/notes/tm-eval-progress.md` | hub と同じ（2026-11-20 に、古い節を別の文書に分けてから反映した。下の追記） |
 | `docs/DECISIONS-archive.md`・`docs/notes/tm-eval-progress-1.md` | hub と同じ（2026-11-20 に分けて作り、反映した。下の追記） |
@@ -319,7 +319,7 @@ writer-mcp について分かったことです。
 
 - 上の 1〜5 を Skill に直す。writer-mcp の `_notes` の重なり（`start_revision`・`add_reason_for_update`）を直す。「決めていないこと」の 3（outline の `textLocations`）を決める。3 つは互いに関わるので、1 回にまとめる。
 - `work/REV-dev/`・`work/REV-plugin/`・`work/REV-skill/` は、確認が済んだら消してかまわない（配布物の写しなので、リポジトリには入れない）。
-- この追記は、Project の文書に反映していない。
+- この追記は、Project の文書に反映していない（2026-11-21 13:00 JST ごろに反映した）。
 
 ### 追記（2026-11-21 10:55 JST）: Skill の手順の修正（0.4.1 の見込み）
 
@@ -347,6 +347,42 @@ writer-mcp について分かったことです。
 2. writer-mcp: `start_revision` と `add_reason_for_update` の `_notes` の、同じ内容の文の重なりを直す。
 3. reader-mcp: `includeLocation` の説明文と `_notes` を、「`textLocations` は `section` が `content`・`all` のときだけ」と直す。サイトの `mcp/reader-mcp`（日・英）も合わせる。
 4. この文書（2026-11-21 の 2 つの追記）を、Project に反映する。
+
+### 追記（2026-11-21 13:15 JST）: writer-mcp と reader-mcp の文の修正
+
+上の「次のチャットで行うこと」の 1 と 4 は済みました（1 は利用者の作業。Skill `s1000d-publish` 0.4.1 は公開済みで、hub は `3d6f9c1`。4 は、この回の最初に、この文書を Project に反映しました）。2 と 3 を行い、writer-mcp・reader-mcp・hub に 1 つずつコミットしました（署名なし、未 push）。どちらも `package.json` の版は変えていません（`npm version` は利用者が行います）。
+
+| リポジトリ | コミット | 内容 |
+|---|---|---|
+| `mcp/s1000d-writer-mcp` | `5515ed4` | `start_revision` の `_notes` から「発行済みの版は変えない」の部分を、`add_reason_for_update` の `_notes` から「本文と変更の印は変えていない」の部分を外した。どちらも core の `notes` の文が同じことを書くので、core の文を残した（core を直すと公開が要るため）。CHANGELOG は「未リリース（0.6.1 の見込み）」 |
+| `mcp/s1000d-reader-mcp` | `8491202` | `includeLocation` の説明に、`textLocations` は `section` が `content`・`all` のときだけ付き、概要には付かないことを書いた。`_notes` は、`section: "outline"` のときに、`textLocations` が付かないことと、`content` か `all` で読み直すことを書く（これまでは、付くように書いていた）。README（英・日）も合わせた。CHANGELOG は「未リリース（0.13.1 の見込み）」 |
+| hub | この追記と同じコミット | サイトの `mcp/reader-mcp`（日・英）と `skill/s1000d-publish`（日・英）の 4 段目、`docs/design/reader-mcp.md`、`docs/design/skills-and-editor.md` の E2 を、上の決まりに合わせた |
+
+確かめたことです（Mac 側の VM。`/tmp/writer`・`/tmp/reader` に写し、`npm ci` をしてから。`S1000D_SPEC_TESTS=1`）。
+
+- writer-mcp の vitest は 62 件、reader-mcp の vitest は 34 件が通った（スキップなし）。`tsc`・`eslint`・`prettier`（`src`）も通った。
+- 足したテストの確かめ（writer-mcp の 2 つ、reader-mcp の 1 つ）は、直す前の `handlers.ts` に戻すと落ちた。writer-mcp の 2 つは、1 つずつ戻して、それぞれ落ちることを見た。
+- コミットした木と、テストした木の違いは、どちらも CHANGELOG だけだった（テストの後に書いた）。
+- サイトの `node scripts/check-i18n.mjs` は、どのページも `ok` だった。サイトのビルドはしていない（直したのは段落の中の文だけ）。
+
+確かめていないことです。
+
+- plugin 経由と dev の MCP では呼んでいません（公開と、Mac でのビルドの後になります）。
+- サイトの `skill/s1000d-publish` は、Skill 0.4.1 のほかの変更（E1 で `issueType` が `deleted` かを見ること、聞く項目のまとめ方）を、まだ書いていません。
+
+利用者が行うことです。
+
+| 順 | 作業 |
+|---|---|
+| 1 | writer-mcp（`5515ed4`）を見て、Mac で `npm ci` と `S1000D_SPEC_TESTS=1 npm test` を実行し、CHANGELOG の見出しを `0.6.1 (日付)` に直して、0.6.1 として公開する（`npm version patch`、push、npm、MCP Registry） |
+| 2 | reader-mcp（`8491202`）も同じく、0.13.1 として公開する |
+| 3 | hub のコミットを見て、署名を付けて push する。サイトを公開し直す。2 つが出た後に、claude-plugins の台帳と hub の `stack.json` を合わせる |
+
+次に行うことの候補です。
+
+- サイトの `skill/s1000d-publish`（日・英）に、Skill 0.4.1 のほかの変更を書く。
+- 7 回目から残っている「決めていないこと」（`applyFix`・`applySegments` の寄せ方、`text` にまとめた `para` の `id`・`applicRefId`、PM の `reasonForUpdate`、Skill `s1000d-review` の観点）。
+- `work/REV-dev/`・`work/REV-plugin/`・`work/REV-skill/` と、`work/` の途中の版のパッチを消す（利用者の確認の後）。
 
 ## 作業の仕方（7 回目からの追加）
 
