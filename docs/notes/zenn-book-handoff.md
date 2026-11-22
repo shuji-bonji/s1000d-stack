@@ -1,4 +1,4 @@
-# 続編の Zenn Book の引き継ぎ（2026-11-22 08:40 JST）
+# 続編の Zenn Book の引き継ぎ（2026-11-22 10:15 JST）
 
 「S1000D入門」の続編を、別のチャットで書き始めるための文書です。方針は [DECISIONS.md](../DECISIONS.md) の D-36、サイトのリファレンスは D-37 と [design/site-reference.md](../design/site-reference.md) にあります。対応する Issue は s1000d-stack の #10 です。
 
@@ -18,7 +18,7 @@
 | 項目 | 内容 |
 |---|---|
 | 題名 | 「S1000D実践 — データモジュールを読み、確かめ、作る」（2026-11-22 に利用者が決めた） |
-| 置き場所 | Zenn Book。リポジトリは `/Users/bonji/workspace/shuji-bonji/submissions/zenn-articles`、本は `books/s1000d-practice`。`config.yaml`（`published: false`）と、題だけを書いた 16 個の章のファイルを作ってある（未コミット） |
+| 置き場所 | Zenn Book。リポジトリは `/Users/bonji/workspace/shuji-bonji/submissions/zenn-articles`、本は `books/s1000d-practice`。`config.yaml`（`published: false`）と 16 個の章のファイルがある。全章の下書きを書いた（2026-11-22。下の「下書きの状態」） |
 | 章立て | 下の「章立て」の 14 章と付録 2 つ（2026-11-22 に利用者が決めた） |
 | 読者 | 「S1000D入門」を読み終えた人。データモジュールを作る人と、S1000D を処理するコードを書く人を分けない |
 | 本に書くもの | S1000D の決まり、自作の DM の例、確かめる観点 |
@@ -72,7 +72,7 @@
 | 10 | `create-data-module` | DM を作る | 04、05 | 種類と DMC の決め方、識別・状態の部分に入れる値、作る側は値を補わない方針 | D-31、[design/writer-mcp.md](../design/writer-mcp.md)。説明 DM を 1 件作る |
 | 11 | `revise-data-module` | DM を直し、改版する | 11 | 作業中の版での修正、`issueNumber` と `inWork`、`issueType`、更新の理由、変更の印。章末に元の XML を保ったまま直す方法 | D-32〜D-35、[design/core-structural-edit.md](../design/core-structural-edit.md)、[design/core-revision.md](../design/core-revision.md) |
 | 12 | `applicability` | 適用性で出し分ける | （入門に無い） | `applic`、`applicRefId` の指す先が 2 通りあること、ACT・PCT | background.md。紙幣を受け付ける機種と受け付けない機種（新しく作る） |
-| 13 | `publication-module` | PM でまとめる | 07 | `pmEntry` の木、DM の並べ方、PM の参照の確かめ方 | `PMC-KENBAIKI-K0001-7BTJ7-00_001-00`（`pmEntry` が 10 個） |
+| 13 | `publication-module` | PM でまとめる | 07 | `pmEntry` の木、DM の並べ方、PM の参照の確かめ方 | `PMC-KENBAIKI-K0001-7BTJ7-00_001-00`（`pmEntry` が 5 個、DM への参照が 9 件） |
 | 14 | `csdb-and-dml` | CSDB をフォルダーと Git で持つ | （入門に無い） | 複数の版のファイルの持ち方、DML との照合、納品前の確認 | D-26、[ietp-kickoff.md](./ietp-kickoff.md)。05A の 001〜003 版 |
 | 付録 A | `appendix-review-and-comment` | レビューと comment DM | — | comment DM の構造、指摘を残す流れ | `COM-KENBAIKI-K0001-2026-00001-Q` |
 | 付録 B | `appendix-translation` | 多言語版を作る | — | DMC が同じで言語だけが違う DM | 05A の 520A の `EN-US` 版。[i18n-trial.md](./i18n-trial.md) |
@@ -84,9 +84,132 @@
 2026-11-22 に、リポジトリと券売機の CSDB を見て確かめた点です。
 
 - 12 章の例の ACT・PCT は、XML を手で書く。`lib/s1000d-core/src` で ACT・PCT を扱うのは読み取り（`applic/`）だけで、`write/` には無い。
-- 13 章には、PM を単独で作る操作を載せられない。MCP のツールに PM を作るものは無く、PM ができるのは `convert_manual` の中だけである。章の手順は「`read_publication_module` で読む → DM を 1 件足す分を手で直す → `verify_csdb` で確かめる」にする。
+- 13 章には、既にある PM に DM を 1 件足す操作を載せられない。PM の全体を組み立てる操作は、`build_data_module`（種類が `pm`）と `convert_manual` にあるが、PM の一部を直すツールは無い。章の手順は「`read_publication_module` で読む → DM を 1 件足す分を手で直す → `verify_data_module` で確かめる」にした（この行は、2026-11-22 09:20 JST に直した。前は「PM を作るツールは無い」と書いていたが、誤りだった）。
 - 12 章と 14 章は、サイトのガイド（`ja/guide/applicability.md`、`ja/guide/csdb.md`）と重なる。概要を繰り返さず、例と確かめ方を中心に書く。
 - 券売機の CSDB には、種類ごとの DM（説明 040A、手順 520A、故障探求 411A、プロセス 130A）、プロジェクト BREX と上位の BREX（KENBAIKI と KBWORKS の 022A）、PM、comment、05A の 520A の 001〜003 版と英語版がある。ACT・PCT は無い。
+
+## 下書きの状態（2026-11-22 09:20 JST）
+
+16 個の章のすべてに、下書きがあります（合計で約 10 万字）。下書き、見直し、最初の 5 つの図は、利用者が `zenn-articles` の `02a4fcc` としてコミットし、push しました。後から足した 3 つの図（4・13・14 章）は、コミットしていません。利用者は、まだ通読していません。
+
+| 項目 | 内容 |
+|---|---|
+| 各章の形 | 冒頭の説明 → 仕様の定め（Chap・Para の番号）→ 自作の XML → 「確かめ方」→「実装するときの注意」→「この章のポイント」→「出典」 |
+| 用語 | DM の版は「版（issue）」と書き、「バージョン」は製品のバージョンの意味にだけ使う（2026-11-22 に利用者が決めた）。3 つの属性（`changeType`・`changeMark`・`reasonForUpdateRefIds`）は「変更の印」 |
+| リンク | 属性名は S1000D リファレンス、ツール名は Stack リファレンスへ。公開後の URL（`https://shuji-bonji.github.io/s1000d-stack/ja/reference/…`）で書いた。2026-11-22 に、リンク先のページがブランチ `feature/site-reference` にあることを確かめた |
+| 仕様書の番号 | 章の番号は、仕様書の目次（PDF から取り出した文章）で確かめた。Para の番号は、設計文書に記録済みのものを使った。今回読んだのは、Chap 4.4 の ICN の書式、Chap 4.5 の `dmlType`・`dmlEntryType` の値、Chap 4.6.1 の `commentType` の値、Chap 3.5 の issue・inwork の語 |
+
+### 見直し（2026-11-22 10:05 JST）
+
+利用者の依頼で、Claude が 16 個の章の本文を読み直して直しました。
+
+| 直した点 | 内容 |
+|---|---|
+| 「版」の指す対象 | 「版」は DM・PM の版（issue）だけに使う。S1000D の仕様の版は「Issue」と書く（「S1000D の Issue」「スキーマの Issue」）。入門は仕様の版も「版」と書いているので、入門とは書き方が違う |
+| 比喩の言い換え | 「届く」（BREX の参照）→「既定 BREX が検査に入っている」。「拾う」→「扱う」「使う」。「落とす・落ちる」→「読み取りを止めない」「失われる」。「部品」→「共通の要素」。「黙って」→「何も知らせずに」。「スキーマが待っていた」→「スキーマが置けるとしている」 |
+| 語の定義 | 「層」（参照でつながった BREX の 1 つ 1 つ）と「節点」「木」を、最初に出る場所で説明した |
+| 読点 | 助詞の直後の読点が多かったので減らした（「を、」「の、」と、短い文の「は、」など）。1 文あたりの読点は、入門と同じ程度になった |
+| 確かめていない記述 | プロセスの DM を使えない納め先への書き方、版を書かない参照がどの版を指すか、の 2 か所を、言い切らない書き方に直した |
+| 実行した確認 | `extract_segments` を実行し、適用性の人が読む文が取り出され、条件（`assert`）は取り出されないことを確かめた（付録 B の記述と合っている） |
+
+### 図（2026-11-22 10:15 JST）
+
+Zenn の HTML/CSS の埋め込み（コードブロックの言語名を `html-embed` にする。2026-11-11 からの Beta）で、図を 8 つ入れました。利用者が、`published: false` のまま push して、Zenn のサイトで Book の章に図が表示されることを確かめました（最初の 5 つ）。
+
+| 章 | 図 | 元の HTML（`/Users/bonji/s1000d-stack-eval/work/ZENN-FIG/` の下） |
+|---|---|---|
+| 3 | ファイル名の色分けと、DMC・版の内訳 | `fig-file-name.html` |
+| 4 | `dmAddress` と `dmStatus` の値の一覧 | `fig-ident-status.html` |
+| 5 | 手順の XML の構造と、表示の例 | `fig-procedure.html` |
+| 9 | BREX の検査した層と、検査していない既定 BREX | `fig-brex-layers.html` |
+| 11 | 改版の前と後の表示の例（`add`・`delete` の札） | `fig-change-marks.html` |
+| 12 | 2 つの製品で読んだ表示の例（`notApplicable`・`undetermined`） | `fig-applicability.html` |
+| 13 | PM の目次の表示の例 | `fig-pm-toc.html` |
+| 14 | 版と言語で並べたファイルの一覧 | `fig-issues-grid.html` |
+
+- 制限: 1 つ 50KB まで、高さ 500px まで（超えた分は図の中でスクロールする）。JavaScript・外部の CSS・Web フォントは使えない。どの図も 2.5〜4KB。
+- 書き方: 図ごとに、クラス名の頭の 2 文字を変える（`fn-`・`is-` など）。色は CSS 変数にして、`[data-theme="dark"]` で上書きする。幅 520px 以下で縦に並べる。
+- 確かめ方: クラウド側の Chrome で描画して画面を見た（幅 700px のライト、幅 340px のダーク）。`zenn-markdown-html` 0.5.15 に `htmlEmbed: true` と `embedOrigin` を渡して変換し、iframe になることを確かめた。
+- 手元の `zenn-cli` は 0.5.8 で、`html-embed` に対応していない（最新は 0.5.15）。利用者の手元の `npx zenn preview` では、図を確かめられなかった。
+- スマホの幅では、4 章（約 690px）、5 章（約 565px）、9 章（約 507px）の図が 500px を超え、図の中でスクロールする。
+- 表示の例（5・11・12・13 章）は、Claude が描いたもの。本文に「実際の見た目は、閲覧の道具が決めます」と書いてある。
+
+### 例を作った場所
+
+本に載せた結果は、dev の MCP を、次のフォルダーに対して実行したものです。元の `/Users/bonji/s1000d-stack-eval/csdb` は変えていません。
+
+| フォルダー（`/Users/bonji/s1000d-stack-eval/work/` の下） | 章 | 中身 |
+|---|---|---|
+| `ZENN-CH08/broken.xml` | 8 | 手順の DM に、月 `13` と、要素 `memo` を入れたもの |
+| `ZENN-CH09/csdb` | 9 | `…-02A-520A-D` の機密区分を `05`、責任を持つ企業を `K0009` に変えたもの |
+| `ZENN-CH10/csdb` | 10、13 | `build_data_module` で作った `…-02A-040A-D_001-00`（払い戻しの説明）。PM に `pmEntry` を 1 つ手で足したもの |
+| `ZENN-CH11/csdb` | 11 | `…-01A-520A-D_001-01`（`start_revision` と `edit_data_module` 2 回の結果） |
+| `ZENN-CH12/csdb` | 12、14 | 手で書いた ACT（`00W`）・PCT（`00P`）。`…-05A-520A-D_003-00`（DM の全体の適用性）、`…-04A-520A-D_001-00`（`applicRefId`）、プロジェクトの BREX（`00P`・`00W` を許す値に足した）を、手で直したもの |
+
+例のために、ツールが「利用者が決める」としている値を、Claude が選びました（11 章の `issueType`・理由の文・`updateReasonType`・`changeMark`、10 章の DM の題名と本文、12 章の属性と製品）。利用者は、まだ確かめていません。
+
+### 書いていて分かったこと
+
+| 項目 | 内容 | 扱い |
+|---|---|---|
+| 券売機の BREX の参照が、既定 BREX に着かない | `DMC-KBWORKS-…-022A-D` の `brexDmRef` が、自分自身を指している。`verify_data_module` は 2 層（KENBAIKI・KBWORKS）だけを検査し、既定 BREX を検査しない。仕様書の決まり（参照の先は既定 BREX で終わる）に合っていない | 9 章は、これを「例の CSDB の誤り」として書き、既定 BREX を指定した `check_against_brex`（243 ルール、違反 0 件）を別に行う形にした。例の CSDB を直すか、道具が知らせるようにするかは、決めていない |
+| `convert_manual`・`build_data_module` の `001-00` に `issueType` が無い | 既定 BREX の検査は通る（属性が無いので、BREX-S1-00030 の条件に当たらない） | 10 章の「実装するときの注意」に、残っている課題として書いた |
+| `…-05A-520A-D` の `002-00`・`003-00` に、`issueType`・`reasonForUpdate`・変更の印が無い | 11 章の決まりに沿った改版の例になっていない。既定 BREX の検査は通る | 14 章に、手本ではないという注記を入れた。例を作り直すかは、決めていない |
+| プロジェクトの BREX が `00W`・`00P` を許していない | ACT・PCT を足すと、KB-00002 に違反する | 12 章の例では、BREX の許す値に足した |
+| writer に、PM へ DM を 1 件足す操作と、ACT・PCT を作る操作が無い | 12 章と 13 章は、XML を手で直している | 本文に、そのとおり書いた |
+| 例の CSDB に ICN のファイルが無い | 図を持つ DM の参照の確認が `unresolved` になる（`verify_csdb` で 19 件のうち 6 件） | 各章で、理由を書いた |
+
+### 例のリポジトリ（2026-11-22 14:40 JST）
+
+例の CSDB を、別のリポジトリ [shuji-bonji/s1000d-examples](https://github.com/shuji-bonji/s1000d-examples) に置いた。手元の場所は `s1000d-stack/examples/s1000d-examples`。ハブの `.gitignore` に `/examples/` を足した（`/mcp/` と同じ扱い）。ライセンスは CC BY 4.0。`/Users/bonji/s1000d-stack-eval` は、動かしていない。
+
+> [!IMPORTANT]
+> 2026-11-22 14:40 JST の時点で、`s1000d-examples` はコミットしていない（`LICENSE`、`README.md`、`README.ja.md`、`kenbaiki/` が未追跡）。ハブの `.gitignore` と引き継ぎメモも、コミットしていない。本は、例の修正に伴う変更までを利用者が `zenn-articles` の `8d3b359` にコミットした。ICN を入れたことに伴う 6 つの章（1・3・7・11・14 章、付録 A）の変更は、2026-11-22 15:20 JST の時点でコミットしていない。
+
+| フォルダー | 中身 |
+|---|---|
+| `kenbaiki/csdb/` | 元の 18 個のファイルを直したもの |
+| `kenbaiki/chapters/08-xsd`〜`14-csdb` | 章ごとに、足したファイルと直したファイル。直した後の `csdb/` を元に、dev の MCP で作り直した |
+
+元の CSDB から直した点は、次の 6 つ。
+
+| 直した点 | 内容 |
+|---|---|
+| 組織の BREX の参照 | `brexDmRef` を、自分自身から、既定 BREX（`S1000D-J-04-10-0301-00A-022A-D`）に変えた。DM・PM の検査が 3 層になった |
+| 組織の BREX の版 | `003-00`・`issueType="changed"` を、`001-00`・`issueType="new"` に変えた。`001`・`002` のファイルも更新の理由も無かったため。**利用者の指示には無い変更で、Claude が選んだ** |
+| `001-00` の DM・PM の `issueType` | 属性が無かった 12 件に、`new` を足した |
+| `…-05A-520A-D` の `002-00`（JA・EN） | `issueType="status"`、品質保証を `firstVerification`（`tabtop`）、更新の理由 `urt01`。値は Claude が選んだ |
+| `…-05A-520A-D` の `003-00`（JA・EN） | `issueType="changed"`、更新の理由 `urt02`、足した手順 `stp-record` に変更の印。値は Claude が選んだ |
+| プロジェクトの BREX | 使ってよい情報コードに `00P`・`00W` を足した。`objectUse` から、テストのための注記（「exact の修正」など）を取り除いた |
+
+`verify_csdb` の結果（Issue 7 のスキーマと既定 BREX）は、`kenbaiki/csdb/` が 17 件すべて `valid`・`passed`（違反 0 件）、章のファイルを重ねた CSDB が 23 件すべて `valid`・`passed`。この時点では、図のファイルが無い DM が、それぞれ 6 件と 8 件あった。
+
+本は、9 章（層の表、図 `fig-brex-layers`、「例の CSDB の誤り」の注記）、10・11・13 章（層の数）、12 章（BREX と作業中の版の注記）、14 章（3 つの版の注記）、付録 B（違う行の数）、1 章（例の入手先）、4 章（品質保証）を直した。
+
+ICN は、2026-11-22 15:15 JST に入れた（利用者が STEP を選んだ）。
+
+| ファイル | 作り方 |
+|---|---|
+| `ICN-K0001-00001`〜`00005`（PNG、800×480） | HTML・SVG を Chrome のヘッドレスモードで画像にした。画面の文言と駅の名前は Claude が考えた架空のもの |
+| `ICN-K0001-00006-001-01.STEP` | CadQuery 2.8.0（Open CASCADE）で、箱 3 つ（`cabinet`・`front-door`・`door-handle`）を組んだ。スキーマは AP214。`notations.xml` の `step` の公開識別子は「STEP AP203」で、AP203 での書き出しは設定を試したが変わらなかった |
+
+- 「前面扉を開ける（係員）」の `001-00` と `001-01` の宣言を、`NDATA jt`（writer-mcp が独自に宣言した形）から `NDATA step` に変えた。プロジェクトの BREX に、形式を絞るルールは無い。
+- `notations.xml` に `png`・`svg`・`cgm`・`step`・`iges`・`wrl`・`x3d`・`u3d` はあり、glTF は無い。JT は `ugs` の名前である。Open CASCADE の OSS 版は JT を書き出せない。
+- 入れた後の `verify_csdb` は、`kenbaiki/csdb/`（17 件）と、章のファイルを重ねた CSDB（23 件）のどちらも、指す先の無い参照が 0 件。
+- 本は、7 章（参照の結果を 2 件とも解決に。ファイルを 1 つ取り除いたときの結果を足した）、11 章（`unresolved` の注記を削除）、14 章（納品前の確認の件数を 23 件・0 件に）、3 章と 1 章（ICN がある）、付録 A（コメントは図を入れる前の記録という注記）を直した。
+- コメントの DM（`COM-…-Q`）の R-1・R-2 は、古いファイル名（`.JT`）のまま残している。
+
+### 残っていること
+
+| 作業 | 内容 |
+|---|---|
+| 利用者の通読 | 章の形、分量、例の値、「実装するときの注意」に書いてよい内容か |
+| 例のリポジトリのコミットと push | `s1000d-examples` と、ハブの `.gitignore`。利用者の指示を待つ |
+| 図の見た目の確認 | 画面の図 4 つと前面扉の図を、利用者はまだ見ていない |
+| 表紙 | `cover.jpg`（入門にはある） |
+| 用語集 | 入門の 14 章に当たるものは、作っていない |
+| 確かめていない結果 | 12 章の、`K60-0002` で読んだときの手順 1.3 の状態（本文には載せていない）。付録 B の `apply_segments` は、今回は実行していない（ツールの説明と、既にある英語の DM との差分から書いた）。2 章の `list_schemas` も実行していない（ソースの説明文から書いた） |
+| Zenn での表示 | `html-embed` の図は、利用者が Zenn のサイトで確かめた（最初の 5 つ）。Mermaid の図、`diff xml` のコードブロック、`:::message` の表示を、Claude は見ていない |
 
 ## 最初に書く章: 「改版する」
 
