@@ -38,7 +38,7 @@ flowchart LR
 | `brex.state` | `passed` | すべての層で違反 0、評価できなかったルール 0、未解決の BREX 0 |
 | | `violations` | 違反あり |
 | | `incomplete` | 違反は 0 だが、連鎖の途中の BREX が無いか、評価できないルールがある。検査されていない部分がある |
-| `references.state` | `resolved` / `unresolved` | 未解決の参照が 0 か 1 以上か |
+| `references.state` | `resolved` / `unresolved` | 未解決の参照が 0 か 1 以上か。仕様書（モデル識別コード `S1000D`）への `dmRef` は数えず、その件数を `references.specificationReferences` に返す |
 
 :::caution[`schema-not-found` は `valid` ではありません]
 XSD が見つからなかったときは検証が行われていないだけで、文書が正しいことを意味しません。`list_schemas` で配布物の置き方を確かめてください。XSD に違反した文書では要素の位置が仕様と違う可能性があるため、BREX の違反が誤って出たり隠れたりします。`schema.state` が `invalid` のときは BREX の結果を参考程度に読んでください（応答の `_notes` にも書きます）。
@@ -111,5 +111,5 @@ XSD 検証は `libxml2-wasm`（libxml2 の WebAssembly 版）で行い、XSD ご
 
 ## 公式サンプルで分かること
 
-Bike Samples の DMC 106 件と PMC 4 件は、すべて Issue 7 の XSD に適合します。一方、`dmRef` 1,843 件のうち 954 件はモデル識別コード `S1000D` の DMC、つまり仕様書の章への参照で、CSDB には無いので未解決になります（ほぼすべてビジネスルール文書 `…-024A-D` の中）。`check_references` はこれを `specificationReferences` として別枠で返し、`unresolved` には入れません。また、DOCTYPE で `.PNG` と宣言された ICN の実ファイルが `.SVG` という不整合が 1 件あり、`file-not-found` として報告されます。拡張子の違いを許す寛容な解決は入れていません。宣言どおりに置かれていないことは、納品の検査で見つけたい事実だからです。そのかわり `suggest_fixes` は、この参照に「同じ名前で拡張子が `.SVG` のファイル」を候補として返し、宣言の `NDATA` も合わせて直す必要があることを説明に添えます。
+Bike Samples の DMC 106 件と PMC 4 件は、すべて Issue 7 の XSD に適合します。一方、`dmRef` 1,843 件のうち 954 件はモデル識別コード `S1000D` の DMC、つまり仕様書の章への参照で、CSDB には無いので未解決になります（ほぼすべてビジネスルール文書 `…-024A-D` の中）。`check_references` はこれを `specificationReferences` として別枠で返し、`unresolved` には入れません。検証状態の `references.unresolvedCount` と `references.state` も同じ数え方で、未解決が仕様書への参照だけの DM は `resolved` になります。また、DOCTYPE で `.PNG` と宣言された ICN の実ファイルが `.SVG` という不整合が 1 件あり、`file-not-found` として報告されます。拡張子の違いを許す寛容な解決は入れていません。宣言どおりに置かれていないことは、納品の検査で見つけたい事実だからです。そのかわり `suggest_fixes` は、この参照に「同じ名前で拡張子が `.SVG` のファイル」を候補として返し、宣言の `NDATA` も合わせて直す必要があることを説明に添えます。
 
