@@ -30,7 +30,7 @@ flowchart LR
 
 - A **data module** is the smallest unit of information that is complete on its own. Each kind of content has its own schema: descriptions, procedures, fault information, parts information, BREX and so on.
 - The **CSDB** is where data modules are stored and managed. S1000D defines its functions but does not prescribe any particular software. In this stack, a folder that holds files named `DMC-….XML` is treated as a CSDB.
-- A **publication module** defines which data modules appear in which order. It corresponds to the table of contents of a publication.
+- A **publication module** defines which data modules appear in which order. It corresponds to the table of contents of a publication. It is explained in detail in [Publication modules and the PMC](/s1000d-stack/guide/publication-module-and-pmc/).
 - **BREX (Business Rules Exchange)** is one kind of data module. It expresses in XML those rules agreed for a project that can be checked by machine. [BREX](/s1000d-stack/guide/brex/) explains this in detail.
 
 ## S1000D in Japan

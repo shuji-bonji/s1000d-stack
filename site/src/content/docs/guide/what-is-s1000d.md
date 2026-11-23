@@ -30,7 +30,7 @@ flowchart LR
 | Storage and management | CSDB, data management lists, comments | [CSDB](/s1000d-stack/guide/csdb/) |
 | Project-specific rules | Business rules, BREX (Business Rules Exchange) | [BREX](/s1000d-stack/guide/brex/) |
 | Which products content applies to | Applicability | [Applicability](/s1000d-stack/guide/applicability/) |
-| Assembling and outputting publications | Publication modules, page-oriented publications, IETP | [IETM and S1000D](/s1000d-stack/guide/ietm-and-s1000d/) |
+| Assembling and outputting publications | Publication modules, PMC, page-oriented publications, IETP | [Publication modules and the PMC](/s1000d-stack/guide/publication-module-and-pmc/), [IETM and S1000D](/s1000d-stack/guide/ietm-and-s1000d/) |
 | Exchanging data | Data dispatch note (DDN), file naming | [CSDB](/s1000d-stack/guide/csdb/) |
 
 Data modules come in kinds that match their content — descriptions, procedures, fault information, illustrated parts data, wiring data, training and so on — and each kind has its own schema.

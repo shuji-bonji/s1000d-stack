@@ -30,7 +30,7 @@ flowchart LR
 | 保管と管理 | CSDB、データ管理リスト、コメント | [CSDB](/s1000d-stack/ja/guide/csdb/) |
 | プロジェクトごとの決まり | ビジネスルール、BREX | [BREX](/s1000d-stack/ja/guide/brex/) |
 | どの製品に当てはまるか | 適用性 | [適用性](/s1000d-stack/ja/guide/applicability/) |
-| 出版物の組み立てと出力 | パブリケーションモジュール、ページ型の出版物、IETP | [IETM と S1000D](/s1000d-stack/ja/guide/ietm-and-s1000d/) |
+| 出版物の組み立てと出力 | パブリケーションモジュール、PMC、ページ型の出版物、IETP | [パブリケーションモジュールと PMC](/s1000d-stack/ja/guide/publication-module-and-pmc/)、[IETM と S1000D](/s1000d-stack/ja/guide/ietm-and-s1000d/) |
 | データの受け渡し | 納入票（DDN）、ファイル名の付け方 | [CSDB](/s1000d-stack/ja/guide/csdb/) |
 
 データモジュールには、説明・手順・故障情報・図解部品カタログ・配線データ・訓練など、内容に応じた種類があり、種類ごとにスキーマが分かれています。

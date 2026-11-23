@@ -26,7 +26,7 @@ The data module is at the centre of the CSDB. Illustrations, videos and similar 
 | Data update file | Used to update the data modules of a common information repository (CIR) by differences | `UPF-` |
 | Data dispatch note (DDN) | The note attached when data is sent to another party. It states the sender, the receiver and what is sent | `DDN-` |
 
-How files are named is defined in Chap 7.5.1 as part of the rules for exchanging data as files. How to read the file name of a data module is explained in [Data modules and the DMC](/s1000d-stack/guide/data-module-and-dmc/).
+How files are named is defined in Chap 7.5.1 as part of the rules for exchanging data as files. How to read the file name of a data module is explained in [Data modules and the DMC](/s1000d-stack/guide/data-module-and-dmc/), and that of a publication module in [Publication modules and the PMC](/s1000d-stack/guide/publication-module-and-pmc/).
 
 ## The planned list and the current-state list
 

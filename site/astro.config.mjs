@@ -66,6 +66,7 @@ export default defineConfig({
             { label: 'What S1000D is', translations: { ja: 'S1000D とは' }, slug: 'guide/what-is-s1000d' },
             { label: 'IETM and S1000D', translations: { ja: 'IETM と S1000D' }, slug: 'guide/ietm-and-s1000d' },
             { label: 'Data modules and the DMC', translations: { ja: 'データモジュールと DMC' }, slug: 'guide/data-module-and-dmc' },
+            { label: 'Publication modules and the PMC', translations: { ja: 'パブリケーションモジュールと PMC' }, slug: 'guide/publication-module-and-pmc' },
             { label: 'CSDB (Common Source DataBase)', translations: { ja: 'CSDB（共通ソースデータベース）' }, slug: 'guide/csdb' },
             { label: 'BREX (Business Rules Exchange)', translations: { ja: 'BREX（ビジネスルール交換）' }, slug: 'guide/brex' },
             { label: 'Applicability', translations: { ja: '適用性（どの製品に当てはまるか）' }, slug: 'guide/applicability' },
