@@ -60,7 +60,7 @@ flowchart LR
 
 ## 適用性と検証状態
 
-`product` を渡さないときは、適用性はすべて `undetermined` で、`displayText`（人が読む適用範囲の文）だけを返します。`assert` の式はどんなときも返しません。適用性の仕組み（ACT・CCT・PCT、式の評価）は [適用性のページ](/s1000d-stack/ja/guide/applicability/)に書いています。
+`product` を渡さないときは、式（`assert`・`evaluate`）のある適用性は `undetermined` で、`displayText`（人が読む適用範囲の文）だけを返します。式が無く表示文だけの適用性は、判定するものが無いので、`product` が無くても `applicable`（`reason` は `no expression (display text only)`）です。`assert` の式はどんなときも返しません。適用性の仕組み（ACT・CCT・PCT、式の評価）は [適用性のページ](/s1000d-stack/ja/guide/applicability/)に書いています。
 
 ### 3 値の読み方
 

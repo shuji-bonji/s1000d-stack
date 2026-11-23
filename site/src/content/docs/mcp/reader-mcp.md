@@ -60,7 +60,7 @@ To add change markup with `edit_data_module` of [s1000d-writer-mcp](/s1000d-stac
 
 ## Applicability and verification status
 
-When `product` is not passed, every applicability state is `undetermined`, and only `displayText` (the human-readable statement of the applicable range) is returned. The `assert` expressions are never returned. How applicability works (ACT, CCT, PCT and the evaluation of expressions) is described on the [applicability page](/s1000d-stack/guide/applicability/).
+When `product` is not passed, applicability that has an expression (`assert`, `evaluate`) is `undetermined`, and only `displayText` (the human-readable statement of the applicable range) is returned. Applicability with a display text only has nothing to evaluate, so it is `applicable` even without `product` (`reason` is `no expression (display text only)`). The `assert` expressions are never returned. How applicability works (ACT, CCT, PCT and the evaluation of expressions) is described on the [applicability page](/s1000d-stack/guide/applicability/).
 
 ### Reading the three states
 
