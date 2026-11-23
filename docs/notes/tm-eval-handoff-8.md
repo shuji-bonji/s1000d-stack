@@ -251,7 +251,7 @@ Skill `s1000d-publish` は 0.4.0 として出ました（利用者の作業。hu
 
 | 文書 | Project の状態 |
 |---|---|
-| `docs/notes/tm-eval-handoff-8.md`（この文書） | hub と同じ（2026-11-21 13:00 JST ごろに、2026-11-21 の 2 つの追記を含めて反映した） |
+| `docs/notes/tm-eval-handoff-8.md`（この文書） | hub と同じ（2026-11-24 00:30 JST ごろに、2026-11-24 の追記までを反映した） |
 | `docs/design/core-revision.md`・`docs/design/writer-mcp.md`・`docs/design/skills-and-editor.md`・`docs/design/reader-mcp.md` | hub と同じ（同上。クラウド側の写しと hub のファイルの sha256 が合うことを確かめた） |
 | `docs/DECISIONS.md`・`docs/notes/tm-eval-progress.md` | hub と同じ（2026-11-20 に、古い節を別の文書に分けてから反映した。下の追記） |
 | `docs/DECISIONS-archive.md`・`docs/notes/tm-eval-progress-1.md` | hub と同じ（2026-11-20 に分けて作り、反映した。下の追記） |
@@ -383,6 +383,32 @@ writer-mcp について分かったことです。
 - サイトの `skill/s1000d-publish`（日・英）に、Skill 0.4.1 のほかの変更を書く。
 - 7 回目から残っている「決めていないこと」（`applyFix`・`applySegments` の寄せ方、`text` にまとめた `para` の `id`・`applicRefId`、PM の `reasonForUpdate`、Skill `s1000d-review` の観点）。
 - `work/REV-dev/`・`work/REV-plugin/`・`work/REV-skill/` と、`work/` の途中の版のパッチを消す（利用者の確認の後）。
+
+### 追記（2026-11-24 00:25 JST）: writer-mcp 0.6.1・reader-mcp 0.13.1 の公開
+
+上の追記（2026-11-21 13:15 JST）の「利用者が行うこと」の 1〜3 は済みました（利用者の作業）。
+
+| 対象 | 公開した版 | コミット（署名の後） | 確かめたこと（2026-11-24 00:20 JST ごろ） |
+|---|---|---|---|
+| writer-mcp | 0.6.1（npm、MCP Registry、tag `v0.6.1`） | `f79b72a`（上の表の `5515ed4` に当たる）、版のコミットは `6699f4c` | npm の版は 0.6.1。`package.json`・`plugin.json`・`server.json` は 0.6.1。`origin/main` と一致 |
+| reader-mcp | 0.13.1（npm、MCP Registry、tag `v0.13.1`） | `9cba17e`（上の表の `8491202` に当たる）、版のコミットは `abbc71b` | npm の版は 0.13.1。3 つのファイルは 0.13.1。`origin/main` と一致 |
+| hub | — | `f73430c` | `stack.json` は writer-mcp 0.6.1・reader-mcp 0.13.1。`origin/main` と一致 |
+
+claude-plugins の台帳は、利用者が更新しました（このチャットにはフォルダーを接続していないので、こちらでは見ていません）。
+
+分かったことです。
+
+| 分かったこと | 扱い |
+|---|---|
+| writer-mcp の CHANGELOG の見出しが、公開のときに `0.6.2 (2026-11-24)` になっていた（公開した版は 0.6.1） | 利用者が `0.6.1` に直して push した（`5cddbfa`）。tag `v0.6.1` が指すコミット（`6699f4c`）の CHANGELOG は 0.6.2 のまま。tag は付け直していない |
+| npm の 0.6.1 のパッケージ（`npm pack` で取り出した `.tgz`）に、`CHANGELOG.md` は入っていない | 誤った見出しは、npm には出ていない。MCP Registry に登録されるのは `server.json` の内容で、CHANGELOG は含まない |
+
+確かめていないことです。
+
+- writer-mcp の GitHub Release の本文と `.plugin` に、0.6.2 と書かれていないかは見ていません。
+- 公開した 0.6.1・0.13.1 を、plugin 経由と dev の MCP で呼んで、`_notes` の文を見ることはしていません。
+
+この追記の前に、hub にはサイトのリファレンスの追加と、続編の Zenn Book の引き継ぎ（[zenn-book-handoff.md](./zenn-book-handoff.md)）が入っています（利用者の作業と、別のチャット）。この文書には書いていません。
 
 ## 作業の仕方（7 回目からの追加）
 
