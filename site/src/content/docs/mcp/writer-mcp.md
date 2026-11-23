@@ -11,7 +11,7 @@ description: Configuration and tools of the MCP server that lets an LLM create d
 
 - **It does not let the LLM write XML.** When a data module is created, the only input is a tree called a draft (`draft`); there is no entry point for XML written by an LLM. The LLM does not invent DMCs, ICNs or the BREX reference: the server assigns them from the numbering rules. The tools that take existing XML are `apply_fixes`, `edit_data_module`, `start_revision`, `add_reason_for_update`, `extract_segments` and `apply_segments`. Only `edit_data_module` inserts, removes or moves nodes, and the content to add is given as draft nodes, not as XML.
 - **It does not fix with values outside the candidates.** When a fix is applied, the server computes the candidates again and applies only a selection that matches one of them. There is no way to write a value freely.
-- **It does not write by default.** The XML it builds is only returned in the response. It is written to the CSDB only when you pass `write: true`.
+- **It does not write by default.** The XML it builds is only returned in the response. It is written to the CSDB only when you pass `write: true`. The `xml` in the response is what the server built and verified; it is not meant to be edited by the LLM and saved. To change it, pass that `xml` to `apply_fixes` (fixes chosen from the candidates) or to `edit_data_module` (inserting, removing or moving nodes).
 
 ## What it does
 

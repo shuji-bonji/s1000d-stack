@@ -21,7 +21,7 @@ description: Configuration and tools of the MCP server that lets an LLM read a B
 
 - It does not validate against the XML schema (XSD). XSD validation, and the verification status that combines XSD, BREX and references, are returned by [`s1000d-verify-mcp`](/s1000d-stack/mcp/verify-mcp/).
 - It does not judge conformance to S1000D®. `passed: true` means only that no machine-checkable BREX rule was violated in any of the layers that were found. `nonContextRules` are returned as `manualChecks`, and the judgement is left to a person.
-- It does not interpret the meaning of severity level codes (`brsl01` to `brsl99`).
+- It does not interpret the meaning of severity level codes (`brsl01` to `brsl99`). For the same reason, `passed` does not take severity into account: a single violation of a machine-checkable rule, whatever its severity, makes it `false`. S1000D Chap 7.9 treats a data module as valid when it passes the "relevant rules" of each layer (the severity levels the project decides make a data module invalid). When the only remaining violations have severity levels the project does not treat as invalidating, a person decides, looking at the `brSeverityLevel` of each violation.
 
 These points are also written in the MCP `instructions` (the description placed in the client's system context), so the LLM can read them before choosing a tool.
 

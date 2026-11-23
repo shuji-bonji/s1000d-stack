@@ -30,7 +30,7 @@ Grok Build に plugin で入れた S1000D Stack（MCP 4 本・Skill 4 本）を�
 | `instructions/UC01`〜`UC10` | ユースケースごとの指示書 | 置く |
 | `fixtures/DMC-KENBAIKI-A-90-00-00-00A-040A-D_001-00_JA-JP.XML`・`fixtures/DMC-KENBAIKI-A-91-00-00-00A-040A-D_001-00_JA-JP.XML` | UC10 のエラー経路の検体（自作）。前者は KENBAIKI の BREX を途中で切ったもの、後者は空のファイル。CSDB の対象になるよう DMC の形の名前にしている | `fixtures/incoming/broken/` に置く |
 | `fixtures/assets/` | 体験型マニュアルの `assets` が指す素材のダミー（1×1 の PNG 5 件、JT・GLB の中身の無いファイル）。e2e の `assetBaseDir` と同じ扱い | `fixtures/incoming/` の `img/`・`cad/` に置く |
-| `reports/2026-11/` | 2026-11-05 の試用の報告書と、そのとき作られた CSDB | 置かない |
+| `reports/2026-11/` | 2026-11-05 の試用の報告書と、そのとき作られた CSDB。`REFCHECK.md`・`REFCHECK-FINDINGS.md` は、2026-11-24 に受け取った、リファレンスとの照合の報告と所見 | 置かない |
 
 ## Grok Build への登録の形（2026-11-05）
 
