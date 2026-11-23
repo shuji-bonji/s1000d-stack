@@ -36,7 +36,7 @@ Grok Build が、S1000D Stack の MCP の応答を、S1000D Issue 7 の仕様書
 | # | 観察（出典） | 扱い |
 | --- | --- | --- |
 | H-05 | 53.5 MB の Issue 7 の仕様書 PDF が、pdf-reader-mcp の 50 MB の上限を超えて開けず、Grok は該当ページを切り出して画像で読んだ（REFCHECK 1） | pdf-reader-mcp の側の制限。s1000d 側では直さない。仕様書の該当箇所を引く手順で同じ問題が続くので、pdf-reader-mcp のリポジトリで扱う |
-| H-06 | reader 0.14.0 の公開後も、Grok の `read_data_module` は更新前の数え方（`state: unresolved`・`unresolvedCount: 467`）を返した。Grok の reader のプロセス（`npm exec @shuji-bonji/s1000d-reader-mcp@latest`）は 03:23:04 に起動していて、0.14.0 の公開（03:44:54）より前に読み込んだ 0.13.1 のコードのまま動いていた。npx のキャッシュは 03:46:46 に 0.14.0 に差し替わっていた。応答に版の項目が無いため、Grok は起動中のプロセスの版を確かめられなかった（2026-11-24 04:14 に受け取った報告） | 不具合ではない。Grok を起動し直せば 0.14.0 が読み込まれる。同じ時刻の Claude 側の plugin 版（03:47:48）は `resolved`・`specificationReferences: 467` を返した。H-04（`serverInfo` がツールの結果として届かない）と同じ根から来ているので、応答に版を載せるかを 4 本の MCP でまとめて検討する |
+| H-06 | reader 0.14.0 の公開後も、Grok の `read_data_module` は更新前の数え方（`state: unresolved`・`unresolvedCount: 467`）を返した。Grok の reader のプロセス（`npm exec @shuji-bonji/s1000d-reader-mcp@latest`）は 03:23:04 に起動していて、0.14.0 の公開（03:44:54）より前に読み込んだ 0.13.1 のコードのまま動いていた。npx のキャッシュは 03:46:46 に 0.14.0 に差し替わっていた。応答に版の項目が無いため、Grok は起動中のプロセスの版を確かめられなかった（2026-11-24 04:14 に受け取った報告） | 不具合ではない。Grok を起動し直せば 0.14.0 が読み込まれる。同じ時刻の Claude 側の plugin 版（03:47:48）は `resolved`・`specificationReferences: 467` を返した。H-04（`serverInfo` がツールの結果として届かない）と同じ根から来ているので、応答に版を載せるかを 4 本の MCP でまとめて検討する。→ 2026-11-24 に、すべてのツールの応答の最後に `_server`（`name`・`version`・`core`）を載せると決めた（DECISIONS の D-38、Issue #12）。core 0.17.0・brex 0.7.0・verify 0.10.0・reader 0.15.0・writer 0.8.0 で公開済み。キットの手順には、最初の呼び出しで `_server` を記録して npm の公開版と比べることを足した |
 
 ## 5. 再確認（2026-11-24 03:37 JST に受け取った報告）
 
