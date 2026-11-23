@@ -78,7 +78,7 @@ The expert agents (MCP and Skills) come first; the two product projects (experie
 | Repository | Layer | Form | Status | Version | npm |
 | --- | --- | --- | --- | --- | --- |
 | [s1000d-core](https://github.com/shuji-bonji/s1000d-core) | core | library | released | 0.17.0 | `@shuji-bonji/s1000d-core` |
-| [s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | mcp | mcp-server | released | 0.7.0 | `@shuji-bonji/s1000d-brex-mcp` |
+| [s1000d-brex-mcp](https://github.com/shuji-bonji/s1000d-brex-mcp) | mcp | mcp-server | released | 0.8.0 | `@shuji-bonji/s1000d-brex-mcp` |
 | [s1000d-verify-mcp](https://github.com/shuji-bonji/s1000d-verify-mcp) | mcp | mcp-server | released | 0.10.0 | `@shuji-bonji/s1000d-verify-mcp` |
 | [s1000d-reader-mcp](https://github.com/shuji-bonji/s1000d-reader-mcp) | mcp | mcp-server | released | 0.15.0 | `@shuji-bonji/s1000d-reader-mcp` |
 | [experiential-manual-model](https://github.com/shuji-bonji/experiential-manual-model) | model | library | released | 0.4.0 | `@shuji-bonji/experiential-manual-model` |
