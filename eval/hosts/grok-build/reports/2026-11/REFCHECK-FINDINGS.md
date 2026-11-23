@@ -5,12 +5,14 @@ Grok Build が、S1000D Stack の MCP の応答を、S1000D Issue 7 の仕様書
 - 照合した観点: BREX の層ごとの照合、XSD の選び方、仕様書への `dmRef` の数え方、`nonContextRules` の扱い、適用性の式を返さないこと
 - 結果の要約: 5 つの観点のうち 4 つはリファレンスどおりでした。仕様書への `dmRef` の数え方だけが、リファレンスと実装で食い違っていました（R-01）。同じ日に直して公開しています
 - 「ソース」の列は、Claude がリポジトリのソースと手元の MCP で確かめたかどうかです
+- 2026-11-24 03:37（JST）に、修正後の版で Grok に再確認してもらった結果を受け取りました（「5. 再確認」）。reader-mcp だけが古い数え方のまま残っていました（R-09）
 
 ## 1. MCP・core で直したもの
 
 | # | 対象 | 観察（出典） | ソース | 対応 |
 | --- | --- | --- | --- | --- |
 | R-01 | core・verify・writer | ビジネスルール雛形 `DMC-S1000D-J-04-10-0100-00A-024A-D` を、既定 BREX のフォルダーだけを `csdbDirs` にして調べると、`check_references` の `references.unresolvedCount` は 0、`specificationReferences.count` は 467 なのに、同じ応答の `counts.dmRef.unresolved` と、`suggest_fixes`・`verify_data_module` の `verification.references.unresolvedCount` は 467、`state` は `unresolved` だった。サイトの verify-mcp のページは、仕様書への参照を `unresolved` に入れないと書いている（REFCHECK 3） | 確認済み。開発版の verify-mcp で同じ値を再現した。原因は core `verify/verify.ts` が `status.references` を、仕様書への `dmRef` を含めて数えていたこと。469 件は `dmRef` 467 件と `internalRef` 2 件 | core 0.16.0 で、`unresolvedCount` と `state` を仕様書への `dmRef` を除いて決め、件数を `specificationReferences` に返すようにした。verify-mcp 0.9.0 で `counts.dmRef.unresolved` も同じ数え方にした。writer-mcp 0.7.0 で、未解決が仕様書への参照だけのときも `omitted.specificationReferences` に件数を返すようにした。修正後の plugin 版で、同じ呼び出しの要約・詳細・`counts` がすべて 0、`specificationReferences` が 467 になることを確かめた |
+| R-09 | reader | 修正後の再確認で、同じ雛形を `read_data_module`（`verify: "full"`、`section: "identAndStatus"`）で読むと、`verification.references` は `state: unresolved`、`unresolvedCount: 467` のままで、`specificationReferences` が無かった。verify 0.9.0・writer 0.7.0 は直っていた（再確認） | 確認済み。reader 0.13.1 は依存が `@shuji-bonji/s1000d-core` の `^0.14.0` で、0.16.0 を含まない。reader は検証状態を core から受け取ってそのまま返すので、コードの変更は要らない。公開前の core 0.16.0 に差し替えて、reader のテスト 29 件が通ることは R-01 の作業で確かめていた | reader-mcp 0.14.0 で、依存の core を `^0.16.0` に上げる |
 
 ## 2. Skill・説明文で補ったもの
 
@@ -34,3 +36,16 @@ Grok Build が、S1000D Stack の MCP の応答を、S1000D Issue 7 の仕様書
 | # | 観察（出典） | 扱い |
 | --- | --- | --- |
 | H-05 | 53.5 MB の Issue 7 の仕様書 PDF が、pdf-reader-mcp の 50 MB の上限を超えて開けず、Grok は該当ページを切り出して画像で読んだ（REFCHECK 1） | pdf-reader-mcp の側の制限。s1000d 側では直さない。仕様書の該当箇所を引く手順で同じ問題が続くので、pdf-reader-mcp のリポジトリで扱う |
+
+## 5. 再確認（2026-11-24 03:37 JST に受け取った報告）
+
+修正後の版（core 0.16.0・verify 0.9.0・writer 0.7.0・reader 0.13.1）で、Grok に同じ呼び出しをし直してもらった結果です。原文は会話で受け取ったもので、このフォルダーには置いていません。
+
+| 観点 | 結果 |
+| --- | --- |
+| 仕様書への `dmRef`（verify） | `verify_data_module` の `verification.references` は `state: resolved`・`unresolvedCount: 0`・`specificationReferences: 467`。`check_references` の `references.unresolvedCount`・`counts.dmRef.unresolved` も 0。`suggest_fixes` は `fixCount: 0`・`omitted.specificationReferences: 467` |
+| 仕様書への `dmRef`（writer） | 本文に仕様書への `dmRef` を 1 件入れた説明 DM を `build_data_module`（`write: false`）で組み立てると、`state: resolved`・`unresolvedCount: 0`・`specificationReferences: 1`・`omitted.specificationReferences: 1` |
+| 仕様書への `dmRef`（reader） | 古い数え方のまま。R-09 |
+| BREX の層ごとの照合・XSD の選び方・`manualChecks`・適用性の式 | 前回と同じ（R-05〜R-08） |
+| 雛形の `verification.brex`（reader） | `state: incomplete`・`layers: 0`・`unresolved: ["S1000D-H-04-10-0301-00A-022A-D"]`。雛形の `brexDmRef` が Issue 7 の既定 BREX（システム差異コード J）ではなく古い版の H を指していて、渡したフォルダーにそのファイルが無いため。見つからない BREX を `incomplete` とするのはリファレンスどおりで、不具合ではない |
+
