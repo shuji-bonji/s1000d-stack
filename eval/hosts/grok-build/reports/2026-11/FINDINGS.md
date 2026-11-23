@@ -23,7 +23,7 @@ Grok Build（1.0.70）で、S1000D Stack の MCP 4 本（brex 0.5.0・verify 0.6
 | F-11 | verify・reader | `reconcile_dml` の `not-found` の行に `listedIssueInfo`・`language`・`title` が無い。`notListed` の行に `issueInfo` が無い。件数のフィールドが verify は `notListedCount`、reader の `list_data_modules` は `reconciliation.notListed`（UC06） | 未確認 | DML に書いてある版は `not-found` の行にも返す。2 本でフィールド名をそろえる |
 | F-12 | writer | `convert_manual` の `notRepresented` のホットスポットの行で、`count` が 6、`where` が 5 件（`hs-shortage-back` は戻り遷移の行にだけある）（UC02） | 未確認 | 件数と `where` の数え方をそろえる |
 | F-13 | brex | `explain_brex` を `limit: 1` で呼んでも、既定 BREX の `commonInfo` の全文がヘッダに入る（UC01） | 未確認 | `limit` と別に、ヘッダの `commonInfo` を省く引数を設けるか、既定で要約にする |
-| F-14 | brex | `list_notations` の `_note` が、親が `self`（連鎖の終端）の BREX でも「Check the parent BREX …」と書く（UC02）。サーバーの説明の「連鎖は既定 BREX で終わる」も、自作の BREX のように自分自身で終わる連鎖と合わない（UC01） | 未確認 | 終端の BREX では親への言及を省く。説明を「既定 BREX または自分自身を指す BREX で終わる」にする |
+| F-14 | brex | `list_notations` の `_note` が、親が `self`（連鎖の終端）の BREX でも「Check the parent BREX …」と書く（UC02）。サーバーの説明の「連鎖は既定 BREX で終わる」も、自作の BREX のように自分自身で終わる連鎖と合わない（UC01） | 確認済み（2026-11-24、brex 0.8.0 の `list_notations` を既定 BREX にかけて再現）。`lookup_value`・`lookup_sns` の注記も親の有無を見ていなかった。instructions と `check_against_brex` の説明も「既定 BREX で終わる」と書いていた | 終端の BREX では親への言及を省く。説明を「既定 BREX または自分自身を指す BREX で終わる」にする。→ brex の次の版で、`brexDmRef` が無いか自分自身を指す BREX では 3 つのツールの注記を「ends the BREX chain」にし、instructions と説明も直した |
 
 ## 2. 説明文（description・`_notes`）で補うもの
 
