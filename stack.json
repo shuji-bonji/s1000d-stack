@@ -6,7 +6,7 @@
     "layer = 役割 / form = 配布形態（誰が起動するか）/ status = released・developing・planned・concept。",
     "developing はリポジトリで開発中で npm 未公開。planned / concept はディレクトリも npm も無い。"
   ],
-  "generatedAt": "2026-11-22T09:55:09.396Z",
+  "generatedAt": "2026-11-23T15:15:20.853Z",
   "generatedBy": "scripts/generate-stack.mjs",
   "npmScope": "@shuji-bonji",
   "repos": [
@@ -82,16 +82,16 @@
       "status": "released",
       "public": true,
       "note": "段階 2。データモジュールの本文を構造化して返す、参照の解決、適用性の判定（式は LLM に渡さない）。応答に検証状態を含める。list_data_modules / read_data_module / read_publication_module / resolve_reference / describe_applicability / read_icn_metadata の 6 tools",
-      "published": "0.13.0",
+      "published": "0.13.1",
       "local": {
-        "version": "0.13.0",
-        "tag": "v0.13.0",
+        "version": "0.13.1",
+        "tag": "v0.13.1",
         "dirty": false,
-        "unpushedCommits": 1
+        "unpushedCommits": 0
       },
       "consistency": {
         "status": "match",
-        "detail": "0.13.0"
+        "detail": "0.13.1"
       }
     },
     {
@@ -124,16 +124,16 @@
       "status": "released",
       "public": true,
       "note": "段階 3。LLM に XML を書かせずにデータモジュールを作り、既にあるデータモジュールを直す。build_data_module / convert_manual / apply_fixes / edit_data_module / start_revision / add_reason_for_update / create_comment / extract_segments / apply_segments の 9 tools。0.5.0 で構造を変える編集（edit_data_module）、0.6.0 で改版の入口（start_revision・add_reason_for_update、edit_data_module の marking）を追加",
-      "published": "0.6.0",
+      "published": "0.6.1",
       "local": {
-        "version": "0.6.0",
-        "tag": "v0.6.0",
+        "version": "0.6.1",
+        "tag": "v0.6.1",
         "dirty": false,
-        "unpushedCommits": 1
+        "unpushedCommits": 0
       },
       "consistency": {
         "status": "match",
-        "detail": "0.6.0"
+        "detail": "0.6.1"
       }
     },
     {
@@ -233,8 +233,8 @@
       "local": {
         "version": null,
         "tag": null,
-        "dirty": true,
-        "unpushedCommits": null
+        "dirty": false,
+        "unpushedCommits": 0
       },
       "consistency": {
         "status": "developing",
