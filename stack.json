@@ -6,7 +6,7 @@
     "layer = 役割 / form = 配布形態（誰が起動するか）/ status = released・developing・planned・concept。",
     "developing はリポジトリで開発中で npm 未公開。planned / concept はディレクトリも npm も無い。"
   ],
-  "generatedAt": "2026-11-23T20:23:41.452Z",
+  "generatedAt": "2026-11-23T21:00:15.236Z",
   "generatedBy": "scripts/generate-stack.mjs",
   "npmScope": "@shuji-bonji",
   "repos": [
@@ -40,16 +40,16 @@
       "status": "released",
       "public": true,
       "note": "BREX を LLM が読み、データモジュールを BREX に照合する。explain_brex / lookup_sns / lookup_value / list_notations / check_against_brex の 5 tools。段階 1 の成果物",
-      "published": "0.8.0",
+      "published": "0.8.1",
       "local": {
-        "version": "0.8.0",
-        "tag": "v0.8.0",
+        "version": "0.8.1",
+        "tag": "v0.8.1",
         "dirty": false,
         "unpushedCommits": 0
       },
       "consistency": {
         "status": "match",
-        "detail": "0.8.0"
+        "detail": "0.8.1"
       }
     },
     {
@@ -233,8 +233,8 @@
       "local": {
         "version": null,
         "tag": null,
-        "dirty": false,
-        "unpushedCommits": 4
+        "dirty": true,
+        "unpushedCommits": 1
       },
       "consistency": {
         "status": "developing",
