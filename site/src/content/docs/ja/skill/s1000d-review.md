@@ -11,6 +11,7 @@ description: S1000D のデータモジュールをレビューし、指摘を co
 
 - **渡すもの**: 対象のデータモジュール（DMC かファイルのパス、またはフォルダー）と、CSDB のフォルダーです。文章の観点でも見るときは、用語集のファイル（2 列の CSV、Markdown の表、DeepL の用語集）を渡します。comment DM にするときは、`commentType` と `commentPriorityCode` の値をプロジェクトの決まりで選んで伝えます。
 - **受け取るもの**: 観点を書き分けた指摘の一覧、利用者が選んだ指摘を入れた comment DM、Review Report（対象、観点ごとの指摘、comment DM にしたものとしなかったもの、検証状態）です。comment DM の書き込みは、利用者が確認した後に行います。
+- **報告に書かれる版**: Review Report の「使用ツール」には、使った MCP サーバーごとに、応答の最後の `_server` にある名前・版・s1000d-core の版をそのまま書き写します。`_server` の無い古い版の応答は「版の項目なし」と書きます。`_server` の読み方は [s1000d-reader-mcp](/s1000d-stack/ja/mcp/reader-mcp/) のページにあります。
 
 ## 前提の MCP サーバー
 

@@ -17,6 +17,7 @@ npm install @shuji-bonji/s1000d-core
 | --- | --- |
 | Parse and format a DMC (with or without a learn code) | `parseDmc` / `formatDmc` / `sameDmc` / `isBrexDmc` |
 | Parse and format a DMC file name (issue information, language, extension) | `parseDmcFileName` / `formatDmcFileName` |
+| Parse and format a PMC and its file name | `parsePmc` / `formatPmc` / `samePmc` / `parsePmcFileName` |
 | Parse and format an ICN (MIC-based and CAGE-based) | `parseIcn` / `formatIcn` / `parseIcnFileName` |
 | Infer the schema name and issue from `xsi:noNamespaceSchemaLocation` | `parseSchemaLocation` |
 | Read the identification and status section | `readDataModuleInfo` / `readIdentAndStatus` / `readDmRef` |
@@ -29,7 +30,7 @@ npm install @shuji-bonji/s1000d-core
 | Collect and resolve references (`dmRef` / `pmRef` / ICN / `internalRef` / `applicRefId`) | `collectReferences` / `resolveReferences` / `CsdbIndex` |
 | Applicability (read the ACT, CCT and PCT; three-valued evaluation of `assert` / `evaluate`) | `readAct` / `readCct` / `readPct` / `ApplicEvaluator` |
 | Read content (descript / proced / process / fault / pm) into a common shape | `readContent` / `readContentFromXml` |
-| Verification status that combines one data module's checks (well-formedness, XSD, BREX, references) | `verifyDataModule` / `VerificationStatus` |
+| Verification status that combines one data module's checks (well-formedness, XSD, BREX, references). A `dmRef` to the specification itself (model identification code `S1000D`) is not counted as unresolved; the number is returned in `references.specificationReferences` | `verifyDataModule` / `VerificationStatus` / `isSpecificationReference` |
 | Fix candidates from the verification result and from applicability that cannot be decided | `suggestFixes` / `findUndeterminedApplicability` / `findApplicTables` |
 | Swapping where the CSDB lives (a folder by default) | `CsdbSource` / `DirectoryCsdbSource` / `MemoryCsdbSource` / `CsdbIndex.fromSource` |
 | Reading a DML (data management list) and a DDN (data dispatch note) and reconciling them with the CSDB | `readDml` / `readDdn` / `reconcileDml` / `reconcileDdn` |
@@ -40,6 +41,7 @@ npm install @shuji-bonji/s1000d-core
 | A CSDB place that can be written to | `WritableCsdbSource` / `isWritableCsdbSource` |
 | Building a comment data module | `buildComment` |
 | Taking out sentences for translation and putting them back | `extractSegments` / `applySegments` |
+| Name and version of this package (the MCP servers put it in `_server.core` of their responses) | `CORE_INFO` |
 
 ```ts
 import { readFileSync } from 'node:fs';
@@ -157,6 +159,6 @@ The data dictionary in the distribution contains samples whose DMC in the file n
 
 ## Publishing and versions
 
-The current version is 0.15.0.
+The current version is 0.17.0.
 
 Publishing to npm happens in GitHub Actions as a Trusted Publisher (OIDC) when a `v*` tag is pushed. While the version is 0.x, a dependency such as `^0.1.0` does not cross minor versions. When this library's minor version goes up, the dependency ranges of the MCP servers are raised and published again as well.

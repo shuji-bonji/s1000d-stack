@@ -11,6 +11,7 @@ description: Explains what you provide to the Skill that builds S1000D data modu
 
 - **You provide**: the material (text, notes or existing data modules), the CSDB folder to write to, the security classification and the numbering rules. You decide the kind of data module (descriptive, procedural, process or fault isolation) together with the Skill.
 - **You receive**: one verified data module, the result of checking whether the new data module is listed in the data management list (DML), and a Publish Report (verification status, fixes applied automatically and the files written). The files are written after you confirm.
+- **Versions written in the report**: under "Tools used", the Publish Report copies, for each MCP server used, the name, the version and the s1000d-core version from `_server` at the end of the responses. A response from an older version without `_server` is recorded as having no version item. How to read `_server` is explained on the [s1000d-writer-mcp](/s1000d-stack/mcp/writer-mcp/) page.
 
 ## Required MCP servers
 

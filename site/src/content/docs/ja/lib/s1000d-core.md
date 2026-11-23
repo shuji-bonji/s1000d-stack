@@ -17,6 +17,7 @@ npm install @shuji-bonji/s1000d-core
 | --- | --- |
 | DMC の分解・組み立て（学習コード付きも可） | `parseDmc` / `formatDmc` / `sameDmc` / `isBrexDmc` |
 | DMC のファイル名（発行情報・言語・拡張子）の分解・組み立て | `parseDmcFileName` / `formatDmcFileName` |
+| PMC とそのファイル名の分解・組み立て | `parsePmc` / `formatPmc` / `samePmc` / `parsePmcFileName` |
 | ICN（MIC 基準・CAGE 基準）の分解・組み立て | `parseIcn` / `formatIcn` / `parseIcnFileName` |
 | `xsi:noNamespaceSchemaLocation` からスキーマ名と版を推定 | `parseSchemaLocation` |
 | 識別・状態部の読み取り | `readDataModuleInfo` / `readIdentAndStatus` / `readDmRef` |
@@ -29,7 +30,7 @@ npm install @shuji-bonji/s1000d-core
 | 参照（`dmRef` / `pmRef` / ICN / `internalRef` / `applicRefId`）の収集と解決 | `collectReferences` / `resolveReferences` / `CsdbIndex` |
 | 適用性（ACT・CCT・PCT の読み取り、`assert` / `evaluate` の 3 値評価） | `readAct` / `readCct` / `readPct` / `ApplicEvaluator` |
 | 本文（descript / proced / process / fault / pm）の共通の形への読み取り | `readContent` / `readContentFromXml` |
-| 1 件の検証（整形式・XSD・BREX・参照）をまとめた検証状態 | `verifyDataModule` / `VerificationStatus` |
+| 1 件の検証（整形式・XSD・BREX・参照）をまとめた検証状態。仕様書（モデル識別コード `S1000D`）への `dmRef` は未解決に数えず、件数を `references.specificationReferences` に返します | `verifyDataModule` / `VerificationStatus` / `isSpecificationReference` |
 | 検証の結果と、判定できない適用性からの修正候補 | `suggestFixes` / `findUndeterminedApplicability` / `findApplicTables` |
 | CSDB の置き場所の差し替え（既定はフォルダー） | `CsdbSource` / `DirectoryCsdbSource` / `MemoryCsdbSource` / `CsdbIndex.fromSource` |
 | DML（データ管理リスト）・DDN（納入票）の読み取りと CSDB との照合 | `readDml` / `readDdn` / `reconcileDml` / `reconcileDdn` |
@@ -40,6 +41,7 @@ npm install @shuji-bonji/s1000d-core
 | 書き込める CSDB の置き場所 | `WritableCsdbSource` / `isWritableCsdbSource` |
 | コメントデータモジュールの組み立て | `buildComment` |
 | 翻訳向けの文の取り出しと差し戻し | `extractSegments` / `applySegments` |
+| このパッケージの名前と版（MCP サーバーが応答の `_server.core` に載せます） | `CORE_INFO` |
 
 ```ts
 import { readFileSync } from 'node:fs';
@@ -157,6 +159,6 @@ S1000D の仕様書・XSD・既定 BREX・公式サンプルは再配布でき�
 
 ## 公開と版
 
-現在の版は 0.15.0 です。
+現在の版は 0.17.0 です。
 
 npm への公開は、`v*` の tag を push したときに GitHub Actions が Trusted Publisher（OIDC）で行います。0.x の間、`^0.1.0` のような依存は minor をまたぎません。このライブラリの minor を上げたときは、MCP 側の依存範囲も上げて公開し直します。

@@ -11,6 +11,7 @@ description: Explains what you provide to the Skill that reviews S1000D data mod
 
 - **You provide**: the data modules to review (a DMC, a file path or a folder) and the CSDB folder. When you also want the wording reviewed, you provide a glossary file (a two-column CSV, a Markdown table or a DeepL glossary). To create comment DMs, you choose the values of `commentType` and `commentPriorityCode` by the rules of your project and tell the Skill.
 - **You receive**: a list of findings in which the viewpoints are kept apart, comment DMs that hold the findings you chose, and a Review Report (the target, the findings for each viewpoint, what was and was not made into comment DMs, and the verification status). The comment DMs are written after you confirm.
+- **Versions written in the report**: under "Tools used", the Review Report copies, for each MCP server used, the name, the version and the s1000d-core version from `_server` at the end of the responses. A response from an older version without `_server` is recorded as having no version item. How to read `_server` is explained on the [s1000d-reader-mcp](/s1000d-stack/mcp/reader-mcp/) page.
 
 ## Required MCP servers
 

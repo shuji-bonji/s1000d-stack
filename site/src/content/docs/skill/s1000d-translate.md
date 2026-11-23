@@ -11,6 +11,7 @@ description: Explains what you provide to the Skill that translates S1000D data 
 
 - **You provide**: the data module to translate (a DMC or a file path), the target language (for example `en` and `US`) and the CSDB folder. If you have a glossary, pass it as a two-column CSV, a Markdown table or a DeepL glossary.
 - **You receive**: a data module with the same DMC and a different language, and a Translation Report (the number of sentences, the distribution of scores, the sentences replaced after comparing with DeepL, the sentences that could not be put back, the sentences that remained untranslated, and the verification status). The file is written after you confirm.
+- **Versions written in the report**: under "Tools used", the Translation Report copies, for each MCP server used, the name, the version and the s1000d-core version from `_server` at the end of the responses. A response from an older version without `_server` is recorded as having no version item. How to read `_server` is explained on the [s1000d-writer-mcp](/s1000d-stack/mcp/writer-mcp/) page.
 
 ## Required MCP servers
 

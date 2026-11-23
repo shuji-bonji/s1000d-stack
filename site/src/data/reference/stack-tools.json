@@ -4,7 +4,7 @@
     {
       "id": "brex",
       "package": "@shuji-bonji/s1000d-brex-mcp",
-      "version": "0.6.4",
+      "version": "0.8.1",
       "tools": [
         {
           "name": "explain_brex",
@@ -160,7 +160,7 @@
         },
         {
           "name": "check_against_brex",
-          "description": "Check a data module against BREX rules and report violations with location (XPath + line), actual value, rule id, objectUse text and severity. Also accepts a publication module (pm) or a comment (the brexDmRef in pmStatus / commentStatus is followed). By default follows the document's brexDmRef chain (project BREX → … → S1000D default BREX found under S1000D_SPEC_DIR) and checks each layer separately; pass \"brex\" to check against one specific BREX instead or in addition. Does NOT validate against the XML schema (XSD): run schema validation separately. nonContextRules cannot be checked automatically and are returned as manualChecks.",
+          "description": "Check a data module against BREX rules and report violations with location (XPath + line), actual value, rule id, objectUse text and severity. Also accepts a publication module (pm) or a comment (the brexDmRef in pmStatus / commentStatus is followed). By default follows the document's brexDmRef chain (project BREX → … → the BREX that ends the chain by referring to itself: usually the S1000D default BREX found under S1000D_SPEC_DIR) and checks each layer separately; pass \"brex\" to check against one specific BREX instead or in addition. Does NOT validate against the XML schema (XSD): run schema validation separately. nonContextRules cannot be checked automatically and are returned as manualChecks.",
           "inputSchema": {
             "type": "object",
             "properties": {
@@ -207,7 +207,7 @@
     {
       "id": "verify",
       "package": "@shuji-bonji/s1000d-verify-mcp",
-      "version": "0.8.1",
+      "version": "0.10.0",
       "tools": [
         {
           "name": "verify_data_module",
@@ -519,7 +519,7 @@
     {
       "id": "reader",
       "package": "@shuji-bonji/s1000d-reader-mcp",
-      "version": "0.13.0",
+      "version": "0.15.0",
       "tools": [
         {
           "name": "list_data_modules",
@@ -646,7 +646,7 @@
               },
               "includeLocation": {
                 "type": "boolean",
-                "description": "Add \"location\" (path, line, column) to every node of the body or the outline (default false). Pass true when you are going to edit the data module with s1000d-writer-mcp edit_data_module: its \"at\" and \"to\" take location.path as returned here. A step also gets \"textLocations\": the locations of the paragraphs joined into its \"text\", in order."
+                "description": "Add \"location\" (path, line, column) to every node of the body or the outline (default false). Pass true when you are going to edit the data module with s1000d-writer-mcp edit_data_module: its \"at\" and \"to\" take location.path as returned here. With section \"content\" or \"all\", a step also gets \"textLocations\": the locations of the paragraphs joined into its \"text\", in order. The outline has no textLocations."
               },
               "outlineDepth": {
                 "type": "integer",
@@ -811,7 +811,7 @@
     {
       "id": "writer",
       "package": "@shuji-bonji/s1000d-writer-mcp",
-      "version": "0.6.0",
+      "version": "0.8.0",
       "tools": [
         {
           "name": "build_data_module",

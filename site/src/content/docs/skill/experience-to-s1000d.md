@@ -11,6 +11,7 @@ description: Explains what you provide to the Skill that converts an experientia
 
 - **You provide**: the path of the manual JSON, the CSDB folder to write to, the security classification and the numbering rules (model identification code, system difference code, SNS, the information code for each kind, CAGE code). You can pass a JSON saved by the authoring tool for experiential manuals (a separate project; its prototype is provisionally called manual-editor).
 - **You receive**: one data module per Topic and one publication module, the original illustration files, and a Conversion Report that summarises the result of the conversion (verification status, fixes applied automatically, what could not be expressed, and the files written). The files are written after you confirm.
+- **Versions written in the report**: under "Tools used", the Conversion Report copies, for each MCP server used, the name, the version and the s1000d-core version from `_server` at the end of the responses. A response from an older version without `_server` is recorded as having no version item. How to read `_server` is explained on the [s1000d-writer-mcp](/s1000d-stack/mcp/writer-mcp/) page.
 
 ## Required MCP servers
 
