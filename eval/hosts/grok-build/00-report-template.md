@@ -8,7 +8,7 @@
 - 実施日時: YYYY-MM-DD HH:mm〜HH:mm（JST）
 - ホスト: Grok Build（版が分かれば書く）
 - セッション: 新しいセッション / 前の UC から続けた
-- サーバーの版（serverInfo）:
+- サーバーの版（応答の最後の `_server` の `version` と `core`。無ければ「版の項目なし」）:
   - s1000d-brex-mcp:
   - s1000d-verify-mcp:
   - s1000d-reader-mcp:

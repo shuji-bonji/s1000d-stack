@@ -95,6 +95,16 @@ flowchart LR
   PM["read_publication_module<br/>table of contents"] --> RD
 ```
 
+## Version of the server that answered (`_server`)
+
+Every tool response ends with `_server`: the package name (`name`) and version (`version`) of the server that answered, and the version of s1000d-core it has loaded (`core`). It is present both in successful responses and in `{"error": …}` responses.
+
+```json
+"_server": { "name": "@shuji-bonji/s1000d-reader-mcp", "version": "<version>", "core": "<core version>" }
+```
+
+These versions belong to the process that is answering now, not to the package installed on disk. If the host keeps running after a new version is published, the old process keeps answering. When the versions in `_server` are not what you expect, restart the host.
+
 ## What it does not do
 
 - **It does not summarise or translate.** Its job is to return the material a summary needs (headings, step numbers, warning types, reference targets) without omitting anything.

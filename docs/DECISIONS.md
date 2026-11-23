@@ -194,6 +194,15 @@ D-36 の設計（[design/site-reference.md](./design/site-reference.md)）の決
 - 残っていること: 手書きの欄の「値の選び方」の確認。英語の訳の採点（16 属性）。Stack リファレンスの「応答の例」「使う場面」。日本語の引数の説明を訳すか。残りの属性（U-11）。
 - 実装の結果と確認は [design/site-reference.md](./design/site-reference.md) の「実装の結果」。
 
+### D-38 応答の最後に、答えたサーバーの名前と版、core の版を `_server` として載せる（2026-11-24）
+
+[design/server-version.md](./design/server-version.md) の V-1〜V-6 の決定（Issue [#12](https://github.com/shuji-bonji/s1000d-stack/issues/12)）。2026-11-24 04:32 に、利用者がすべて提案どおりと決めた。
+
+- **理由**: MCP の初期化の `serverInfo` はツールの結果として届かない（Grok Build の FINDINGS.md の H-04）。reader-mcp 0.14.0 の公開後も、Grok の reader のプロセスは公開前のコードのまま答え、応答からそれを見分けられなかった（REFCHECK-FINDINGS.md の H-06）。H-06 は core の版の違いで起きた。
+- **形**: brex・verify・reader・writer の 4 本のすべてのツールの応答の最上位に、`"_server": { "name", "version", "core" }` を最後の項目として足す。`core` は実際に読み込まれている core の版。成功・想定内の失敗・想定外の失敗の 3 通りすべてに付ける。
+- **作り**: core が `CORE_INFO`（`{ name, version }`）を公開する。各 MCP は `src/server.ts` の包みの 1 か所で足す。stdio と HTTP は同じ `buildServer()` を通るので、両方に効く。
+- **使い方**: 4 つの Skill の報告に `_server` を書く欄を足す。Grok Build のキットの手順に、最初の呼び出しで `_server` を記録し、npm の公開版と比べることを足す。npm と比べる手順は、キットだけに置き、Skill には入れない（Skill の利用者は npm を確かめる手段を持たないことがあるため。設計メモの「残っている確認」を実装のときにこう決めた）。
+
 ## 未決事項
 
 | ID | 内容 | 判断の材料 |

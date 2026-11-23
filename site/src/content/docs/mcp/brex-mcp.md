@@ -17,6 +17,16 @@ description: Configuration and tools of the MCP server that lets an LLM read a B
 | [`list_notations`](/s1000d-stack/reference/stack/brex/list-notations/) | Returns the illustration and multimedia formats that may be used, split into the base set (`baseSet`), exclusions from the base set (`baseExcluded`) and the per-schema redefinitions and exclusions (`perContext`). Pass a schema name in `context` to get how that schema is restricted in `effectiveFor.mode`: `closed` means only the formats in `allowed` may be used, `open` means only the formats in `excluded` are forbidden (a BREX with exclusions only), and `unrestricted` means this BREX does not restrict formats |
 | [`check_against_brex`](/s1000d-stack/reference/stack/brex/check-against-brex/) | Checks a data module against a BREX and returns each violation with its location (XPath and line number), actual value, rule ID, description and severity level. By default it follows the `brexDmRef` chain and checks against each layer separately |
 
+## Version of the server that answered (`_server`)
+
+Every tool response ends with `_server`: the package name (`name`) and version (`version`) of the server that answered, and the version of s1000d-core it has loaded (`core`). It is present both in successful responses and in `{"error": …}` responses.
+
+```json
+"_server": { "name": "@shuji-bonji/s1000d-brex-mcp", "version": "<version>", "core": "<core version>" }
+```
+
+These versions belong to the process that is answering now, not to the package installed on disk. If the host keeps running after a new version is published, the old process keeps answering. When the versions in `_server` are not what you expect, restart the host.
+
 ## What it does not do
 
 - It does not validate against the XML schema (XSD). XSD validation, and the verification status that combines XSD, BREX and references, are returned by [`s1000d-verify-mcp`](/s1000d-stack/mcp/verify-mcp/).

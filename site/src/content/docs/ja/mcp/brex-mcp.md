@@ -17,6 +17,16 @@ description: BREX を LLM が読み、データモジュールを BREX に照合
 | [`list_notations`](/s1000d-stack/ja/reference/stack/brex/list-notations/) | 使ってよい図・マルチメディアの形式を、基本セット（`baseSet`）、基本セットからの除外（`baseExcluded`）、スキーマ別の再定義と除外（`perContext`）に分けて返します。`context` にスキーマ名を渡すと、そのスキーマでの扱いを `effectiveFor.mode` で返します。`closed` は `allowed` に挙げた形式だけを使える、`open` は `excluded` に挙げた形式だけを禁止する（除外だけの BREX）、`unrestricted` はこの BREX では制限しない、という意味です |
 | [`check_against_brex`](/s1000d-stack/ja/reference/stack/brex/check-against-brex/) | データモジュールを BREX に照合し、違反を箇所（XPath と行番号）・実際の値・ルール ID・説明・重大度付きで返します。既定では `brexDmRef` の連鎖をたどり、各層に個別に照合します |
 
+## 答えたサーバーの版（`_server`）
+
+すべてのツールの応答は、最後の項目に `_server` を持ちます。答えたサーバーのパッケージ名（`name`）と版（`version`）、実際に読み込んでいる s1000d-core の版（`core`）です。成功の応答にも、`{"error": …}` の応答にも付きます。
+
+```json
+"_server": { "name": "@shuji-bonji/s1000d-brex-mcp", "version": "<版>", "core": "<core の版>" }
+```
+
+この版は、ディスクに入っているパッケージではなく、いま答えているプロセスのものです。新しい版が公開された後もホストが起動したままだと、古い版のプロセスが答え続けます。`_server` の版が期待と違うときは、ホストを起動し直してください。
+
 ## できないこと
 
 - XML スキーマ（XSD）による検証は行いません。XSD の検証と、XSD・BREX・参照をまとめた検証状態は [`s1000d-verify-mcp`](/s1000d-stack/ja/mcp/verify-mcp/) が返します。
