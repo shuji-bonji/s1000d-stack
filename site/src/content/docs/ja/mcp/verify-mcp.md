@@ -16,7 +16,7 @@ description: XSD 検証・BREX 照合・参照の解決を行い、結果を 1 �
 | [`check_references`](/s1000d-stack/ja/reference/stack/verify/check-references/) | 参照を 5 種類集め、参照先の有無を理由付き（`not-found` / `no-entity-declaration` / `file-not-found` / `no-such-id` / `no-csdb`）で返します。仕様書の章への `dmRef`（モデル識別コード `S1000D`）は参照切れではないので別枠にします |
 | [`verify_csdb`](/s1000d-stack/ja/reference/stack/verify/verify-csdb/) | フォルダーの中の CSDB オブジェクト（既定は DMC と PMC）をまとめて検証し、1 件ごとの検証状態と件数の集計を返します。`offset` と `limit` で分けて読み、`reportPath` で詳細を JSON に書き出せます |
 | [`suggest_fixes`](/s1000d-stack/ja/reference/stack/verify/suggest-fixes/) | `verify_data_module` と同じ検証を行い、違反ごとに直し方の候補を返します。候補はサーバーが決め、候補の出どころと確からしさ（`exact` / `several` / `none`）を付けます。`product` を渡すと、製品の値が足りず判定できない適用性にも、与える値の候補を付けます。修正を文書に当てることはしません |
-| [`reconcile_dml`](/s1000d-stack/ja/reference/stack/verify/reconcile-dml/) | データ管理リスト（DML）か納入票（DDN）を CSDB と照合し、行ごとに `found` / `issue-mismatch`（対象はあるが指定の版が無い）/ `not-found` / `not-checked` と、CSDB にあるのに DML に載っていない DM・PM を返します。`path` も `xml` も省くと CSDB の DML・DDN をすべて照合します。`dmlType` などの値は解釈しません |
+| [`reconcile_dml`](/s1000d-stack/ja/reference/stack/verify/reconcile-dml/) | データ管理リスト（DML）か納入票（DDN）を CSDB と照合し、行ごとに `found` / `issue-mismatch`（対象はあるが指定の版が無い）/ `not-found` / `not-checked` と、CSDB にあるのに DML に載っていない DM・PM（`notListed`。行ごとにそのファイルの版の `issueInfo` が付きます）を返します。`path` も `xml` も省くと CSDB の DML・DDN をすべて照合します。`dmlType` などの値は解釈しません |
 | [`list_schemas`](/s1000d-stack/ja/reference/stack/verify/list-schemas/) | `S1000D_SPEC_DIR` の下で見つかった `xml_schema_flat/` の一覧（版、XSD の数、スキーマ名）を返します。`schema-not-found` の原因を調べるのに使います |
 
 ## 検証状態の読み方
