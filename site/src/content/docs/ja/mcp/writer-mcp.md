@@ -214,7 +214,7 @@ flowchart LR
 | 適用範囲（`scopes`） | データモジュールの適用性 |
 | 素材（`assets`） | ICN を採番し、図への参照を入れる |
 
-変換で表せなかったもの（ホットスポットの座標、`scopeRefs` の一部など）は、黙って捨てずに `notRepresented` に件数で返します。
+変換で表せなかったもの（ホットスポットの座標、`scopeRefs` の一部など）は、黙って捨てずに `notRepresented` に件数（`count`）と場所（`where`）で返します。`where` に入るのは最初の 5 件で、入らなかった数は `whereOmitted` に出ます。
 
 ## 翻訳用の文の出し入れ
 

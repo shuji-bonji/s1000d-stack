@@ -159,6 +159,6 @@ The data dictionary in the distribution contains samples whose DMC in the file n
 
 ## Publishing and versions
 
-The current version is 0.17.0.
+The current version is 0.18.0.
 
 Publishing to npm happens in GitHub Actions as a Trusted Publisher (OIDC) when a `v*` tag is pushed. While the version is 0.x, a dependency such as `^0.1.0` does not cross minor versions. When this library's minor version goes up, the dependency ranges of the MCP servers are raised and published again as well.

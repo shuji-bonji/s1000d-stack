@@ -214,7 +214,7 @@ It adds one reason for update to the identification and status section of an in-
 | Scopes (`scopes`) | The applicability of the data modules |
 | Assets (`assets`) | ICNs are assigned and references to the figures are inserted |
 
-What the conversion cannot express (the coordinates of hotspots, part of `scopeRefs` and so on) is not silently dropped; it is returned as counts in `notRepresented`.
+What the conversion cannot express (the coordinates of hotspots, part of `scopeRefs` and so on) is not silently dropped; it is returned in `notRepresented` with a count (`count`) and the places (`where`). `where` holds the first 5 places only; the number left out is given in `whereOmitted`.
 
 ## Handing sentences out and back for translation
 
