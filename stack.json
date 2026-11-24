@@ -6,7 +6,7 @@
     "layer = 役割 / form = 配布形態（誰が起動するか）/ status = released・developing・planned・concept。",
     "developing はリポジトリで開発中で npm 未公開。planned / concept はディレクトリも npm も無い。"
   ],
-  "generatedAt": "2026-11-24T09:21:33.274Z",
+  "generatedAt": "2026-11-24T11:24:45.140Z",
   "generatedBy": "scripts/generate-stack.mjs",
   "npmScope": "@shuji-bonji",
   "repos": [
@@ -61,16 +61,16 @@
       "status": "released",
       "public": true,
       "note": "段階 2。利用者が入手した公式 XSD による検証 ＋ BREX 照合（core を呼ぶ）＋ 参照の解決を 1 つの検証状態にまとめる。verify_data_module / validate_schema / check_references / verify_csdb / suggest_fixes / reconcile_dml / list_schemas の 7 tools",
-      "published": "0.10.0",
+      "published": "0.11.0",
       "local": {
-        "version": "0.10.0",
-        "tag": "v0.10.0",
+        "version": "0.11.0",
+        "tag": "v0.11.0",
         "dirty": false,
         "unpushedCommits": 0
       },
       "consistency": {
         "status": "match",
-        "detail": "0.10.0"
+        "detail": "0.11.0"
       }
     },
     {
@@ -150,7 +150,7 @@
         "version": "0.1.4",
         "tag": "v0.1.4",
         "dirty": false,
-        "unpushedCommits": 0
+        "unpushedCommits": 1
       },
       "consistency": {
         "status": "plugin",
@@ -233,7 +233,7 @@
       "local": {
         "version": null,
         "tag": null,
-        "dirty": true,
+        "dirty": false,
         "unpushedCommits": 1
       },
       "consistency": {
