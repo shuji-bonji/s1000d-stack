@@ -2,7 +2,7 @@
 
 LLM が S1000D の技術文書を正しく読み、プロジェクトの決まり（ビジネスルール）に沿って検査・作成できるようにするための、MCP サーバー・共有ライブラリ・Skill と学習リソースをまとめるプロジェクトです。この文書では、このまとまり（s1000d-core・MCP サーバー・Skill・experiential-manual-model）を「S1000D の処理系」と呼びます（D-39）。体験型マニュアルの作成ツールと、IETM / IETP の閲覧ソフトは、この処理系を使う別のプロジェクトで進めます（D-29）。
 
-- 作成日: 2026-10-23（JST）、更新日: 2026-11-24（JST。段階 3 の完了、その後に足した機能、進行中のものと未着手のものを「いまの状態」にまとめました）
+- 作成日: 2026-10-23（JST）、更新日: 2026-11-25（JST。段階 5「DML の書き出し」と段階 6「OSS の CSDB」を足しました。D-40）
 - 構成の手本: [houki-hub](https://github.com/shuji-bonji/houki-hub)、[pdf-agent-stack](https://github.com/shuji-bonji/pdf-agent-stack)
 - 決定事項: [DECISIONS.md](./DECISIONS.md)
 - 調査メモ: [notes/background.md](./notes/background.md)
@@ -10,6 +10,7 @@ LLM が S1000D の技術文書を正しく読み、プロジェクトの決ま�
 - 段階 2.5 の設計: [design/agent-platform.md](./design/agent-platform.md)
 - 段階 3 の設計: [design/writer-mcp.md](./design/writer-mcp.md)（writer）、[design/skills-and-editor.md](./design/skills-and-editor.md)（Skill 4 つと作成ツールの試作）
 - 段階 3 の後の設計: [design/core-structural-edit.md](./design/core-structural-edit.md)（構造を変える編集）、[design/core-revision.md](./design/core-revision.md)（改版）、[design/site-reference.md](./design/site-reference.md)（サイトのリファレンス）、[design/server-version.md](./design/server-version.md)（応答の `_server`）
+- 段階 5 の設計: [design/core-dml-writing.md](./design/core-dml-writing.md)（DMRL と CSL の書き出し）。段階 6 の設計文書は着手するときに作ります
 - 製品の分離（2026-11-07、D-29）: [notes/editor-and-viewer-study.md](./notes/editor-and-viewer-study.md)（検討）、[design/player-and-editor.md](./design/player-and-editor.md)（体験型マニュアルの画面設計の草案）、[notes/ietp-kickoff.md](./notes/ietp-kickoff.md)（IETM / IETP の最初の文書の下書き）
 
 ## 目指すもの
@@ -70,6 +71,8 @@ experiential-manual-model（文書の中では「manual-model」と略します�
 | 2.5 | 修正提案（verify-mcp `suggest_fixes`）、`CsdbSource` インターフェース、HTTP transport、DML・DDN の読み取り、サイトの「CSDB 製品への組み込み」のページ | LLM エージェントがスキーマ検証・クロスリファレンスチェック・適用性チェック・修正提案の 4 つをできる。修正提案の候補は core が決め、LLM は候補の外の値を出さない。CSDB をフォルダー以外（製品のデータベース・API）から読める。**段階 2.5 は 2026-10-28 に完了**（core 0.7.0、brex-mcp 0.4.0、verify-mcp 0.6.0、reader-mcp 0.7.0 を公開） |
 | 3 | s1000d-writer-mcp（LLM に XML を書かせず、構造化された入力から組み立てて「生成 → 検証 → 修正」を回す）、Skill（experience-to-s1000d / s1000d-publish / s1000d-review / s1000d-translate。STE の用語集は利用者のものを参照）、作成ツールの試作、comment DM の生成、翻訳向けの文の抜き出しと差し戻し | 券売機の例を共通データモデル経由で S1000D に出力し、verify を通る。**writer の実装は 2026-10-28 に済み、完了条件をテストで満たした**（core 0.8.0・writer-mcp 0.1.0。同日に npm に公開）。Skill 4 つも同じ日に公開し、作成ツールの試作も動いた。**段階 3 は 2026-10-28 に完了**。その後に足したものは「いまの状態」に書く |
 | 4 | ~~閲覧ソフト~~ → **別プロジェクトへ移管（2026-11-07、D-29）**。S1000D の CSDB を直接表示する簡易な技術マニュアルの Web システム（[design/agent-platform.md](./design/agent-platform.md)「参照実装」）は IETM / IETP プロジェクトの最初の成果物に、共通データモデルを表示する閲覧ソフトは体験型マニュアルプロジェクトの player になる | s1000d-stack の側に残る仕事は、2 つの製品から戻ってくる core・MCP への要望（API の不足、`CsdbSource` の実装、WebMCP 向けの読み取り）に応えること。完了の条件は製品側の文書に書く |
+| 5 | DML の書き出し（[design/core-dml-writing.md](./design/core-dml-writing.md)）。DMRL（これから作る DM・PM の一覧）と CSL（CSDB にある CSDB オブジェクトの一覧）を組み立てる core の関数、writer-mcp の `plan_dmrl` / `build_dml` / `build_csl`、`convert_manual` の `planOnly`、DMRL の DMC を採番に使う `allocation.dmrl`、照合の読み分け、DML の BREX の連鎖（`dmlStatus`） | 券売機の例で、DMRL を先に出して利用者が確かめ、その DMC で DM を作り、`reconcile_dml` で「作成済み・まだ・計画に無い」が分かれて出る。自作の DMRL と、Bike Samples の CSDB から作った CSL が、Issue 7 の XSD と既定 BREX（BREX-S1-00001〜00009 を含む）を通る |
+| 6 | **OSS の CSDB**（D-40）。RDB とオブジェクトストレージで作る CSDB。手元では SQLite とフォルダー、サーバーでは PostgreSQL と S3 互換のストレージを同じ構成で使う。版・状態の履歴・参照・DMRL / CSL を RDB に、ICN の実体をオブジェクトストレージに置き、`CsdbSource` を実装して S1000D の処理系をそのまま使えるようにする | 着手するときに設計文書で決める。最低限、フォルダーの CSDB を取り込み、同じフォルダー（標準のファイル名の XML と ICN だけ）に書き出せること。取り込んだ CSDB に対して reader・verify・writer が、フォルダーのときと同じ結果を返すこと |
 
 ```mermaid
 flowchart LR
@@ -79,7 +82,11 @@ flowchart LR
   S3 --> XM["別プロジェクト<br/>Experiential Manual"]
   S3 --> IETP["別プロジェクト<br/>IETM / IETP"]
   XM & IETP -. 要望を戻す .-> S1
+  S3 --> S5["段階 5<br/>DML の書き出し<br/>（DMRL・CSL）"]
+  S5 --> S6["段階 6<br/>OSS の CSDB<br/>（RDB ＋ オブジェクトストレージ）"]
 ```
+
+段階 5 と 6 は 2026-11-25 に足しました（D-40）。CSDB の正本をフォルダー ＋ Git に置き、他社の CSDB 製品には `CsdbSource` で組み込める部品として渡す方針は変えません。段階 6 は、その方針の次に、DB を持つ OSS の CSDB が見当たらない（2026-11-25 に調べた範囲で、OSS は s1kd-tools のフォルダーの CSDB だけ）ことを理由に計画に入れたものです。段階 6 を s1000d-stack の部品にするか、別プロジェクトにするかは U-13 です。
 
 ## いまの状態（2026-11-24）
 
@@ -147,7 +154,7 @@ S1000D の処理（core・MCP）で、まだできないことです。CSDB 製�
 | 機能 | いまの状態 |
 |---|---|
 | 発行の操作 | 作業中の版は始められるが、`inWork` を `00` に戻して発行番号を上げる操作が無い |
-| DML・DDN の書き出し | 読み取りと照合だけがある |
+| DML・DDN の書き出し | 読み取りと照合だけがある。DMRL と CSL は段階 5 で書く。DDN は段階 5 に入れない |
 | 表・図・前提条件の品目の編集、段落の文の書き換え | `edit_data_module` は節点を足す・取り除く・移すだけ |
 | 文の一部の変更の印（`changeInline`）、表・図への変更の印 | 対応していない |
 | 段落の中のインライン要素（強調など）の下書き | 下書きの形で表せない |
@@ -165,6 +172,35 @@ S1000D の処理（core・MCP）で、まだできないことです。CSDB 製�
 | U-03 | 自作のサンプルデータを共有パッケージに切り出す時期 |
 | U-11 | S1000D リファレンスに、既定 BREX と XSD の値のコードをまとめて載せてよいか |
 | U-12 | このプロジェクトの主題を、「CSDB 製品への組み込み」（D-19・D-29）のままにするか、「LLM が S1000D を正しく扱うための処理系」にして、組み込みはその使い道の 1 つにするか |
+
+## 段階 5 の作業（DML の書き出し）
+
+設計は [design/core-dml-writing.md](./design/core-dml-writing.md)。作業の順序は同じ文書の 8 節にあり、ここには要点だけを書きます。
+
+| 順 | 作業 | 置き場所 |
+|---|---|---|
+| 5-1 | 確定が要ること（DL-1〜DL-7）を決める | docs/ |
+| 5-2 | `readBrexDmRefOf` に `dmlStatus` を足す（DML の BREX の連鎖をたどる） | lib/s1000d-core |
+| 5-3 | `DraftDml` と `buildDml` | lib/s1000d-core |
+| 5-4 | `planDmrl`、台帳との相互の変換、`buildCsl` | lib/s1000d-core |
+| 5-5 | 照合の読み分け（DMRL と CSL） | lib/s1000d-core、mcp/s1000d-verify-mcp |
+| 5-6 | writer-mcp のツール 3 本と、既存のツールの変更 | mcp/s1000d-writer-mcp |
+| 5-7 | `editDml`（既にある DML の行を、元の XML を保って足す・取り除く） | lib/s1000d-core、mcp/s1000d-writer-mcp |
+| 5-8 | Skill 2 つの手順、例のデータ、サイトのページ、公開 | skill/、examples/、site/ |
+
+## 段階 6 の計画（OSS の CSDB）
+
+着手するときに設計文書を作ります。2026-11-25 の時点で決めている前提と、設計で決めることを書いておきます。
+
+| 項目 | 前提・決めること |
+|---|---|
+| 構成 | RDB（版・状態の履歴・参照・DMRL / CSL・DML の照合の結果）と、オブジェクトストレージ（ICN の実体。RDB には ICN・ハッシュ・保存先のキーだけを持つ）。DM の本文の XML は RDB に文字列で持ち、版の行と同じトランザクションで書く |
+| 規模の切り替え | 手元は SQLite とフォルダー、サーバーは PostgreSQL と S3 互換のストレージ。同じ表の設計で使う |
+| 版の扱い | 1 つの版を 1 行にし、発行した行は書き換えない。版を上げるときは行を足す。ICN の保存先も版ごとに分け、上書きしない |
+| 正本 | 最初は「フォルダーから取り込み、フォルダーへ書き出す」形にし、フォルダーとの往復で中身が変わらないことを確かめる。RDB を正本にして画面から編集するのは、その後に決める |
+| 処理系とのつながり | `CsdbSource` を実装する。`CsdbSource` は同期のインターフェースなので、SQLite（同期で読める）はそのまま、PostgreSQL は先読みか同期で読めるキャッシュを置く（[design/agent-platform.md](./design/agent-platform.md)）。非同期の `CsdbSource` が要るかも、ここで決める |
+| 決めること | 利用者と権限・ワークフローを持つか（D-19 では処理系に持たせないとした）、全文検索（日本語の分かち書き）、DDN の書き出し、置き場所（U-13） |
+| 前提になる作業 | 段階 5（DMRL・CSL）と、「いまの状態」の発行の操作（`inWork` を `00` に戻して発行番号を上げる） |
 
 ## 段階 1 の作業（完了）
 
