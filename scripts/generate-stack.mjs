@@ -80,8 +80,8 @@ const REGISTRY = [
 
 /** 外部にあり、この束ねの配下に置かないもの（参照だけ残す） */
 const EXTERNAL = [
-  { name: '体験型マニュアル（別プロジェクト。製品名は U-05）', layer: 'app', form: 'app', public: false, note: 'D-29 で分離。experiential-manual-model を読み書きする player（Web Components）・editor・cli。試作 manual-editor はここへ移す。この基盤を使う製品' },
-  { name: 'IETM / IETP（別プロジェクト）', layer: 'app', form: 'app', public: false, note: 'D-29 で分離。S1000D の CSDB を表示する Web の閲覧ソフトから始め、作成・公開まで広げる。段階 4 の参照実装はここへ移す。この基盤を使う製品' },
+  { name: '体験型マニュアル（別プロジェクト。製品名は U-05）', layer: 'app', form: 'app', public: false, note: 'D-29 で分離。experiential-manual-model を読み書きする player（Web Components）・editor・cli。試作 manual-editor はここへ移す。S1000D の処理系（s1000d-stack）を使う製品' },
+  { name: 'IETM / IETP（別プロジェクト）', layer: 'app', form: 'app', public: false, note: 'D-29 で分離。S1000D の CSDB を表示する Web の閲覧ソフトから始め、作成・公開まで広げる。段階 4 の参照実装はここへ移す。S1000D の処理系（s1000d-stack）を使う製品' },
   { name: 'S1000D 配布物（s1000d.org）', layer: 'source', form: 'data', public: false, note: '仕様書 PDF・XSD・既定 BREX・公式サンプル。利用条件により再配布できないため、利用者が入手して S1000D_SPEC_DIR で指定する' },
   { name: 'i2oss/s1000d-mcp', layer: 'mcp', form: 'mcp-server', public: true, note: 'Python の S1000D MCP（自作サブセット XSD、参照・適用性）。依存しない。参照・適用性の実装の参考' },
   { name: 'Zenn Book「IETM入門 — 概念から S1000D まで」', layer: 'learning', form: 'book', public: true, note: '概念の入門はこちら。サイトはこのスタックの利用者向けの説明に絞る' },

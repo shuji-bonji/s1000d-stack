@@ -1,6 +1,6 @@
 # s1000d-stack ロードマップ
 
-LLM が S1000D の技術文書を正しく読み、プロジェクトの決まり（ビジネスルール）に沿って検査・作成できるようにするための、MCP サーバー・共有ライブラリ・Skill と学習リソースをまとめるプロジェクトです。体験型マニュアルの作成ツールと、IETM / IETP の閲覧ソフトは、この基盤を使う別のプロジェクトで進めます（D-29）。
+LLM が S1000D の技術文書を正しく読み、プロジェクトの決まり（ビジネスルール）に沿って検査・作成できるようにするための、MCP サーバー・共有ライブラリ・Skill と学習リソースをまとめるプロジェクトです。この文書では、このまとまり（s1000d-core・MCP サーバー・Skill・experiential-manual-model）を「S1000D の処理系」と呼びます（D-39）。体験型マニュアルの作成ツールと、IETM / IETP の閲覧ソフトは、この処理系を使う別のプロジェクトで進めます（D-29）。
 
 - 作成日: 2026-10-23（JST）、更新日: 2026-11-24（JST。段階 3 の完了、その後に足した機能、進行中のものと未着手のものを「いまの状態」にまとめました）
 - 構成の手本: [houki-hub](https://github.com/shuji-bonji/houki-hub)、[pdf-agent-stack](https://github.com/shuji-bonji/pdf-agent-stack)
@@ -15,11 +15,11 @@ LLM が S1000D の技術文書を正しく読み、プロジェクトの決ま�
 ## 目指すもの
 
 > [!IMPORTANT]
-> 2026-11-07（D-29）に、製品（作成ツール・閲覧ソフト）を 2 つの別プロジェクトに分けました。s1000d-stack は 3 の**基盤**に専念し、1 と 2 はこの基盤を使う製品として別のプロジェクトで進めます。
+> 2026-11-07（D-29）に、製品（作成ツール・閲覧ソフト）を 2 つの別プロジェクトに分けました。s1000d-stack は **S1000D の処理系**（core・MCP・Skill・model）だけを持ち、1 と 2 はこの処理系を使う製品として別のプロジェクトで進めます。3 は、処理系の使い道の 1 つです。
 
-1. **一般向け**（別プロジェクト「Experiential Manual」。製品名は 2026-11-14 に決定、D-30。リポジトリは [experiential-manual-editor](https://github.com/shuji-bonji/experiential-manual-editor)）: 画面や機器の操作を体験しながら学べるマニュアルを、軽い Web 形式で作れるようにします（2021 年の作品 [experience_based_operation_explanation](https://github.com/shuji-bonji/experience_based_operation_explanation) の再構築）。データモデル `experiential-manual-model` は基盤側に残し、player・editor・cli を製品側で作ります。検討と画面設計の文書は、製品側のリポジトリの `docs/` が新しい版です（この基盤側の [notes/editor-and-viewer-study.md](./notes/editor-and-viewer-study.md) と [design/player-and-editor.md](./design/player-and-editor.md) は、分ける前の版です）。
+1. **一般向け**（別プロジェクト「Experiential Manual」。製品名は 2026-11-14 に決定、D-30。リポジトリは [experiential-manual-editor](https://github.com/shuji-bonji/experiential-manual-editor)）: 画面や機器の操作を体験しながら学べるマニュアルを、軽い Web 形式で作れるようにします（2021 年の作品 [experience_based_operation_explanation](https://github.com/shuji-bonji/experience_based_operation_explanation) の再構築）。データモデル `experiential-manual-model` は s1000d-stack の側に残し、player・editor・cli を製品側で作ります。検討と画面設計の文書は、製品側のリポジトリの `docs/` が新しい版です（s1000d-stack の側の [notes/editor-and-viewer-study.md](./notes/editor-and-viewer-study.md) と [design/player-and-editor.md](./design/player-and-editor.md) は、分ける前の版です）。
 2. **産業向け**（別プロジェクト「IETM / IETP」。未着手で、製品名とリポジトリはまだありません）: S1000D の CSDB を Web で表示する閲覧ソフト（IETP の最小形）から始め、作成・公開まで広げます。輸出先から S1000D を求められる日本の中小企業の作業を支援することを目指します。最初の文書の下書きは [notes/ietp-kickoff.md](./notes/ietp-kickoff.md)。
-3. **組み込み基盤**（2026-10-25 に追加、D-19。**このプロジェクトの主題**）: CSDB 製品にオーサリング支援・レビュー・翻訳・プロジェクト管理の AI エージェントを組み込めるようにする基盤を目指します。最低限の要件は、LLM エージェントが**スキーマ検証・クロスリファレンスチェック・適用性チェック・修正提案**をできることです。決定論的に確かめられることは core が行い、LLM は文章の生成と説明に限ります。設計は [design/agent-platform.md](./design/agent-platform.md)。
+3. **CSDB 製品への組み込み**（2026-10-25 に追加、D-19。D-29 では 3 つのうちこれを主にすると書いた。いまも主にするかは U-12）: 他社の CSDB 製品が、オーサリング支援・レビュー・翻訳・プロジェクト管理の AI エージェントを、この処理系を使って組み込めるようにします。最低限の要件は、LLM エージェントが**スキーマ検証・クロスリファレンスチェック・適用性チェック・修正提案**をできることです。決定論的に確かめられることは core が行い、LLM は文章の生成と説明に限ります。設計は [design/agent-platform.md](./design/agent-platform.md)。
 
 専門家エージェント（MCP と Skill）を先に作り、2 つの製品プロジェクトがそれを開発の道具として使います。製品側で足りなかったものは core・MCP に戻します（D-19）。
 
@@ -59,7 +59,7 @@ flowchart TB
   IETP -. 図＋ホットスポットの表示部品 .-> XM
 ```
 
-experiential-manual-model（文書の中では「manual-model」と略します。U-04）は s1000d-core に依存させません。一般向けの製品が S1000D の概念を抱え込まないようにするためです（D-01、D-09）。S1000D との変換関数は writer 側に置きます。製品 2 つは別プロジェクトで、この図では基盤との依存だけを示します（D-29）。
+experiential-manual-model（文書の中では「manual-model」と略します。U-04）は s1000d-core に依存させません。一般向けの製品が S1000D の概念を抱え込まないようにするためです（D-01、D-09）。S1000D との変換関数は writer 側に置きます。製品 2 つは別プロジェクトで、この図では処理系との依存だけを示します（D-29）。
 
 ## 段階
 
@@ -67,9 +67,9 @@ experiential-manual-model（文書の中では「manual-model」と略します�
 |---|---|---|
 | 1 | s1000d-stack（サイトの骨組みと用語の説明）、s1000d-core、s1000d-brex-mcp | **自動**: 自作 BREX と自作データモジュールで、BREX の説明と照合のテストが CI で通る（2026-10-23 済み）。**手動**: 既定の BREX（利用者が入手したもの）を `explain_brex` で読み、自作データモジュールを照合して、結果が仕様書の BREX の章の記述と矛盾しないことを確認済み（2026-10-23 済み。券売機の説明 DM は既定 BREX の 243 ルールに違反なし）。**サイト**: BREX・データモジュールの説明を仕様書と照合済み（2026-10-24 に、作業 3 で読んだ Chap 4.10.2〜4.10.3・7.9 と既定 BREX の実測に基づいて執筆。2026-10-24 に利用者が 9 ページを通読し、仕様書との矛盾が無いことを確認済み。確認の根拠は [notes/site-review.md](./notes/site-review.md)）。**段階 1 は 2026-10-24 に完了** |
 | 2 | s1000d-reader-mcp、s1000d-verify-mcp、manual-model | 公式 XSD（利用者が入手したもの）による検証、参照の解決、適用性の判定ができる。reader の応答には対象データモジュールの版（issue）と検証状態を必ず含め、適用性の判定は reader が済ませてから LLM に渡す。**段階 2 は 2026-10-26 に完了**（3 部品と brex-mcp を npm に公開、hub と学習サイトを公開） |
-| 2.5 | 修正提案（verify-mcp `suggest_fixes`）、`CsdbSource` インターフェース、HTTP transport、DML・DDN の読み取り、サイトの「組み込み基盤」のページ | LLM エージェントがスキーマ検証・クロスリファレンスチェック・適用性チェック・修正提案の 4 つをできる。修正提案の候補は core が決め、LLM は候補の外の値を出さない。CSDB をフォルダー以外（製品のデータベース・API）から読める。**段階 2.5 は 2026-10-28 に完了**（core 0.7.0、brex-mcp 0.4.0、verify-mcp 0.6.0、reader-mcp 0.7.0 を公開） |
+| 2.5 | 修正提案（verify-mcp `suggest_fixes`）、`CsdbSource` インターフェース、HTTP transport、DML・DDN の読み取り、サイトの「CSDB 製品への組み込み」のページ | LLM エージェントがスキーマ検証・クロスリファレンスチェック・適用性チェック・修正提案の 4 つをできる。修正提案の候補は core が決め、LLM は候補の外の値を出さない。CSDB をフォルダー以外（製品のデータベース・API）から読める。**段階 2.5 は 2026-10-28 に完了**（core 0.7.0、brex-mcp 0.4.0、verify-mcp 0.6.0、reader-mcp 0.7.0 を公開） |
 | 3 | s1000d-writer-mcp（LLM に XML を書かせず、構造化された入力から組み立てて「生成 → 検証 → 修正」を回す）、Skill（experience-to-s1000d / s1000d-publish / s1000d-review / s1000d-translate。STE の用語集は利用者のものを参照）、作成ツールの試作、comment DM の生成、翻訳向けの文の抜き出しと差し戻し | 券売機の例を共通データモデル経由で S1000D に出力し、verify を通る。**writer の実装は 2026-10-28 に済み、完了条件をテストで満たした**（core 0.8.0・writer-mcp 0.1.0。同日に npm に公開）。Skill 4 つも同じ日に公開し、作成ツールの試作も動いた。**段階 3 は 2026-10-28 に完了**。その後に足したものは「いまの状態」に書く |
-| 4 | ~~閲覧ソフト~~ → **別プロジェクトへ移管（2026-11-07、D-29）**。S1000D の CSDB を直接表示する簡易な技術マニュアルの Web システム（[design/agent-platform.md](./design/agent-platform.md)「参照実装」）は IETM / IETP プロジェクトの最初の成果物に、共通データモデルを表示する閲覧ソフトは体験型マニュアルプロジェクトの player になる | 基盤側に残る仕事は、2 つの製品から戻ってくる core・MCP への要望（API の不足、`CsdbSource` の実装、WebMCP 向けの読み取り）に応えること。完了の条件は製品側の文書に書く |
+| 4 | ~~閲覧ソフト~~ → **別プロジェクトへ移管（2026-11-07、D-29）**。S1000D の CSDB を直接表示する簡易な技術マニュアルの Web システム（[design/agent-platform.md](./design/agent-platform.md)「参照実装」）は IETM / IETP プロジェクトの最初の成果物に、共通データモデルを表示する閲覧ソフトは体験型マニュアルプロジェクトの player になる | s1000d-stack の側に残る仕事は、2 つの製品から戻ってくる core・MCP への要望（API の不足、`CsdbSource` の実装、WebMCP 向けの読み取り）に応えること。完了の条件は製品側の文書に書く |
 
 ```mermaid
 flowchart LR
@@ -87,11 +87,11 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-  B["基盤<br/>段階 1〜3 は完了・公開済み"] --> L["学習リソース<br/>進行中"]
+  B["S1000D の処理系<br/>段階 1〜3 は完了・公開済み"] --> L["学習リソース<br/>進行中"]
   B --> X["Experiential Manual Editor<br/>進行中（別プロジェクト）"]
   B --> I["IETM / IETP<br/>未着手（別プロジェクト）"]
   B --> V["Issue 4.2 への対応<br/>未着手"]
-  B --> F["基盤の個別の機能<br/>未着手"]
+  B --> F["S1000D の処理で<br/>まだできないこと"]
 ```
 
 ### 公開中の版
@@ -110,7 +110,7 @@ flowchart LR
 
 版の正典は `stack.json`（`node scripts/generate-stack.mjs` で作ります）です。この表は 2026-11-24 の時点の写しです。
 
-### 段階 3 の後に基盤に足したもの
+### 段階 3 の後に処理系に足したもの
 
 | 時期 | 足したもの | 版・決定 |
 |---|---|---|
@@ -142,7 +142,7 @@ flowchart LR
 | IETM / IETP | 段階 0（製品名・リポジトリ・ROADMAP）から。閲覧ソフト → 公開の束 → 作成の画面 → フォルダー ＋ Git の運用 → 図（CGM・3D）→ ICA に要る追加、の順の案がある | [notes/ietp-kickoff.md](./notes/ietp-kickoff.md) |
 | Issue 4.2 への対応 | 「次の対象」のまま。版の違う XSD を選べることは、テストで確かめてある。元請けが指定する版は Issue 7 とは限らないので、IETM / IETP の作成の画面と同じ時期に要る | U-07 |
 
-基盤（core・MCP）の機能です。製品側から要望が戻ってきたときに、優先度を決めます。
+S1000D の処理（core・MCP）で、まだできないことです。CSDB 製品へ組み込むための仕組み（`CsdbSource`、HTTP、検証状態、機密区分）は、段階 2.5 で一通りそろっています。製品側から要望が戻ってきたときに、優先度を決めます。
 
 | 機能 | いまの状態 |
 |---|---|
@@ -164,6 +164,7 @@ flowchart LR
 | OpenSpec ＋ spec-ids の導入 | 公開の後に入れると 2026-10-26 に決めたまま、始めていない |
 | U-03 | 自作のサンプルデータを共有パッケージに切り出す時期 |
 | U-11 | S1000D リファレンスに、既定 BREX と XSD の値のコードをまとめて載せてよいか |
+| U-12 | このプロジェクトの主題を、「CSDB 製品への組み込み」（D-19・D-29）のままにするか、「LLM が S1000D を正しく扱うための処理系」にして、組み込みはその使い道の 1 つにするか |
 
 ## 段階 1 の作業（完了）
 
@@ -278,7 +279,7 @@ flowchart LR
 | 11 | 済み（2026-10-27）。3 本に `mcpName`・`server.json`・`.claude-plugin/plugin.json`・`scripts/sync-plugin-version.mjs` を足して 0.1.1 を `publish.yml` 経由で公開（`npm version patch` → `git push --follow-tags`。Trusted Publisher の初回動作確認を兼ねた）。`mcp-publisher publish` で Registry に `active` で登録。claude-plugins に category `s1000d` を新設して 3 件を収録（marketplace 0.7.0）。`claude plugin install s1000d-brex-mcp@shuji-bonji` が成功 |
 | 保守 | 2026-10-25: 4 リポジトリの `vitest` を 2.1 → 4.1 に上げた（2.x の依存に脆弱性の報告 6 件。開発時だけの依存。`npm audit` 0 件）。brex-mcp の CI の Node を 22・24 に揃えた（`engines` が >=22 のため） |
 
-## 段階 2.5 の作業（組み込み基盤に向けて）
+## 段階 2.5 の作業（CSDB 製品への組み込みに向けて）
 
 設計は [design/agent-platform.md](./design/agent-platform.md)。段階 2 の作業 10（公開）と並行して進められます。
 
@@ -289,7 +290,7 @@ flowchart LR
 | 3 | core に `CsdbSource` インターフェース（フォルダー実装を既定）。`CsdbIndex` をその上に載せ、製品側が自分の CSDB を差し込めるようにする | lib/s1000d-core |
 | 4 | 各 MCP に HTTP（Streamable HTTP）transport の起動オプション。認証・権限は製品側の責務 | mcp/* |
 | 5 | core に DML・DDN の読み取りと、CSDB との照合（「DML にあるのに無い」「版が違う」）。verify-mcp と reader-mcp に反映 | lib/s1000d-core、mcp/* |
-| 6 | サイトに「組み込み基盤」のページ（4 つの要件、境界、製品側が組む部分、LLM 活用時の注意点への対応、近似スキーマとの違い） | s1000d-stack/site |
+| 6 | サイトに「CSDB 製品への組み込み」のページ（4 つの要件、境界、製品側が組む部分、LLM 活用時の注意点への対応、近似スキーマとの違い） | s1000d-stack/site |
 | 7 | reader-mcp に概要モード（`section: "outline"`: 見出し・手順の番号と最初の 1 文・警告の数）と節点ごとの文字数。機密区分（`securityClassification`）を応答の先頭に必ず付ける | lib/s1000d-core、mcp/s1000d-reader-mcp |
 | 8 | 版が混ざった CSDB での `verify_csdb` の確認（XSD を版ごとに選ぶ） | mcp/s1000d-verify-mcp |
 
@@ -341,7 +342,7 @@ flowchart LR
 | 8-4 | サイトの Skill の章（`skill/*.md`、日英 4 ページずつ。20 × 2 言語、`check:i18n` ok、内部リンク切れ 0）、`architecture`・`use-cases`・`index` の更新、`generate-stack.mjs` に Skill 4 行と manual-editor（`developing`）。claude-plugins の台帳に Skill 4 件（marketplace 0.9.0）と README の表を用意した（未コミット。Skill のリポジトリを push してからコミットする） |
 | E2E | 2026-10-28〜29。hub の `e2e/`（4 本の MCP を stdio で起動し、Skill の手順をなぞるシナリオ 5 本・43 件。既定は npm の版、`E2E_TARGET=local` で手元の `dist`。`S1000D_SPEC_TESTS=1` で Issue 7 の XSD・既定 BREX。`.github/workflows/e2e.yml` は手動と週 1 回）。未確認だった `apply_fixes`・DML がある CSDB での `reconcile_dml`・comment と訳文の `write: true`・`skeleton-mismatch` はすべて Skill どおりに動いた。見つかった不具合 2 件を直し、2026-10-29 23:30 JST 頃までに公開した（core 0.8.2、verify 0.6.1・reader 0.7.1・writer 0.1.2 を npm・MCP Registry・claude-plugins に、Skill 4 つの 0.1.1 を Release と claude-plugins に。31 件一致）: A. verify・reader の CSDB の索引が起動後に増えたファイルを見ない → core 0.8.2 の `fingerprintDirs`（相対パス・大きさ・更新時刻の指紋）で呼び出しのたびに鮮度を確かめる（verify 0.6.1・reader 0.7.1）。B. BREX を 1 層も照合していないのに `brex.state: passed` → `not-run` と理由（core 0.8.2。writer 0.1.2 の `_notes` にも出す）。修正後、npm に公開した版で 42 件通過・1 件スキップ（spec モードは 27 件通過・16 件スキップ）。Skill 4 つの記述の食い違い 5 点も直した（各 0.1.1） |
 | 8-5 | manual-editor の試作（当時の置き場所は `app/manual-editor`。D-29 の後に別リポジトリ [experiential-manual-editor](https://github.com/shuji-bonji/experiential-manual-editor) に移した。SvelteKit 2 ＋ Svelte 5 ＋ `adapter-static` ＋ `@vite-pwa/sveltekit`。実行時の依存は experiential-manual-model だけ）。Topic 一覧、画面エディター（ドラッグで矩形・円のホットスポット）、手順・注意・適用範囲、検査（`validateManual`）、体験表示。svelte-check 0 件、Vitest 32 件、build 392 KB。クラウド側の Chromium で build を開き、券売機の例の読み込み・ホットスポットの作図・体験表示での遷移（STEP1 → STEP2 → 戻る）を確かめた（ページのエラー 0）。見送り: 説明の Block の編集、故障探求の行き先の編集、多角形、ホットスポットの移動・変形、英語の文言、Playwright のテスト（VM に Playwright が無い）。manual-model で足りなかった点: `Asset` に画像の元の大きさが無い、`AssetFile.path` がファイル名と data URL の両方を担う |
-| model 0.2.0 | 済み（2026-11-08 04:00 JST 頃、`lib/experiential-manual-model` の `3f49e56`。同じ日に npm に公開した。その後 0.3.0・0.4.0 を 2026-11-15 に公開）。D-29 の分離後に基盤側に残る最初の作業（design/player-and-editor.md 6 節の作業 1、notes/editor-and-viewer-study.md 6 節）。`AssetFile` の `path`（ファイル名または URL）と `data`（data URL）を分けてどちらか一方を必須にし、`width` / `height`（1 以上の整数）を足した。`Screen.capture { url, viewport?, capturedAt? }`・`Hotspot.capture { selector }`・`Admonition.title` を任意で追加。JSON Schema・`validateManual`・`fromLegacyJson`（`imageUrl` が data URL なら `data` へ）・券売機の例・README（日英）・CHANGELOG を更新し、テストは 13 件。追加だけで 0.1.0 の JSON はそのまま読める。**製品側への影響**: 型の上で `AssetFile.path` が任意になるので、writer-mcp の `src/convert/manual-to-draft.ts`（`extname(asset.source.path)`）は依存を `^0.2.0` に上げるときに `data` の扱いを足す（`^0.1.0` のままなら 0.2.0 は入らないので、いまは影響しない） |
+| model 0.2.0 | 済み（2026-11-08 04:00 JST 頃、`lib/experiential-manual-model` の `3f49e56`。同じ日に npm に公開した。その後 0.3.0・0.4.0 を 2026-11-15 に公開）。D-29 の分離後に s1000d-stack の側に残る最初の作業（design/player-and-editor.md 6 節の作業 1、notes/editor-and-viewer-study.md 6 節）。`AssetFile` の `path`（ファイル名または URL）と `data`（data URL）を分けてどちらか一方を必須にし、`width` / `height`（1 以上の整数）を足した。`Screen.capture { url, viewport?, capturedAt? }`・`Hotspot.capture { selector }`・`Admonition.title` を任意で追加。JSON Schema・`validateManual`・`fromLegacyJson`（`imageUrl` が data URL なら `data` へ）・券売機の例・README（日英）・CHANGELOG を更新し、テストは 13 件。追加だけで 0.1.0 の JSON はそのまま読める。**製品側への影響**: 型の上で `AssetFile.path` が任意になるので、writer-mcp の `src/convert/manual-to-draft.ts`（`extname(asset.source.path)`）は依存を `^0.2.0` に上げるときに `data` の扱いを足す（`^0.1.0` のままなら 0.2.0 は入らないので、いまは影響しない） |
 
 ## 対象とする S1000D の版
 

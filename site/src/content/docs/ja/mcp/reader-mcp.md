@@ -139,7 +139,7 @@ flowchart LR
 
 引数を直せば済む誤りは、ツールの失敗（`isError`）ではなく、s1000d-writer-mcp と同じ `error: { code, path, detail }` で返します。`code` は `file-not-found`（ファイルが無い）・`no-csdb`（CSDB のフォルダーが無い）・`not-found`（DMC・PMC・ICN が CSDB に無い）・`input-error`（引数の形が違う、必要な引数が無い） のどれかで、`path` は直す引数（`/path`、`/csdbDirs` など）です。
 
-既定は stdio です。`--http` を付けると Streamable HTTP（既定 `http://127.0.0.1:3000/mcp`。`--host` / `--port` / `--path` で変更）で起動し、CSDB 製品のサーバーや Web アプリから HTTP で呼べます。loopback に束縛したときは `Host` と `Origin` を localhost 系に限り、それ以外のアドレスでは検査しないので、製品側のリバースプロキシや認証の後ろに置いてください。認証・権限・マルチテナントはサーバーでは持ちません（[組み込み基盤の設計](https://github.com/shuji-bonji/s1000d-stack/blob/main/docs/design/agent-platform.md)の境界）。
+既定は stdio です。`--http` を付けると Streamable HTTP（既定 `http://127.0.0.1:3000/mcp`。`--host` / `--port` / `--path` で変更）で起動し、CSDB 製品のサーバーや Web アプリから HTTP で呼べます。loopback に束縛したときは `Host` と `Origin` を localhost 系に限り、それ以外のアドレスでは検査しないので、製品側のリバースプロキシや認証の後ろに置いてください。認証・権限・マルチテナントはサーバーでは持ちません（[CSDB 製品への組み込みの設計](https://github.com/shuji-bonji/s1000d-stack/blob/main/docs/design/agent-platform.md)の境界）。
 
 ## 応答の例
 

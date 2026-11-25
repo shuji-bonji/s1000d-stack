@@ -4,7 +4,7 @@
 
 **English** | [日本語](./README.ja.md)
 
-s1000d-stack is a project that brings together the MCP servers, shared libraries and Skills that let an LLM read technical documents written in S1000D® correctly and check and create them according to the rules agreed for a project (business rules). The products that use this foundation — an authoring tool and a player for manuals that teach through hands-on operation of screens and equipment (experiential manuals), and a web viewer that displays an S1000D CSDB (IETM / IETP) — are developed in separate projects.
+s1000d-stack is a project that brings together the MCP servers, shared libraries and Skills that let an LLM read technical documents written in S1000D® correctly and check and create them according to the rules agreed for a project (business rules). The products that use this toolkit — an authoring tool and a player for manuals that teach through hands-on operation of screens and equipment (experiential manuals), and a web viewer that displays an S1000D CSDB (IETM / IETP) — are developed in separate projects.
 
 This repository holds only the stack manifest (`stack.json`), the documentation site (`site/`) and the record of plans and decisions (`docs/`). Each component is an independent repository.
 
@@ -14,7 +14,7 @@ This repository holds only the stack manifest (`stack.json`), the documentation 
 
 ## What it does
 
-Stage 1 (understanding and checking against BREX) and stage 2 (verification and reading as structure) are complete, and fix suggestions have been added as the first component of stage 2.5 (a foundation that CSDB products can build in). In stage 3, s1000d-writer-mcp has been added, which lets an LLM create data modules without writing XML. Parts manufacturers and technical publication companies can use an LLM to understand the BREX (Business Rules Exchange) handed over by a customer, to confirm that their own data modules follow the XML schema (XSD) and the BREX, to receive candidate corrections for the violations, and to read data modules as structure rather than as XML. They can also use an LLM, without letting it write XML, to create data modules from a structured draft such as an experiential manual, verify and repair them, and hand sentences out and back for translation.
+Stage 1 (understanding and checking against BREX) and stage 2 (verification and reading as structure) are complete, and fix suggestions have been added as the first component of stage 2.5 (what is needed to embed the toolkit in CSDB products). In stage 3, s1000d-writer-mcp has been added, which lets an LLM create data modules without writing XML. Parts manufacturers and technical publication companies can use an LLM to understand the BREX (Business Rules Exchange) handed over by a customer, to confirm that their own data modules follow the XML schema (XSD) and the BREX, to receive candidate corrections for the violations, and to read data modules as structure rather than as XML. They can also use an LLM, without letting it write XML, to create data modules from a structured draft such as an experiential manual, verify and repair them, and hand sentences out and back for translation.
 
 The four Skills of stage 3 (experience-to-s1000d, s1000d-publish, s1000d-review and s1000d-translate) have been created. A Skill is a procedure that tells Claude which MCP servers to call in which order and what to ask the user at each step. The prototype of the authoring tool for experiential manuals (provisionally called manual-editor) was moved to a separate product project on 2026-11-07.
 
@@ -52,7 +52,7 @@ flowchart TB
     V["s1000d-verify-mcp"]
     W["s1000d-writer-mcp"]
   end
-  subgraph Products["separate projects (products that use this foundation)"]
+  subgraph Products["separate projects (products that use this toolkit)"]
     XM["experiential manuals<br/>authoring tool and player"]
     IETP["IETM / IETP<br/>viewer for a CSDB"]
   end
@@ -67,7 +67,7 @@ flowchart TB
   SK -.calls.-> Mcp
 ```
 
-The expert agents (MCP and Skills) come first; the two product projects (experiential manuals, and IETM / IETP) use those agents as development tools. The mapping to S1000D is gathered into the common data model and its conversion functions, so that the agents and the products do not interpret it separately. The products stay usable without AI. Whatever the products find missing is returned to this foundation (core and MCP).
+The expert agents (MCP and Skills) come first; the two product projects (experiential manuals, and IETM / IETP) use those agents as development tools. The mapping to S1000D is gathered into the common data model and its conversion functions, so that the agents and the products do not interpret it separately. The products stay usable without AI. Whatever the products find missing is added to core and the MCP servers.
 
 ## Stack manifest
 

@@ -46,6 +46,6 @@ flowchart LR
 
 ## Plans
 
-As a real user of this foundation, a simple technical-manual web system that displays an S1000D CSDB directly is planned. With a minimal feature set — follow data modules from the table of contents of a publication module, hide sections that do not apply to the selected product, show issue, verification status and security classification at the top of each page — it is also the place where anything missing from the API is fed back to core and the MCP servers.
+As a real user of s1000d-core and the MCP servers, a simple technical-manual web system that displays an S1000D CSDB directly is planned. With a minimal feature set — follow data modules from the table of contents of a publication module, hide sections that do not apply to the selected product, show issue, verification status and security classification at the top of each page — it is also the place where anything missing from the API is fed back to core and the MCP servers.
 
 The design history is in [docs/design/agent-platform.md](https://github.com/shuji-bonji/s1000d-stack/blob/main/docs/design/agent-platform.md) in the hub repository.

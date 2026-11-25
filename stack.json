@@ -248,14 +248,14 @@
       "layer": "app",
       "form": "app",
       "public": false,
-      "note": "D-29 で分離。experiential-manual-model を読み書きする player（Web Components）・editor・cli。試作 manual-editor はここへ移す。この基盤を使う製品"
+      "note": "D-29 で分離。experiential-manual-model を読み書きする player（Web Components）・editor・cli。試作 manual-editor はここへ移す。S1000D の処理系（s1000d-stack）を使う製品"
     },
     {
       "name": "IETM / IETP（別プロジェクト）",
       "layer": "app",
       "form": "app",
       "public": false,
-      "note": "D-29 で分離。S1000D の CSDB を表示する Web の閲覧ソフトから始め、作成・公開まで広げる。段階 4 の参照実装はここへ移す。この基盤を使う製品"
+      "note": "D-29 で分離。S1000D の CSDB を表示する Web の閲覧ソフトから始め、作成・公開まで広げる。段階 4 の参照実装はここへ移す。S1000D の処理系（s1000d-stack）を使う製品"
     },
     {
       "name": "S1000D 配布物（s1000d.org）",
