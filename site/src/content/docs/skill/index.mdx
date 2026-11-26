@@ -1,0 +1,27 @@
+---
+title: Skills
+description: What the four S1000D Stack Skills do and how to choose one, with links to the page for each Skill.
+sidebar:
+  label: Overview
+---
+
+import SectionPages from '../../../components/SectionPages.astro';
+
+A Skill is a procedure that tells Claude which MCP servers to call in which order, and what to confirm with the user at each step. A Skill has no conversion or verification logic of its own; every decision is based on the responses of the MCP servers.
+
+## Which Skill to use
+
+Choose by what you have and what you want to do.
+
+| What you have | What you want to do | Skill |
+| --- | --- | --- |
+| The JSON of an experiential manual | Turn it into an S1000D CSDB | `experience-to-s1000d` |
+| Text or specification notes | Create data modules one at a time, or edit and revise data modules in the CSDB | `s1000d-publish` |
+| Data modules in the CSDB | Review them and leave the findings as comment DMs | `s1000d-review` |
+| Data modules in the CSDB | Create a version in another language | `s1000d-translate` |
+
+## Pages for each Skill
+
+Each page explains what you provide, the MCP servers it needs, the flow of the procedure and what it does not do.
+
+<SectionPages dir="skill" order={['experience-to-s1000d', 's1000d-publish', 's1000d-review', 's1000d-translate']} />

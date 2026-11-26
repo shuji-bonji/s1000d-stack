@@ -1,7 +1,11 @@
 ---
 title: 3 つの使い方（見取り図）
 description: s1000d-stack の MCP サーバーと Skill をどのような場面で使うかを、3 つの使い方に分けて説明します。
+sidebar:
+  order: 0
 ---
+
+import SectionPages from '../../../../components/SectionPages.astro';
 
 s1000d-stack は、S1000D の技術文書を LLM が BREX に沿って読み、検査し、作れるようにする道具の束ねです。ここでは、その道具をどの場面でどう組み合わせるかを 3 つに分けて説明します。1 と 2 は既存の S1000D データを扱う使い方、3 は S1000D を持たない現場から S1000D を作る使い方です。
 
@@ -56,6 +60,8 @@ S1000D を導入していない現場でも、画面や機器の操作を体験�
 
 作成ツールは別プロジェクトで開発中で、試作の名前は仮称（manual-editor）です。ツールが保存した JSON を Skill [experience-to-s1000d](/s1000d-stack/ja/skill/experience-to-s1000d/) に渡すと、writer による変換と verify による検証が、利用者への確認を挟みながら進みます。体験型マニュアルを経由せず、文章からデータモジュールを作るときは、Skill [s1000d-publish](/s1000d-stack/ja/skill/s1000d-publish/) を使います。
 
-:::tip[製品に組み込む使い方]
-CSDB 製品のベンダーが、製品に AI エージェントを組み込むために MCP サーバーを使う方法は [CSDB 製品に組み込む](/s1000d-stack/ja/use-cases/embedding/) で説明しています。
-:::
+## 場面を絞った使い方のページ
+
+特定の利用者や場面に絞った使い方は、次のページで説明しています。CSDB 製品のベンダーが、製品に AI エージェントを組み込むために MCP サーバーを使う方法も、ここにあります。
+
+<SectionPages dir="use-cases" />

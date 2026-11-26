@@ -1,0 +1,24 @@
+---
+title: MCP サーバー
+description: S1000D Stack の 4 つの MCP サーバーがそれぞれ何をするかと、各サーバーのページを案内します。
+sidebar:
+  label: 概要
+---
+
+import SectionPages from '../../../../components/SectionPages.astro';
+
+S1000D Stack は、LLM が S1000D® のデータを読み、確かめ、作るための MCP サーバーを 4 つ持ちます。どのサーバーも、判定は共有ライブラリ `s1000d-core` が決定論的に行い、LLM には結果だけを渡します（[設計方針](/s1000d-stack/ja/guide/design-principles/)）。
+
+```mermaid
+flowchart LR
+  W["s1000d-writer-mcp<br/>作る・直す・改版する"] --> CSDB[("CSDB")]
+  CSDB --> V["s1000d-verify-mcp<br/>XSD・BREX・参照を確かめる"]
+  CSDB --> R["s1000d-reader-mcp<br/>構造として読む"]
+  CSDB --> B["s1000d-brex-mcp<br/>BREX を読み、照合する"]
+```
+
+## 各サーバーのページ
+
+各ページで、設定のしかた、ツールの一覧、応答の読み方を説明しています。ツールごとの引数は [Stack リファレンス](/s1000d-stack/ja/reference/stack/) にあります。
+
+<SectionPages dir="mcp" order={['brex-mcp', 'verify-mcp', 'reader-mcp', 'writer-mcp']} />

@@ -1,7 +1,11 @@
 ---
 title: Three ways to use it
 description: Explains in which situations the MCP servers and Skills of s1000d-stack are used, divided into three ways of using them.
+sidebar:
+  order: 0
 ---
+
+import SectionPages from '../../../components/SectionPages.astro';
 
 s1000d-stack is a set of tools that lets an LLM read, check and create S1000D® technical documents in line with BREX (Business Rules Exchange). This page explains how to combine those tools in which situation, divided into three use cases. Use cases 1 and 2 work with existing S1000D data; use case 3 creates S1000D from a workplace that does not have S1000D.
 
@@ -56,6 +60,8 @@ This correspondence is defined as experiential-manual-model, a common data model
 
 The authoring tool is being developed in a separate project, and the name of its prototype (manual-editor) is provisional. When you pass a JSON saved by the tool to the Skill [experience-to-s1000d](/s1000d-stack/skill/experience-to-s1000d/), the conversion by the writer and the verification by verify proceed with your confirmation at each step. To create data modules from text without going through an experiential manual, use the Skill [s1000d-publish](/s1000d-stack/skill/s1000d-publish/).
 
-:::tip[Embedding in a product]
-How vendors of CSDB products use the MCP servers to embed AI agents in their product is explained in [Embedding in a CSDB product](/s1000d-stack/use-cases/embedding/).
-:::
+## Pages for specific use cases
+
+The following pages explain use cases narrowed to a particular kind of user or situation, including how vendors of CSDB products use the MCP servers to embed AI agents in their product.
+
+<SectionPages dir="use-cases" />

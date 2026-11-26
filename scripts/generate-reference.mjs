@@ -657,6 +657,97 @@ function toolPage(server, tool, lang, summary, related) {
   return `${L.join('\n').trimEnd()}\n`;
 }
 
+// ───────────────────────── render: 区分の入口 ─────────────────────────
+
+/** 手書きの欄の最初の 1 文（何を表すか）。表の左の欄に属性名があるので、文頭の属性名は外す */
+function firstSentence(text, lang, name) {
+  const t = text.replace(/\s+/g, ' ').trim();
+  const m = lang === 'ja' ? /^.*?。/.exec(t) : /^.*?\.(?=\s|$)/.exec(t);
+  const s = m ? m[0] : t;
+  if (lang === 'ja') return s.replace(new RegExp(`^\`${name}\` は、`), '');
+  const rest = s.replace(new RegExp(`^\`${name}\` is `), '');
+  return rest === s ? s : rest.charAt(0).toUpperCase() + rest.slice(1);
+}
+
+function s1000dIndex(meta, lang) {
+  const ja = lang === 'ja';
+  const L = [];
+  L.push('---', ja ? `title: S1000D リファレンス（Issue ${meta.issue}）` : `title: S1000D reference (Issue ${meta.issue})`);
+  L.push(
+    ja
+      ? `description: S1000D Issue ${meta.issue} の属性ごとに、付く要素・書ける値・関連する決まりをまとめた非公式のリファレンスの入口です。ページのある属性の一覧を載せています。`
+      : `description: The entry page of the unofficial reference that describes, for each S1000D Issue ${meta.issue} attribute, the elements that carry it, the allowed values and the related rules. It lists the attributes that have a page.`,
+  );
+  L.push('sidebar:', ja ? '  label: 概要' : '  label: Overview', '  order: 0');
+  L.push('---', '', MARK, '');
+  if (ja) {
+    L.push(':::note[このリファレンスについて]');
+    L.push(
+      `S1000D® Issue ${meta.issue} の内容を、このプロジェクトが自分の言葉でまとめた非公式の手引きです。${meta.distributionDate} 付けの配布物をもとに書いています。このプロジェクトは ASD とは無関係です（[仕様書の扱いと商標](${BASE}/ja/guide/license/)）。正式な定義は仕様書にあります。`,
+    );
+  } else {
+    L.push(':::note[About this reference]');
+    L.push(
+      `This reference is an unofficial guide to S1000D® Issue ${meta.issue}, written in this project's own words. It is based on the S1000D distribution dated ${meta.distributionDate}. This is a personal project and is not affiliated with ASD ([Specification files and trademarks](${BASE}/guide/license/)). The formal definitions are in the S1000D specification.`,
+    );
+  }
+  L.push(':::', '');
+  L.push(
+    ja
+      ? '属性 1 つにつき 1 ページで、その属性が付く要素、書ける値、関連する決まり、S1000D Stack のツールでの扱いを説明します。書ける値は、XML スキーマと既定 BREX の定めを分けて示しています。'
+      : 'Each page covers one attribute: the elements that carry it, the allowed values, the related rules, and how the S1000D Stack tools handle it. The allowed values are shown separately for the XML schema and for the default BREX.',
+    '',
+  );
+  L.push(ja ? '## 属性の一覧' : '## Attributes', '');
+  L.push(
+    ja
+      ? `ページがあるのは、次の ${meta.attributes.length} 属性です。値の意味を自分の言葉で書いた属性だけを載せており、属性は順に足していきます。`
+      : `The following ${meta.attributes.length} attributes have a page. Only the attributes whose values have been described in this project's own words are listed; more attributes will be added over time.`,
+    '',
+  );
+  L.push(ja ? '| 属性 | 何を表すか |' : '| Attribute | What it indicates |', '| --- | --- |');
+  const rows = meta.attributes
+    .map((a) => ({ a, notes: readNotes(a.name, lang) }))
+    .filter((x) => x.notes)
+    .sort((x, y) => x.a.name.localeCompare(y.a.name));
+  for (const { a, notes } of rows) L.push(`| [${code(a.name)}](${langBase(lang)}/reference/s1000d/issue-${ISSUE}/${a.slug}/) | ${cell(firstSentence(notes.lead, lang, a.name))} |`);
+  L.push('');
+  return `${L.join('\n').trimEnd()}\n`;
+}
+
+function stackIndex(tools, lang) {
+  const ja = lang === 'ja';
+  const total = tools.servers.reduce((n, s) => n + s.tools.length, 0);
+  const L = [];
+  L.push('---', ja ? 'title: Stack リファレンス' : 'title: Stack reference');
+  L.push(
+    ja
+      ? `description: S1000D Stack の MCP サーバー ${tools.servers.length} つが持つツール ${total} 個の、引数と tools/list が返す説明をまとめたリファレンスの入口です。`
+      : `description: The entry page of the reference for the ${total} tools of the ${tools.servers.length} S1000D Stack MCP servers — their arguments and the descriptions returned by tools/list.`,
+  );
+  L.push('---', '', MARK, '');
+  L.push(
+    ja
+      ? `S1000D Stack の MCP サーバー ${tools.servers.length} つが持つツール ${total} 個を、1 つ 1 ページで説明します。各ページは、サーバーが \`tools/list\` で返す内容から生成しているので、サーバーの版が上がると内容も変わります。サーバーの設定のしかたと応答の読み方は、[MCP サーバー](${BASE}/ja/mcp/)の各ページにあります。`
+      : `Each of the ${total} tools of the ${tools.servers.length} S1000D Stack MCP servers has its own page. The pages are generated from what the servers return for \`tools/list\`, so they change when a server is updated. The configuration of each server and how to read its responses are on the [MCP servers](${BASE}/mcp/) pages.`,
+    '',
+  );
+  for (const server of tools.servers) {
+    const sum = summaries(server.id, lang);
+    L.push(`## s1000d-${server.id}-mcp`, '');
+    L.push(
+      ja
+        ? `[s1000d-${server.id}-mcp](${langBase(lang)}/mcp/${server.id}-mcp/) ${server.version} のツール ${server.tools.length} 個です。`
+        : `The ${server.tools.length} tools of [s1000d-${server.id}-mcp](${langBase(lang)}/mcp/${server.id}-mcp/) ${server.version}.`,
+      '',
+    );
+    L.push(ja ? '| ツール | 概要 |' : '| Tool | Summary |', '| --- | --- |');
+    for (const tool of server.tools) L.push(`| [${code(tool.name)}](${langBase(lang)}/reference/stack/${server.id}/${kebab(tool.name)}/) | ${cell(sum.get(tool.name) ?? '')} |`);
+    L.push('');
+  }
+  return `${L.join('\n').trimEnd()}\n`;
+}
+
 // ───────────────────────── render: 入口 ─────────────────────────
 
 function build() {
@@ -712,6 +803,8 @@ function build() {
       }
     }
   }
+  if (s1000d.attributes.length) for (const lang of LANGS) files.set(join(langDir(lang), 'reference/s1000d', `issue-${ISSUE}`, 'index.md'), s1000dIndex(s1000d, lang));
+  if (tools.servers.length) for (const lang of LANGS) files.set(join(langDir(lang), 'reference/stack', 'index.md'), stackIndex(tools, lang));
   return { files, problems };
 }
 

@@ -1,0 +1,27 @@
+---
+title: Skill
+description: S1000D Stack の 4 つの Skill が何をするものかと、どの Skill を使うかの選び方を説明し、各 Skill のページを案内します。
+sidebar:
+  label: 概要
+---
+
+import SectionPages from '../../../../components/SectionPages.astro';
+
+Skill は、どの MCP サーバーをどの順番で呼び、各段階で利用者に何を確かめるかを Claude に伝える手順です。変換や検証の処理は持たず、判定はすべて MCP サーバーの応答を根拠にします。
+
+## どの Skill を使うか
+
+手元にあるものと、したいことで選びます。
+
+| 手元にあるもの | したいこと | Skill |
+| --- | --- | --- |
+| 体験型マニュアルの JSON | S1000D の CSDB にする | `experience-to-s1000d` |
+| 文章や仕様メモ | データモジュールを 1 件ずつ作る、CSDB にあるデータモジュールを編集・改版する | `s1000d-publish` |
+| CSDB にあるデータモジュール | レビューし、指摘を comment DM として残す | `s1000d-review` |
+| CSDB にあるデータモジュール | 別の言語の版を作る | `s1000d-translate` |
+
+## 各 Skill のページ
+
+各ページで、渡すもの、前提の MCP サーバー、手順の流れ、しないことを説明しています。
+
+<SectionPages dir="skill" order={['experience-to-s1000d', 's1000d-publish', 's1000d-review', 's1000d-translate']} />

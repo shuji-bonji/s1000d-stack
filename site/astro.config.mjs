@@ -76,6 +76,7 @@ export default defineConfig({
           label: 'MCP servers',
           translations: { ja: 'MCP サーバー' },
           items: [
+            { label: 'Overview', translations: { ja: '概要' }, slug: 'mcp' },
             { label: 's1000d-brex-mcp', slug: 'mcp/brex-mcp' },
             { label: 's1000d-verify-mcp', slug: 'mcp/verify-mcp' },
             { label: 's1000d-reader-mcp', slug: 'mcp/reader-mcp' },
@@ -86,6 +87,7 @@ export default defineConfig({
           label: 'Skills',
           translations: { ja: 'Skill' },
           items: [
+            { label: 'Overview', translations: { ja: '概要' }, slug: 'skill' },
             { label: 'experience-to-s1000d', slug: 'skill/experience-to-s1000d' },
             { label: 's1000d-publish', slug: 'skill/s1000d-publish' },
             { label: 's1000d-review', slug: 'skill/s1000d-review' },
@@ -103,6 +105,7 @@ export default defineConfig({
           translations: { ja: 'Stack リファレンス' },
           collapsed: true,
           items: [
+            { label: 'Overview', translations: { ja: '概要' }, slug: 'reference/stack' },
             { label: 's1000d-brex-mcp', collapsed: true, items: [{ autogenerate: { directory: 'reference/stack/brex' } }] },
             { label: 's1000d-verify-mcp', collapsed: true, items: [{ autogenerate: { directory: 'reference/stack/verify' } }] },
             { label: 's1000d-reader-mcp', collapsed: true, items: [{ autogenerate: { directory: 'reference/stack/reader' } }] },
@@ -112,10 +115,8 @@ export default defineConfig({
         {
           label: 'Use cases',
           translations: { ja: 'ユースケース' },
-          items: [
-            { label: 'Three ways to use it', translations: { ja: '3 つの使い方（見取り図）' }, slug: 'use-cases' },
-            { label: 'Embedding in a CSDB product', translations: { ja: 'CSDB 製品に組み込む' }, slug: 'use-cases/embedding' },
-          ],
+          // 入口（index.mdx、見取り図）を先頭に置き、ほかのページは足すたびに自動で並ぶ。入口の一覧は SectionPages が作る
+          items: [{ autogenerate: { directory: 'use-cases' } }],
         },
         {
           // 設計は docs/design/site-reference.md。区分の名前に「非公式」を入れる（D-02、SR-4）

@@ -1,0 +1,31 @@
+---
+/**
+ * 区分の入口ページ（<dir>/index.mdx）に、その区分のページを題名と説明のカードで並べる。
+ * ページを足しても入口ページを直さずに済むように、docs のコレクションから読む。
+ *
+ *   <SectionPages dir="mcp" order={['brex-mcp', 'verify-mcp', 'reader-mcp', 'writer-mcp']} />
+ *
+ * order に無いページは、order にあるページの後に、ファイル名の順で並ぶ。
+ */
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+import { getCollection } from 'astro:content';
+
+interface Props {
+  dir: string;
+  order?: string[];
+}
+const { dir, order = [] } = Astro.props;
+const locale = Astro.locals.starlightRoute.locale; // 英語（root）は undefined
+const prefix = `${locale ? `${locale}/` : ''}${dir}/`;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const entries = (await getCollection('docs', (e) => e.id.startsWith(prefix) && !e.data.sidebar?.hidden))
+  .map((e) => ({ e, name: e.id.slice(prefix.length) }))
+  .filter(({ name }) => name && !name.includes('/'));
+const rank = (name: string) => (order.includes(name) ? order.indexOf(name) : order.length);
+entries.sort((a, b) => rank(a.name) - rank(b.name) || a.name.localeCompare(b.name));
+---
+
+<CardGrid>
+  {entries.map(({ e }) => <LinkCard title={e.data.title} description={e.data.description} href={`${base}/${e.id}/`} />)}
+</CardGrid>

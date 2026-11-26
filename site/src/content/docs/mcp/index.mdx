@@ -1,0 +1,24 @@
+---
+title: MCP servers
+description: What each of the four S1000D Stack MCP servers does, with links to the page for each server.
+sidebar:
+  label: Overview
+---
+
+import SectionPages from '../../../components/SectionPages.astro';
+
+S1000D Stack has four MCP servers that let an LLM read, check and create S1000D® data. In every server, the decisions are made deterministically by the shared library `s1000d-core`, and the LLM receives only the results ([Design principles](/s1000d-stack/guide/design-principles/)).
+
+```mermaid
+flowchart LR
+  W["s1000d-writer-mcp<br/>create, fix, revise"] --> CSDB[("CSDB")]
+  CSDB --> V["s1000d-verify-mcp<br/>check XSD, BREX and references"]
+  CSDB --> R["s1000d-reader-mcp<br/>read as structure"]
+  CSDB --> B["s1000d-brex-mcp<br/>read and check against BREX"]
+```
+
+## Pages for each server
+
+Each page explains the configuration, the list of tools and how to read the responses. The arguments of each tool are in the [Stack reference](/s1000d-stack/reference/stack/).
+
+<SectionPages dir="mcp" order={['brex-mcp', 'verify-mcp', 'reader-mcp', 'writer-mcp']} />
