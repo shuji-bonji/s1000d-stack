@@ -64,7 +64,7 @@ The family used to be called the ILS (Integrated Logistics Support) specificatio
 
 ## In this stack
 
-- The first target is Issue 7; Issue 4.2 is planned next
+- The stack is built on Issue 7 and has also been run against Issue 4.2, Issue 4.1 and the Issue 4.0 series. The results for each issue are in ["Target issue" on the architecture page](/s1000d-stack/guide/architecture/#target-issue)
 - The specification, XML schemas, default BREX and official samples are not bundled; the ones the user obtained from s1000d.org are given with `S1000D_SPEC_DIR` (see [Getting started](/s1000d-stack/guide/getting-started/))
 - The mechanisms in the table above are handled by the following components: BREX by [s1000d-brex-mcp](/s1000d-stack/mcp/brex-mcp/), validating data modules and reconciling them with the DML by [s1000d-verify-mcp](/s1000d-stack/mcp/verify-mcp/), reading content, references and applicability by [s1000d-reader-mcp](/s1000d-stack/mcp/reader-mcp/), and creating data modules by [s1000d-writer-mcp](/s1000d-stack/mcp/writer-mcp/)
 - The kinds of data module covered are descriptions, procedures, processes, fault isolation, publication modules and a few others; not every kind can be read. See "What it does not do" on each server's page

@@ -75,7 +75,21 @@ The two products were separated from s1000d-stack on 2026-11-07 and are develope
 
 ## Target issue
 
-The first target is Issue 7. Issue 4.2 is planned next, because most real-world examples, in Japan and elsewhere, use the Issue 4 series. `s1000d-core` is structured so that it can read each issue separately.
+The stack is built on Issue 7. It has also been run against the distributions of Issue 4.2, Issue 4.1 and the Issue 4.0 series (4.0, 4.0.1 and 4.0.2), because most real-world examples, in Japan and elsewhere, use the Issue 4 series. The issue of a data module is read from the URL in `xsi:noNamespaceSchemaLocation`.
+
+| Issue | Reading and verifying (results on the Bike samples) | Creating (`issue` of s1000d-writer-mcp) |
+| --- | --- | --- |
+| Issue 7 | All 118 XML files are `valid` against the XSD | The default (when `issue` is omitted) |
+| Issue 4.2 | All 105 XML files are `valid` against the XSD | `"4.2"`. A draft written for Issue 7 is built as it is |
+| Issue 4.1 | All 103 XML files are `valid` against the XSD | `"4.1"`. A section of a process data module cannot have a title |
+| Issue 4.0 series | 194 of the 195 XML files are `valid` against the XSD | `"4.0"` and so on. A section of a process data module cannot have a title. Publication modules and comments are built without `brexDmRef` |
+
+- **Reading**: in the samples of all four issues, no text is lost from the data modules whose content is read as structure (descriptive, procedural, process and fault isolation).
+- **Verifying**: the XSD files and the default BREX are found in the distribution under `S1000D_SPEC_DIR`. Point it at the distribution of the same issue as the data modules.
+- **Creating**: when a draft contains something that is known not to fit the XSD of the target issue, the server does not leave it out; it returns `input-error` with the place in the draft.
+- **The mark for controlled content** (`authorityName` and `authorityDocument`) exists in Issue 4.0 to 4.2. It is written from `authority` on a node of the draft. Issue 7 replaced it with `controlAuthority`, which the stack does not read or write yet.
+- The rules of the Issue 4.0 default BREX have no identifiers. Violations are reported, but without a rule number.
+- The stack has not been run against Issue 5.0 or Issue 6. The S1000D reference pages cover Issue 7 only.
 
 :::note[Design decisions]
 Why decisions are left to the server, and decisions such as not letting the LLM write XML, are summarised in [Design principles](/s1000d-stack/guide/design-principles/). The history of decisions and the open questions are recorded with numbers in [docs/DECISIONS.md](https://github.com/shuji-bonji/s1000d-stack/blob/main/docs/DECISIONS.md) in the hub repository.

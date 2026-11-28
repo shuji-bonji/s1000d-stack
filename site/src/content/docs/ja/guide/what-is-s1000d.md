@@ -64,7 +64,7 @@ S1000D は、製品のライフサイクル全体にわたる支援を扱う仕�
 
 ## このスタックでは
 
-- 最初の対象は Issue 7 で、次に Issue 4.2 を対象にする予定です
+- Issue 7 を基準に作り、Issue 4.2・4.1・4.0 系でも動くことを確かめています。版ごとの結果は[全体構成の「対象とする版」](/s1000d-stack/ja/guide/architecture/#対象とする版)にあります
 - 仕様書・XML スキーマ・既定 BREX・公式サンプルは同梱せず、利用者が s1000d.org から入手したものを `S1000D_SPEC_DIR` で指定します（[導入手順](/s1000d-stack/ja/guide/getting-started/)）
 - 上の表の仕組みは、次の部品が扱います。BREX は [s1000d-brex-mcp](/s1000d-stack/ja/mcp/brex-mcp/)、データモジュールの検証と DML との照合は [s1000d-verify-mcp](/s1000d-stack/ja/mcp/verify-mcp/)、本文・参照・適用性の読み取りは [s1000d-reader-mcp](/s1000d-stack/ja/mcp/reader-mcp/)、データモジュールの作成は [s1000d-writer-mcp](/s1000d-stack/ja/mcp/writer-mcp/) です
 - 対象にしているデータモジュールの種類は、説明・手順・プロセス・故障探求・パブリケーションモジュールなどで、すべての種類を読めるわけではありません。各サーバーのページの「できないこと」をご覧ください

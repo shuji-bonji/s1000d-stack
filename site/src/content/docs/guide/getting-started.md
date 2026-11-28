@@ -16,7 +16,7 @@ flowchart LR
   E --> F
 ```
 
-1. **The S1000D® distribution.** From the download page at [s1000d.org](https://s1000d.org/), obtain the zip for the target issue (the first target is Issue 7; `S1000D Issue 7.zip`) and extract it into one folder. This gives you the specification PDF and ten inner zip files. The MCP servers read the contents of the following two.
+1. **The S1000D® distribution.** From the download page at [s1000d.org](https://s1000d.org/), obtain the zip for the same issue as your data modules and extract it into one folder. This page uses Issue 7 (`S1000D Issue 7.zip`) as the example. This gives you the specification PDF and ten inner zip files. The MCP servers read the contents of the following two.
 
    | Inner zip | Contents | Extract |
    | --- | --- | --- |
@@ -25,6 +25,8 @@ flowchart LR
    | `S1000D Issue 7 Bike Samples.zip` | The sample bicycle CSDB | Only if you want to try reading it |
 
    The MCP servers do not read the other seven (Data Dictionary, Example SNS and so on), so you do not need to extract them. The original inner zip files remain after extraction; the servers never open zip files, so you can leave them there. You can name the extracted folders as you like: the servers search under `S1000D_SPEC_DIR` for the default BREX file name and for an `xml_schema_flat/` folder that contains `brex.xsd`.
+
+   For data modules of Issue 4.2, Issue 4.1 or the Issue 4.0 series, extract the distribution of that issue in the same way and point `S1000D_SPEC_DIR` at its folder. The names of the inner zip files and folders differ between issues. The Issue 4.1 and Issue 4.0 distributions contain more than one folder of XSD files for the same issue (the original ones and the ones in patches); the `S1000D_SCHEMA_DIR` environment variable selects which one is used. What has been checked for each issue is listed in ["Target issue" on the architecture page](/s1000d-stack/guide/architecture/#target-issue).
 2. **Node.js 22 or later.** The MCP servers can be started with `npx`.
 3. **An MCP client.** Something that can register MCP servers, such as Claude Desktop or Claude Code.
 
