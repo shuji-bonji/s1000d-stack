@@ -7,7 +7,7 @@ Issue 4.2・4.1・4.0 の配布物でいまの MCP を動かした結果（[issu
 
 | 番号 | 題 | 版によるか | Issue | 状態（2026-11-29） |
 |---|---|---|---|---|
-| F-1 | Issue 4.2 に無い要素を、writer が組み立てる前に知らせる | Issue 4.2 | [#26](https://github.com/shuji-bonji/s1000d-stack/issues/26) | 済み。置けないものは入力の誤りにすると決めた（D-43）。いまの組み立てる側が書く要素と属性は、すべて Issue 4.2 にあり、断るものは無い。`authorityName`・`authorityDocument` は、節点の `authority` で書けるようにした（s1000d-core 0.20.0） |
+| F-1 | Issue 4.2 に無い要素を、writer が組み立てる前に知らせる | Issue 4.2 | [#26](https://github.com/shuji-bonji/s1000d-stack/issues/26) | 済み。置けないものは入力の誤りにすると決めた（D-43）。いまの組み立てる側が書く要素と属性は、すべて Issue 4.2 にあり、断るものは無い。`authorityName`・`authorityDocument` は、節点の `authority` で書けるようにした（s1000d-core 0.20.0）。Issue 7 の `controlAuthority` は、`controlAuthorities` と `controlAuthorityRefs` で読み書きできるようにした（s1000d-core 0.21.0。公開はまだ） |
 | F-2 | 先頭に BOM がある XML を読めるようにする | よらない | [#23](https://github.com/shuji-bonji/s1000d-stack/issues/23) | core 0.19.0 で直した（brex-mcp 0.9.1・verify-mcp 0.12.0・reader-mcp 0.17.0・writer-mcp 0.10.0 として 2026-11-29 に公開） |
 | F-3 | `content/refs` の `dmRef` の題名を、本文の読み取りの結果に入れる | よらない | [#24](https://github.com/shuji-bonji/s1000d-stack/issues/24) | core 0.19.0 と reader-mcp 0.17.0 で直した（2026-11-29 に公開） |
 | F-4 | 配布物の中に同じ版の `xml_schema_flat/` が複数あるときの選び方を決める | よらない | [#25](https://github.com/shuji-bonji/s1000d-stack/issues/25) | core 0.19.0 で、写しを 1 つにまとめた。同じ版で中身の違う XSD は、利用者が設定で選ぶ（`S1000D_SCHEMA_DIR`・`schemaDirs`。2026-11-29 に決定し、core と verify・reader・writer の MCP に実装した） |
@@ -45,7 +45,21 @@ Issue 4.2・4.1・4.0 の配布物でいまの MCP を動かした結果（[issu
 - 要素の名前と、付けられるようになった版の対応は、core の `src/write/content/authority-elements.ts` にあります。Issue 4.0・4.1・4.2 の XSD（`descript`・`proced`・`process`・`fault`・`pm`）から取り出した 79 個です（Issue 4.0 から 56、4.1 から 22、4.2 から 1）。同じ名前の要素が、XSD によって属性を持ったり持たなかったりする所はありませんでした。
 - reader は、`authorityName`・`authorityDocument` が書かれている要素の節点に、`authority: { name?, document? }` を返します。自作の DM で確かめました（4 つの版の Bike のサンプルには、この属性を書いた DM が 1 件もありません）。
 - core の配布物付きのテストで、`authority` を付けた下書き（説明の節、手順、故障探求の手順）を Issue 4.0・4.1・4.2 向けに組み立て、それぞれの版の XSD で `valid` になることを確かめています。
-- Issue 7 の `controlAuthority` は、書くことも読むこともまだしていません。
+- Issue 7 の `controlAuthority` は、s1000d-core 0.21.0 で読み書きできるようにしました（下の節）。
+
+### 内容を管理する機関（Issue 7 の `controlAuthority`）
+
+Issue 7 では、機関を識別・状態部に 1 回定義して、内容部の要素から id で指します。`authority` とは別の項目にしました（理由は DECISIONS の D-43）。
+
+| 下書きの項目 | 出力 |
+|---|---|
+| `controlAuthorities: [{ id, type, source?, value?, text? }]` | `dmStatus`（PM は `pmStatus`）の `security` の後ろの `controlAuthorityGroup/controlAuthority`。`type` は `controlAuthorityType`（`cat01`〜`cat99`。必須で、既定は無い） |
+| 節点の `controlAuthorityRefs: [id, …]` | その節点の要素の属性 `controlAuthorityRefs` |
+
+- 属性を持てる要素の名前は、core の `src/write/content/control-authority-elements.ts` にあります。Issue 7 の XSD（`descript`・`proced`・`process`・`fault`・`pm`）から取り出した 234 個です。Issue 4.x の `authorityName` と違い、`para` にも付けられます。
+- 対象の版が Issue 4.2 以前のとき、一覧に無い id を指しているとき、属性を持てない要素になる節点のときは、`input-error` と位置を返します。
+- reader は、`identAndStatus.controlAuthorities` と、節点の `controlAuthorityRefs` に返します。Issue 7 の Bike Samples には、この仕組みを使った DM が 1 件あります（機関 5 つ、参照のある手順 4 つ）。core の配布物付きのテストで、この DM を読めることと、自作の下書き 5 件が Issue 7 の XSD で `valid` になることを確かめています。
+- `controlAuthority` の子の `dmRef` と `symbol` は、読む側は返しますが、作る側では書けません。
 
 ## F-2 先頭に BOM がある XML を読めるようにする
 
