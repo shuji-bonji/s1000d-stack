@@ -3,16 +3,16 @@
 Issue 4.2・4.1・4.0 の配布物でいまの MCP を動かした結果（[issue-4.2-survey.md](./issue-4.2-survey.md)、[issue-4.0-4.1-survey.md](./issue-4.0-4.1-survey.md)）から、別の Issue に分ける課題の下書きです。GitHub の Issue を起こす人が、題と本文をそのまま貼れるように書いています。起こしたら、この文書の該当する節に Issue の番号を書き足します。
 
 > [!NOTE]
-> 2026-11-28 に、6 件とも GitHub の Issue にしました。F-5 は、利用者が「Issue 4.1 と Issue 4.0 系をどちらも対象にする」と決めたので（D-42）、版ごとの 2 件に分けています。下の節は、起こしたときの下書きです。その後の経過は、それぞれの Issue に書きます。
+> 状態の列は 2026-11-29 のものです。2026-11-28 に、6 件とも GitHub の Issue にしました。F-5 は、利用者が「Issue 4.1 と Issue 4.0 系をどちらも対象にする」と決めたので（D-42）、版ごとの 2 件に分けています。下の節は、起こしたときの下書きです。その後の経過は、それぞれの Issue に書きます。
 
-| 番号 | 題 | 版によるか | Issue | 状態（2026-11-28） |
+| 番号 | 題 | 版によるか | Issue | 状態（2026-11-29） |
 |---|---|---|---|---|
 | F-1 | Issue 4.2 に無い要素を、writer が組み立てる前に知らせる | Issue 4.2 | [#26](https://github.com/shuji-bonji/s1000d-stack/issues/26) | 未着手 |
 | F-2 | 先頭に BOM がある XML を読めるようにする | よらない | [#23](https://github.com/shuji-bonji/s1000d-stack/issues/23) | core 0.19.0 で直した（公開はまだ） |
 | F-3 | `content/refs` の `dmRef` の題名を、本文の読み取りの結果に入れる | よらない | [#24](https://github.com/shuji-bonji/s1000d-stack/issues/24) | core 0.19.0 と reader-mcp 0.17.0 で直した（公開はまだ） |
-| F-4 | 配布物の中に同じ版の `xml_schema_flat/` が複数あるときの選び方を決める | よらない | [#25](https://github.com/shuji-bonji/s1000d-stack/issues/25) | core 0.19.0 で、写しをまとめる所まで直した。同じ版で中身の違う XSD の優先順は未決 |
-| F-5 | Issue 4.1 への対応 | Issue 4.1 | [#27](https://github.com/shuji-bonji/s1000d-stack/issues/27) | 対象にすると決定。未着手 |
-| F-5 | Issue 4.0 系への対応 | Issue 4.0 | [#28](https://github.com/shuji-bonji/s1000d-stack/issues/28) | 対象にすると決定。未着手 |
+| F-4 | 配布物の中に同じ版の `xml_schema_flat/` が複数あるときの選び方を決める | よらない | [#25](https://github.com/shuji-bonji/s1000d-stack/issues/25) | core 0.19.0 で、写しを 1 つにまとめた。同じ版で中身の違う XSD は、利用者が設定で選ぶ（`S1000D_SCHEMA_DIR`・`schemaDirs`。2026-11-29 に決定し、core と verify・reader・writer の MCP に実装した） |
+| F-5 | Issue 4.1 への対応 | Issue 4.1 | [#27](https://github.com/shuji-bonji/s1000d-stack/issues/27) | 読む・検証する側は済み（core のテストに数を固定した）。作る側のプロセス DM が残る |
+| F-5 | Issue 4.0 系への対応 | Issue 4.0 | [#28](https://github.com/shuji-bonji/s1000d-stack/issues/28) | 読む・検証する側は済み（BREX は元から決まりどおり。DML の `dmEntry` を読めるようにした）。作る側は未決 |
 
 ## F-1 Issue 4.2 に無い要素を、writer が組み立てる前に知らせる
 
@@ -84,7 +84,7 @@ Issue 4.2・4.1・4.0 の配布物でいまの MCP を動かした結果（[issu
 材料は [issue-4.0-4.1-survey.md](./issue-4.0-4.1-survey.md) の「U-14 を決めるための材料」にあります。
 
 - Issue 4.1 は、F-2 と F-3 を直せば、読む側と検証する側が Issue 4.2 と同じ水準になります。作る側は、プロセス DM の `dmNode` の題名だけが通りません。
-- Issue 4.0 は、BREX の `allowedObjectFlag` の型が違い（2 値）、ルールの識別子（`brDecisionRef`）がありません。いまの照合の結果は使えません。作る側は、PM・コメント・DML・プロセス・ACT が通りません。
+- Issue 4.0 は、BREX のルールに識別子（`brDecisionRef`）がありません。作る側は、PM・コメント・DML・プロセス・ACT が通りません。**訂正（2026-11-29）**: 最初は「`allowedObjectFlag` の型が違うので、いまの照合の結果は使えない」と書いていましたが、誤りでした。仕様書で確かめると、`0`・`1` の意味は Issue 7 と同じで、core は元から決まりどおりに照合しています（[issue-4.0-4.1-survey.md](./issue-4.0-4.1-survey.md) の「BREX の違い」）。
 - 日本での実例として記録にあるのは、MRJ の供給企業に求められた Issue 4.0.1 です。
 
 **決めること**:

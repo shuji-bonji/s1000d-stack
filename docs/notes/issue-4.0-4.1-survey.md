@@ -9,17 +9,20 @@ S1000D Issue 4.0 と Issue 4.1 の配布物を展開し、いまの s1000d-brex-
 > [!WARNING]
 > 配布物の文章は写していません。この文書にあるのは、ファイル名・要素名・属性名・ルール ID・件数と、XSD の検証器が返した違反の文（要素名と属性名）だけです（D-03）。
 
+> [!IMPORTANT]
+> **訂正（2026-11-29）**: 最初の版のこの文書は、「Issue 4.0 では `allowedObjectFlag` の意味が違うので、BREX への照合の結果は使えない」と書いていました。これは誤りでした。Issue 4.0 の仕様書（Chap 4.10.2 の 2.5.2）を読むと、値 `0`（使ってはならない）と `1`（必ず含める）の意味は Issue 7 と同じで、属性を書かない場合が「任意」（Issue 4.1 以降の `2`）に当たります。core は元からそのとおりに照合しています。XSD の型の名前（`yesOrNoAttType`）から意味を推測したのが誤りの原因です。下の「BREX の違い」を書き直しました。
+
 ## 結論
 
 | 版 | 読む・検証する | 作る（Issue 7 向けの出力の URL だけを替える） |
 |---|---|---|
 | Issue 4.2 | そのまま動く | 27 件とも通る |
 | Issue 4.1 | ほぼそのまま動く。直す所が 2 つある（BOM、`content/refs` の題名） | 説明・手順・故障探求・PM・コメント・DML は通る。プロセスは通らない |
-| Issue 4.0 | XSD の検証と本文の読み取りは動く。**BREX への照合の結果は使えない**（`allowedObjectFlag` の意味が違う） | PM・コメント・DML・プロセス・ACT が通らない |
+| Issue 4.0 | XSD の検証、BREX への照合、本文の読み取りが動く。BREX のルールに識別子が無く、DML の項目の要素名が違う | PM・コメント・DML・プロセス・ACT が通らない |
 
 ```mermaid
 flowchart LR
-  A["Issue 4.0<br/>BREX の意味が違う<br/>作る側は 5 種が通らない"] --> B["Issue 4.1<br/>読む側は 2 点を直せば足りる<br/>作る側はプロセスが通らない"] --> C["Issue 4.2<br/>読む側はそのまま<br/>作る側は URL の切り替えで通る"] --> D["Issue 7<br/>いまの対象"]
+  A["Issue 4.0<br/>BREX のルールに識別子が無い<br/>作る側は 5 種が通らない"] --> B["Issue 4.1<br/>読む側は 2 点を直せば足りる<br/>作る側はプロセスが通らない"] --> C["Issue 4.2<br/>読む側はそのまま<br/>作る側は URL の切り替えで通る"] --> D["Issue 7<br/>いまの対象"]
 ```
 
 版をさかのぼるほど、Issue 7 との違いが大きくなります。Issue 4.1 は Issue 4.2 に近く、Issue 4.0 は別の扱いが要ります。
@@ -38,7 +41,8 @@ flowchart LR
 | Issue 7 | 118 | 0 | 0 | 118 | 0（1,587 個のうち） | XML Schema Package（`7`） |
 
 - 見つかる XSD のフォルダーは、Issue 4.0 が 3 つ（`4.0`・`4.0.1`・`4.0.2`。データ辞書の中の写しは、XML Schema Package と中身が同じなので 1 つにまとまる）、Issue 4.1 が 3 つ（どれも `4.1` で、中身が違う）になりました。
-- Issue 4.1 の 3 つ（Patch 4.1.A、直下の `xml_schema_flat`、XML Schema Package の `Schemas`）は、版が同じで中身が違います。名前の順で先に見つかる Patch 4.1.A が使われ、ほかの 2 つは `locateXsd` の `otherCandidates` に入ります。どれを優先するかは、まだ決めていません（#25 に残した）。
+- Issue 4.1 の 3 つ（Patch 4.1.A、直下の `xml_schema_flat`、XML Schema Package の `Schemas`）は、版が同じで中身が違います。指定が無ければ、名前の順で先に見つかる Patch 4.1.A が使われ、ほかの 2 つは `locateXsd` の `otherCandidates` に入ります。どれを使うかは、利用者が設定で選びます（2026-11-29 に決定。環境変数 `S1000D_SCHEMA_DIR` か、設定ファイルの `"schemaDirs"`）。
+- 上の表の数は、core の配布物付きのテスト（`src/issues.spec.test.ts`）に固定しました。
 - MCP の応答に反映されるのは、MCP が読み込む core を 0.19.0 に上げた後です。下の節の数は、直す前（core 0.18.0）のものです。
 
 ## 見つかった問題（版によらないもの）
@@ -130,7 +134,7 @@ Bike data set は 381 ファイルです（DMC 190、DDN 2、DME 2、SMC 1、ICN
 | 見た所 | 結果 |
 |---|---|
 | XSD の検証 | 195 件のうち 194 件が `valid`（193 件は `4.0`、1 件は `4.0.1` の XSD）。残りの 1 件は、版の書かれていない `SMC-…` |
-| BREX への照合 | **結果は使えない**（下の「BREX の違い」）。違反ありが 74 件、飛ばしたルールが 444 件と出た |
+| BREX への照合 | 照合できた。違反ありが 74 件、飛ばしたルールが 444 件。どちらも、サンプルの自転車の BREX の書き方によるもの（下の「BREX の違い」） |
 | 既定 BREX | `S1000D-A-04-10-0301-00A-022A-D` の `004-00`（元）と `005-00`（Patch 4.0.1）、`S1000D-D-…` の `006-00`（Patch 4.0.2）の 3 つがある。構造のルールは 78 |
 | 参照の解決 | 1,152 件を調べ、未解決は 2 文書の 3 種類 |
 | 識別・状態部 | 190 件のすべてで、`dmCode`・`issueInfo`・`brexDmRef`・`qualityAssurance` などが読めた。`issueType`・`reasonForUpdates` は 75 件（学習の DM に書かれていない） |
@@ -138,16 +142,19 @@ Bike data set は 381 ファイルです（DMC 190、DDN 2、DME 2、SMC 1、ICN
 
 ### BREX の違い
 
-Issue 4.0 の BREX は、Issue 4.1 以降と 2 点で違います。
+Issue 4.0 の BREX は、Issue 4.1 以降と 2 点で違います。照合の結果を変える違いは、ありません。
 
 | 違い | Issue 4.0 | Issue 4.1 以降 | いまの core での動き |
 |---|---|---|---|
-| `objectPath/@allowedObjectFlag` の型 | 「はい・いいえ」の 2 値（XSD の型は `yesOrNoAttType`） | `0`・`1`・`2` の 3 値 | 値 `1` を「必ず含める」と読むので、対象の要素が無い DM を `missing` の違反にする。Bike data set では、自転車の BREX で 148 件の `missing` が出た |
-| ルールの識別子 | `brDecisionRef` が無い（`brex.xsd` に要素が無い） | 各ルールに `brDecisionRef` | 違反の `ruleId` が空になる |
+| `objectPath/@allowedObjectFlag` の値 | `0`（使ってはならない）と `1`（必ず含める）の 2 つ。任意のときは属性を書かない | `0`・`1`・`2` の 3 つ。`2`（任意）が既定 | 属性が無いときを `2` として読むので、Issue 4.0 の決まりどおりに照合する |
+| ルールの識別子 | `brDecisionRef` が無い（`brex.xsd` に要素が無い） | 各ルールに `brDecisionRef` | 違反の `ruleId` が空になる。どのルールかは `objectPath` で見分ける |
 
-飛ばしたルールの 444 件は、自転車の BREX の `objectPath` が XPath として読めないためです（`dmCode@modelIdentCode` のように、`/` が抜けている式が 6 つある）。これはサンプルの側の誤りで、core は読めない式を飛ばして知らせています。
+値の意味は、Issue 4.0 の仕様書の Chap 4.10.2（2.5.2 Object path）と、Issue 4.1 の同じ章で確かめました（2026-11-29）。
 
-`allowedObjectFlag` の意味の違いは、XSD の型から分かったことです。Issue 4.0 の仕様書の本文（Chap 4.10.2）は読んでいません。対応するなら、先に本文で意味を確かめます。
+Bike data set で出た数は、サンプルの自転車の BREX の書き方によるものです。
+
+- **`missing` の違反 148 件**: 自転車の BREX に、`allowedObjectFlag="1"` のルールが 2 つあります（`//commentPriority/@commentPriorityCode` と `//crewMember/@crewMembertype`）。式に条件が無いので、コメントでも乗員の DM でもない文書は、すべて「必ず含める対象が無い」になります。2 つのルール × 74 文書で 148 件です。既定 BREX には、`1` のルールはありません（78 のうち `0` が 22、属性なしが 56）。
+- **飛ばしたルール 444 件**: 自転車の BREX の `objectPath` のうち 6 つが、XPath として読めません（`dmCode@modelIdentCode` のように、`/` が抜けている）。core は読めない式を飛ばして知らせています。
 
 ### XSD の名前の違い（Issue 4.0 と Issue 7）
 
@@ -158,7 +165,7 @@ Issue 4.0 の BREX は、Issue 4.1 以降と 2 点で違います。
 | `dml` | `dmEntry`・`variableRef` | `dmEntryType`・`variableName` |
 | `process` | `dmNodeAlt`・`dialogAlt`・`messageAlt`・`proceduralStepAlt` と、乗員の手順の 15 要素 | `altName` など |
 
-`dml` の項目の要素名が違います（Issue 4.0 は `dmEntry`、Issue 4.1 以降は `dmlEntry`）。`reconcile_dml` は、Issue 4.0 の DML を読めないはずです。Bike data set に DML が無いので、実物では確かめていません。
+`dml` の項目の要素名が違います（Issue 4.0 は `dmEntry`、Issue 4.1 以降は `dmlEntry`）。core 0.18.0 の `readDml` は `dmlEntry` だけを読むので、Issue 4.0 の DML の項目を読めません。core 0.19.0 で、`dmEntry`・`dmEntryType` も同じ行として読むようにしました（2026-11-29）。Bike data set に DML が無いので、自作の DML で確かめています。
 
 ### 作る側
 
@@ -193,6 +200,6 @@ Issue 4.0 では、内容部の先頭に適用性の文の一覧（`referencedAp
 | 版 | 読む・検証する側で要ること | 作る側で要ること |
 |---|---|---|
 | Issue 4.1 | BOM を読めるようにする。`content/refs` の題名を読む。どちらも版によらない修正 | プロセス DM の `dmNode` の題名の扱いを、版で分ける |
-| Issue 4.0 | 上に加えて、BREX の `allowedObjectFlag` を版で読み分ける。ルールの識別子が無い BREX の扱いを決める。DML の `dmEntry` を読む | PM・コメント・DML の `brexDmRef` の位置、ACT の属性、適用性の文の一覧を、版で分ける。作る側の作りを版ごとに持つことになる |
+| Issue 4.0 | 上に加えて、ルールの識別子が無い BREX の扱いを決める。DML の `dmEntry` を読む（core 0.19.0 で読めるようにした） | PM・コメント・DML の `brexDmRef` の位置、ACT の属性、適用性の文の一覧を、版で分ける。作る側の作りを版ごとに持つことになる |
 
 日本での実例として記録にあるのは、MRJ の供給企業に求められた Issue 4.0.1 です（[background.md](./background.md) の「日本での状況」）。Issue 4.0 系は、今回見た 3 つの版の中で、対応に要る作業がいちばん多い版です。
