@@ -7,12 +7,12 @@ Issue 4.2・4.1・4.0 の配布物でいまの MCP を動かした結果（[issu
 
 | 番号 | 題 | 版によるか | Issue | 状態（2026-11-29） |
 |---|---|---|---|---|
-| F-1 | Issue 4.2 に無い要素を、writer が組み立てる前に知らせる | Issue 4.2 | [#26](https://github.com/shuji-bonji/s1000d-stack/issues/26) | 未着手 |
+| F-1 | Issue 4.2 に無い要素を、writer が組み立てる前に知らせる | Issue 4.2 | [#26](https://github.com/shuji-bonji/s1000d-stack/issues/26) | 済み。置けないものは入力の誤りにすると決めた（D-43）。いまの組み立てる側が書く要素と属性は、すべて Issue 4.2 にあり、断るものは無い |
 | F-2 | 先頭に BOM がある XML を読めるようにする | よらない | [#23](https://github.com/shuji-bonji/s1000d-stack/issues/23) | core 0.19.0 で直した（公開はまだ） |
 | F-3 | `content/refs` の `dmRef` の題名を、本文の読み取りの結果に入れる | よらない | [#24](https://github.com/shuji-bonji/s1000d-stack/issues/24) | core 0.19.0 と reader-mcp 0.17.0 で直した（公開はまだ） |
 | F-4 | 配布物の中に同じ版の `xml_schema_flat/` が複数あるときの選び方を決める | よらない | [#25](https://github.com/shuji-bonji/s1000d-stack/issues/25) | core 0.19.0 で、写しを 1 つにまとめた。同じ版で中身の違う XSD は、利用者が設定で選ぶ（`S1000D_SCHEMA_DIR`・`schemaDirs`。2026-11-29 に決定し、core と verify・reader・writer の MCP に実装した） |
-| F-5 | Issue 4.1 への対応 | Issue 4.1 | [#27](https://github.com/shuji-bonji/s1000d-stack/issues/27) | 読む・検証する側は済み（core のテストに数を固定した）。作る側のプロセス DM が残る |
-| F-5 | Issue 4.0 系への対応 | Issue 4.0 | [#28](https://github.com/shuji-bonji/s1000d-stack/issues/28) | 読む・検証する側は済み（BREX は元から決まりどおり。DML の `dmEntry` を読めるようにした）。作る側は未決 |
+| F-5 | Issue 4.1 への対応 | Issue 4.1 | [#27](https://github.com/shuji-bonji/s1000d-stack/issues/27) | 読む・検証する側は済み（core のテストに数を固定した）。作る側は、プロセス DM の節の題名を入力の誤りにする（D-43） |
+| F-5 | Issue 4.0 系への対応 | Issue 4.0 | [#28](https://github.com/shuji-bonji/s1000d-stack/issues/28) | 読む・検証する側は済み（BREX は元から決まりどおり。DML の `dmEntry` を読めるようにした）。作る側は、PM とコメントを入力の誤りにする（D-43）。組み立てられるようにするかは未決 |
 
 ## F-1 Issue 4.2 に無い要素を、writer が組み立てる前に知らせる
 
