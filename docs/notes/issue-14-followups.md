@@ -7,12 +7,12 @@ Issue 4.2・4.1・4.0 の配布物でいまの MCP を動かした結果（[issu
 
 | 番号 | 題 | 版によるか | Issue | 状態（2026-11-29） |
 |---|---|---|---|---|
-| F-1 | Issue 4.2 に無い要素を、writer が組み立てる前に知らせる | Issue 4.2 | [#26](https://github.com/shuji-bonji/s1000d-stack/issues/26) | 済み。置けないものは入力の誤りにすると決めた（D-43）。いまの組み立てる側が書く要素と属性は、すべて Issue 4.2 にあり、断るものは無い |
+| F-1 | Issue 4.2 に無い要素を、writer が組み立てる前に知らせる | Issue 4.2 | [#26](https://github.com/shuji-bonji/s1000d-stack/issues/26) | 済み。置けないものは入力の誤りにすると決めた（D-43）。いまの組み立てる側が書く要素と属性は、すべて Issue 4.2 にあり、断るものは無い。`authorityName`・`authorityDocument` は、節点の `authority` で書けるようにした（s1000d-core 0.20.0） |
 | F-2 | 先頭に BOM がある XML を読めるようにする | よらない | [#23](https://github.com/shuji-bonji/s1000d-stack/issues/23) | core 0.19.0 で直した（公開はまだ） |
 | F-3 | `content/refs` の `dmRef` の題名を、本文の読み取りの結果に入れる | よらない | [#24](https://github.com/shuji-bonji/s1000d-stack/issues/24) | core 0.19.0 と reader-mcp 0.17.0 で直した（公開はまだ） |
 | F-4 | 配布物の中に同じ版の `xml_schema_flat/` が複数あるときの選び方を決める | よらない | [#25](https://github.com/shuji-bonji/s1000d-stack/issues/25) | core 0.19.0 で、写しを 1 つにまとめた。同じ版で中身の違う XSD は、利用者が設定で選ぶ（`S1000D_SCHEMA_DIR`・`schemaDirs`。2026-11-29 に決定し、core と verify・reader・writer の MCP に実装した） |
 | F-5 | Issue 4.1 への対応 | Issue 4.1 | [#27](https://github.com/shuji-bonji/s1000d-stack/issues/27) | 読む・検証する側は済み（core のテストに数を固定した）。作る側は、プロセス DM の節の題名を入力の誤りにする（D-43） |
-| F-5 | Issue 4.0 系への対応 | Issue 4.0 | [#28](https://github.com/shuji-bonji/s1000d-stack/issues/28) | 読む・検証する側は済み（BREX は元から決まりどおり。DML の `dmEntry` を読めるようにした）。作る側は、PM とコメントを入力の誤りにする（D-43）。組み立てられるようにするかは未決 |
+| F-5 | Issue 4.0 系への対応 | Issue 4.0 | [#28](https://github.com/shuji-bonji/s1000d-stack/issues/28) | 読む・検証する側は済み（BREX は元から決まりどおり。DML の `dmEntry` を読めるようにした）。作る側は、PM とコメントを `brexDmRef` 無しで組み立てる（s1000d-core 0.20.0。D-43 の「その後」） |
 
 ## F-1 Issue 4.2 に無い要素を、writer が組み立てる前に知らせる
 
@@ -29,9 +29,23 @@ Issue 4.2・4.1・4.0 の配布物でいまの MCP を動かした結果（[issu
 - [ ] 下書き（`DraftDataModule`）のどの節点・どの項目が、上の要素と属性を出すかを洗い出す（候補: 題名の `infoNameVariant`、前提条件の品目の危険性の `hazards`）
 - [ ] 版に無い要素を出す下書きを、組み立てる前に入力の誤り（`input-error` と位置）として返すか、その要素を出さずに `_notes` で知らせるか。読む側の「内容を落とさない」（D-31）と同じ考えなら、黙って落とさず、誤りとして返す
 - [ ] 版ごとの「使えない要素」の表を、core が XSD から作るか（`fix/xsd-index.ts` は XSD の内容モデルを読める）、手で持つか
-- [ ] Issue 7 では `controlAuthority` に置き換わった `authorityName`・`authorityDocument` を、Issue 4.2 向けの下書きで書けるようにするか
+- [x] Issue 7 では `controlAuthority` に置き換わった `authorityName`・`authorityDocument` を、Issue 4.0〜4.2 向けの下書きで書けるようにする（2026-11-29。s1000d-core 0.20.0）
 
-**確かめること**: Issue 4.2 の Bike Sample Data Set には、`authorityName`・`authorityDocument` を書いた DM がありません。reader がこの 2 つの属性を応答に入れるかを、自作の DM で確かめます。
+### 管理された内容の印（`authority`）
+
+下書きの節点に `authority: { name, document? }` を書くと、その節点の要素に `authorityName`・`authorityDocument` が付きます。
+
+| 対象の版 | 結果 |
+|---|---|
+| Issue 4.0・4.1・4.2 で、その版の XSD が `authorityName` を持たせている要素になる節点（節、手順、故障探求の手順、表、図、定義リストの項目、参照など） | 属性を書く |
+| Issue 4.0 の `pmEntry` | `input-error`（`…/authority`）。`pmEntry` に付けられるのは Issue 4.1 から |
+| 上の版で、`authorityName` を持てない要素になる節点（`para` など） | `input-error`（`…/authority`） |
+| Issue 4.2 より後（`issue` を省いたときの Issue 7 を含む） | `input-error`（`…/authority`） |
+
+- 要素の名前と、付けられるようになった版の対応は、core の `src/write/content/authority-elements.ts` にあります。Issue 4.0・4.1・4.2 の XSD（`descript`・`proced`・`process`・`fault`・`pm`）から取り出した 79 個です（Issue 4.0 から 56、4.1 から 22、4.2 から 1）。同じ名前の要素が、XSD によって属性を持ったり持たなかったりする所はありませんでした。
+- reader は、`authorityName`・`authorityDocument` が書かれている要素の節点に、`authority: { name?, document? }` を返します。自作の DM で確かめました（4 つの版の Bike のサンプルには、この属性を書いた DM が 1 件もありません）。
+- core の配布物付きのテストで、`authority` を付けた下書き（説明の節、手順、故障探求の手順）を Issue 4.0・4.1・4.2 向けに組み立て、それぞれの版の XSD で `valid` になることを確かめています。
+- Issue 7 の `controlAuthority` は、書くことも読むこともまだしていません。
 
 ## F-2 先頭に BOM がある XML を読めるようにする
 

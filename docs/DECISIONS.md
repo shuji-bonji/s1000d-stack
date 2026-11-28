@@ -253,18 +253,22 @@ D-36 の設計（[design/site-reference.md](./design/site-reference.md)）の決
 - **決めたこと**: 版を指定して組み立てるとき（D-41 の `issue`）、その版の XSD に置けないと分かっているものが下書きにあれば、組み立てる前に `input-error` と下書きの位置を返す。
 - **選ばなかった案**: その要素を出さずに組み立て、`_notes` で知らせる（B 案）。同じ下書きを複数の版に出しやすいが、書き手が `_notes` を読まなければ、内容が消えたことに気付かない。
 - **理由**: 読む側の「内容を落とさない」（D-31）と同じ考えにそろえる。
-- **いま断るもの**（s1000d-core 0.19.0）:
+- **いま断るもの**（s1000d-core 0.20.0。2026-11-29 に、下の「その後」のとおり変えた）:
 
   | 対象 | 断る版 | 位置 | 理由 |
   |---|---|---|---|
   | プロセス DM の節（`dmNode` になる `section`）の題名 | Issue 4.2 より前 | `…/title` | `dmNode` に `title` を置けるのは Issue 4.2 から |
-  | パブリケーションモジュール | Issue 4.1 より前 | `/kind` | `pmStatus` に `brexDmRef` があるのは Issue 4.1 から |
-  | コメント | Issue 4.1 より前 | `/options/issue` | `commentStatus` に `brexDmRef` があるのは Issue 4.1 から |
+  | パブリケーションモジュールとコメントで、明示した `brexDmRef` | Issue 4.1 より前 | `/brexDmRef` | `pmStatus`・`commentStatus` に `brexDmRef` があるのは Issue 4.1 から |
+  | 管理された内容の印（節点の `authority`） | Issue 4.2 より後（既定の Issue 7 を含む） | `…/authority` | `authorityName`・`authorityDocument` があるのは Issue 4.0〜4.2。Issue 7 では `controlAuthority` に置き換わった |
+  | 管理された内容の印（節点の `authority`） | その版で `authorityName` を持てない要素になる節点（`para` など。`pmEntry` は Issue 4.0） | `…/authority` | XSD で、その要素の型が属性を持たない |
 
 - **Issue 4.2 では、断るものが無い**: 組み立てる側が書く要素名と属性名（要素 141、属性 51）は、すべて Issue 4.2 の XSD にある。`hazards`・`safetyInformation`・`infoNameVariant` などの、Issue 4.2 に無い要素は、いまの組み立てる側が書かない。自作の下書き 6 件（説明 2、手順、プロセス、故障探求、PM）は、Issue 4.2 の XSD にそのまま通る。
 - **確かめ方**: core の配布物付きのテスト（`src/issues.spec.test.ts`）が、自作の下書きを Issue 4.2・4.1・4.0 を指定して組み立て、その版の XSD にかける。誤りにならずに組み立てられたものは、どの版でも `valid` になる。
 - **表に無い版**（5.0・6 など）: 調べない。その版の XSD の検証で確かめる。
-- **決めていないこと**: Issue 4.0 系で、PM とコメントを組み立てられるようにするか（`brexDmRef` を書かない組み立てを版ごとに持つか）。#28。
+- **その後（2026-11-29）**: 利用者が、次の 2 つを決めた。s1000d-core 0.20.0 に入れた。
+  - Issue 4.0 系の PM とコメントは、作る側まで対応する。0.19.0 では PM（`/kind`）とコメント（`/options/issue`）を断っていたが、`brexDmRef` を書かずに組み立て、書かなかったことを `_notes` に入れる。これは「黙って落とす」には当たらない（その版に `brexDmRef` を置く場所が無く、書き手が指定したものでもない）。書き手が `brexDmRef` を明示したときだけ断る。#28。
+  - Issue 7 で `controlAuthority` に置き換わった `authorityName`・`authorityDocument` を、Issue 4.0〜4.2 向けに書けるようにする。下書きの節点に `authority: { name, document? }` を足した。読む側も、節点の `authority` に返す。#26。
+- **決めていないこと**: Issue 7 の `controlAuthority`（`controlAuthorityGroup` に定義を置き、`controlAuthorityRefs` で指す）を、同じ `authority` から書くか。
 
 ## 未決事項
 

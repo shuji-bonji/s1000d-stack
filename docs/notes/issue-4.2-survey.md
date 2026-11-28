@@ -195,7 +195,7 @@ Issue 4.2 の配布物には、既定 BREX が 2 つ入っています。
 ## 確かめていないこと
 
 - Issue 4.2 の Front Matter Samples（内側の zip 3 本は展開していません）。
-- `authorityName`・`authorityDocument` を書いた DM の読み取り（実物が無い）。
+- `authorityName`・`authorityDocument` を書いた DM の読み取り（実物が無い）。2026-11-29 に、自作の DM で確かめました。s1000d-core 0.20.0 から、reader は節点の `authority` に返し、writer は節点の `authority` から書きます（[issue-14-followups.md](./issue-14-followups.md) の F-1）。
 - 同じ名前の要素で、中身の決まり（子の順序・出現回数）が Issue 4.2 と Issue 7 で違う所。Bike Sample Data Set が通ることと、`kenbaiki` が通ることは確かめましたが、XSD の内容モデルを 1 つずつ比べてはいません。
 - writer のツール（`build_data_module`・`start_revision`・`edit_data_module` など）を、Issue 4.2 の CSDB に対して動かすこと。`edit_data_module` は元の XML を保つ作りなので Issue 4.2 の DM にも使えそうですが、試していません。
 - `suggest_fixes` の修正候補が、Issue 4.2 の XSD から正しく作られるか。1 件で応答が返ることだけ確かめました。
