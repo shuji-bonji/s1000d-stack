@@ -90,14 +90,14 @@ flowchart LR
 
 ## いまの状態（2026-11-24）
 
-段階 1〜3 は完了し、MCP サーバー 4 本・共有ライブラリ 2 つ・Skill 4 つを公開しています。いま進めているのは、学習リソースと、別プロジェクトの Experiential Manual Editor です。IETM / IETP は、まだ始めていません。Issue 4.2 への対応は、配布物での実測まで済み、対応する範囲は決めていません（U-07）。
+段階 1〜3 は完了し、MCP サーバー 4 本・共有ライブラリ 2 つ・Skill 4 つを公開しています。いま進めているのは、学習リソースと、別プロジェクトの Experiential Manual Editor です。IETM / IETP は、まだ始めていません。Issue 4.2 への対応は、範囲を決め（D-41）、core と writer-mcp に実装しました（公開はまだ）。
 
 ```mermaid
 flowchart LR
   B["S1000D の処理系<br/>段階 1〜3 は完了・公開済み"] --> L["学習リソース<br/>進行中"]
   B --> X["Experiential Manual Editor<br/>進行中（別プロジェクト）"]
   B --> I["IETM / IETP<br/>未着手（別プロジェクト）"]
-  B --> V["Issue 4.2 への対応<br/>実測まで済み、範囲は未決"]
+  B --> V["Issue 4.2 への対応<br/>実装済み、公開はまだ"]
   B --> F["S1000D の処理で<br/>まだできないこと"]
 ```
 
@@ -147,7 +147,8 @@ flowchart LR
 | 対象 | 内容 | 文書 |
 |---|---|---|
 | IETM / IETP | 段階 0（製品名・リポジトリ・ROADMAP）から。閲覧ソフト → 公開の束 → 作成の画面 → フォルダー ＋ Git の運用 → 図（CGM・3D）→ ICA に要る追加、の順の案がある | [notes/ietp-kickoff.md](./notes/ietp-kickoff.md) |
-| Issue 4.2 への対応 | 配布物を展開し、いまの brex・verify・reader を Issue 4.2 の Bike Sample Data Set にかけた（2026-11-28）。読む側と検証する側は、コードを変えずに動いた。作る側は、スキーマの URL が `S1000D_7` の固定のまま。どこまで対応するかは未決。元請けが指定する版は Issue 7 とは限らないので、IETM / IETP の作成の画面と同じ時期に要る | U-07、[notes/issue-4.2-survey.md](./notes/issue-4.2-survey.md) |
+| Issue 4.2 への対応 | 読む・検証する側は、コードを変えずに Issue 4.2 の Bike Sample Data Set を扱えた（2026-11-28）。作る側は、対象とする版（`issue`）を指定できるようにした（s1000d-core 0.19.0、s1000d-writer-mcp 0.10.0。公開はまだ）。残り: 公開、テストとサイトの「対象とする版」への反映、Issue 4.2 に無い要素の扱い（別の Issue） | D-41、[notes/issue-4.2-survey.md](./notes/issue-4.2-survey.md) |
+| Issue 4.0・4.1 への対応 | 配布物で実測した（2026-11-28）。Issue 4.1 は Issue 4.2 に近い。Issue 4.0 は BREX の決まりが違い、いまの照合の結果は使えない。対象に入れるかは未決 | U-14、[notes/issue-4.0-4.1-survey.md](./notes/issue-4.0-4.1-survey.md) |
 
 S1000D の処理（core・MCP）で、まだできないことです。CSDB 製品へ組み込むための仕組み（`CsdbSource`、HTTP、検証状態、機密区分）は、段階 2.5 で一通りそろっています。製品側から要望が戻ってきたときに、優先度を決めます。
 

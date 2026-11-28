@@ -225,6 +225,17 @@ D-36 の設計（[design/site-reference.md](./design/site-reference.md)）の決
 - **段階 5 を先に置く理由**: DMRL（これから作る DM・PM の一覧）と CSL（CSDB にある CSDB オブジェクトの一覧）は、どの CSDB でも計画と納入に要る。段階 6 の表の設計（「計画した DM」と「作った DM」）にもつながる。設計は [design/core-dml-writing.md](./design/core-dml-writing.md)。
 - **決めていないこと**: 段階 5 の DL-1〜DL-7（設計文書の 7 節）。段階 6 の置き場所（U-13）、利用者と権限・ワークフローを持つか、全文検索、DDN の書き出し。
 
+### D-41 Issue 4.2 は、読む・検証する側はそのまま対象にし、作る側は版の指定だけを足す（2026-11-28）
+
+2026-11-28 19:26 に、利用者が決めた。Issue [#14](https://github.com/shuji-bonji/s1000d-stack/issues/14) の実測（[notes/issue-4.2-survey.md](./notes/issue-4.2-survey.md)）を受けた決定で、U-07 を解決する。
+
+- **読む・検証する側**: コードを変えずに Issue 4.2 の Bike Sample Data Set を扱えたので、版ごとに読み取りを分けない（[design/reader-mcp.md](./design/reader-mcp.md) の「Issue 4.2 と IMF」の問いへの答え）。
+- **作る側**: 最低限の変更にとどめる。`buildDataModule`・`buildComment` に対象とする版（`options.issue`）を足し、`xsi:noNamespaceSchemaLocation` の版だけを切り替える。writer-mcp は `build_data_module`・`convert_manual`・`create_comment` の引数 `issue` で受ける。省いたときは Issue 7 のまま。
+- **Issue 4.2 に無い要素**（`hazards`・`safetyInformation`・`infoNameVariant`・`controlAuthority` など）: 今回は扱わず、別の Issue にする。それまでは、Issue 4.2 の XSD の検証で `invalid` になることで分かる。
+- **既定 BREX の探索**: `findDefaultBrex` は、同じ DMC の既定 BREX が版を変えて複数あるとき、発行番号のいちばん大きいものを返す。`brexDmRef` をたどる側とそろえるため。DMC の違う既定 BREX の間では比べない。
+- **Issue 4.0・4.1**: 配布物で動かして材料を集める（[notes/issue-4.0-4.1-survey.md](./notes/issue-4.0-4.1-survey.md)）。どこまで対応するかは U-14。
+- **実装**: s1000d-core 0.19.0、s1000d-writer-mcp 0.10.0。分けて起こす Issue の下書きは [notes/issue-14-followups.md](./notes/issue-14-followups.md)。
+
 ## 未決事項
 
 | ID | 内容 | 判断の材料 |
@@ -236,12 +247,13 @@ D-36 の設計（[design/site-reference.md](./design/site-reference.md)）の決
 | ~~U-05~~ | 体験型マニュアルの製品名 | **解決（2026-11-14）**: Experiential Manual（作成ツールは Experiential Manual Editor、D-30）。以下は経過。一般の利用者向けの名前にする。試作の間は仮称 `manual-editor`（D-28）。D-29 で製品は別プロジェクトになったので、名前はそのプロジェクトで決め、決まったら player / editor / cli に同じ語を頭に付ける。IETM / IETP のプロジェクト名も別に決める |
 | ~~U-10~~ | 簡易 Web マニュアル（段階 4 の参照実装）の技術の選定 | **解決（2026-10-28）**: SvelteKit ＋ PWA（D-28）。作成ツールの試作も同じ |
 | ~~U-06~~ | Starlight の日本語検索の精度 | **解決（2026-10-24）**: 生成された Pagefind の索引を Node から検索して確認。単語（照合・券売機・適用性・識別・商標）は期待どおり。Pagefind は日本語を単語に分けて索引するため、「データモジュール」のような複合語をそのまま入れると同じつながりで現れたページ（1 件）だけが返り、「データ モジュール」と空けると 9 件になる。サイトの見出しに主要な複合語をそのまま書くことで補う |
-| U-07 | Issue 4.2 に対応する時期 | 段階 2 で reader を作るときに判断する。Issue 4.2 以降の ICN メタデータファイル（IMF）を reader の対象に含めるかも一緒に判断する。**材料（2026-11-28）**: Issue 4.2 の配布物を展開し、いまの brex・verify・reader を Bike Sample Data Set にそのままかけた。XSD の検証は 105 件とも `valid`、本文を構造として読む 58 件でテキスト節点を 1 つも落とさず、例外で止まった呼び出しは無い。Issue 7 向けに作った DM は、スキーマの URL を替えるだけで Issue 4.2 の XSD に通った（[notes/issue-4.2-survey.md](./notes/issue-4.2-survey.md)）。残っているのは、作る側まで対応するかと、4.0・4.1 も見るかの判断 |
+| ~~U-07~~ | Issue 4.2 に対応する時期 | **解決（2026-11-28）**: 読む・検証する側はそのまま対象にし、作る側は版の指定（`issue`）だけを足す（D-41）。IMF は Issue 7 の対象として `read_icn_metadata` で読んでいて、Issue 4.2 の IMF も同じツールで読めた。Issue 4.2 に無い要素の扱いは別の Issue、Issue 4.0・4.1 は U-14。以下は経過。段階 2 で reader を作るときに判断する、としていた。2026-11-28 に配布物で実測した（[notes/issue-4.2-survey.md](./notes/issue-4.2-survey.md)） |
 | ~~U-08~~ | XSD 検証の方式（段階 2）。XML の読み取りと XPath は D-12 で決定済み | **解決（2026-10-24）**: `libxml2-wasm` に確定（D-15）。根拠は [notes/u08-xsd-validation.md](./notes/u08-xsd-validation.md) の「U-08 の判断材料」と「U-08 の比較結果（2026-10-24）」 |
 | ~~U-10~~ | s1000d-core の npm 公開の時期 | **解決（2026-10-24）**: brex-mcp の CI が `file:` 依存を解決できず落ちたため、core を先に `0.1.0` として npm に公開し、GitHub も Public にした。brex-mcp の依存は `^0.1.0`。hub と brex-mcp の公開（U-01）は従来どおり段階 1 が揃った時点で判断する |
 | ~~U-09~~ | Skill のリポジトリ名の規則 | **解決（2026-10-28）**: `shuji-bonji/<名前>-skill`、plugin 名は `<名前>`（D-28） |
 | U-11 | サイトの S1000D リファレンスに、既定 BREX と XSD の値のコードをまとめて載せてよいか（90 属性、`objectValue` 1,443 件） | D-03 の利用条件は、再配布と翻訳・翻案を認めていない。値のコード・ルール ID・章の番号は事実の記載だが、まとめて載せることが利用条件に触れないかは確かめていない。法律の専門家の領分で、設計では決められない。決まるまでは、自分の言葉の説明を書いた属性のページだけを公開する（[design/site-reference.md](./design/site-reference.md) の SR-3） |
 | U-12 | このプロジェクトの主題を、「CSDB 製品への組み込み」（D-19。D-29 は ROADMAP の「目指すもの」でこれを主にすると書いた）のままにするか、「LLM が S1000D を正しく扱うための処理系」にして、組み込みはその使い道の 1 つにするか | D-19 の後、他社の CSDB 製品への組み込みを目的として挙げた記録は無い。2026-10-30 に「目的は技術マニュアル作成などで、そのついでに S1000D を LLM が正確に扱えるよう MCP を作っている」、2026-11-14 に「その後は IETM・IETP システムを作成する方向」と利用者が述べている。組み込んだ実例はまだ無い。決まれば、ROADMAP の「目指すもの」の順と、README・サイトの最初の説明を合わせる |
 | U-13 | 段階 6 の OSS の CSDB を、s1000d-stack の部品（`lib/` や `app/`）にするか、別プロジェクトにするか（D-40） | D-29 では製品を別プロジェクトに分けた。CSDB は利用者が直接使う製品でもあり、IETM / IETP の製品の土台でもある。段階 5 が終わり、段階 6 の設計文書を書き始めるときに決める |
+| U-14 | Issue 4.0・4.1 にどこまで対応するか | 2026-11-28 に配布物で実測した（[notes/issue-4.0-4.1-survey.md](./notes/issue-4.0-4.1-survey.md)）。Issue 4.1 は、版によらない 2 点（BOM で始まる XML、`content/refs` の題名）を直せば、読む側が Issue 4.2 と同じ水準になる。Issue 4.0 は、BREX の `allowedObjectFlag` の型が 2 値で、ルールの識別子が無く、いまの照合の結果は使えない。作る側は、Issue 4.1 でプロセス DM、Issue 4.0 で PM・コメント・DML・プロセス・ACT が通らない。MRJ の供給企業に求められたのは Issue 4.0.1。対象に入れる版と、作る側まで対応するかを決める |
 
 U-08 の判断材料と比較結果は、[notes/u08-xsd-validation.md](./notes/u08-xsd-validation.md) にあります。

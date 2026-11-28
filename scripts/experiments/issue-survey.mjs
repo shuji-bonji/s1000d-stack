@@ -9,8 +9,8 @@
 //
 // 標準出力には集計だけを出す。ファイル名・ルール ID・要素名・件数だけで、配布物の文章は出さない（D-03）。
 // 結果は docs/notes/issue-4.2-survey.md を参照。
-import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { basename, join, resolve } from 'node:path';
 
 const root = process.cwd();
 const spec = resolve(process.env.S1000D_SPEC_DIR ?? '');
@@ -60,7 +60,9 @@ function textCoverage(xml) {
         if (!haystack.includes(t)) {
           r.lost++;
           if (!under) r.lostSilent++;
-          inc(r.lostByParent, `${el.parentNode?.nodeName ?? ''}/${el.nodeName}`);
+          // 「親の親の親/親の親/親」の要素名ごとに数える
+          const up = (n, k) => (k === 0 || !n?.parentNode?.nodeName ? [] : [...up(n.parentNode, k - 1), n.nodeName]);
+          inc(r.lostByParent, up(el, 4).join('/'));
         }
       } else if (n.nodeType === 1) walk(n, under);
     }
@@ -69,7 +71,15 @@ function textCoverage(xml) {
   return r;
 }
 
-const files = readdirSync(csdb).sort();
+// CSDB のフォルダーの下を、サブフォルダーも含めて見る（Issue 4.0 の Bike data set は、DM と図が別のフォルダーにある）
+const walk = (d, out = []) => {
+  for (const n of readdirSync(d)) {
+    const p = join(d, n);
+    statSync(p).isDirectory() ? walk(p, out) : out.push(p);
+  }
+  return out;
+};
+const files = walk(csdb).sort();
 const S = {
   specDir: spec,
   csdbDir: csdb,
@@ -79,7 +89,7 @@ const S = {
   })),
   files: { total: files.length, byKind: {} },
   thrown: [],
-  schema: { byState: {}, bySchemaName: {}, invalid: [] },
+  schema: { byState: {}, bySchemaName: {}, byIssue: {}, invalid: [] },
   brex: { byState: {}, layers: {}, violationsByRule: {}, unresolved: {}, skippedRules: {} },
   references: { byState: {}, checked: 0, unresolved: [] },
   reader: {
@@ -89,7 +99,7 @@ const S = {
     identAndStatusFields: {},
     unknownElements: {},
     notReadElements: {},
-    coverage: { measured: 0, total: 0, lost: 0, lostSilent: 0, clean: 0, lostByParent: {} },
+    coverage: { measured: 0, total: 0, lost: 0, lostSilent: 0, clean: 0, lostByParent: {}, unreadable: [] },
   },
   pm: [],
   icn: [],
@@ -99,8 +109,8 @@ const S = {
 };
 const note = (tool, f, r) => r?._thrown && S.thrown.push({ tool, file: f, message: r._thrown });
 
-for (const f of files) {
-  const p = join(csdb, f);
+for (const p of files) {
+  const f = basename(p);
   const kind = /\.xml$/i.test(f) ? f.split('-')[0].toUpperCase() : `ICN(${f.split('.').pop().toUpperCase()})`;
   inc(S.files.byKind, kind);
   if (!/\.xml$/i.test(f)) continue;
@@ -113,8 +123,17 @@ for (const f of files) {
   const sch = ver.schema ?? {};
   inc(S.schema.byState, sch.state ?? 'none');
   inc(S.schema.bySchemaName, ver.target?.schemaName ?? '?');
+  inc(S.schema.byIssue, `doc ${ver.target?.issue ?? '?'} / xsd ${sch.issue ?? '?'}`);
   if (sch.state !== 'valid')
-    S.schema.invalid.push({ file: f, state: sch.state, errorCount: sch.errorCount, reason: sch.reason });
+    S.schema.invalid.push({
+      file: f,
+      schemaName: ver.target?.schemaName,
+      state: sch.state,
+      errorCount: sch.errorCount,
+      reason: sch.reason,
+      // XSD の違反の文（要素名・属性名と位置。配布物の文章ではない）を、先頭の 3 件だけ
+      errors: (v.schema?.errors ?? v.errors ?? []).slice(0, 3).map((e) => String(e.message ?? e).replace(/\s+/g, ' ').slice(0, 200)),
+    });
   if (v.brex) {
     inc(S.brex.byState, ver.brex?.state ?? 'none');
     inc(S.brex.layers, String(v.brex.layers?.length ?? 0));
@@ -145,7 +164,13 @@ for (const f of files) {
       if (val !== undefined && val !== null && val !== '') inc(S.reader.identAndStatusFields, k);
     for (const [k, n] of Object.entries(r.content?.unknownElements ?? {})) inc(S.reader.unknownElements, k, n);
     for (const [k, n] of Object.entries(r.content?.notReadElements ?? {})) inc(S.reader.notReadElements, k, n);
-    const c = textCoverage(readFileSync(p, 'utf8'));
+    let c;
+    try {
+      c = textCoverage(readFileSync(p, 'utf8'));
+    } catch (e) {
+      // XML として読めない文書（MCP のツールも同じ理由で断る。上の thrown に入る）
+      S.reader.coverage.unreadable.push({ file: f, message: String(e?.message ?? e).slice(0, 160) });
+    }
     if (c) {
       const C = S.reader.coverage;
       C.measured++;

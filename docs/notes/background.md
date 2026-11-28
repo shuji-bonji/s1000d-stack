@@ -129,6 +129,28 @@ Issue 7 の配布物と違う点:
 - XML Schema Package に `notations/notations.xml` が無い。
 - フォルダー名が Issue 7 と違う（`bike-samples` ではなく `bike-sample-data-set`、`default-brex` ではなく `default-brex-data-module` など）。MCP はフォルダー名を決め打ちにしていないので、そのまま見つかった。
 
+## 仕様書の展開後のファイル構成（Issue 4.0・4.1）
+
+2026-11-28 に `specs/s1000d/issue-4.0/` と `specs/s1000d/issue-4.1/` へ展開して記録したものです（パスとファイル名だけ）。動かした結果は [issue-4.0-4.1-survey.md](./issue-4.0-4.1-survey.md) にあります。フォルダー名は小文字ハイフン区切りに直し、内側の zip はその中に展開しました。
+
+| 展開先 | Issue 4.0（約 120 MB、14,314 ファイル） | Issue 4.1（約 116 MB、13,255 ファイル） |
+|---|---|---|
+| 仕様書本体 | `specification/`（PDF 1） | `specification/`（PDF 1）。直下に S1000X の PDF が 1 つある |
+| 既定 BREX | `default-brex-data-module/` に `DMC-S1000D-A-04-10-0301-00A-022A-D_004-00`（3） | `default-brex-data-module/` に `DMC-S1000D-E-04-10-0301-00A-022A-D_009-00`（4） |
+| XSD | `xml-schema-package/Schemas/xml_schema_flat/`（27）と `xml_schema_master/`・`xcf_schema_master/` | 直下の `xml-schema-flat/`（30）と、`xml-schema-package/Schemas/`（同じ 30）。`xml-schema-package/Notations/` がある |
+| サンプル | `bike-data-set/`（381）。学習の DM は直下、ほかは `S1000D_4-0/samples/`、図は `samples/illustrations/` と `media/` | `bike-data-set/S1000D_4-1_Bike_Samples/`（152） |
+| パッチ | `patches/4.0.1/`（XSD 27、既定 BREX の `005-00`）、`patches/4.0.2/`（XSD 27、既定 BREX は DMC が `S1000D-D-…` の `006-00`）（213） | `patches/Patch 4.1.A`〜`E/`（A に XSD 30。A・B・C・E に既定 BREX の `010-00`〜`013-00`）（85） |
+| データ辞書 | `data-dictionary/S1000D_4.0_DataDictionary_Output/`（4,696） | `data-dictionary/`（`Files/` が直下。1,954） |
+| XSD の説明 | `schema-documentation/xml_schema_doc/`（8,913） | `schema-documentation/`（10,935） |
+| そのほか | `example-sns/`（18）、`functionality-matrix/`、`unit-of-measure/`、`iss-3.0-to-iss-4.0/`（Issue 3.0 からの対応表） | `example-sns/`（18）、`functionality-matrix/`、`unit-of-measure/`、`business-rule-decision-point-index/`、`brdp-relationships/` |
+
+Issue 7・4.2 の配布物と違う点:
+
+- 既定 BREX のシステム差異コードは、Issue 4.0 が `A`（Patch 4.0.2 は `D`）、Issue 4.1 が `E`。
+- XSD が、同じ版で複数の場所にある（XML Schema Package、パッチ、データ辞書の中の写し）。データ辞書のフォルダー名が `data_dictionary_*` ではないので、MCP は写しを除かない。
+- Issue 4.0 のサンプルは、XML 195 件のうち 126 件が UTF-8 の BOM で始まる。
+- Issue 4.0 には PM・DML・IMF のサンプルが無い。Issue 4.1 には IMF のサンプルが無い。
+
 ## BREX の章（Issue 7 Chap 4.10.2〜4.10.3）の読解結果
 
 2026-10-23 に PDF の p.2110〜2143（Chap 4.10.2 BREX data module、4.10.2.1 SNS rules、4.10.2.2 Context related rules、4.10.2.3 Context independent rules、4.10.2.4 Coding BREX data modules、4.10.3 Default BREX data module）を読みました。関連する Chap 4.10.1（ビジネスルール文書）の `brSeverityLevel` の定義も確認しました。以下は照合処理の実装に必要な点の要約で、仕様書の記述そのものではありません。
