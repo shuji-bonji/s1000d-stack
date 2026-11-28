@@ -147,8 +147,9 @@ flowchart LR
 | 対象 | 内容 | 文書 |
 |---|---|---|
 | IETM / IETP | 段階 0（製品名・リポジトリ・ROADMAP）から。閲覧ソフト → 公開の束 → 作成の画面 → フォルダー ＋ Git の運用 → 図（CGM・3D）→ ICA に要る追加、の順の案がある | [notes/ietp-kickoff.md](./notes/ietp-kickoff.md) |
-| Issue 4.2 への対応 | 読む・検証する側は、コードを変えずに Issue 4.2 の Bike Sample Data Set を扱えた（2026-11-28）。作る側は、対象とする版（`issue`）を指定できるようにした（s1000d-core 0.19.0、s1000d-writer-mcp 0.10.0。公開はまだ）。残り: 公開、テストとサイトの「対象とする版」への反映、Issue 4.2 に無い要素の扱い（別の Issue） | D-41、[notes/issue-4.2-survey.md](./notes/issue-4.2-survey.md) |
-| Issue 4.0・4.1 への対応 | 配布物で実測した（2026-11-28）。Issue 4.1 は Issue 4.2 に近い。Issue 4.0 は BREX の決まりが違い、いまの照合の結果は使えない。対象に入れるかは未決 | U-14、[notes/issue-4.0-4.1-survey.md](./notes/issue-4.0-4.1-survey.md) |
+| Issue 4.2 への対応 | 読む・検証する側は、コードを変えずに Issue 4.2 の Bike Sample Data Set を扱えた（2026-11-28）。作る側は、対象とする版（`issue`）を指定できるようにした（s1000d-core 0.19.0、s1000d-writer-mcp 0.10.0。公開はまだ）。残り: 公開、テストとサイトの「対象とする版」への反映、Issue 4.2 に無い要素の扱い（[#26](https://github.com/shuji-bonji/s1000d-stack/issues/26)） | D-41、[notes/issue-4.2-survey.md](./notes/issue-4.2-survey.md) |
+| Issue 4.1 への対応 | 対象にすると決めた（2026-11-28）。版によらない問題（BOM、`content/refs` の題名、XSD の写し）を core 0.19.0 で直した後は、Bike data set の XML 103 件が Issue 4.1 の XSD で `valid` になり、本文のテキスト節点を 1 つも落とさない。残り: テストへの数の追加、プロセス DM の `dmNode` の題名 | D-42、[#27](https://github.com/shuji-bonji/s1000d-stack/issues/27) |
+| Issue 4.0 系への対応 | 対象にすると決めた（2026-11-28）。XSD の検証と本文の読み取りは動く。BREX の `allowedObjectFlag` の型が 2 値で、いまの照合の結果は使えない。先に仕様書で意味を確かめ、BREX の読み取りを版で読み分ける。作る側まで対応するかは未決 | D-42、[#28](https://github.com/shuji-bonji/s1000d-stack/issues/28) |
 
 S1000D の処理（core・MCP）で、まだできないことです。CSDB 製品へ組み込むための仕組み（`CsdbSource`、HTTP、検証状態、機密区分）は、段階 2.5 で一通りそろっています。製品側から要望が戻ってきたときに、優先度を決めます。
 

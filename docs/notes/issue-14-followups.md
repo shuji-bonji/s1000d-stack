@@ -2,13 +2,17 @@
 
 Issue 4.2・4.1・4.0 の配布物でいまの MCP を動かした結果（[issue-4.2-survey.md](./issue-4.2-survey.md)、[issue-4.0-4.1-survey.md](./issue-4.0-4.1-survey.md)）から、別の Issue に分ける課題の下書きです。GitHub の Issue を起こす人が、題と本文をそのまま貼れるように書いています。起こしたら、この文書の該当する節に Issue の番号を書き足します。
 
-| 番号 | 題 | 版によるか | リポジトリ |
-|---|---|---|---|
-| F-1 | Issue 4.2 に無い要素を、writer が組み立てる前に知らせる | Issue 4.2 | s1000d-stack（実装は core・writer-mcp） |
-| F-2 | 先頭に BOM がある XML を読めるようにする | よらない | s1000d-core |
-| F-3 | `content/refs` の `dmRef` の題名を、本文の読み取りの結果に入れる | よらない | s1000d-core |
-| F-4 | 配布物の中に同じ版の `xml_schema_flat/` が複数あるときの選び方を決める | よらない | s1000d-core・verify-mcp |
-| F-5 | Issue 4.0・4.1 にどこまで対応するかを決める（U-14） | Issue 4.0・4.1 | s1000d-stack |
+> [!NOTE]
+> 2026-11-28 に、6 件とも GitHub の Issue にしました。F-5 は、利用者が「Issue 4.1 と Issue 4.0 系をどちらも対象にする」と決めたので（D-42）、版ごとの 2 件に分けています。下の節は、起こしたときの下書きです。その後の経過は、それぞれの Issue に書きます。
+
+| 番号 | 題 | 版によるか | Issue | 状態（2026-11-28） |
+|---|---|---|---|---|
+| F-1 | Issue 4.2 に無い要素を、writer が組み立てる前に知らせる | Issue 4.2 | [#26](https://github.com/shuji-bonji/s1000d-stack/issues/26) | 未着手 |
+| F-2 | 先頭に BOM がある XML を読めるようにする | よらない | [#23](https://github.com/shuji-bonji/s1000d-stack/issues/23) | core 0.19.0 で直した（公開はまだ） |
+| F-3 | `content/refs` の `dmRef` の題名を、本文の読み取りの結果に入れる | よらない | [#24](https://github.com/shuji-bonji/s1000d-stack/issues/24) | core 0.19.0 と reader-mcp 0.17.0 で直した（公開はまだ） |
+| F-4 | 配布物の中に同じ版の `xml_schema_flat/` が複数あるときの選び方を決める | よらない | [#25](https://github.com/shuji-bonji/s1000d-stack/issues/25) | core 0.19.0 で、写しをまとめる所まで直した。同じ版で中身の違う XSD の優先順は未決 |
+| F-5 | Issue 4.1 への対応 | Issue 4.1 | [#27](https://github.com/shuji-bonji/s1000d-stack/issues/27) | 対象にすると決定。未着手 |
+| F-5 | Issue 4.0 系への対応 | Issue 4.0 | [#28](https://github.com/shuji-bonji/s1000d-stack/issues/28) | 対象にすると決定。未着手 |
 
 ## F-1 Issue 4.2 に無い要素を、writer が組み立てる前に知らせる
 

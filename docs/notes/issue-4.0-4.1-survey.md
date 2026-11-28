@@ -24,6 +24,23 @@ flowchart LR
 
 版をさかのぼるほど、Issue 7 との違いが大きくなります。Issue 4.1 は Issue 4.2 に近く、Issue 4.0 は別の扱いが要ります。
 
+## その後（2026-11-28）
+
+利用者が、Issue 4.1 と Issue 4.0 系をどちらも対象にすると決めました（DECISIONS の D-42）。Issue は [#27](https://github.com/shuji-bonji/s1000d-stack/issues/27)（Issue 4.1）と [#28](https://github.com/shuji-bonji/s1000d-stack/issues/28)（Issue 4.0 系）です。
+
+下の「見つかった問題（版によらないもの）」の 3 つは、s1000d-core 0.19.0 で直しました（[#23](https://github.com/shuji-bonji/s1000d-stack/issues/23)・[#24](https://github.com/shuji-bonji/s1000d-stack/issues/24)・[#25](https://github.com/shuji-bonji/s1000d-stack/issues/25)）。直した core を直接呼んで測り直した結果です（`scripts/experiments/core-survey.mjs`。BOM を取り除いた写しではなく、配布物のファイルをそのまま読ませた）。
+
+| 版 | XML | BOM で始まる | 読めない文書 | XSD で `valid` | 落としたテキスト節点 | 使われた XSD |
+|---|---|---|---|---|---|---|
+| Issue 4.0 | 195 | 126 | 0 | 194（残りの 1 件は版の書かれていない `SMC-…`） | 0（1,692 個のうち） | 193 件は XML Schema Package（`4.0`）、1 件は Patch 4.0.1（`4.0.1`） |
+| Issue 4.1 | 103 | 1 | 0 | 103 | 0（1,495 個のうち） | Patch 4.1.A（`4.1`） |
+| Issue 4.2 | 105 | 0 | 0 | 105 | 0（1,458 個のうち） | XML Schema Package（`4.2`） |
+| Issue 7 | 118 | 0 | 0 | 118 | 0（1,587 個のうち） | XML Schema Package（`7`） |
+
+- 見つかる XSD のフォルダーは、Issue 4.0 が 3 つ（`4.0`・`4.0.1`・`4.0.2`。データ辞書の中の写しは、XML Schema Package と中身が同じなので 1 つにまとまる）、Issue 4.1 が 3 つ（どれも `4.1` で、中身が違う）になりました。
+- Issue 4.1 の 3 つ（Patch 4.1.A、直下の `xml_schema_flat`、XML Schema Package の `Schemas`）は、版が同じで中身が違います。名前の順で先に見つかる Patch 4.1.A が使われ、ほかの 2 つは `locateXsd` の `otherCandidates` に入ります。どれを優先するかは、まだ決めていません（#25 に残した）。
+- MCP の応答に反映されるのは、MCP が読み込む core を 0.19.0 に上げた後です。下の節の数は、直す前（core 0.18.0）のものです。
+
 ## 見つかった問題（版によらないもの）
 
 Issue 4.0・4.1 のサンプルで表に出ましたが、どの版の CSDB でも起きます。
@@ -169,6 +186,9 @@ Issue 4.0 では、内容部の先頭に適用性の文の一覧（`referencedAp
 - core 0.19.0 の `findDefaultBrex`（同じ DMC のいちばん新しい版を返す）で測り直した数。MCP が読み込んでいる core は 0.18.0 なので、`brex` を省いた `explain_brex` は、Issue 4.1 で `009-00` を使いました。core 0.19.0 の関数を直接呼ぶと、Issue 4.1 では `013-00`、Issue 4.0 では `S1000D-A-…` の `005-00` を返します。Issue 4.0 の `006-00` は DMC が違う（システム差異コードが `D`）ので、比べる対象になりません。
 
 ## U-14 を決めるための材料
+
+> [!NOTE]
+> 2026-11-28 に、Issue 4.1 と Issue 4.0 系をどちらも対象にすると決まりました（D-42）。下の表の作業は、#27 と #28 に移しました。
 
 | 版 | 読む・検証する側で要ること | 作る側で要ること |
 |---|---|---|

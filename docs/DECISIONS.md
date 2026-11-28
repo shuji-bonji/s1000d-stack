@@ -231,10 +231,19 @@ D-36 の設計（[design/site-reference.md](./design/site-reference.md)）の決
 
 - **読む・検証する側**: コードを変えずに Issue 4.2 の Bike Sample Data Set を扱えたので、版ごとに読み取りを分けない（[design/reader-mcp.md](./design/reader-mcp.md) の「Issue 4.2 と IMF」の問いへの答え）。
 - **作る側**: 最低限の変更にとどめる。`buildDataModule`・`buildComment` に対象とする版（`options.issue`）を足し、`xsi:noNamespaceSchemaLocation` の版だけを切り替える。writer-mcp は `build_data_module`・`convert_manual`・`create_comment` の引数 `issue` で受ける。省いたときは Issue 7 のまま。
-- **Issue 4.2 に無い要素**（`hazards`・`safetyInformation`・`infoNameVariant`・`controlAuthority` など）: 今回は扱わず、別の Issue にする。それまでは、Issue 4.2 の XSD の検証で `invalid` になることで分かる。
+- **Issue 4.2 に無い要素**（`hazards`・`safetyInformation`・`infoNameVariant`・`controlAuthority` など）: 今回は扱わず、別の Issue にする（[#26](https://github.com/shuji-bonji/s1000d-stack/issues/26)）。それまでは、Issue 4.2 の XSD の検証で `invalid` になることで分かる。
 - **既定 BREX の探索**: `findDefaultBrex` は、同じ DMC の既定 BREX が版を変えて複数あるとき、発行番号のいちばん大きいものを返す。`brexDmRef` をたどる側とそろえるため。DMC の違う既定 BREX の間では比べない。
-- **Issue 4.0・4.1**: 配布物で動かして材料を集める（[notes/issue-4.0-4.1-survey.md](./notes/issue-4.0-4.1-survey.md)）。どこまで対応するかは U-14。
-- **実装**: s1000d-core 0.19.0、s1000d-writer-mcp 0.10.0。分けて起こす Issue の下書きは [notes/issue-14-followups.md](./notes/issue-14-followups.md)。
+- **Issue 4.0・4.1**: 配布物で動かして材料を集める（[notes/issue-4.0-4.1-survey.md](./notes/issue-4.0-4.1-survey.md)）。どこまで対応するかは U-14（D-42 で解決）。
+- **実装**: s1000d-core 0.19.0、s1000d-writer-mcp 0.10.0。分けた Issue は #23〜#28（下書きは [notes/issue-14-followups.md](./notes/issue-14-followups.md)）。
+
+### D-42 Issue 4.1 と Issue 4.0 系を、どちらも対象にする（2026-11-28）
+
+2026-11-28 20:35 に、利用者が決めた。U-14 を解決する。材料は [notes/issue-4.0-4.1-survey.md](./notes/issue-4.0-4.1-survey.md)。
+
+- **Issue 4.1**: 対象にする。Issue 4.2 に近く、版によらない問題を直した後は、読む側と検証する側が Issue 4.2 と同じ水準になる。残る作業は Issue [#27](https://github.com/shuji-bonji/s1000d-stack/issues/27)（テストへの数の追加、プロセス DM の `dmNode` の題名、乗員の手順の要素の確認）。
+- **Issue 4.0 系（4.0・4.0.1・4.0.2）**: 対象にする。BREX の `allowedObjectFlag` の型が 2 値で、ルールの識別子が無いので、BREX の読み取りを版で読み分ける必要がある。先に仕様書の Chap 4.10.2 で意味を確かめる。作る側まで対応するかは、Issue [#28](https://github.com/shuji-bonji/s1000d-stack/issues/28) の中で決める。
+- **版によらない問題**: 同じ日に直した（s1000d-core 0.19.0、s1000d-reader-mcp 0.17.0）。BOM で始まる XML を読む（[#23](https://github.com/shuji-bonji/s1000d-stack/issues/23)）。内容部の先頭の参照の一覧を `refs` として返す（[#24](https://github.com/shuji-bonji/s1000d-stack/issues/24)）。中身が同じ XSD の写しを 1 つにまとめ、見つける順を名前の順に固定する（[#25](https://github.com/shuji-bonji/s1000d-stack/issues/25)）。
+- **決めていないこと**: 同じ版で中身の違う XSD（配布物の XSD とパッチの XSD）のどれを優先するか（#25）。Issue 4.0 系で作る側まで対応するか（#28）。
 
 ## 未決事項
 
@@ -254,6 +263,6 @@ D-36 の設計（[design/site-reference.md](./design/site-reference.md)）の決
 | U-11 | サイトの S1000D リファレンスに、既定 BREX と XSD の値のコードをまとめて載せてよいか（90 属性、`objectValue` 1,443 件） | D-03 の利用条件は、再配布と翻訳・翻案を認めていない。値のコード・ルール ID・章の番号は事実の記載だが、まとめて載せることが利用条件に触れないかは確かめていない。法律の専門家の領分で、設計では決められない。決まるまでは、自分の言葉の説明を書いた属性のページだけを公開する（[design/site-reference.md](./design/site-reference.md) の SR-3） |
 | U-12 | このプロジェクトの主題を、「CSDB 製品への組み込み」（D-19。D-29 は ROADMAP の「目指すもの」でこれを主にすると書いた）のままにするか、「LLM が S1000D を正しく扱うための処理系」にして、組み込みはその使い道の 1 つにするか | D-19 の後、他社の CSDB 製品への組み込みを目的として挙げた記録は無い。2026-10-30 に「目的は技術マニュアル作成などで、そのついでに S1000D を LLM が正確に扱えるよう MCP を作っている」、2026-11-14 に「その後は IETM・IETP システムを作成する方向」と利用者が述べている。組み込んだ実例はまだ無い。決まれば、ROADMAP の「目指すもの」の順と、README・サイトの最初の説明を合わせる |
 | U-13 | 段階 6 の OSS の CSDB を、s1000d-stack の部品（`lib/` や `app/`）にするか、別プロジェクトにするか（D-40） | D-29 では製品を別プロジェクトに分けた。CSDB は利用者が直接使う製品でもあり、IETM / IETP の製品の土台でもある。段階 5 が終わり、段階 6 の設計文書を書き始めるときに決める |
-| U-14 | Issue 4.0・4.1 にどこまで対応するか | 2026-11-28 に配布物で実測した（[notes/issue-4.0-4.1-survey.md](./notes/issue-4.0-4.1-survey.md)）。Issue 4.1 は、版によらない 2 点（BOM で始まる XML、`content/refs` の題名）を直せば、読む側が Issue 4.2 と同じ水準になる。Issue 4.0 は、BREX の `allowedObjectFlag` の型が 2 値で、ルールの識別子が無く、いまの照合の結果は使えない。作る側は、Issue 4.1 でプロセス DM、Issue 4.0 で PM・コメント・DML・プロセス・ACT が通らない。MRJ の供給企業に求められたのは Issue 4.0.1。対象に入れる版と、作る側まで対応するかを決める |
+| ~~U-14~~ | Issue 4.0・4.1 にどこまで対応するか | **解決（2026-11-28）**: どちらも対象にする（D-42）。Issue 4.1 は #27、Issue 4.0 系は #28。以下は経過。2026-11-28 に配布物で実測した（[notes/issue-4.0-4.1-survey.md](./notes/issue-4.0-4.1-survey.md)）。Issue 4.1 は、版によらない 2 点（BOM で始まる XML、`content/refs` の題名）を直せば、読む側が Issue 4.2 と同じ水準になる。Issue 4.0 は、BREX の `allowedObjectFlag` の型が 2 値で、ルールの識別子が無く、いまの照合の結果は使えない。作る側は、Issue 4.1 でプロセス DM、Issue 4.0 で PM・コメント・DML・プロセス・ACT が通らない。MRJ の供給企業に求められたのは Issue 4.0.1。対象に入れる版と、作る側まで対応するかを決める |
 
 U-08 の判断材料と比較結果は、[notes/u08-xsd-validation.md](./notes/u08-xsd-validation.md) にあります。

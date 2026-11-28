@@ -40,7 +40,7 @@ function textCoverage(xml) {
   if (!content.structured) return undefined;
   const { document } = core.defaultXmlEngine.parse(xml);
   const haystack = norm(
-    JSON.stringify([content.blocks, core.readApplicStatements(document)], (k, v) =>
+    JSON.stringify([content.blocks, content.refs, core.readApplicStatements(document)], (k, v) =>
       k === 'location' ? undefined : v,
     )
       .replace(/\\"/g, '"')
