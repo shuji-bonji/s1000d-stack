@@ -87,7 +87,7 @@ Issue 7 を基準に作っています。Issue 4.2・4.1・4.0 系（4.0・4.0.1
 - **読む**: 4 つの版のどのサンプルでも、本文を構造として読むデータモジュール（説明・手順・プロセス・故障探求）のテキストを、1 つも落とさずに読めます。
 - **検証する**: XSD と既定 BREX は、`S1000D_SPEC_DIR` に置いた配布物から探します。データモジュールと同じ版の配布物を指定してください。
 - **作る**: その版の XSD に置けないと分かっているものが下書きにあるときは、その要素を省いて組み立てることはせず、`input-error` と下書きの中の位置を返します。
-- **管理された内容の印**（`authorityName`・`authorityDocument`）は、Issue 4.0〜4.2 の属性です。下書きの節点の `authority` で書けます。Issue 7 では `controlAuthority` に置き換わっていて、こちらはまだ読み書きできません。
+- **管理された内容の印**（`authorityName`・`authorityDocument`）は、Issue 4.0〜4.2 の属性です。下書きの節点の `authority` で書けます。Issue 7 では `controlAuthority` に置き換わっています。Issue 7 向けには、下書きの `controlAuthorities` に機関を定義し、節点の `controlAuthorityRefs` でその id を指します。機関の種別（`controlAuthorityType`）の意味はプロジェクトが決めるので、サーバーは選びません。
 - Issue 4.0 の既定 BREX には、ルールの識別子がありません。違反は報告されますが、ルールの番号は付きません。
 - Issue 5.0 と Issue 6 では、まだ動かしていません。S1000D リファレンスのページは、Issue 7 だけを扱っています。
 

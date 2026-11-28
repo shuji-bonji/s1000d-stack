@@ -87,7 +87,7 @@ The stack is built on Issue 7. It has also been run against the distributions of
 - **Reading**: in the samples of all four issues, no text is lost from the data modules whose content is read as structure (descriptive, procedural, process and fault isolation).
 - **Verifying**: the XSD files and the default BREX are found in the distribution under `S1000D_SPEC_DIR`. Point it at the distribution of the same issue as the data modules.
 - **Creating**: when a draft contains something that is known not to fit the XSD of the target issue, the server does not leave it out; it returns `input-error` with the place in the draft.
-- **The mark for controlled content** (`authorityName` and `authorityDocument`) exists in Issue 4.0 to 4.2. It is written from `authority` on a node of the draft. Issue 7 replaced it with `controlAuthority`, which the stack does not read or write yet.
+- **The mark for controlled content** (`authorityName` and `authorityDocument`) exists in Issue 4.0 to 4.2. It is written from `authority` on a node of the draft. Issue 7 replaced it with `controlAuthority`: for Issue 7, define the authorities in `controlAuthorities` of the draft and refer to their ids with `controlAuthorityRefs` on the nodes. The meaning of the authority type (`controlAuthorityType`) is set by the project, so the server does not choose it.
 - The rules of the Issue 4.0 default BREX have no identifiers. Violations are reported, but without a rule number.
 - The stack has not been run against Issue 5.0 or Issue 6. The S1000D reference pages cover Issue 7 only.
 
