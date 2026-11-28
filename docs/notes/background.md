@@ -100,6 +100,35 @@ MCP が探すべきもの:
 - 使える NOTATION の一覧: `notations/notations.xml`
 - 要素の定義（`explain_brex` で要素の説明を補うときの候補）: `data_dictionary_7/Files/`
 
+## 仕様書の展開後のファイル構成（Issue 4.2）
+
+2026-11-28 に `s1000d-stack/specs/s1000d/issue-4.2/` へ展開して記録したものです（パスとファイル名だけ。内容は写していません）。Issue 4.2 の配布物でいまの MCP を動かした結果は、[issue-4.2-survey.md](./issue-4.2-survey.md) にあります。
+
+配布 zip（`S1000D Issue 4.2.zip`、約 58 MB）は、Issue 7 と作りが違います。直下に仕様書本体の PDF があり、その横に題名ごとのフォルダーが 11 個あります。フォルダーの中に、zip が 1 本入っているものと、ファイルがそのまま入っているものがあります。ここでは、フォルダー名を小文字ハイフン区切りに直し、内側の zip をその中に展開しました。
+
+| 展開先 | 元のフォルダー | 中身（ファイル数） |
+|---|---|---|
+| `S1000D_Issue_4.2.pdf` | （直下） | 仕様書本体 |
+| `default-brex-data-module/` | Default BREX Data Module | `DMC-S1000D-F-04-10-0301-00A-022A-D_001-00_EN-US.XML` と同名の `.html`、`.doc` 1 つ（3） |
+| `xml-schema-package/` | XML Schema Package | `xml_schema_flat/*.xsd`（32）、`xml_schema_cat/`（`catalog.xml`・`catalog.xsd`）、`ent/`、`lom_schema/`（69）。`notations/` は無い。フォルダーには、同じ中身の zip（`S1000D_4.2_Schemas.zip`）と展開済みのファイルの両方が入っていて、69 個とも 1 バイトも違わない |
+| `bike-sample-data-set/Bike Data Set for Issue 4.2/` | Bike Sample Data Set | DMC 95（`S1000DBIKE` 73、`S1000DLIGHTING` 18、`BRAKE` 4）、PMC 4、DML 1、DDN 1、UPF 1、IMF 1、DME 2、ICN 50（CGM 41、JPG 6、PNG 2、GIF 1）（155） |
+| `patches/Patch 4.2.A/` | Patches | PDF 3 本（3） |
+| `patches/Patch 4.2.B/` | Patches | PDF 1 本、`S1000D_4.2.B_patch/`（既定 BREX の `002-00` の `.XML` と `.html`、画像 1 つ）、`Bike Data Set for Release number 4.2 no SWF/`（155。`bike-sample-data-set/` と 1 バイトも違わない）（159） |
+| `data-dictionary/data_dictionary_4-2/` | Data Dictionary | `Index.html`、`README.TXT`、`Files/` 以下に要素・属性の定義（xml 1,969、xsd 85、png 64 など）（2,152） |
+| `business-rule-template/` | Business Rule Template | ビジネスルール文書の雛形の `.XML`（DMC は `S1000D-E-…`）と `.pdf`（DMC は `S1000D-F-…`）（2） |
+| `business-rule-decision-point-index/` | Business Rule Decision Point Index | `Issue 4.2 Project Decision Points.xlsx`（1） |
+| `example-sns/` | Example SNS | `DMC-AE-A-08-03-0100`〜`1800-00A-040A-A` の PDF 18 本（18） |
+| `front-matter-sample-data-set/Front Matter Samples/` | Front Matter Sample Data Set | `.docx` 1 つと、zip 3 本（データモジュール・パブリケーションモジュール・図）。この 3 本は展開していない（4） |
+| `functionality-matrix/` | Functionality Matrix | `S1000D_4.2_FunctionalityMatrix.xls`（1） |
+| `unit-of-measure/Unit of Measure/` | Unit of Measure | `S1000DUnits.xml`、`Units.xsd`、`Units.xsl`、`DocumentInfo.xsd`（4） |
+
+Issue 7 の配布物と違う点:
+
+- 既定 BREX が 2 つある（元の `001-00` と、Patch 4.2.B の `002-00`）。`S1000D_SPEC_DIR` の下に両方があると、ツールによって選ぶ版が分かれる（[issue-4.2-survey.md](./issue-4.2-survey.md) の「見つかった問題」）。
+- 既定 BREX のシステム差異コードは `F`（Issue 7 は `J`）。
+- XML Schema Package に `notations/notations.xml` が無い。
+- フォルダー名が Issue 7 と違う（`bike-samples` ではなく `bike-sample-data-set`、`default-brex` ではなく `default-brex-data-module` など）。MCP はフォルダー名を決め打ちにしていないので、そのまま見つかった。
+
 ## BREX の章（Issue 7 Chap 4.10.2〜4.10.3）の読解結果
 
 2026-10-23 に PDF の p.2110〜2143（Chap 4.10.2 BREX data module、4.10.2.1 SNS rules、4.10.2.2 Context related rules、4.10.2.3 Context independent rules、4.10.2.4 Coding BREX data modules、4.10.3 Default BREX data module）を読みました。関連する Chap 4.10.1（ビジネスルール文書）の `brSeverityLevel` の定義も確認しました。以下は照合処理の実装に必要な点の要約で、仕様書の記述そのものではありません。

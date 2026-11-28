@@ -236,7 +236,7 @@ D-36 の設計（[design/site-reference.md](./design/site-reference.md)）の決
 | ~~U-05~~ | 体験型マニュアルの製品名 | **解決（2026-11-14）**: Experiential Manual（作成ツールは Experiential Manual Editor、D-30）。以下は経過。一般の利用者向けの名前にする。試作の間は仮称 `manual-editor`（D-28）。D-29 で製品は別プロジェクトになったので、名前はそのプロジェクトで決め、決まったら player / editor / cli に同じ語を頭に付ける。IETM / IETP のプロジェクト名も別に決める |
 | ~~U-10~~ | 簡易 Web マニュアル（段階 4 の参照実装）の技術の選定 | **解決（2026-10-28）**: SvelteKit ＋ PWA（D-28）。作成ツールの試作も同じ |
 | ~~U-06~~ | Starlight の日本語検索の精度 | **解決（2026-10-24）**: 生成された Pagefind の索引を Node から検索して確認。単語（照合・券売機・適用性・識別・商標）は期待どおり。Pagefind は日本語を単語に分けて索引するため、「データモジュール」のような複合語をそのまま入れると同じつながりで現れたページ（1 件）だけが返り、「データ モジュール」と空けると 9 件になる。サイトの見出しに主要な複合語をそのまま書くことで補う |
-| U-07 | Issue 4.2 に対応する時期 | 段階 2 で reader を作るときに判断する。Issue 4.2 以降の ICN メタデータファイル（IMF）を reader の対象に含めるかも一緒に判断する |
+| U-07 | Issue 4.2 に対応する時期 | 段階 2 で reader を作るときに判断する。Issue 4.2 以降の ICN メタデータファイル（IMF）を reader の対象に含めるかも一緒に判断する。**材料（2026-11-28）**: Issue 4.2 の配布物を展開し、いまの brex・verify・reader を Bike Sample Data Set にそのままかけた。XSD の検証は 105 件とも `valid`、本文を構造として読む 58 件でテキスト節点を 1 つも落とさず、例外で止まった呼び出しは無い。Issue 7 向けに作った DM は、スキーマの URL を替えるだけで Issue 4.2 の XSD に通った（[notes/issue-4.2-survey.md](./notes/issue-4.2-survey.md)）。残っているのは、作る側まで対応するかと、4.0・4.1 も見るかの判断 |
 | ~~U-08~~ | XSD 検証の方式（段階 2）。XML の読み取りと XPath は D-12 で決定済み | **解決（2026-10-24）**: `libxml2-wasm` に確定（D-15）。根拠は [notes/u08-xsd-validation.md](./notes/u08-xsd-validation.md) の「U-08 の判断材料」と「U-08 の比較結果（2026-10-24）」 |
 | ~~U-10~~ | s1000d-core の npm 公開の時期 | **解決（2026-10-24）**: brex-mcp の CI が `file:` 依存を解決できず落ちたため、core を先に `0.1.0` として npm に公開し、GitHub も Public にした。brex-mcp の依存は `^0.1.0`。hub と brex-mcp の公開（U-01）は従来どおり段階 1 が揃った時点で判断する |
 | ~~U-09~~ | Skill のリポジトリ名の規則 | **解決（2026-10-28）**: `shuji-bonji/<名前>-skill`、plugin 名は `<名前>`（D-28） |
